@@ -1,0 +1,7 @@
+PMM Sucker Multiplatform Daemon
+Juan V. Guerrero
+fn(x) Software
+
+Requirements
+* libcurl runtime and header files version 7.21.x
+* jsoncpp 

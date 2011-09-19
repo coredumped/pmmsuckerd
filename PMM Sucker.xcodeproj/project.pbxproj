@@ -7,28 +7,59 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
+		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
 		82F86B301425A457006ACFEB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F86B2F1425A457006ACFEB /* Cocoa.framework */; };
 		82F86B3A1425A458006ACFEB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B381425A458006ACFEB /* InfoPlist.strings */; };
 		82F86B3C1425A458006ACFEB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B3B1425A458006ACFEB /* main.m */; };
 		82F86B401425A458006ACFEB /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B3E1425A458006ACFEB /* Credits.rtf */; };
 		82F86B431425A458006ACFEB /* PMMSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B421425A458006ACFEB /* PMMSAppDelegate.m */; };
 		82F86B461425A458006ACFEB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B441425A458006ACFEB /* MainMenu.xib */; };
+		82F86B4D1425A54F006ACFEB /* PushMeMailIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B4C1425A54F006ACFEB /* PushMeMailIcon.png */; };
+		82F86B501425A634006ACFEB /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F86B4F1425A634006ACFEB /* libetpan.framework */; };
+		82F86B591425A810006ACFEB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B581425A810006ACFEB /* main.cpp */; };
+		82F86B5B1425A810006ACFEB /* pmmsuckerd.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82F86B5A1425A810006ACFEB /* pmmsuckerd.1 */; };
+		82F86B601425B0AD006ACFEB /* README in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B5F1425B0AD006ACFEB /* README */; };
+		82F86B641425B618006ACFEB /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		82F86B531425A810006ACFEB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				82F86B5B1425A810006ACFEB /* pmmsuckerd.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
 		82F86B2B1425A457006ACFEB /* PMM Sucker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PMM Sucker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		82F86B2F1425A457006ACFEB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		82F86B321425A458006ACFEB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		82F86B331425A458006ACFEB /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		82F86B341425A458006ACFEB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		82F86B371425A458006ACFEB /* PMM Sucker-Info.plist */ = {isa = PBXFileReference; path = "PMM Sucker-Info.plist"; sourceTree = "<group>"; };
+		82F86B371425A458006ACFEB /* PMM Sucker-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PMM Sucker-Info.plist"; sourceTree = "<group>"; };
 		82F86B391425A458006ACFEB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		82F86B3B1425A458006ACFEB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		82F86B3D1425A458006ACFEB /* PMM Sucker-Prefix.pch */ = {isa = PBXFileReference; path = "PMM Sucker-Prefix.pch"; sourceTree = "<group>"; };
+		82F86B3D1425A458006ACFEB /* PMM Sucker-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PMM Sucker-Prefix.pch"; sourceTree = "<group>"; };
 		82F86B3F1425A458006ACFEB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		82F86B411425A458006ACFEB /* PMMSAppDelegate.h */ = {isa = PBXFileReference; path = PMMSAppDelegate.h; sourceTree = "<group>"; };
+		82F86B411425A458006ACFEB /* PMMSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMMSAppDelegate.h; sourceTree = "<group>"; };
 		82F86B421425A458006ACFEB /* PMMSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PMMSAppDelegate.m; sourceTree = "<group>"; };
 		82F86B451425A458006ACFEB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		82F86B4C1425A54F006ACFEB /* PushMeMailIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PushMeMailIcon.png; sourceTree = "<group>"; };
+		82F86B4E1425A577006ACFEB /* PMM Sucker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PMM Sucker.entitlements"; sourceTree = "<group>"; };
+		82F86B4F1425A634006ACFEB /* libetpan.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libetpan.framework; path = "../../Xcode-Output/Release/libetpan.framework"; sourceTree = "<group>"; };
+		82F86B551425A810006ACFEB /* pmmsuckerd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pmmsuckerd; sourceTree = BUILT_PRODUCTS_DIR; };
+		82F86B581425A810006ACFEB /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		82F86B5A1425A810006ACFEB /* pmmsuckerd.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = pmmsuckerd.1; sourceTree = "<group>"; };
+		82F86B5F1425B0AD006ACFEB /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		82F86B621425B54B006ACFEB /* PMMSuckerSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMMSuckerSession.h; sourceTree = "<group>"; };
+		82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMMSuckerSession.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,7 +67,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82F86B501425A634006ACFEB /* libetpan.framework in Frameworks */,
 				82F86B301425A457006ACFEB /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82F86B521425A810006ACFEB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,7 +86,12 @@
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				82AA9FCC1426B22000E3FB3C /* libcurl.dylib */,
+				82F86B611425B500006ACFEB /* SuckingEngine */,
+				82F86B4F1425A634006ACFEB /* libetpan.framework */,
+				82F86B4C1425A54F006ACFEB /* PushMeMailIcon.png */,
 				82F86B351425A458006ACFEB /* PMM Sucker */,
+				82F86B571425A810006ACFEB /* pmmsuckerd */,
 				82F86B2E1425A457006ACFEB /* Frameworks */,
 				82F86B2C1425A457006ACFEB /* Products */,
 			);
@@ -56,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				82F86B2B1425A457006ACFEB /* PMM Sucker.app */,
+				82F86B551425A810006ACFEB /* pmmsuckerd */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -82,6 +128,7 @@
 		82F86B351425A458006ACFEB /* PMM Sucker */ = {
 			isa = PBXGroup;
 			children = (
+				82F86B4E1425A577006ACFEB /* PMM Sucker.entitlements */,
 				82F86B411425A458006ACFEB /* PMMSAppDelegate.h */,
 				82F86B421425A458006ACFEB /* PMMSAppDelegate.m */,
 				82F86B441425A458006ACFEB /* MainMenu.xib */,
@@ -100,6 +147,25 @@
 				82F86B3E1425A458006ACFEB /* Credits.rtf */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		82F86B571425A810006ACFEB /* pmmsuckerd */ = {
+			isa = PBXGroup;
+			children = (
+				82F86B581425A810006ACFEB /* main.cpp */,
+				82F86B5A1425A810006ACFEB /* pmmsuckerd.1 */,
+				82F86B5F1425B0AD006ACFEB /* README */,
+			);
+			path = pmmsuckerd;
+			sourceTree = "<group>";
+		};
+		82F86B611425B500006ACFEB /* SuckingEngine */ = {
+			isa = PBXGroup;
+			children = (
+				82F86B621425B54B006ACFEB /* PMMSuckerSession.h */,
+				82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */,
+			);
+			name = SuckingEngine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -122,6 +188,23 @@
 			productReference = 82F86B2B1425A457006ACFEB /* PMM Sucker.app */;
 			productType = "com.apple.product-type.application";
 		};
+		82F86B541425A810006ACFEB /* pmmsuckerd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82F86B5C1425A810006ACFEB /* Build configuration list for PBXNativeTarget "pmmsuckerd" */;
+			buildPhases = (
+				82F86B511425A810006ACFEB /* Sources */,
+				82F86B521425A810006ACFEB /* Frameworks */,
+				82F86B531425A810006ACFEB /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = pmmsuckerd;
+			productName = pmmsuckerd;
+			productReference = 82F86B551425A810006ACFEB /* pmmsuckerd */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -143,6 +226,7 @@
 			projectRoot = "";
 			targets = (
 				82F86B2A1425A457006ACFEB /* PMM Sucker */,
+				82F86B541425A810006ACFEB /* pmmsuckerd */,
 			);
 		};
 /* End PBXProject section */
@@ -155,6 +239,8 @@
 				82F86B3A1425A458006ACFEB /* InfoPlist.strings in Resources */,
 				82F86B401425A458006ACFEB /* Credits.rtf in Resources */,
 				82F86B461425A458006ACFEB /* MainMenu.xib in Resources */,
+				82F86B4D1425A54F006ACFEB /* PushMeMailIcon.png in Resources */,
+				82F86B601425B0AD006ACFEB /* README in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +253,16 @@
 			files = (
 				82F86B3C1425A458006ACFEB /* main.m in Sources */,
 				82F86B431425A458006ACFEB /* PMMSAppDelegate.m in Sources */,
+				82F86B641425B618006ACFEB /* PMMSuckerSession.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82F86B511425A810006ACFEB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */,
+				82F86B591425A810006ACFEB /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +346,7 @@
 		82F86B4A1425A458006ACFEB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "PMM Sucker/PMM Sucker.entitlements";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PMM Sucker/PMM Sucker-Prefix.pch";
 				INFOPLIST_FILE = "PMM Sucker/PMM Sucker-Info.plist";
@@ -261,11 +358,26 @@
 		82F86B4B1425A458006ACFEB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "PMM Sucker/PMM Sucker.entitlements";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PMM Sucker/PMM Sucker-Prefix.pch";
 				INFOPLIST_FILE = "PMM Sucker/PMM Sucker-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		82F86B5D1425A810006ACFEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		82F86B5E1425A810006ACFEB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -288,6 +400,16 @@
 				82F86B4B1425A458006ACFEB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		82F86B5C1425A810006ACFEB /* Build configuration list for PBXNativeTarget "pmmsuckerd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				82F86B5D1425A810006ACFEB /* Debug */,
+				82F86B5E1425A810006ACFEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
