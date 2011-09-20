@@ -10,6 +10,7 @@
 #ifndef DEFAULT_PMM_SERVICE_URL
 #define DEFAULT_PMM_SERVICE_URL "https://pmmservice.appspot.com/pmmsuckerd"
 #endif
+#include "PMMSuckerSession.h"
 
 int main (int argc, const char * argv[])
 {
@@ -21,6 +22,8 @@ int main (int argc, const char * argv[])
 		}
 	}
 	//Register to PMMService...
+	pmm::SuckerSession session;
+	session.register2PMM();
     return 0;
 }
 

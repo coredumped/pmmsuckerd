@@ -11,6 +11,19 @@
 #include<string>
 
 namespace pmm {
+	class HTTPException {
+		private:
+		int code;
+		std::string msg;
+		public:
+		HTTPException(){ }
+		HTTPException(int _code, const std::string &_msg){ 
+			code = _code;
+			msg = _msg;
+		}
+		int errorCode(){ return code; }
+		std::string errorMessage(){ return std::string(msg); }
+	};
 	class SuckerSession {
 	private:
 		std::string pmmServiceURL;

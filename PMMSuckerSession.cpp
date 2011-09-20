@@ -65,7 +65,8 @@ namespace pmm {
 #ifdef __APPLE__ 
 		//Try to retrieve value from system
 		SecAccessRef access = nil;
-		CFStringRef accessLabel = CFStringCreateWithCStringNoCopy(NULL, DEFAULT_SECURITY_ACCESS_LABEL, kCFStringEncodingUTF8, kCFAllocatorNull);
+		//CFStringRef accessLabel = CFStringCreateWithCStringNoCopy(NULL, DEFAULT_SECURITY_ACCESS_LABEL, kCFStringEncodingUTF8, kCFAllocatorNull);
+		CFStringRef accessLabel = CFSTR(DEFAULT_SECURITY_ACCESS_LABEL);
 		SecTrustedApplicationRef myself;
 		OSStatus err = SecTrustedApplicationCreateFromPath(NULL, &myself);
 #warning TODO: verify and report issues regarding the err variable status		
@@ -84,14 +85,16 @@ namespace pmm {
 			//Create UUID
 			CFUUIDRef cfuuid = CFUUIDCreate(NULL);
 			CFStringRef cfuuid_s = CFUUIDCreateString(NULL, cfuuid);
-			suckerID.assign((char *)CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingUTF8), CFStringGetLength(cfuuid_s));
+			//char cfuuid_buf [CFStringGetLength(cfuuid_s)];
+			suckerID = "";
+			suckerID.assign((char *)CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman), CFStringGetLength(cfuuid_s));
 			//Store it in keychain
-			SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
-										  strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
-										  (UInt32)CFStringGetLength(cfuuid_s), (void *)CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingUTF8), &item);
-			SecKeychainItemSetAccess(item, access);
+			err = SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
+												strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
+												(UInt32)CFStringGetLength(cfuuid_s), (void *)CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman), &item);
+			if(item) SecKeychainItemSetAccess(item, access);
 #ifdef DEBUG
-			std::cerr << "Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingUTF8) << std::endl;
+			std::cerr << "Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman) << std::endl;
 #endif
 			CFRelease(cfuuid_s);
 			CFRelease(cfuuid);
@@ -160,6 +163,7 @@ namespace pmm {
 			if (size == 0) {
 				buffer = (char *)malloc(dataSize);
 				if (buffer == NULL) return NULL;
+				memcpy(buffer, (const void *)data, size);
 				size = dataSize;
 			}
 			else {
@@ -200,8 +204,33 @@ namespace pmm {
 		}
 		curl_easy_setopt(www, CURLOPT_POSTFIELDSIZE, encodedPost.str().size());
 		curl_easy_setopt(www, CURLOPT_POSTFIELDS, encodedPost.str().c_str());
-		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
 		curl_easy_setopt(www, CURLOPT_WRITEDATA, buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+	}
+	
+	static void executePost(std::map<std::string, std::string> &postData, std::string &output, CURL *wwwx = NULL, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
+		CURL *www;
+		char errorBuffer[CURL_ERROR_SIZE + 4096];
+		if (wwwx == NULL) www = curl_easy_init();
+		else www = wwwx;
+		DataBuffer serverOutput;
+		preparePostRequest(www, postData, &serverOutput);
+		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+		CURLcode ret = curl_easy_perform(www);
+		if(ret == CURLE_OK){
+			output.assign(serverOutput.buffer, serverOutput.size);
+		}
+		else {
+#ifdef DEBUG
+			std::cerr << "DEBUG: Unable to execute POST request to " << dest_url << ": " << errorBuffer << std::endl;
+#endif
+			int http_errcode; 
+			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
+			if(wwwx == NULL) curl_easy_cleanup(www);
+			throw HTTPException(http_errcode, errorBuffer);
+		}
+		if(wwwx == NULL) curl_easy_cleanup(www);
 	}
 	
 	SuckerSession::SuckerSession() {
@@ -215,19 +244,17 @@ namespace pmm {
 	}
 	
 	bool SuckerSession::register2PMM(){
-		CURL *www = curl_easy_init();
-		DataBuffer dataBuffer;
-		char errorBuffer[CURL_ERROR_SIZE];
+		if(this->myID.size() == 0) suckerIdGet(this->myID);
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
-		suckerIdGet(params["suckerID"]);
-		preparePostRequest(www, params, &dataBuffer);
-		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
-		curl_easy_perform(www);
+		params["suckerID"] = this->myID;
+#ifdef DEBUG
+		std::cerr << "DEBUG: Registering with suckerID=" << this->myID << std::endl;
+#endif
+		std::string output;
+		executePost(params, output);
 		//Read and parse returned data
 		
-		
-		curl_easy_cleanup(www);
 		return true;
 	}
 }
