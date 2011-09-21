@@ -8,7 +8,7 @@
 
 #include <iostream>
 #ifndef DEFAULT_PMM_SERVICE_URL
-#define DEFAULT_PMM_SERVICE_URL "https://pmmservice.appspot.com/pmmsuckerd"
+#define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
 #endif
 #include "PMMSuckerSession.h"
 

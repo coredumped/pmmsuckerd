@@ -26,7 +26,8 @@
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
 #endif
 #ifndef DEFAULT_PMM_SERVICE_URL
-#define DEFAULT_PMM_SERVICE_URL "https://pmmservice.appspot.com/pmmsuckerd"
+#define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
+//#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
 #endif
 #ifndef DEFAULT_PMM_SUCKER_USER_AGENT
 #define DEFAULT_PMM_SUCKER_USER_AGENT "pmmsucker v=0.0.1"
@@ -85,8 +86,6 @@ namespace pmm {
 			//Create UUID
 			CFUUIDRef cfuuid = CFUUIDCreate(NULL);
 			CFStringRef cfuuid_s = CFUUIDCreateString(NULL, cfuuid);
-			//char cfuuid_buf [CFStringGetLength(cfuuid_s)];
-			suckerID = "";
 			suckerID.assign((char *)CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman), CFStringGetLength(cfuuid_s));
 			//Store it in keychain
 			err = SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
@@ -163,7 +162,7 @@ namespace pmm {
 			if (size == 0) {
 				buffer = (char *)malloc(dataSize);
 				if (buffer == NULL) return NULL;
-				memcpy(buffer, (const void *)data, size);
+				memcpy(buffer, data, dataSize);
 				size = dataSize;
 			}
 			else {
@@ -186,14 +185,17 @@ namespace pmm {
 	}
 
 	static void preparePostRequest(CURL *www, std::map<std::string, std::string> &postData, DataBuffer *buffer, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
-		std::stringstream encodedPost;
+
 		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
 		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
 		curl_easy_setopt(www, CURLOPT_POST, 1);
 		curl_easy_setopt(www, CURLOPT_URL, dest_url);
 		curl_easy_setopt(www, CURLOPT_USE_SSL, 1);
 		curl_easy_setopt(www, CURLOPT_USERAGENT, suckerUserAgent);
-		//Let's url encode the param map
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		std::stringstream encodedPost;
 		std::map<std::string, std::string>::iterator keypair;
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
@@ -202,11 +204,12 @@ namespace pmm {
 			if (encodedPost.str().size() == 0) encodedPost << param << "=" << value;
 			else encodedPost << "&" << param << "=" << value;
 		}
-		curl_easy_setopt(www, CURLOPT_POSTFIELDSIZE, encodedPost.str().size());
-		curl_easy_setopt(www, CURLOPT_POSTFIELDS, encodedPost.str().c_str());
-		curl_easy_setopt(www, CURLOPT_WRITEDATA, buffer);
-		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
-		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		//curl_easy_setopt(www, CURLOPT_POSTFIELDSIZE, encodedPost.str().size());
+		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
+#ifdef DEBUG
+		std::cerr << "Sending post data: " << encodedPost.str().c_str() << std::endl;
+#endif
+
 	}
 	
 	static void executePost(std::map<std::string, std::string> &postData, std::string &output, CURL *wwwx = NULL, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
@@ -216,10 +219,14 @@ namespace pmm {
 		else www = wwwx;
 		DataBuffer serverOutput;
 		preparePostRequest(www, postData, &serverOutput);
+		//Let's url encode the param map
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
 		CURLcode ret = curl_easy_perform(www);
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
+#ifdef DEBUG
+			std::cerr << "POST RESPONSE: " << output << std::endl;
+#endif
 		}
 		else {
 #ifdef DEBUG
@@ -248,13 +255,16 @@ namespace pmm {
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["suckerID"] = this->myID;
+		params["opType"] = "pmmSuckerReg";
 #ifdef DEBUG
-		std::cerr << "DEBUG: Registering with suckerID=" << this->myID << std::endl;
+		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
 #endif
 		std::string output;
 		executePost(params, output);
 		//Read and parse returned data
-		
+		if (output.find("OK") == 0) {
+			std::cout << "REGISTERED: " << output << std::endl;
+		}
 		return true;
 	}
 }
