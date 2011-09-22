@@ -21,6 +21,7 @@
 #include <sstream>
 #include <curl/curl.h>
 #include "PMMSuckerSession.h"
+#include "ServerResponse.h"
 
 #ifndef DEFAULT_API_KEY
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
@@ -262,9 +263,7 @@ namespace pmm {
 		std::string output;
 		executePost(params, output);
 		//Read and parse returned data
-		if (output.find("OK") == 0) {
-			std::cout << "REGISTERED: " << output << std::endl;
-		}
-		return true;
+		pmm::ServerResponse response(output);
+		return response.status;
 	}
 }

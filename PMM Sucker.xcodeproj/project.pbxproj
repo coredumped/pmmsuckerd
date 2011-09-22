@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		82708497142ADF7700D05386 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 82708495142ADF7700D05386 /* jsonxx.cc */; };
+		82708499142AE32A00D05386 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 82708495142ADF7700D05386 /* jsonxx.cc */; };
+		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
+		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
 		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
 		82F86B301425A457006ACFEB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F86B2F1425A457006ACFEB /* Cocoa.framework */; };
@@ -41,6 +47,12 @@
 /* Begin PBXFileReference section */
 		821675BB14283DA800F8FF70 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		8238F494142AF767007F76C0 /* JSONParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONParseException.h; sourceTree = "<group>"; };
+		8238F496142AFA3E007F76C0 /* JSONParseException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSONParseException.cpp; sourceTree = "<group>"; };
+		82708495142ADF7700D05386 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = ../../cxxLibraries/jsonxx/jsonxx.cc; sourceTree = "<group>"; };
+		82708496142ADF7700D05386 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = ../../cxxLibraries/jsonxx/jsonxx.h; sourceTree = "<group>"; };
+		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
+		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
 		82F86B2B1425A457006ACFEB /* PMM Sucker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PMM Sucker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		82F86B2F1425A457006ACFEB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -89,9 +101,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		82708493142ADF5E00D05386 /* jsonxx */ = {
+			isa = PBXGroup;
+			children = (
+				82708495142ADF7700D05386 /* jsonxx.cc */,
+				82708496142ADF7700D05386 /* jsonxx.h */,
+			);
+			name = jsonxx;
+			sourceTree = "<group>";
+		};
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				82708493142ADF5E00D05386 /* jsonxx */,
 				821675BE14283DDE00F8FF70 /* Security.framework */,
 				821675BB14283DA800F8FF70 /* CoreFoundation.framework */,
 				82AA9FCC1426B22000E3FB3C /* libcurl.dylib */,
@@ -172,6 +194,10 @@
 			children = (
 				82F86B621425B54B006ACFEB /* PMMSuckerSession.h */,
 				82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */,
+				82708498142AE23900D05386 /* ServerResponse.h */,
+				8270849A142AE34F00D05386 /* ServerResponse.cpp */,
+				8238F494142AF767007F76C0 /* JSONParseException.h */,
+				8238F496142AFA3E007F76C0 /* JSONParseException.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -262,6 +288,9 @@
 				82F86B3C1425A458006ACFEB /* main.m in Sources */,
 				82F86B431425A458006ACFEB /* PMMSAppDelegate.m in Sources */,
 				82F86B641425B618006ACFEB /* PMMSuckerSession.cpp in Sources */,
+				82708497142ADF7700D05386 /* jsonxx.cc in Sources */,
+				8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */,
+				8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +298,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */,
+				8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */,
+				82708499142AE32A00D05386 /* jsonxx.cc in Sources */,
 				82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */,
 				82F86B591425A810006ACFEB /* main.cpp in Sources */,
 			);
@@ -379,6 +411,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -386,6 +419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

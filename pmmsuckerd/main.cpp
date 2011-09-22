@@ -15,15 +15,23 @@
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
+	pmm::SuckerSession session;
 	for (int i = 1; 1 < argc; i++) {
 		std::string arg = argv[i];
 		if (arg.find("-h") == 0 && (i + 1) < argc) {
 			pmmServiceURL = argv[++i];
 		}
+		else if(arg.find("-reqMembership") == 0){
+			//session.reqMembership();
+		}
 	}
 	//Register to PMMService...
-	pmm::SuckerSession session;
-	session.register2PMM();
+	if(session.register2PMM()){
+		//Registration succeded, retrieve max
+#ifdef DEBUG
+		std::cout << "Initial registration succeded!!!" << std::endl;
+#endif
+	}
     return 0;
 }
 

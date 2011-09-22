@@ -3,7 +3,7 @@
 //  PMM Sucker
 //
 //  Created by Juan V. Guerrero on 9/17/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 fn(x) Software. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
