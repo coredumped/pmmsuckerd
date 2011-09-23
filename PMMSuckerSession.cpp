@@ -26,10 +26,6 @@
 #ifndef DEFAULT_API_KEY
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
 #endif
-#ifndef DEFAULT_PMM_SERVICE_URL
-#define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
-//#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
-#endif
 #ifndef DEFAULT_PMM_SUCKER_USER_AGENT
 #define DEFAULT_PMM_SUCKER_USER_AGENT "pmmsucker v=0.0.1"
 #endif
@@ -61,6 +57,11 @@
 namespace pmm {
 	
 	static const char *suckerUserAgent = DEFAULT_PMM_SUCKER_USER_AGENT;
+	
+	namespace OperationTypes {
+		static const char *register2PMM = "pmmSuckerReg";
+		static const char *ask4Membership = "opTypePMMSuckerAsk4Membership";
+	};
 	
 	static void suckerIdGet(std::string &suckerID){
 		std::stringstream sId;
@@ -256,7 +257,27 @@ namespace pmm {
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["suckerID"] = this->myID;
-		params["opType"] = "pmmSuckerReg";
+		params["opType"] = pmm::OperationTypes::register2PMM;
+#ifdef DEBUG
+		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
+#endif
+		std::string output;
+		executePost(params, output);
+		//Read and parse returned data
+		pmm::ServerResponse response(output);
+		return response.status;
+	}
+	
+	bool SuckerSession::reqMembership(const std::string &petition){
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::ask4Membership;
+		if(petition.size() > 1024){
+			params["petition"] = petition.substr(0, 1024);
+		}
+		else {
+			params["petition"] = petition;
+		}
 #ifdef DEBUG
 		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
 #endif

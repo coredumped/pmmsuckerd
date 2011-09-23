@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		82156446142BDAE600DFB92B /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 82708495142ADF7700D05386 /* jsonxx.cc */; };
 		821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		82708497142ADF7700D05386 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 82708495142ADF7700D05386 /* jsonxx.cc */; };
-		82708499142AE32A00D05386 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 82708495142ADF7700D05386 /* jsonxx.cc */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
@@ -298,9 +298,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82156446142BDAE600DFB92B /* jsonxx.cc in Sources */,
 				8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */,
 				8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */,
-				82708499142AE32A00D05386 /* jsonxx.cc in Sources */,
 				82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */,
 				82F86B591425A810006ACFEB /* main.cpp in Sources */,
 			);
@@ -419,6 +419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = YES;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;

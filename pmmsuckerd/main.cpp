@@ -7,31 +7,55 @@
 //
 
 #include <iostream>
-#ifndef DEFAULT_PMM_SERVICE_URL
-#define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
-#endif
 #include "PMMSuckerSession.h"
+#include "ServerResponse.h"
 
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
-	pmm::SuckerSession session;
+	bool registered = false;
 	for (int i = 1; 1 < argc; i++) {
 		std::string arg = argv[i];
 		if (arg.find("-h") == 0 && (i + 1) < argc) {
 			pmmServiceURL = argv[++i];
 		}
-		else if(arg.find("-reqMembership") == 0){
-			//session.reqMembership();
+		else if(arg.find("--req-membership") == 0 && (i + 1) < argc){
+			try {
+#ifdef DEBUG
+				std::cout << "Requesting to central pmm service cluster... ";
+				std::cout.flush();
+#endif
+				pmm::SuckerSession session(pmmServiceURL);
+				if(session.reqMembership(argv[++i])) std::cout << "OK" << std::endl;
+				return 0;
+			} catch (pmm::ServerResponseException &se1) {
+				std::cerr << "Unable to request membership to server: " << se1.errorDescription << std::endl;
+				return 1;
+			}
 		}
 	}
-	//Register to PMMService...
-	if(session.register2PMM()){
-		//Registration succeded, retrieve max
-#ifdef DEBUG
-		std::cout << "Initial registration succeded!!!" << std::endl;
-#endif
+	pmm::SuckerSession session(pmmServiceURL);
+	//1. Register to PMMService...
+	try {
+		session.register2PMM();
+	} catch (pmm::ServerResponseException &se1) {
+		if (se1.errorCode == pmm::PMM_ERROR_SUCKER_DENIED) {
+			std::cerr << "Unable to register, permission denied." << std::endl;
+		}
+		else {
+			//Try to ask for membership automatically or report if a membership has already been asked
+		}
+		return 1;
 	}
+	//Registration succeded, retrieve max
+#ifdef DEBUG
+	std::cout << "Initial registration succeded!!!" << std::endl;
+#endif
+	//2. Request accounts to poll
+	//3. Start APNS notification threads, validate remote devTokens
+	//4. Dispatch polling threads for imap
+	//5. Dispatch polling threads for pop3
+	//6. After registration time ends, close every connection, return to Step 1
     return 0;
 }
 

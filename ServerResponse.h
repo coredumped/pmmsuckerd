@@ -3,7 +3,7 @@
 //  PMM Sucker
 //
 //  Created by Juan V. Guerrero on 9/21/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 fn(x) Software. All rights reserved.
 //
 
 #ifndef PMM_Sucker_ServerResponse_h
@@ -35,7 +35,10 @@ namespace pmm {
 		
 		PMM_ERROR_USER_ACCOUNT_REMOVAL_FAILED = 1012,
 		PMM_ERROR_OCCURRED = 1013,
-		PMM_ERROR_USER_ACCOUNT_ALREADY_EXISTS = 1014
+		PMM_ERROR_USER_ACCOUNT_ALREADY_EXISTS = 1014,
+		PMM_ERROR_SUCKER_DENIED = 1015,
+		PMM_ERROR_SUCKER_MEMBERSHIP_REQUIRED = 1016,
+		PMM_ERROR_OPTYPE_INVALID = 2000
 	} PMMResponseErrorCodes; //Always keep this enumerator in synch with the one at PMMResponseErrorCodes.h
 
 	
@@ -50,12 +53,18 @@ namespace pmm {
 	class ServerResponse {
 	public:
 		bool status;
-		int errorCode;
+		long errorCode;
 		std::string errorDescription;
 		std::vector<MetaDataInfo> metaData;
 		std::string operationType;
 		ServerResponse();
 		ServerResponse(const std::string &fromJson);
+	};
+	
+	class ServerResponseException : public ServerResponse {
+		public:
+		ServerResponseException() : ServerResponse(){ }
+		ServerResponseException(const std::string &fromJson) : ServerResponse(fromJson){ }
 	};
 }
 

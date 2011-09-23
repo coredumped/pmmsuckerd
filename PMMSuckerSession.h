@@ -8,6 +8,10 @@
 
 #ifndef PMM_Sucker_PMMSuckerSession_h
 #define PMM_Sucker_PMMSuckerSession_h
+#ifndef DEFAULT_PMM_SERVICE_URL
+#define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
+//#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
+#endif
 #include<string>
 
 namespace pmm {
@@ -35,6 +39,7 @@ namespace pmm {
 		SuckerSession(const std::string &srvURL);
 		
 		bool register2PMM();
+		bool reqMembership(const std::string &petition);
 		//void register2PMMAsync();
 	};
 }
