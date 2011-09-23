@@ -5,6 +5,7 @@
 //  Created by Juan V. Guerrero on 9/18/11.
 //  Copyright (c) 2011 fn(x) Software. All rights reserved.
 //
+#include <unistd.h>
 #ifdef __APPLE__
 //#include <CFArray.h>
 #include <CoreFoundation/CoreFoundation.h>
@@ -17,7 +18,8 @@
 #ifdef __linux__
 #include <uuid/uuid.h>
 #include <fstream>
-#include <unistd.h>
+#include <strings.h>
+#include <cstdlib>
 #endif
 #include <map>
 #include <set>
@@ -331,6 +333,9 @@ namespace pmm {
 			params["petition"] = petition;
 		}
 		params["contactEmail"] = contactEmail;
+		char *myHostname[260];
+		::gethostname((char *)myHostname, 260);
+		params["hostname"] = (char *)myHostname;
 #ifdef DEBUG
 		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
 #endif
