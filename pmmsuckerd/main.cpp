@@ -10,10 +10,14 @@
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
 
+#ifndef DEFAULT_REGISTER_INTERVAL
+#define DEFAULT_REGISTER_INTERVAL 600
+#endif
+
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
-	bool registered = false;
+	int registerInterval = DEFAULT_REGISTER_INTERVAL;
 	for (int i = 1; 1 < argc; i++) {
 		std::string arg = argv[i];
 		if (arg.find("-h") == 0 && (i + 1) < argc) {
@@ -43,7 +47,14 @@ int main (int argc, const char * argv[])
 			std::cerr << "Unable to register, permission denied." << std::endl;
 		}
 		else {
-			//Try to ask for membership automatically or report if a membership has already been asked
+			try{
+				//Try to ask for membership automatically or report if a membership has already been asked
+				session.reqMembership("Automated membership petition, please help!!!");
+				std::cerr << "Membership request issued to pmm controller, try again later" << std::endl;
+			}
+			catch(pmm::ServerResponseException  &se2){ 
+				std::cerr << "Failed to request membership automatically: " << se2.errorDescription << std::endl;
+			}
 		}
 		return 1;
 	}

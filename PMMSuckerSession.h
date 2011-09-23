@@ -39,7 +39,7 @@ namespace pmm {
 		SuckerSession(const std::string &srvURL);
 		
 		bool register2PMM();
-		bool reqMembership(const std::string &petition);
+		bool reqMembership(const std::string &petition, const std::string &contactEmail = "");
 		//void register2PMMAsync();
 	};
 }

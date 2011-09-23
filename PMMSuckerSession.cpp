@@ -14,6 +14,12 @@
 #include <Security/SecTrustedApplication.h>
 #include <Security/SecACL.h>
 #endif
+#ifdef __linux__
+#include <uuid/uuid.h>
+#include <fstream>
+#include <cstrings>
+#include <unistd.h>
+#endif
 #include <map>
 #include <set>
 #include <string>
@@ -63,27 +69,40 @@ namespace pmm {
 		static const char *ask4Membership = "opTypePMMSuckerAsk4Membership";
 	};
 	
+#ifdef __APPLE__
+	static void dieOnSecError(OSStatus err){
+		if (err == errSecSuccess) return;
+		CFStringRef errorMessage = SecCopyErrorMessageString(err, NULL);
+		std::cerr << "Unable to generate suckerID: ";
+		if (errorMessage != NULL) {
+			std::cerr << CFStringGetCStringPtr(errorMessage, kCFStringEncodingASCII);
+			CFRelease(errorMessage);
+		}
+		std::cerr << "program aborted!!!" << std::endl;
+		exit(1);
+	}
+#endif
+	
 	static void suckerIdGet(std::string &suckerID){
 		std::stringstream sId;
 #ifdef __APPLE__ 
 		//Try to retrieve value from system
 		SecAccessRef access = nil;
-		//CFStringRef accessLabel = CFStringCreateWithCStringNoCopy(NULL, DEFAULT_SECURITY_ACCESS_LABEL, kCFStringEncodingUTF8, kCFAllocatorNull);
 		CFStringRef accessLabel = CFSTR(DEFAULT_SECURITY_ACCESS_LABEL);
 		SecTrustedApplicationRef myself;
 		OSStatus err = SecTrustedApplicationCreateFromPath(NULL, &myself);
-#warning TODO: verify and report issues regarding the err variable status		
+		dieOnSecError(err);
 		CFArrayRef trustedApp = CFArrayCreate(NULL, (const void **)&myself, 1, &kCFTypeArrayCallBacks);
-#warning TODO: verify and report issues regarding the err variable status
 		err = SecAccessCreate(accessLabel, trustedApp, &access);
+		dieOnSecError(err);
 		//Get stored suckerID
 		SecKeychainItemRef item = nil, apiKeyItem = nil;
 		UInt32 suckerIDItemLength, apiKeyItemLength;
 		void *suckerIDItemString, *apiKeyItemString;
-#warning TODO: verify and report issues regarding the err variable status
 		err = SecKeychainFindGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
 									   strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
 									   &suckerIDItemLength, &suckerIDItemString, &item);
+		dieOnSecError(err);
 		if (err != noErr) {
 			//Create UUID
 			CFUUIDRef cfuuid = CFUUIDCreate(NULL);
@@ -93,6 +112,7 @@ namespace pmm {
 			err = SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
 												strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
 												(UInt32)CFStringGetLength(cfuuid_s), (void *)CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman), &item);
+			dieOnSecError(err);
 			if(item) SecKeychainItemSetAccess(item, access);
 #ifdef DEBUG
 			std::cerr << "Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman) << std::endl;
@@ -104,20 +124,51 @@ namespace pmm {
 			suckerID.assign((char *)suckerIDItemString, suckerIDItemLength);
 			SecKeychainItemFreeContent(NULL, suckerIDItemString);
 		}
-#warning TODO: verify and report issues regarding the err variable status
 		err = SecKeychainFindGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
 											 strlen(DEFAULT_SEC_ITEM_APIKEY), DEFAULT_SEC_ITEM_APIKEY, 
 											 &apiKeyItemLength, &apiKeyItemString, &apiKeyItem);
-		if (err != noErr) {
-			SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
-										  strlen(DEFAULT_SEC_ITEM_APIKEY), DEFAULT_SEC_ITEM_APIKEY, 
-										  strlen(DEFAULT_API_KEY), DEFAULT_API_KEY, &apiKeyItem);
-		}
+		dieOnSecError(err);
+		SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
+									  strlen(DEFAULT_SEC_ITEM_APIKEY), DEFAULT_SEC_ITEM_APIKEY, 
+									  strlen(DEFAULT_API_KEY), DEFAULT_API_KEY, &apiKeyItem);
 		if (access) CFRelease(access);
 		if (item) CFRelease(item);
 		if (apiKeyItem) CFRelease(apiKeyItem);
 #else
-#error TODO: YOU MUST IMPLEMENT A LINUX VERSION FOR suckerIdGet()
+#ifdef __linux__
+		std::ifstream conf("pmmsucker.conf");
+		if (conf.good()) {
+			while (!conf.eof()) {
+				buffer[8192];
+				conf.getline(buffer, 8191);
+				char *sptr = index(buffer, '=');
+				if (sptr != NULL) {
+					if (strncmp(buffer, "suckerID", 8)) {
+						suckerID = (sptr + 1);
+					}
+				}
+			}
+			if (suckerID.size() == 0) {
+				std::cerr << "Unable to retrieve suckerID, aborting..." << std::endl;
+				unlink("pmmsucker.conf");
+				exit(1);
+			}
+		}
+		else{
+			uuid_t myuuid;
+			uuid_generate(myuuid);
+			std::ofstream of("pmmsucker.conf");
+			of << "apiKey=" << DEFAULT_API_KEY << "\n";
+			std::sstream uuidBuilder;
+			for (int i = 0; i < 16; i++) {
+				uuidBuilder << std::hex << myuuid[i];
+			}
+			suckerID = uuidBuilder.str();
+			of << "suckerID=" << suckerID << "\n";
+		}
+#else
+#error TODO: YOU MUST IMPLEMENT A VERSION OF suckerIdGet() WHICH IS SPECIFIC TO YOUR PLATFORM
+#endif
 #endif
 	}
 	
@@ -242,6 +293,8 @@ namespace pmm {
 		if(wwwx == NULL) curl_easy_cleanup(www);
 	}
 	
+///////////////////////// SUCKER SESSION METHODS ////////////////////////////
+	
 	SuckerSession::SuckerSession() {
 		apiKey = DEFAULT_API_KEY;
 		pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
@@ -268,7 +321,7 @@ namespace pmm {
 		return response.status;
 	}
 	
-	bool SuckerSession::reqMembership(const std::string &petition){
+	bool SuckerSession::reqMembership(const std::string &petition, const std::string &contactEmail){
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::ask4Membership;
@@ -278,6 +331,7 @@ namespace pmm {
 		else {
 			params["petition"] = petition;
 		}
+		params["contactEmail"] = contactEmail;
 #ifdef DEBUG
 		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
 #endif

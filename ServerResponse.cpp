@@ -57,7 +57,7 @@ namespace pmm {
 			}
 			else {
 				status = false;
-				errorCode = obj.get<jsonxx::integer>("errorCode");
+				errorCode = obj.get<jsonxx::number>("errorCode");
 				ServerResponseException e;
 				e.status = status;
 				e.errorCode = errorCode;
