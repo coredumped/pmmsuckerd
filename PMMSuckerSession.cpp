@@ -20,6 +20,7 @@
 #include <fstream>
 #include <strings.h>
 #include <cstdlib>
+#include <cstring>
 #endif
 #include <map>
 #include <set>
