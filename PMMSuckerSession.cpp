@@ -17,7 +17,6 @@
 #ifdef __linux__
 #include <uuid/uuid.h>
 #include <fstream>
-#include <cstrings>
 #include <unistd.h>
 #endif
 #include <map>
@@ -139,7 +138,7 @@ namespace pmm {
 		std::ifstream conf("pmmsucker.conf");
 		if (conf.good()) {
 			while (!conf.eof()) {
-				buffer[8192];
+				char buffer[8192];
 				conf.getline(buffer, 8191);
 				char *sptr = index(buffer, '=');
 				if (sptr != NULL) {
@@ -159,9 +158,9 @@ namespace pmm {
 			uuid_generate(myuuid);
 			std::ofstream of("pmmsucker.conf");
 			of << "apiKey=" << DEFAULT_API_KEY << "\n";
-			std::sstream uuidBuilder;
+			std::stringstream uuidBuilder;
 			for (int i = 0; i < 16; i++) {
-				uuidBuilder << std::hex << myuuid[i];
+				uuidBuilder << std::hex << (int)myuuid[i];
 			}
 			suckerID = uuidBuilder.str();
 			of << "suckerID=" << suckerID << "\n";
@@ -342,3 +341,4 @@ namespace pmm {
 		return response.status;
 	}
 }
+
