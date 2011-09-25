@@ -68,7 +68,7 @@ namespace pmm {
 	
 	namespace OperationTypes {
 		static const char *register2PMM = "pmmSuckerReg";
-		static const char *ask4Membership = "opTypePMMSuckerAsk4Membership";
+		static const char *ask4Membership = "pmmSuckerAskMember";
 	};
 	
 #ifdef __APPLE__
@@ -324,9 +324,11 @@ namespace pmm {
 	}
 	
 	bool SuckerSession::reqMembership(const std::string &petition, const std::string &contactEmail){
+		if(this->myID.size() == 0) suckerIdGet(this->myID);
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::ask4Membership;
+		params["suckerID"] = this->myID;
 		if(petition.size() > 1024){
 			params["petition"] = petition.substr(0, 1024);
 		}
@@ -344,6 +346,14 @@ namespace pmm {
 		executePost(params, output);
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
+		if(response.status){
+			//Retrieve timeout				
+			std::istringstream input(response.metaData["regInterval"]);
+			input >> expirationTime;
+#ifdef DEBUG
+			std::cerr << "Registered with expiration timestamp: " << expirationTime << std::endl;
+#endif
+		}
 		return response.status;
 	}
 }

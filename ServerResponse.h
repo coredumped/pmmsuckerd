@@ -10,7 +10,8 @@
 #define PMM_Sucker_ServerResponse_h
 #include<string>
 #include<vector>
-#include "JSONParseException.h"
+#include<map>
+#include"JSONParseException.h"
 
 namespace pmm {
 	
@@ -40,22 +41,15 @@ namespace pmm {
 		PMM_ERROR_SUCKER_MEMBERSHIP_REQUIRED = 1016,
 		PMM_ERROR_OPTYPE_INVALID = 2000
 	} PMMResponseErrorCodes; //Always keep this enumerator in synch with the one at PMMResponseErrorCodes.h
-
 	
-	class MetaDataInfo {
-	public:
-		std::string param;
-		std::string value;
-		MetaDataInfo();
-		MetaDataInfo(const std::string &_param, const std::string &_value);
-	};
+	typedef std::map<std::string, std::string>::iterator MetaDataItemInterator;
 	
 	class ServerResponse {
 	public:
 		bool status;
 		long errorCode;
 		std::string errorDescription;
-		std::vector<MetaDataInfo> metaData;
+		std::map<std::string,std::string> metaData;
 		std::string operationType;
 		ServerResponse();
 		ServerResponse(const std::string &fromJson);

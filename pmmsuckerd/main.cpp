@@ -10,17 +10,14 @@
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
 
-#ifndef DEFAULT_REGISTER_INTERVAL
-#define DEFAULT_REGISTER_INTERVAL 600
-#endif
+void printHelpInfo();
 
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
-	int registerInterval = DEFAULT_REGISTER_INTERVAL;
 	for (int i = 1; 1 < argc; i++) {
 		std::string arg = argv[i];
-		if (arg.find("-h") == 0 && (i + 1) < argc) {
+		if (arg.find("--url") == 0 && (i + 1) < argc) {
 			pmmServiceURL = argv[++i];
 		}
 		else if(arg.find("--req-membership") == 0 && (i + 1) < argc){
@@ -30,12 +27,16 @@ int main (int argc, const char * argv[])
 				std::cout.flush();
 #endif
 				pmm::SuckerSession session(pmmServiceURL);
-				if(session.reqMembership(argv[++i])) std::cout << "OK" << std::endl;
+				if(session.reqMembership("Explicit membership request from CLI.", argv[++i])) std::cout << "OK" << std::endl;
 				return 0;
 			} catch (pmm::ServerResponseException &se1) {
 				std::cerr << "Unable to request membership to server: " << se1.errorDescription << std::endl;
 				return 1;
 			}
+		}
+		else if(arg.compare("--help") == 0){
+			printHelpInfo();
+			return 0;
 		}
 	}
 	pmm::SuckerSession session(pmmServiceURL);
@@ -45,8 +46,6 @@ int main (int argc, const char * argv[])
 	} catch (pmm::ServerResponseException &se1) {
 		if (se1.errorCode == pmm::PMM_ERROR_SUCKER_DENIED) {
 			std::cerr << "Unable to register, permission denied." << std::endl;
-		}
-		else {
 			try{
 				//Try to ask for membership automatically or report if a membership has already been asked
 				session.reqMembership("Automated membership petition, please help!!!");
@@ -55,6 +54,9 @@ int main (int argc, const char * argv[])
 			catch(pmm::ServerResponseException  &se2){ 
 				std::cerr << "Failed to request membership automatically: " << se2.errorDescription << std::endl;
 			}
+		}
+		else {
+			std::cerr << "Unable to register: " << se1.errorDescription << std::endl;
 		}
 		return 1;
 	}
@@ -70,3 +72,9 @@ int main (int argc, const char * argv[])
     return 0;
 }
 
+void printHelpInfo() {
+	std::cout << "Argument          Parameter   Help text" << std::endl;
+	std::cout << "--help                        Shows this help message." << std::endl;
+	std::cout << "--req-membership  <email>     Asks for membership in the PMM Controller cluster" << std::endl;
+	std::cout << "--url             <URL>       Specifies the PMMServer service URL" << std::endl;
+}

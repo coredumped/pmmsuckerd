@@ -33,6 +33,7 @@ namespace pmm {
 		std::string pmmServiceURL;
 		std::string myID;
 		std::string apiKey;
+		time_t expirationTime;
 	protected:
 	public:
 		SuckerSession();
