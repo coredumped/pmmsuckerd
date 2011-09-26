@@ -17,8 +17,8 @@ LIBS=`pkg-config libcurl --libs` -luuid
 
 all: pmmsuckerd
 
-pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o
-	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o $(LIBS)
+pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o
+	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -31,6 +31,12 @@ PMMSuckerSession.o: ../PMMSuckerSession.h ../PMMSuckerSession.cpp
 
 ServerResponse.o: ../ServerResponse.h ../ServerResponse.cpp
 	$(GCC) $(CFLAGS) -c -o ServerResponse.o ../ServerResponse.cpp
+
+Mutex.o: ../Mutex.h ../Mutex.cpp
+	$(GCC) $(CFLAGS) -c -o Mutex.o ../Mutex.cpp
+
+MailAccountInfo.o: ../MailAccountInfo.h ../MailAccountInfo.cpp
+	$(GCC) $(CFLAGS) -c -o MailAccountInfo.o ../MailAccountInfo.cpp
 
 clean:
 	rm -f *.o pmmsuckerd

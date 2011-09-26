@@ -39,6 +39,7 @@ namespace pmm {
 		PMM_ERROR_USER_ACCOUNT_ALREADY_EXISTS = 1014,
 		PMM_ERROR_SUCKER_DENIED = 1015,
 		PMM_ERROR_SUCKER_MEMBERSHIP_REQUIRED = 1016,
+		PMM_ERROR_SUCKER_REGISTRATION_TIMEOUT = 1017,
 		PMM_ERROR_OPTYPE_INVALID = 2000
 	} PMMResponseErrorCodes; //Always keep this enumerator in synch with the one at PMMResponseErrorCodes.h
 	

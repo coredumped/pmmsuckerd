@@ -30,6 +30,7 @@
 #include <curl/curl.h>
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
+#include "jsonxx.h"
 
 #ifndef DEFAULT_API_KEY
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
@@ -69,6 +70,7 @@ namespace pmm {
 	namespace OperationTypes {
 		static const char *register2PMM = "pmmSuckerReg";
 		static const char *ask4Membership = "pmmSuckerAskMember";
+		static const char *pmmSuckerRequestMailAccounts = "pmmSuckerRequestMailAccounts";
 	};
 	
 #ifdef __APPLE__
@@ -133,6 +135,7 @@ namespace pmm {
 		SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
 									  strlen(DEFAULT_SEC_ITEM_APIKEY), DEFAULT_SEC_ITEM_APIKEY, 
 									  strlen(DEFAULT_API_KEY), DEFAULT_API_KEY, &apiKeyItem);
+		if (trustedApp) CFRelease(trustedApp);
 		if (access) CFRelease(access);
 		if (item) CFRelease(item);
 		if (apiKeyItem) CFRelease(apiKeyItem);
@@ -320,6 +323,9 @@ namespace pmm {
 		executePost(params, output);
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
+		std::istringstream input(response.metaData["expiration"]);
+		input >> expirationTime;
+		expirationTime = time(0x00) + expirationTime - 60;
 		return response.status;
 	}
 	
@@ -355,6 +361,53 @@ namespace pmm {
 #endif
 		}
 		return response.status;
+	}
+	
+	void SuckerSession::retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta){
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerRequestMailAccounts;
+		params["suckerID"] = this->myID;
+		std::string output;
+		executePost(params, output);
+		//ServerResponse xresp(output);
+		//Read and parse returned data
+		std::istringstream input(output);
+		jsonxx::Array o;
+		jsonxx::Array::parse(input, o);
+		for (unsigned int i = 0; i < o.size(); i++) {
+			std::vector<std::string> devTokens;
+#ifdef DEBUG
+			std::cerr << o.get<jsonxx::Object>(i).get<std::string>("email") << std::endl;
+#endif
+			for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").size(); j++) {
+				devTokens.push_back(o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").get<std::string>(j));
+#ifdef DEBUG
+				std::cerr << " " << devTokens[j] << std::endl;
+#endif
+			}
+			MailAccountInfo m(
+							  o.get<jsonxx::Object>(i).get<std::string>("email"),
+							  o.get<jsonxx::Object>(i).get<std::string>("mailboxType"),
+							  o.get<jsonxx::Object>(i).get<std::string>("username"),
+							  o.get<jsonxx::Object>(i).get<std::string>("password"),
+							  o.get<jsonxx::Object>(i).get<std::string>("serverAddress"),
+							  o.get<jsonxx::Object>(i).get<jsonxx::number>("serverPort"),
+							  devTokens,
+							  o.get<jsonxx::Object>(i).get<bool>("useSSL")
+							  );
+			emailAddresses.push_back(m);			
+		}
+	}
+	
+	void SuckerSession::performAutoRegister(){
+		if (time(0x00) >= expirationTime) {
+#ifdef DEBUG
+			std::cerr << "Session is about to expire re-registering in advance..." << std::endl;
+#endif
+			register2PMM();
+		}
 	}
 }
 

@@ -13,8 +13,10 @@
 //#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
 #endif
 #include<string>
+#include "MailAccountInfo.h"
 
 namespace pmm {
+	/** Exception thrown whenever we received an error response from a remote server */
 	class HTTPException {
 		private:
 		int code;
@@ -28,6 +30,8 @@ namespace pmm {
 		int errorCode(){ return code; }
 		std::string errorMessage(){ return std::string(msg); }
 	};
+	
+	/** Use is to communicate with the remote PMM Service server */
 	class SuckerSession {
 	private:
 		std::string pmmServiceURL;
@@ -35,13 +39,19 @@ namespace pmm {
 		std::string apiKey;
 		time_t expirationTime;
 	protected:
+		void performAutoRegister();
 	public:
 		SuckerSession();
 		SuckerSession(const std::string &srvURL);
 		
+		//Register to the PMM Service server, currently located at Google AppEngine
 		bool register2PMM();
+		
+		//Asks for membership in order to join the global PMM Service server cluster
 		bool reqMembership(const std::string &petition, const std::string &contactEmail = "");
-		//void register2PMMAsync();
+
+		//Retrieves configured e-mail accounts located at the remote server so we can poll them later
+		void retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta = false);
 	};
 }
 
