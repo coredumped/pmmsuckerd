@@ -100,9 +100,9 @@ namespace pmm {
 		err = SecAccessCreate(accessLabel, trustedApp, &access);
 		dieOnSecError(err);
 		//Get stored suckerID
-		SecKeychainItemRef item = nil, apiKeyItem = nil;
-		UInt32 suckerIDItemLength, apiKeyItemLength;
-		void *suckerIDItemString, *apiKeyItemString;
+		SecKeychainItemRef item = nil;
+		UInt32 suckerIDItemLength;
+		void *suckerIDItemString;
 		err = SecKeychainFindGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
 									   strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
 									   &suckerIDItemLength, &suckerIDItemString, &item);
@@ -128,17 +128,9 @@ namespace pmm {
 			suckerID.assign((char *)suckerIDItemString, suckerIDItemLength);
 			SecKeychainItemFreeContent(NULL, suckerIDItemString);
 		}
-		err = SecKeychainFindGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
-											 strlen(DEFAULT_SEC_ITEM_APIKEY), DEFAULT_SEC_ITEM_APIKEY, 
-											 &apiKeyItemLength, &apiKeyItemString, &apiKeyItem);
-		dieOnSecError(err);
-		SecKeychainAddGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
-									  strlen(DEFAULT_SEC_ITEM_APIKEY), DEFAULT_SEC_ITEM_APIKEY, 
-									  strlen(DEFAULT_API_KEY), DEFAULT_API_KEY, &apiKeyItem);
 		if (trustedApp) CFRelease(trustedApp);
 		if (access) CFRelease(access);
 		if (item) CFRelease(item);
-		if (apiKeyItem) CFRelease(apiKeyItem);
 #else
 #ifdef __linux__
 		std::ifstream conf("pmmsucker.conf");
@@ -243,7 +235,6 @@ namespace pmm {
 	}
 
 	static void preparePostRequest(CURL *www, std::map<std::string, std::string> &postData, DataBuffer *buffer, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
-
 		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
 		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
 		curl_easy_setopt(www, CURLOPT_POST, 1);
