@@ -28,4 +28,79 @@ namespace pmm {
 		pthread_mutex_unlock(&theMutex);
 	}
 
+	AtomicFlag::AtomicFlag() : Mutex(){
+		theFlag = false;
+	}
+	
+	AtomicFlag::AtomicFlag(bool initialValue) : Mutex() {
+		theFlag = initialValue;
+	}
+	void AtomicFlag::set(bool newValue){
+		lock();
+		theFlag = newValue;
+		unlock();
+	}
+	
+	bool AtomicFlag::get(){
+		bool ret = false;
+		lock();
+		ret = theFlag;
+		unlock();
+		return ret;
+	}
+	
+	void AtomicFlag::toggle(){
+		lock();
+		if (theFlag) {
+			theFlag = false;
+		}
+		else {
+			theFlag = true;
+		}
+		unlock();
+	}
+	
+	bool AtomicFlag::operator=(bool newValue){
+		lock();
+		theFlag = newValue;
+		unlock();		
+		return newValue;
+	}
+	
+	bool AtomicFlag::operator==(bool anotherValue){
+		bool ret = false;
+		lock();
+		if (theFlag == anotherValue) ret = true;
+		unlock();
+		return ret;
+	}
+
+	bool AtomicFlag::operator==(AtomicFlag &another) {
+		bool ret = false;
+		lock();
+		if (theFlag == another.get()) {
+			ret = true;
+		}
+		unlock();
+		return ret;
+	}
+		
+	bool AtomicFlag::operator!=(bool anotherValue){
+		bool ret = true;
+		lock();
+		if (theFlag == anotherValue) ret = false;
+		unlock();
+		return ret;
+	}
+	
+	bool AtomicFlag::operator!=(AtomicFlag &another) {
+		bool ret = true;
+		lock();
+		if (theFlag == another.get()) {
+			ret = false;
+		}
+		unlock();
+		return ret;
+	}
+
 }

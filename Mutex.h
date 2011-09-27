@@ -20,6 +20,27 @@ namespace pmm {
 		void lock();
 		void unlock();
 	};
+	
+	class AtomicFlag : protected Mutex {
+	private:
+		bool theFlag;
+	protected:
+	public:
+		AtomicFlag();
+		AtomicFlag(bool initialValue);
+		void set(bool newValue);
+		bool get();
+		void toggle();
+		
+
+		
+		bool operator=(bool newValue);
+		bool operator==(bool anotherValue);
+		bool operator==(AtomicFlag &another);
+		
+		bool operator!=(bool anotherValue);
+		bool operator!=(AtomicFlag &another);
+	};
 }
 
 #endif
