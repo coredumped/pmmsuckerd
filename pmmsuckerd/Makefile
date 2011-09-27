@@ -17,8 +17,8 @@ LIBS=`pkg-config libcurl --libs` -luuid
 
 all: pmmsuckerd
 
-pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o
-	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o $(LIBS)
+pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o
+	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -37,6 +37,15 @@ Mutex.o: ../Mutex.h ../Mutex.cpp
 
 MailAccountInfo.o: ../MailAccountInfo.h ../MailAccountInfo.cpp
 	$(GCC) $(CFLAGS) -c -o MailAccountInfo.o ../MailAccountInfo.cpp
+
+GenericThread.o: ../GenericThread.cpp ../GenericThread.h
+	$(GCC) $(CFLAGS) -c -o GenericThread.o ../GenericThread.cpp
+
+APNSNotificationThread.: ../APNSNotificationThread.cpp ../APNSNotificationThread.h
+	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
+
+ThreadDispatcher.: ../ThreadDispatcher.cpp ../ThreadDispatcher.h
+	$(GCC) $(CFLAGS) -c -o ThreadDispatcher.o ../ThreadDispatcher.cpp
 
 clean:
 	rm -f *.o pmmsuckerd

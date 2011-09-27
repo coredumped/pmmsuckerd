@@ -67,11 +67,8 @@ int main (int argc, const char * argv[])
 	//2. Request accounts to poll
 	std::vector<pmm::MailAccountInfo> emailAccounts;
 	session.retrieveEmailAddresses(emailAccounts, true);
-	for(size_t i = 0; i < emailAccounts.size(); i++){
-		std::cout << " " << emailAccounts[i].email() << std::endl;
-	}
 	//3. Save email accounts to local datastore, perform full database cleanup
-	
+#warning TODO: Save email accounts to local datastore, perform full database cleanup
 	//4. Start APNS notification threads, validate remote devTokens
 	//5. Dispatch polling threads for imap
 	//6. Dispatch polling threads for pop3

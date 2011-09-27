@@ -119,7 +119,7 @@ namespace pmm {
 			dieOnSecError(err);
 			if(item) SecKeychainItemSetAccess(item, access);
 #ifdef DEBUG
-			std::cerr << "Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman) << std::endl;
+			std::cerr << "DEBUG: Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman) << std::endl;
 #endif
 			CFRelease(cfuuid_s);
 			CFRelease(cfuuid);
@@ -253,10 +253,9 @@ namespace pmm {
 			if (encodedPost.str().size() == 0) encodedPost << param << "=" << value;
 			else encodedPost << "&" << param << "=" << value;
 		}
-		//curl_easy_setopt(www, CURLOPT_POSTFIELDSIZE, encodedPost.str().size());
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
 #ifdef DEBUG
-		std::cerr << "Sending post data: " << encodedPost.str().c_str() << std::endl;
+		std::cerr << "DEBUG: Sending post data: " << encodedPost.str().c_str() << std::endl;
 #endif
 
 	}
@@ -274,7 +273,7 @@ namespace pmm {
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
 #ifdef DEBUG
-			std::cerr << "POST RESPONSE: " << output << std::endl;
+			std::cerr << "DEBUG: POST RESPONSE: " << output << std::endl;
 #endif
 		}
 		else {
@@ -369,14 +368,8 @@ namespace pmm {
 		jsonxx::Array::parse(input, o);
 		for (unsigned int i = 0; i < o.size(); i++) {
 			std::vector<std::string> devTokens;
-#ifdef DEBUG
-			std::cerr << o.get<jsonxx::Object>(i).get<std::string>("email") << std::endl;
-#endif
 			for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").size(); j++) {
 				devTokens.push_back(o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").get<std::string>(j));
-#ifdef DEBUG
-				std::cerr << " " << devTokens[j] << std::endl;
-#endif
 			}
 			MailAccountInfo m(
 							  o.get<jsonxx::Object>(i).get<std::string>("email"),
@@ -395,7 +388,7 @@ namespace pmm {
 	void SuckerSession::performAutoRegister(){
 		if (time(0x00) >= expirationTime) {
 #ifdef DEBUG
-			std::cerr << "Session is about to expire re-registering in advance..." << std::endl;
+			std::cerr << "DEBUG: Session is about to expire re-registering in advance..." << std::endl;
 #endif
 			register2PMM();
 		}
