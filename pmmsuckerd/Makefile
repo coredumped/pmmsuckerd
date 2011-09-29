@@ -17,8 +17,8 @@ LIBS=`pkg-config libcurl --libs` -luuid -lpthread
 
 all: pmmsuckerd
 
-pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o
-	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o $(LIBS)
+pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o
+	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -46,6 +46,9 @@ APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThrea
 
 ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h
 	$(GCC) $(CFLAGS) -c -o ThreadDispatcher.o ../ThreadDispatcher.cpp
+
+SharedQueue.o: ../SharedQueue.cpp ../SharedQueue.h
+	$(GCC) $(CFLAGS) -c -o SharedQueue.o ../SharedQueue.cpp
 
 clean:
 	rm -f *.o pmmsuckerd
