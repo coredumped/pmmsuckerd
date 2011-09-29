@@ -7,14 +7,21 @@
 //
 
 #include <iostream>
+#include <sstream>
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
+#include "APNSNotificationThread.h"
+#include "ThreadDispatcher.h"
+#ifndef DEFAULT_MAX_NOTIFICATION_THREADS
+#define DEFAULT_MAX_NOTIFICATION_THREADS 2
+#endif
 
 void printHelpInfo();
 
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
+	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
 	for (int i = 1; 1 < argc; i++) {
 		std::string arg = argv[i];
 		if (arg.find("--url") == 0 && (i + 1) < argc) {
@@ -37,6 +44,10 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--help") == 0){
 			printHelpInfo();
 			return 0;
+		}
+		else if(arg.compare("--max-nthreads") == 0 && (i + 1) < argc){
+			std::stringstream input(argv[++i]);
+			input >> maxNotificationThreads;
 		}
 	}
 	pmm::SuckerSession session(pmmServiceURL);
@@ -70,9 +81,16 @@ int main (int argc, const char * argv[])
 	//3. Save email accounts to local datastore, perform full database cleanup
 #warning TODO: Save email accounts to local datastore, perform full database cleanup
 	//4. Start APNS notification threads, validate remote devTokens
+	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
+	for (size_t i = 0; i < maxNotificationThreads; i++) {
+		//1. Initializa notification thread...
+		//2. Start thread
+		pmm::ThreadDispatcher::start(notifThreads[i]);
+	}
 	//5. Dispatch polling threads for imap
 	//6. Dispatch polling threads for pop3
 	//7. After registration time ends, close every connection, return to Step 1
+
     return 0;
 }
 
@@ -81,4 +99,5 @@ void printHelpInfo() {
 	std::cout << "--help                        Shows this help message." << std::endl;
 	std::cout << "--req-membership  <email>     Asks for membership in the PMM Controller cluster" << std::endl;
 	std::cout << "--url             <URL>       Specifies the PMMServer service URL" << std::endl;
+	std::cout << "--max-nthreads	<number>	Changes the maximum amount of threads to allocate for processing device push notifications" << std::endl;
 }

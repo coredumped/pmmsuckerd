@@ -9,10 +9,17 @@
 #ifndef PMM_Sucker_APNSNotificationThread_h
 #define PMM_Sucker_APNSNotificationThread_h
 #include"GenericThread.h"
+#include <string>
 namespace pmm {
 	
 	class APNSNotificationThread : public GenericThread {
-		
+	private:
+	protected:
+		void notifyTo(const std::string &devToken, const std::string &msg);
+	public:
+		APNSNotificationThread();
+		~APNSNotificationThread();
+		void operator()();
 	};
 	
 }
