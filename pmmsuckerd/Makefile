@@ -13,7 +13,7 @@
 
 GCC=g++
 CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags`
-LIBS=`pkg-config libcurl --libs` -luuid
+LIBS=`pkg-config libcurl --libs` -luuid -lpthread
 
 all: pmmsuckerd
 
@@ -41,10 +41,10 @@ MailAccountInfo.o: ../MailAccountInfo.h ../MailAccountInfo.cpp
 GenericThread.o: ../GenericThread.cpp ../GenericThread.h
 	$(GCC) $(CFLAGS) -c -o GenericThread.o ../GenericThread.cpp
 
-APNSNotificationThread.: ../APNSNotificationThread.cpp ../APNSNotificationThread.h
+APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h
 	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
 
-ThreadDispatcher.: ../ThreadDispatcher.cpp ../ThreadDispatcher.h
+ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h
 	$(GCC) $(CFLAGS) -c -o ThreadDispatcher.o ../ThreadDispatcher.cpp
 
 clean:
