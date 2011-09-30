@@ -8,10 +8,13 @@
 
 #include <iostream>
 #include <sstream>
+#include <openssl/ssl.h>
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
 #include "APNSNotificationThread.h"
 #include "ThreadDispatcher.h"
+#include "SharedQueue.h"
+#include "NotificationPayload.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
@@ -28,6 +31,9 @@ int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
 	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
+	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
+	SSL_library_init();
+	SSL_load_error_strings();
 	for (int i = 1; 1 < argc; i++) {
 		std::string arg = argv[i];
 		if (arg.find("--url") == 0 && (i + 1) < argc) {
@@ -91,6 +97,7 @@ int main (int argc, const char * argv[])
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
 		//2. Start thread
+		notifThreads[i].notificationQueue = &notificationQueue;
 		pmm::ThreadDispatcher::start(notifThreads[i]);
 	}
 	//5. Dispatch polling threads for imap

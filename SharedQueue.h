@@ -31,7 +31,15 @@ namespace pmm {
 			m.unlock();
 		}
 		
-		T &extractEntry(){
+		T peek(){
+			T val;
+			m.lock();
+			val = queueData[0];
+			m.unlock();
+			return T(val);			
+		}
+		
+		T extractEntry(){
 			T val;
 			m.lock();
 			val = queueData[0];

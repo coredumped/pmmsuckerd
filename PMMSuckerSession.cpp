@@ -31,6 +31,7 @@
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
 #include "jsonxx.h"
+#include "UtilityFunctions.h"
 
 #ifndef DEFAULT_API_KEY
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
@@ -170,7 +171,7 @@ namespace pmm {
 	}
 	
 
-	static inline bool isURLEncodable(char c){
+	/*static inline bool isURLEncodable(char c){
 		static const char *urlEncodableCharacters = "$&+,/:;=?@<>#%{}|\\^~[]` ";		
 		if (c <= 0x1F || c >= 0x7f) {
 			return true;
@@ -195,7 +196,7 @@ namespace pmm {
 			}
 		}
 		if(replaceHappened) theString.assign(urlEncodedString.str());
-	}
+	}*/
 	
 	class DataBuffer {
 	public:

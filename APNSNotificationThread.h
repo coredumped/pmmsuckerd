@@ -8,16 +8,69 @@
 
 #ifndef PMM_Sucker_APNSNotificationThread_h
 #define PMM_Sucker_APNSNotificationThread_h
-#include"GenericThread.h"
+#include "GenericThread.h"
+#include "SharedQueue.h"
+#include "NotificationPayload.h"
 #include <string>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <openssl/ssl.h>
+
+
+#ifndef APPLE_SANDBOX_HOST
+#define APPLE_SANDBOX_HOST          "gateway.sandbox.push.apple.com"
+#endif
+#ifndef APPLE_SANDBOX_PORT
+#define APPLE_SANDBOX_PORT          2195
+#endif
+#ifndef APPLE_SANDBOX_FEEDBACK_HOST
+#define APPLE_SANDBOX_FEEDBACK_HOST "feedback.sandbox.push.apple.com"
+#endif
+#ifndef APPLE_SANDBOX_FEEDBACK_PORT
+#define APPLE_SANDBOX_FEEDBACK_PORT 2196
+#endif
+
+
+#ifndef APPLE_HOST
+#define APPLE_HOST          		"gateway.push.apple.com"
+#endif
+#ifndef APPLE_PORT
+#define APPLE_PORT         			 2195
+#endif
+#ifndef APPLE_FEEDBACK_HOST
+#define APPLE_FEEDBACK_HOST 		"feedback.push.apple.com"
+#endif
+#ifndef APPLE_FEEDBACK_PORT
+#define APPLE_FEEDBACK_PORT 		2196
+#endif
+
+
 namespace pmm {
 	
 	class APNSNotificationThread : public GenericThread {
 	private:
+		SSL_CTX *sslCTX;
+		SSL *apnsConnection;
+		void connect2APNS();
+		void ifNotConnectedToAPNSThenConnect();
+		void disconnectFromAPNS();
+		bool _useSandbox;
+		
+		int _socket;
+		struct sockaddr_in _server_addr;
+		struct hostent *_host_info;
 	protected:
-		void notifyTo(const std::string &devToken, const std::string &msg);
+		bool sslInitComplete;
+		void initSSL();
+		void notifyTo(const std::string &devToken, const NotificationPayload &msg);
 	public:
+		SharedQueue<NotificationPayload> *notificationQueue;
 		APNSNotificationThread();
+		void setKeyPath(const std::string &keyPath);
+		void setCertPath(const std::string &certPath);
+		void setCertPassword(const std::string &certPwd);
 		~APNSNotificationThread();
 		void operator()();
 	};
