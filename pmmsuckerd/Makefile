@@ -19,8 +19,8 @@ all: pmmsuckerd
 
 pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o \
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
-		UtilityFunctions.o
-	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o UtilityFunctions.o $(LIBS)
+		UtilityFunctions.o GenericException.o
+	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -42,6 +42,9 @@ MailAccountInfo.o: ../MailAccountInfo.h ../MailAccountInfo.cpp
 
 GenericThread.o: ../GenericThread.cpp ../GenericThread.h
 	$(GCC) $(CFLAGS) -c -o GenericThread.o ../GenericThread.cpp
+
+GenericException.o: ../GenericException.cpp ../GenericException.h
+	$(GCC) $(CFLAGS) -c -o GenericException.o ../GenericException.cpp
 
 APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h
 	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
