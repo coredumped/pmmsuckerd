@@ -13,7 +13,7 @@
 namespace pmm {
 	
 	class GenericException {
-	private:
+	protected:
 		std::string errmsg;
 	public:
 		GenericException();

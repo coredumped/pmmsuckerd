@@ -11,6 +11,7 @@
 #include "GenericThread.h"
 #include "SharedQueue.h"
 #include "NotificationPayload.h"
+#include "GenericException.h"
 #include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -48,6 +49,22 @@
 
 
 namespace pmm {
+	
+	class SSLException : public GenericException {
+	private:
+	protected:
+		typedef enum {
+			SSLOperationAny,
+			SSLOperationRead,
+			SSLOperationWrite
+		}  SSLOperation;
+		int sslErrorCode;
+		SSLOperation currentOperation;
+	public:
+		SSLException();
+		SSLException(SSL *sslConn, int sslStatus, const std::string &_derrmsg = "");
+		int errorCode();
+	};
 	
 	class APNSNotificationThread : public GenericThread {
 	private:

@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <sstream>
 #include <openssl/ssl.h>
 #include <netdb.h>
 #include "APNSNotificationThread.h"
@@ -91,46 +92,25 @@ namespace pmm {
 			else {
 				caPath = _certPath.substr(0, pos);
 			}
-#ifdef DEBUG
-			m.lock();
-			std::cerr << "DEBUG: Using caPath=" << caPath << std::endl;
-			m.unlock();
-#endif
 			if (SSL_CTX_load_verify_locations(sslCTX, NULL, caPath.c_str()) <= 0) {
 				//Without a valid CA location we can0t continue doing anything!!!
 				//As before we need to notiy the central service of the issue so it can release e-mail accounts
-				std::cerr << "Unable to set CA location" << std::endl;
-				abort();
+				throw SSLException(NULL, 0, "Unable to verify CA location.");
 			}
 #ifdef DEBUG
 			m.lock();
-			std::cerr << "Loading certificate... " << _certPath;
-			std::cerr.flush();
+			std::cerr << "Loading certificate... " << _certPath << std::endl;
 			m.unlock();
 #endif
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
-				m.lock();
-				std::cerr << "Unable to load certificate, can't continue like this" << std::endl;
-				m.unlock();
-				abort();
+				throw SSLException(NULL, 0, "Unable to load certificate file");
 			}
-#ifdef DEBUG
-			m.lock();
-			std::cerr << "done" << std::endl;
-			m.unlock();
-#endif
 			SSL_CTX_set_default_passwd_cb(sslCTX, (pem_password_cb *)_certPassword.c_str());
 			if (SSL_CTX_use_PrivateKey_file(sslCTX, _keyPath.c_str(), SSL_FILETYPE_PEM) <= 0) {
-				m.lock();
-				std::cerr << "Preparation for using keyfile: " << _keyPath << " failed miserably" << std::endl;
-				m.unlock();
-				abort();
+				throw SSLException(NULL, 0, "Can't use given keyfile");
 			}
 			if(!SSL_CTX_check_private_key(sslCTX)){
-				m.lock();
-				std::cerr << "Given private key does not match, aborting!!!" << std::endl;
-				m.unlock();
-				abort();
+				throw SSLException(NULL, 0, "Given private key is not valid, it does not match");
 			}
 		}
 	}
@@ -145,10 +125,7 @@ namespace pmm {
 		_socket = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);       
 		if(_socket == -1)
 		{
-			m.lock();
-			std::cerr << "Unable to create socket!!!" << std::endl;
-			m.unlock();
-			abort();
+			throw GenericException("Unable to create socket");
 		}
 		//Lets clear the _server_addr structure
 		memset(&_server_addr, '\0', sizeof(_server_addr));
@@ -164,24 +141,19 @@ namespace pmm {
 		}
 		else
 		{
-			m.lock();
-			std::cerr << "Unable to resolve server hostname" << std::endl;
-			m.unlock();
-			abort();
+			throw GenericException("Can't resolver APNS server hostname");
 		}
 		
 		int err = connect(_socket, (struct sockaddr*) &_server_addr, sizeof(_server_addr)); 
 		if(err == -1)
 		{
-			std::cerr << "Socket connection to remote server failed miserably, aborting..." << std::endl;
-			abort();
+			throw GenericException("Can't connect to remote APNS server: client connection failed.");
 		}    
 		
 		apnsConnection = SSL_new(sslCTX);
 		if(!apnsConnection)
 		{
-			std::cerr << "SSL socket instantiation failed :-(" << std::endl;
-			abort();
+			throw SSLException(NULL, 0, "Unable to create SSL connection object.");
 		}    
 		
 		SSL_set_fd(apnsConnection, _socket);
@@ -189,8 +161,7 @@ namespace pmm {
 		err = SSL_connect(apnsConnection);
 		if(err == -1)
 		{
-			std::cerr << "Real SSL connection to server didn't work at all :-(" << std::endl;
-			abort();
+			throw SSLException(apnsConnection, err, "APNS SSL Connection");
 		}
 #ifdef DEBUG
 		m.lock();
@@ -207,15 +178,13 @@ namespace pmm {
 		int err = SSL_shutdown(apnsConnection);
 		if(err == -1)
 		{
-			std::cerr << "Unable to shutdown SSL connection, sorry" << std::endl;
-			abort();
+			throw SSLException(apnsConnection, err, "SSL shutdown");
 		}    
 		
 		err = close(_socket);
 		if(err == -1)
 		{
-			std::cerr << "Unable to close native socker, aborting..." << std::endl;
-			abort();
+			throw GenericException("Can't close socket client APNS socket");
 		}    
 		
 		SSL_free(apnsConnection);    
@@ -260,18 +229,30 @@ namespace pmm {
 				std::cout << "DEBUG: APNSNotificationThread=0x" << std::hex << (long)pthread_self() << " keepalive still tickling!!!" << std::endl;
 				m.unlock();
 			}
-			if (i % 20 == 0 && notificationQueue->size() > 0) {
-				m.lock();
-				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
-				m.unlock();
-			}
 #endif
 			//Verify if there are any ending notifications in the notification queue
 			while (this->notificationQueue->size() > 0) {
+#ifdef DEBUG
+				m.lock();
+				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
+				m.unlock();
+#endif
 				NotificationPayload payload = notificationQueue->extractEntry();
 				try {
 					notifyTo(payload.deviceToken(), payload);
-				} catch (...) {
+				} 
+				catch (SSLException &sse1){
+					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
+						//Connection close, force reconnect
+						_socket = -1;
+						connect2APNS();
+						notificationQueue->add(payload);
+					}
+					else{
+						throw;
+					}
+				}
+				catch (...) {
 					notificationQueue->add(payload);
 				}
 			}
@@ -281,5 +262,35 @@ namespace pmm {
 	
 	void APNSNotificationThread::notifyTo(const std::string &devToken, const NotificationPayload &msg){
 		
+	}
+	
+	SSLException::SSLException(){ 
+		currentOperation = SSLOperationAny;
+	}
+	
+	SSLException::SSLException(SSL *sslConn, int sslStatus, const std::string &_derrmsg){
+		std::stringstream errbuf;
+		if (sslConn == NULL) {
+			errmsg = _derrmsg;
+		}
+		else {
+			if(_derrmsg.size() > 0) errbuf << _derrmsg << ": ";
+			else errbuf << "SSL error occurred ";
+			sslErrorCode = SSL_get_error(sslConn, sslStatus);
+			errbuf << "code=" << sslErrorCode << " ";
+			switch (sslErrorCode) {
+				case SSL_ERROR_NONE:
+					errbuf << "this is weird, the ssl operation actually succeded but an exception is still thrown, you are a bad programmer.";
+					break;
+				default:
+					errbuf << "unable to complete SSL task";
+					break;
+			}
+			errmsg = errbuf.str();
+		}
+	}
+
+	int SSLException::errorCode(){
+		return sslErrorCode;
 	}
 }
