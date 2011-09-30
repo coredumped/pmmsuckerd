@@ -84,15 +84,17 @@ namespace pmm {
 				abort();
 			}
 			std::string caPath;
-			size_t pos = _keyPath.find_last_of("/");
-			if (pos == _keyPath.npos) {
+			size_t pos = _certPath.find_last_of("/");
+			if (pos == _certPath.npos) {
 				caPath = ".";
 			}
 			else {
-				caPath = _keyPath.substr(0, pos);
+				caPath = _certPath.substr(0, pos);
 			}
 #ifdef DEBUG
+			m.lock();
 			std::cerr << "DEBUG: Using caPath=" << caPath << std::endl;
+			m.unlock();
 #endif
 			if (SSL_CTX_load_verify_locations(sslCTX, NULL, caPath.c_str()) <= 0) {
 				//Without a valid CA location we can0t continue doing anything!!!
@@ -101,19 +103,33 @@ namespace pmm {
 				abort();
 			}
 #ifdef DEBUG
-			std::cerr << "Loading certificate: " << _certPath << std::endl;
+			m.lock();
+			std::cerr << "Loading certificate... " << _certPath;
+			std::cerr.flush();
+			m.unlock();
 #endif
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
+				m.lock();
 				std::cerr << "Unable to load certificate, can't continue like this" << std::endl;
+				m.unlock();
 				abort();
 			}
+#ifdef DEBUG
+			m.lock();
+			std::cerr << "done" << std::endl;
+			m.unlock();
+#endif
 			SSL_CTX_set_default_passwd_cb(sslCTX, (pem_password_cb *)_certPassword.c_str());
 			if (SSL_CTX_use_PrivateKey_file(sslCTX, _keyPath.c_str(), SSL_FILETYPE_PEM) <= 0) {
+				m.lock();
 				std::cerr << "Preparation for using keyfile: " << _keyPath << " failed miserably" << std::endl;
+				m.unlock();
 				abort();
 			}
 			if(!SSL_CTX_check_private_key(sslCTX)){
+				m.lock();
 				std::cerr << "Given private key does not match, aborting!!!" << std::endl;
+				m.unlock();
 				abort();
 			}
 		}
@@ -122,12 +138,16 @@ namespace pmm {
 	void APNSNotificationThread::connect2APNS(){
 		initSSL();
 #ifdef DEBUG
+		m.lock();
 		std::cerr << "DEBUG: Connecting to APNS server..." << std::endl;
+		m.unlock();
 #endif
 		_socket = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);       
 		if(_socket == -1)
 		{
+			m.lock();
 			std::cerr << "Unable to create socket!!!" << std::endl;
+			m.unlock();
 			abort();
 		}
 		//Lets clear the _server_addr structure
@@ -144,7 +164,9 @@ namespace pmm {
 		}
 		else
 		{
+			m.lock();
 			std::cerr << "Unable to resolve server hostname" << std::endl;
+			m.unlock();
 			abort();
 		}
 		
@@ -169,7 +191,12 @@ namespace pmm {
 		{
 			std::cerr << "Real SSL connection to server didn't work at all :-(" << std::endl;
 			abort();
-		}	
+		}
+#ifdef DEBUG
+		m.lock();
+		std::cerr << "DEBUG: Successfully connected to APNS service. thread=0x" << std::hex << (long)pthread_self() << std::endl;
+		m.unlock();
+#endif
 	}
 	
 	void APNSNotificationThread::ifNotConnectedToAPNSThenConnect(){
@@ -234,11 +261,13 @@ namespace pmm {
 				m.unlock();
 			}
 			if (i % 20 == 0 && notificationQueue->size() > 0) {
+				m.lock();
 				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
+				m.unlock();
 			}
 #endif
 			//Verify if there are any ending notifications in the notification queue
-			while (notificationQueue->size() > 0) {
+			while (this->notificationQueue->size() > 0) {
 				NotificationPayload payload = notificationQueue->extractEntry();
 				try {
 					notifyTo(payload.deviceToken(), payload);

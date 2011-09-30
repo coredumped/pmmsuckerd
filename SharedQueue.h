@@ -53,6 +53,7 @@ namespace pmm {
 			m.lock();
 			s = queueData.size();
 			m.unlock();
+			return s;
 		}
 	};
 }

@@ -98,12 +98,15 @@ int main (int argc, const char * argv[])
 		//1. Initializa notification thread...
 		//2. Start thread
 		notifThreads[i].notificationQueue = &notificationQueue;
+		notifThreads[i].setCertPath("/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem");
+		notifThreads[i].setKeyPath("/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem");
+
 		pmm::ThreadDispatcher::start(notifThreads[i]);
 	}
 	//5. Dispatch polling threads for imap
 	//6. Dispatch polling threads for pop3
 	//7. After registration time ends, close every connection, return to Step 1
-
+	sleep(60);
     return 0;
 }
 
