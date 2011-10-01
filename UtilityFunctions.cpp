@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <strings.h>
 #include "UtilityFunctions.h"
 
 namespace pmm {
