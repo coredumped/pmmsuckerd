@@ -133,7 +133,9 @@ namespace pmm {
 		_server_addr.sin_port        = htons(_useSandbox ? APPLE_SANDBOX_PORT : APPLE_PORT);
 		_host_info = gethostbyname(_useSandbox ? APPLE_SANDBOX_HOST : APPLE_HOST);
 		int enable_nosigpipe = 1;
+#ifndef __linux__
 		setsockopt(_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)enable_nosigpipe, (socklen_t)sizeof(int));
+#endif
 		if(_host_info)
 		{
 			struct in_addr *address = (struct in_addr*)_host_info->h_addr_list[0];
