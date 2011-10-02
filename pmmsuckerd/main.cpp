@@ -100,11 +100,21 @@ int main (int argc, const char * argv[])
 		notifThreads[i].notificationQueue = &notificationQueue;
 		notifThreads[i].setCertPath("/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem");
 		notifThreads[i].setKeyPath("/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem");
-
 		pmm::ThreadDispatcher::start(notifThreads[i]);
 	}
+	int pop3Count = 0, imapCount = 0;
+	for (size_t i = 0; i < emailAccounts; i++) {
+		if (emailAccounts[i].mailboxType().compare("IMAP") == 0) imapCount++;
+		else pop3Count++;
+	}
 	//5. Dispatch polling threads for imap
-	//6. Dispatch polling threads for pop3
+	if (imapCount > 0) {
+		
+	}
+	if (pop3Count > 0) {
+		
+	}
+	//If we have pop3 accounts then we dispatch pop3 polling threads
 	//7. After registration time ends, close every connection, return to Step 1
 	sleep(60);
     return 0;

@@ -12,11 +12,15 @@
 #include <netdb.h>
 #include "APNSNotificationThread.h"
 #include "Mutex.h"
+#include "UtilityFunctions.h"
 #ifndef DEVICE_BINARY_SIZE
 #define DEVICE_BINARY_SIZE 32
 #endif
 #ifndef MAXPAYLOAD_SIZE
 #define MAXPAYLOAD_SIZE 256
+#endif
+#ifndef DEFAULT_WAIT_BEFORE_RECONNECT
+#define DEFAULT_WAIT_BEFORE_RECONNECT 15
 #endif
 
 namespace pmm {
@@ -24,9 +28,9 @@ namespace pmm {
 #ifdef DEBUG
 	static Mutex m;
 #endif
-	static bool sendPayload(SSL *sslPtr, char *deviceTokenBinary, char *payloadBuff, size_t payloadLength)
+	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength)
 	{
-		bool rtn = false;
+		bool rtn = true;
 		if (sslPtr && deviceTokenBinary && payloadBuff && payloadLength)
 		{
 			uint8_t command = 1; /* command number */
@@ -65,8 +69,10 @@ namespace pmm {
 			/* payload */
 			memcpy(binaryMessagePt, payloadBuff, payloadLength);
 			binaryMessagePt += payloadLength;
-			if (SSL_write(sslPtr, binaryMessageBuff, (binaryMessagePt - binaryMessageBuff)) > 0)
-				rtn = true;
+			int sslRetCode;
+			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (binaryMessagePt - binaryMessageBuff))) <= 0){
+				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
+			}
 		}
 		return rtn;
 	}
@@ -202,6 +208,7 @@ namespace pmm {
 #else
 		_useSandbox = false;
 #endif
+		waitTimeBeforeReconnectToAPNS = DEFAULT_WAIT_BEFORE_RECONNECT;
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
@@ -247,6 +254,7 @@ namespace pmm {
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
 						//Connection close, force reconnect
 						_socket = -1;
+						sleep(waitTimeBeforeReconnectToAPNS);
 						connect2APNS();
 						notificationQueue->add(payload);
 					}
@@ -262,8 +270,15 @@ namespace pmm {
 		}
 	}
 	
-	void APNSNotificationThread::notifyTo(const std::string &devToken, const NotificationPayload &msg){
-		
+	void APNSNotificationThread::notifyTo(const std::string &devToken, NotificationPayload &msg){
+		//Add some code here for god sake!!!
+		std::string jsonMsg = msg.toJSON();
+		if (devTokenCache.find(devToken) == devTokenCache.end()) {
+			std::string binaryDevToken;
+			devToken2Binary(devToken, binaryDevToken);
+			devTokenCache[devToken] = binaryDevToken;
+		}
+		sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size());
 	}
 	
 	SSLException::SSLException(){ 

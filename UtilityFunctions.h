@@ -13,6 +13,7 @@
 namespace pmm {
 
 	void url_encode(std::string &theString);
+	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken);
 }
 
 #endif

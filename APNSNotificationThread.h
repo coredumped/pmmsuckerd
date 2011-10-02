@@ -13,6 +13,7 @@
 #include "NotificationPayload.h"
 #include "GenericException.h"
 #include <string>
+#include <map>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -78,10 +79,12 @@ namespace pmm {
 		int _socket;
 		struct sockaddr_in _server_addr;
 		struct hostent *_host_info;
+		int waitTimeBeforeReconnectToAPNS;
+		std::map<std::string, std::string> devTokenCache;
 	protected:
 		bool sslInitComplete;
 		void initSSL();
-		void notifyTo(const std::string &devToken, const NotificationPayload &msg);
+		void notifyTo(const std::string &devToken, NotificationPayload &msg);
 	public:
 		SharedQueue<NotificationPayload> *notificationQueue;
 		APNSNotificationThread();

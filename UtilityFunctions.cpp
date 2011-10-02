@@ -38,5 +38,14 @@ namespace pmm {
 		}
 		if(replaceHappened) theString.assign(urlEncodedString.str());
 	}
+	
+	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken){
+		for (size_t i = 0; i < 64; i+=2) {
+			std::string hex_s = devTokenString.substr(i, 2);
+			int unit = 0;
+			sscanf(hex_s.c_str(), "%x", &unit);
+			binaryDevToken.append(sizeof(char), (char)unit);
+		}
+	}
 
 }
