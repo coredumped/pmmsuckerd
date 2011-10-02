@@ -15,6 +15,7 @@ namespace pmm {
 	private:
 	protected:
 	public:
+		
 		IMAPSuckerThread();
 		virtual ~IMAPSuckerThread();
 	};

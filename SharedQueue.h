@@ -27,14 +27,24 @@ namespace pmm {
 		
 		void add(T &entry){
 			m.lock();
-			queueData.push_back(entry);
+			try {
+				queueData.push_back(entry);
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
 			m.unlock();
 		}
 		
 		T peek(){
 			T val;
 			m.lock();
-			val = queueData[0];
+			try {
+				val = queueData[0];
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
 			m.unlock();
 			return T(val);			
 		}
@@ -42,8 +52,14 @@ namespace pmm {
 		T extractEntry(){
 			T val;
 			m.lock();
-			val = queueData[0];
-			queueData.erase(queueData.begin());
+			try{
+				val = queueData[0];
+				queueData.erase(queueData.begin());
+			}
+			catch(...){
+				m.unlock();
+				throw;
+			}
 			m.unlock();
 			return T(val);
 		}
@@ -51,7 +67,12 @@ namespace pmm {
 		size_t size(){
 			size_t s = 0;
 			m.lock();
-			s = queueData.size();
+			try {
+				s = queueData.size();
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
 			m.unlock();
 			return s;
 		}

@@ -103,7 +103,7 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(notifThreads[i]);
 	}
 	int pop3Count = 0, imapCount = 0;
-	for (size_t i = 0; i < emailAccounts; i++) {
+	for (size_t i = 0; i < emailAccounts.size(); i++) {
 		if (emailAccounts[i].mailboxType().compare("IMAP") == 0) imapCount++;
 		else pop3Count++;
 	}

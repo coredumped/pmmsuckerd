@@ -9,12 +9,17 @@
 #ifndef PMM_Sucker_MailSuckerThread_h
 #define PMM_Sucker_MailSuckerThread_h
 #include "GenericThread.h"
+#include "SharedVector.h"
+#include "MailAccountInfo.h"
 
 namespace pmm {
 	class MailSuckerThread : public GenericThread {
 	private:
 	protected:
+
 	public:
+		SharedVector<MailAccountInfo> emailAccounts;
+
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
 	};
