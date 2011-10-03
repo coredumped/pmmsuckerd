@@ -11,17 +11,42 @@
 #include "GenericThread.h"
 #include "SharedVector.h"
 #include "MailAccountInfo.h"
+#include "SharedQueue.h"
+#include "NotificationPayload.h"
+#include <string>
+#include <map>
 
 namespace pmm {
+	
+	class MailboxControl {
+	public:
+		std::string email;
+		time_t openedOn;
+		bool isOpened;
+		MailboxControl();
+		MailboxControl(const MailboxControl &m);
+	};
+	
 	class MailSuckerThread : public GenericThread {
 	private:
-	protected:
-
+	protected:		
+		Mutex mutex;
+		std::map<std::string, MailboxControl> mailboxControl;
+		std::map<std::string, int> serverConnectAttempts;
+		int iterationWaitMicroSeconds;
+		int maxOpenTime;
+		int maxServerReconnects;
+		virtual void closeConnection(const MailAccountInfo &m); //Override me
+		virtual void openConnection(const MailAccountInfo &m); //Override me
+		virtual void checkEmail(const MailAccountInfo &m); //Override me
 	public:
 		SharedVector<MailAccountInfo> emailAccounts;
+		SharedQueue<NotificationPayload> *notificationQueue;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
+		
+		virtual void operator()();
 	};
 }
 

@@ -39,27 +39,31 @@ namespace pmm {
 		useSSL_ = m.useSSL_;
 	}
 	
-	std::string MailAccountInfo::email(){
-		return std::string(email_);
+	const std::string &MailAccountInfo::email() const {
+		return email_;
 	}
 	
-	std::string MailAccountInfo::mailboxType(){
-		return std::string(mailboxType_);
+	const std::string &MailAccountInfo::mailboxType() const {
+		return mailboxType_;
+	}
+		
+	const std::string &MailAccountInfo::username() const {
+		return username_;
 	}
 	
-	std::string MailAccountInfo::username(){
-		return std::string(username_);
+	const std::string &MailAccountInfo::password() const {
+		return password_;
 	}
 	
-	std::string MailAccountInfo::password(){
-		return std::string(password_);
-	}
-	
-	std::string MailAccountInfo::serverAddress(){
-		return std::string(serverAddress_);
+	const std::string &MailAccountInfo::serverAddress() const {
+		return serverAddress_;
 	}
 	
 	int MailAccountInfo::serverPort(){
+		return serverPort_;
+	}
+	
+	int MailAccountInfo::serverPort() const {
 		return serverPort_;
 	}
 	
@@ -67,8 +71,16 @@ namespace pmm {
 		return std::vector<std::string>(devTokens_);
 	}
 	
+	const std::vector<std::string> &MailAccountInfo::devTokens() const{
+		return devTokens_;
+	}
+
+	
 	bool MailAccountInfo::useSSL(){
 		return useSSL_;
 	}
-	
+
+	bool MailAccountInfo::useSSL() const {
+		return useSSL_;
+	}
 }

@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <openssl/ssl.h>
+#include "openssl/ssl.h"
 #include <netdb.h>
 #include "APNSNotificationThread.h"
 #include "Mutex.h"
@@ -70,7 +70,7 @@ namespace pmm {
 			memcpy(binaryMessagePt, payloadBuff, payloadLength);
 			binaryMessagePt += payloadLength;
 			int sslRetCode;
-			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (binaryMessagePt - binaryMessageBuff))) <= 0){
+			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
 			}
 		}

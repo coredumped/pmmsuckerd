@@ -29,14 +29,17 @@ namespace pmm {
 						const std::string &password__, const std::string &serverAddress__, int serverPort__, 
 						const std::vector<std::string> &devTokens__, bool useSSL__);
 		MailAccountInfo(const MailAccountInfo &m);
-		std::string email();
-		std::string mailboxType();
-		std::string username();
-		std::string password();
-		std::string serverAddress();
+		const std::string &email() const;
+		const std::string &mailboxType() const;
+		const std::string &username() const;
+		const std::string &password() const;
+		const std::string &serverAddress() const;
 		int serverPort();
+		int serverPort() const;
 		std::vector<std::string> devTokens();
+		const std::vector<std::string> &devTokens() const;
 		bool useSSL();
+		bool useSSL() const;
 	};
 }
 

@@ -18,7 +18,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <openssl/ssl.h>
+#include "openssl/ssl.h"
 
 
 #ifndef APPLE_SANDBOX_HOST

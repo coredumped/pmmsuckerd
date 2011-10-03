@@ -49,4 +49,15 @@ namespace pmm {
 		}
 	}
 
+	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){
+		for (size_t i = 0; i < mailAccounts.size(); i++) {
+			if (mailAccounts[i].mailboxType().compare("IMAP") == 0) {
+				imapAccounts.push_back(mailAccounts[i]);
+			}
+			else {
+				pop3Accounts.push_back(mailAccounts[i]);				
+			}
+		}
+	}
+
 }

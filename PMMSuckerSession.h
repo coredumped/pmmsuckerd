@@ -10,7 +10,7 @@
 #define PMM_Sucker_PMMSuckerSession_h
 #ifndef DEFAULT_PMM_SERVICE_URL
 #define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
-//#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
+///#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
 #endif
 #include<string>
 #include "MailAccountInfo.h"
