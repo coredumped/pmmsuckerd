@@ -149,12 +149,12 @@ namespace pmm {
 			//int fd = mailimap_idle_get_fd(imapControl[m.email()].imap);
 			struct pollfd pelem;
 			pelem.fd = fd;
-			pelem.events = POLLIN | POLLOUT;
-			int result = poll(&pelem, 1, 1);
+			pelem.events = POLLIN;
+			int result = poll(&pelem, 1, 0);
 #ifdef DEBUG
 			if(result > 0){
 				mout.lock();
-				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: " << std::hex << pelem.revents << std::endl;
+				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << std::endl;
 				mout.unlock();
 			}
 #endif

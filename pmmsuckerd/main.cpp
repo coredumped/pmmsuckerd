@@ -45,7 +45,7 @@ int main (int argc, const char * argv[])
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	SSL_library_init();
 	SSL_load_error_strings();
-	for (int i = 1; 1 < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		std::string arg = argv[i];
 		if (arg.find("--url") == 0 && (i + 1) < argc) {
 			pmmServiceURL = argv[++i];
