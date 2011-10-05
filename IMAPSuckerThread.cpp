@@ -122,10 +122,10 @@ namespace pmm {
 				if(!mailimap_has_idle(imapControl[m.email()].imap)){
 					throw GenericException("Can't POLL non IDLE mailboxes.");
 				}
-				/*result = mailimap_idle(imapControl[m.email()].imap);
+				result = mailimap_idle(imapControl[m.email()].imap);
 				if(etpanOperationFailed(result)){
 					throw GenericException("Unable to start IDLE!!!");
-				}*/
+				}
 				//Report successfull login
 				mailboxControl[m.email()].isOpened = true;
 				mailboxControl[m.email()].openedOn = time(0x00);
@@ -154,7 +154,7 @@ namespace pmm {
 #ifdef DEBUG
 			if(result > 0){
 				mout.lock();
-				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << std::endl;
+				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << " data: " << mailimap_read_line(imap) << std::endl;
 				mout.unlock();
 			}
 #endif
