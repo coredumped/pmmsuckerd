@@ -49,7 +49,7 @@ namespace pmm {
 			binbuilder << std::hex << (char)unit;
 			//binaryDevToken.append(sizeof(char), (char)unit);
 		}
-		binaryDevToken = binbuilder.str();
+		binaryDevToken = binbuilder.str();q
 	}
 
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){

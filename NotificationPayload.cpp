@@ -32,11 +32,11 @@ namespace pmm {
 		std::string encodedMsg = msg;
 		url_encode(encodedMsg);
 		jsonbuilder << "{";
-		jsonbuilder << " \"aps\": ";
-		jsonbuilder << " {";
-		jsonbuilder << "  \"alert\": \"" << encodedMsg << "\",";
-		jsonbuilder << "  \"sound\": \"" << _soundName << "\"";
-		jsonbuilder << " }";
+		jsonbuilder << "\"aps\":";
+		jsonbuilder << "{";
+		jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
+		jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+		jsonbuilder << "}";
 		jsonbuilder << "}";
 		return std::string(jsonbuilder.str());
 	}

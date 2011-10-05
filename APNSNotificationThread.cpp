@@ -62,7 +62,7 @@ namespace pmm {
 			memcpy(binaryMessagePt, deviceTokenBinary, DEVICE_BINARY_SIZE);
 			binaryMessagePt += DEVICE_BINARY_SIZE;
 			
-			/* payload length network order */
+			/* payload length network obrder */
 			memcpy(binaryMessagePt, &networkOrderPayloadLength, sizeof(uint16_t));
 			binaryMessagePt += sizeof(uint16_t);
 			
@@ -72,6 +72,15 @@ namespace pmm {
 			int sslRetCode;
 			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
+			}
+			if(SSL_pending(sslPtr) > 0){
+				char apnsRetCode[6];
+				SSL_read(sslPtr, (void *)apnsRetCode, 6);
+				if (apnsRetCode[1] != 0) {
+					std::stringstream errmsg;
+					errmsg << "Unable to post notification, error code=" << (int)apnsRetCode[1];
+					throw GenericException(errmsg.str());
+				}
 			}
 		}
 		return rtn;
