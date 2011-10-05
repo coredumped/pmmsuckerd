@@ -9,6 +9,7 @@
 #ifndef PMM_Sucker_MailSuckerThread_h
 #define PMM_Sucker_MailSuckerThread_h
 #include "GenericThread.h"
+#include "GenericException.h"
 #include "SharedVector.h"
 #include "MailAccountInfo.h"
 #include "SharedQueue.h"

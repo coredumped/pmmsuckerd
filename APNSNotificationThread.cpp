@@ -227,18 +227,18 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::operator()(){
-		size_t i;
+		//size_t i;  
 		initSSL();
 		connect2APNS();
 		while (true) {
-#ifdef DEBUG
+/*#ifdef DEBUG
 			i++;
 			if(i % 40 == 0){
 				m.lock();
 				std::cout << "DEBUG: APNSNotificationThread=0x" << std::hex << (long)pthread_self() << " keepalive still tickling!!!" << std::endl;
 				m.unlock();
 			}
-#endif
+#endif*/
 			//Verify if there are any ending notifications in the notification queue
 			while (this->notificationQueue->size() > 0) {
 #ifdef DEBUG

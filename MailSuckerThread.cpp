@@ -56,8 +56,9 @@ namespace pmm {
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
 				//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
-				if (currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
-				if (!mCtrl.isOpened) openConnection(emailAccounts[i]);
+				if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
+				if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
+				checkEmail(emailAccounts[i]);
 			}
 			usleep(iterationWaitMicroSeconds);
 		}

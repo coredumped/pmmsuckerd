@@ -13,7 +13,7 @@
 
 GCC=g++
 CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags`
-LIBS=`pkg-config libcurl --libs` -luuid -lpthread -lssl
+LIBS=`pkg-config libcurl --libs` -luuid -lpthread -lssl -letpan
 
 all: pmmsuckerd
 

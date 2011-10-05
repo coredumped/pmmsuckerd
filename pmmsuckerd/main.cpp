@@ -135,7 +135,10 @@ int main (int argc, const char * argv[])
 		//pmm::ThreadDispatcher::start(pop3SuckingThreads[i]);
 	}
 	//7. After registration time ends, close every connection, return to Step 1
-	sleep(60);
+	while (true) {
+		//session.performAutoRegister();
+		sleep(10);
+	}
     return 0;
 }
 
