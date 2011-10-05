@@ -26,7 +26,7 @@
 namespace pmm {
 	
 #ifdef DEBUG
-	static Mutex m;
+	extern Mutex mout;
 #endif
 	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength)
 	{
@@ -104,9 +104,9 @@ namespace pmm {
 				throw SSLException(NULL, 0, "Unable to verify CA location.");
 			}
 #ifdef DEBUG
-			m.lock();
+			mout.lock();
 			std::cerr << "Loading certificate... " << _certPath << std::endl;
-			m.unlock();
+			mout.unlock();
 #endif
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
 				throw SSLException(NULL, 0, "Unable to load certificate file");
@@ -124,9 +124,9 @@ namespace pmm {
 	void APNSNotificationThread::connect2APNS(){
 		initSSL();
 #ifdef DEBUG
-		m.lock();
+		mout.lock();
 		std::cerr << "DEBUG: Connecting to APNS server..." << std::endl;
-		m.unlock();
+		mout.unlock();
 #endif
 		_socket = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);       
 		if(_socket == -1)
@@ -172,9 +172,9 @@ namespace pmm {
 			throw SSLException(apnsConnection, err, "APNS SSL Connection");
 		}
 #ifdef DEBUG
-		m.lock();
+		mout.lock();
 		std::cerr << "DEBUG: Successfully connected to APNS service. thread=0x" << std::hex << (long)pthread_self() << std::endl;
-		m.unlock();
+		mout.unlock();
 #endif
 	}
 	
@@ -227,24 +227,26 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::operator()(){
-		//size_t i;  
+#ifdef DEBUG
+		size_t i;  
+#endif
 		initSSL();
 		connect2APNS();
 		while (true) {
-/*#ifdef DEBUG
+#ifdef DEBUG
 			i++;
 			if(i % 40 == 0){
-				m.lock();
-				std::cout << "DEBUG: APNSNotificationThread=0x" << std::hex << (long)pthread_self() << " keepalive still tickling!!!" << std::endl;
-				m.unlock();
+				mout.lock();
+				std::cout << "DEBUG: APNSNotificationThread=0x" << std::hex << (long)pthread_self() << " keepalive still tickling!!! pending=" << notificationQueue->size() << std::endl;
+				mout.unlock();
 			}
-#endif*/
+#endif
 			//Verify if there are any ending notifications in the notification queue
-			while (this->notificationQueue->size() > 0) {
+			while (notificationQueue->size() > 0) {
 #ifdef DEBUG
-				m.lock();
+				mout.lock();
 				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
-				m.unlock();
+				mout.unlock();
 #endif
 				NotificationPayload payload = notificationQueue->extractEntry();
 				try {
@@ -273,6 +275,11 @@ namespace pmm {
 	void APNSNotificationThread::notifyTo(const std::string &devToken, NotificationPayload &msg){
 		//Add some code here for god sake!!!
 		std::string jsonMsg = msg.toJSON();
+#ifdef DEBUG
+		mout.lock();
+		std::cout << "DEBUG: Sending notification " << jsonMsg << std::endl;
+		mout.unlock();
+#endif
 		if (devTokenCache.find(devToken) == devTokenCache.end()) {
 			std::string binaryDevToken;
 			devToken2Binary(devToken, binaryDevToken);
