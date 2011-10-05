@@ -26,7 +26,12 @@
 #ifndef DEFAULT_MAX_IMAP_POLLING_THREADS
 #define DEFAULT_MAX_IMAP_POLLING_THREADS 2
 #endif
-
+#ifndef DEFAULT_SSL_CERTIFICATE_PATH
+#define DEFAULT_SSL_CERTIFICATE_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
+#endif
+#ifndef DEFAULT_SS_PRIVATE_KEY_PATH
+#define DEFAULT_SS_PRIVATE_KEY_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
+#endif
 void printHelpInfo();
 
 int main (int argc, const char * argv[])
@@ -35,6 +40,8 @@ int main (int argc, const char * argv[])
 	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
 	size_t maxIMAPSuckerThreads = DEFAULT_MAX_IMAP_POLLING_THREADS;
 	size_t maxPOP3SuckerThreads = DEFAULT_MAX_POP3_POLLING_THREADS;
+	std::string sslCertificatePath = DEFAULT_SSL_CERTIFICATE_PATH;
+	std::string sslPrivateKeyPath = DEFAULT_SS_PRIVATE_KEY_PATH;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	SSL_library_init();
 	SSL_load_error_strings();
@@ -72,6 +79,12 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--max-pop3-threads") == 0 && (i + 1) < argc) {
 			std::stringstream input(argv[++i]);
 			input >> maxPOP3SuckerThreads;			
+		}
+		else if(arg.compare("--ssl-certificate") == 0 && (i + 1) < argc){
+			sslCertificatePath = argv[++i];
+		}
+		else if(arg.compare("--ssl-private-key") == 0 && (i + 1) < argc){
+			sslPrivateKeyPath = argv[++i];
 		}
 	}
 	pmm::SuckerSession session(pmmServiceURL);
@@ -111,8 +124,8 @@ int main (int argc, const char * argv[])
 		//1. Initializa notification thread...
 		//2. Start thread
 		notifThreads[i].notificationQueue = &notificationQueue;
-		notifThreads[i].setCertPath("/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem");
-		notifThreads[i].setKeyPath("/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem");
+		notifThreads[i].setCertPath(sslCertificatePath);
+		notifThreads[i].setKeyPath(sslPrivateKeyPath);
 		pmm::ThreadDispatcher::start(notifThreads[i]);
 	}
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
@@ -150,4 +163,6 @@ void printHelpInfo() {
 	std::cout << "--max-nthreads	 <number>	Changes the maximum amount of threads to allocate for push notification handling" << std::endl;
 	std::cout << "--max-imap-threads <number>   Specifies the amount of threads to dispatch for IMAP mailbox sucking" << std::endl;
 	std::cout << "--max-pop3-threads <number>   Specifies the amount of threads to dispatch for POP3 mailbox sucking" << std::endl;
+	std::cout << "--ssl-certificate  <file>     Path where the SSL certificate for APNS is located" << std::endl;
+	std::cout << "--ssl-private-key  <file>     Path where the SSL certificate private key is located" << std::endl;
 }

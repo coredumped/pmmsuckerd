@@ -141,7 +141,7 @@ namespace pmm {
 				conf.getline(buffer, 8191);
 				char *sptr = index(buffer, '=');
 				if (sptr != NULL) {
-					if (strncmp(buffer, "suckerID", 8)) {
+					if (strncmp(buffer, "suckerID", 8) == 0) {
 						suckerID = (sptr + 1);
 					}
 				}
