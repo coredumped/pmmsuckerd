@@ -46,10 +46,10 @@ namespace pmm {
 			std::string hex_s = devTokenString.substr(i, 2);
 			int unit = 0;
 			sscanf(hex_s.c_str(), "%x", &unit);
-			binbuilder << std::hex << (char)unit;
+			binbuilder << std::hex << htonl(unit);
 			//binaryDevToken.append(sizeof(char), (char)unit);
 		}
-		binaryDevToken = binbuilder.str();q
+		binaryDevToken = binbuilder.str();
 	}
 
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){
