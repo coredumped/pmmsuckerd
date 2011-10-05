@@ -41,12 +41,15 @@ namespace pmm {
 	}
 	
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken){
+		std::stringstream binbuilder;
 		for (size_t i = 0; i < 64; i+=2) {
 			std::string hex_s = devTokenString.substr(i, 2);
 			int unit = 0;
 			sscanf(hex_s.c_str(), "%x", &unit);
-			binaryDevToken.append(sizeof(char), (char)unit);
+			binbuilder << std::hex << (char)unit;
+			//binaryDevToken.append(sizeof(char), (char)unit);
 		}
+		binaryDevToken = binbuilder.str();
 	}
 
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){
