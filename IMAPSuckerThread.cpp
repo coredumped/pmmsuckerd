@@ -153,9 +153,16 @@ namespace pmm {
 			int result = poll(&pelem, 1, 0);
 #ifdef DEBUG
 			if(result > 0){
+				char *response = mailimap_read_line(imap);
 				mout.lock();
-				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << " data: " << mailimap_read_line(imap) << std::endl;
+				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << " data: " << response << std::endl;
 				mout.unlock();
+				std::stringstream msg;
+				msg << "To: " << m.email() << ": " << response;
+				for (size_t i = 0; i < m.devTokens().size(); i++) {
+					NotificationPayload np(m.devTokens()[i], msg.str());
+					notificationQueue->add(np);
+				}
 			}
 #endif
 
@@ -185,12 +192,6 @@ namespace pmm {
 					char *response = mailimap_read_line(imap);
 					std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " recent messages in " << mStatus->st_mailbox << ": " << nx->st_value << " clist has " << clist_count(mStatus->st_info_list) << std::endl; 
 					mout.unlock();
-					std::stringstream msg;
-					msg << "To: " << m.email() << ": " << response;
-					for (size_t i = 0; i < m.devTokens().size(); i++) {
-						NotificationPayload np(m.devTokens()[i], msg.str());
-						notificationQueue->add(np);
-					}
 				}
 #endif
 				mailimap_mailbox_data_status_free(mStatus);
