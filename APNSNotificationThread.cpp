@@ -73,14 +73,20 @@ namespace pmm {
 			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
 			}
-			if(SSL_pending(sslPtr) > 0){
-				char apnsRetCode[6];
-				SSL_read(sslPtr, (void *)apnsRetCode, 6);
-				if (apnsRetCode[1] != 0) {
-					std::stringstream errmsg;
-					errmsg << "Unable to post notification, error code=" << (int)apnsRetCode[1];
-					throw GenericException(errmsg.str());
-				}
+			char apnsRetCode[6];
+			SSL_read(sslPtr, (void *)apnsRetCode, 6);
+#ifdef DEBUG
+			mout.lock();
+			std::streamsize _w = std::cerr.width();
+			std::cerr.width(2);
+			std::cerr << "DEBUG: APNS Response: 0x" << std::hex << (int)apnsRetCode[0] << " 0x" << std::hex << (int)apnsRetCode[1] << " 0x" << std::hex << (int)apnsRetCode[2] << " 0x" << std::hex << (int)apnsRetCode[3] << " 0x" << std::hex << (int)apnsRetCode[4] << " 0x" << std::hex << (int)apnsRetCode[5] << std::endl; 
+			std::cerr.width(_w);
+			mout.unlock();
+#endif
+			if (apnsRetCode[1] != 0) {
+				std::stringstream errmsg;
+				errmsg << "Unable to post notification, error code=" << (int)apnsRetCode[1];
+				throw GenericException(errmsg.str());
 			}
 		}
 		return rtn;
