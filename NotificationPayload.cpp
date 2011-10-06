@@ -31,11 +31,13 @@ namespace pmm {
 		std::stringstream jsonbuilder;
 		std::string encodedMsg = msg;
 		url_encode(encodedMsg);
+#warning TODO: Remember to compute the icon badge before any notification
 		jsonbuilder << "{";
 		jsonbuilder << "\"aps\":";
 		jsonbuilder << "{";
 		jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
-		jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+		jsonbuilder << "\"sound\":\"" << _soundName << "\",";
+		jsonbuilder << "\"badge\":1,";
 		jsonbuilder << "}";
 		jsonbuilder << "}";
 		return std::string(jsonbuilder.str());

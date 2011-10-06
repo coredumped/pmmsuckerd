@@ -17,6 +17,7 @@ namespace pmm {
 		std::string _soundName;
 		std::string msg;
 		std::string devToken;
+		int _badgeNumber;
 	public:
 		NotificationPayload();
 		NotificationPayload(const std::string &devToken_, const std::string &_message, const std::string &sndName = "default");

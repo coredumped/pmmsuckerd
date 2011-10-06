@@ -11,8 +11,13 @@
 #include <sstream>
 #include <strings.h>
 #include "UtilityFunctions.h"
+#include "Mutex.h"
 
 namespace pmm {
+#ifdef DEBUG
+	extern Mutex mout;
+#endif
+	
 	static inline bool isURLEncodable(char c){
 		static const char *urlEncodableCharacters = "$&+,/:;=?@<>#%{}|\\^~[]` ";		
 		if (c <= 0x1F || c >= 0x7f) {
@@ -53,12 +58,28 @@ namespace pmm {
 	}*/
 	
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken){
-		for (size_t i = 0; i < 64; i+=2) {
-			std::string hex_s = devTokenString.substr(i, 2);
+		char buf[32];
+		char *bufptr = buf;
+		
+		for (size_t i = 0; i < devTokenString.size(); i+=8) {
+			std::string hex_s = devTokenString.substr(i, 8);
 			int unit = 0;
 			sscanf(hex_s.c_str(), "%x", &unit);
-			binaryDevToken.append(sizeof(char), (char)unit);
+			unit = htonl(unit);
+			memcpy(bufptr, (void *)&unit, sizeof(unsigned int));
+			bufptr += sizeof(unsigned int);
 		}
+		binaryDevToken.assign(buf, 32);
+#ifdef DEBUG
+		mout.lock();
+		std::cerr << "DEBUG: " << devTokenString << "=";
+		std::cerr.width(2);
+		for(size_t i = 0; i < binaryDevToken.size(); i++){
+			std::cerr << std::hex << (unsigned char)binaryDevToken[i];
+		}
+		std::cerr << std::endl;
+		mout.unlock();
+#endif
 	}
 
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){
