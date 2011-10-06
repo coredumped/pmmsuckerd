@@ -10,6 +10,8 @@
 #include <iostream>
 #include <sstream>
 #include <strings.h>
+#include <arpa/inet.h>
+#include <string.h>
 #include "UtilityFunctions.h"
 #include "Mutex.h"
 
