@@ -20,7 +20,7 @@ namespace pmm {
 		int _badgeNumber;
 	public:
 		NotificationPayload();
-		NotificationPayload(const std::string &devToken_, const std::string &_message, const std::string &sndName = "default");
+		NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber, const std::string &sndName = "default");
 		NotificationPayload(const NotificationPayload &n);
 		
 		std::string toJSON();

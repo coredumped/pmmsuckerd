@@ -76,10 +76,11 @@ namespace pmm {
 			serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
 			if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 				//Max reconnect exceeded, notify user
+#warning TODO: Find a better way to notify the user that we're unable to connect into their mail server
 				std::stringstream errmsg;
 				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 				for (size_t i = 0; m.devTokens().size(); i++) {
-					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
+					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str(), ++mailboxControl[m.email()].availableMessages));
 					notificationQueue->add(msg);
 				}
 				serverConnectAttempts[m.serverAddress()] = 0;
@@ -95,9 +96,10 @@ namespace pmm {
 				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
 					std::stringstream errmsg;
+#warning TODO: Find a better way to notify the user that we're unable to login into their mail account
 					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 					for (size_t i = 0; m.devTokens().size(); i++) {
-						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
+						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str(), ++mailboxControl[m.email()].availableMessages));
 						notificationQueue->add(msg);
 					}
 					serverConnectAttempts[m.serverAddress()] = 0;
@@ -140,63 +142,38 @@ namespace pmm {
 	}
 	
 	void IMAPSuckerThread::checkEmail(const MailAccountInfo &m){
-		if (mailboxControl[m.email()].isOpened) {
+		std::string theEmail = m.email();
+		if (mailboxControl[theEmail].isOpened) {
 			mailimap *imap = imapControl[m.email()].imap;
-#ifdef __linux__
-			
 			mailstream_low *mlow = mailstream_get_low(imap->imap_stream);
 			int fd = mailstream_low_get_fd(mlow);
-			//int fd = mailimap_idle_get_fd(imapControl[m.email()].imap);
 			struct pollfd pelem;
 			pelem.fd = fd;
 			pelem.events = POLLIN;
-			int result = poll(&pelem, 1, 0);
-#ifdef DEBUG
-			if(result > 0){
+			int recent = -1;
+			while (poll(&pelem, 1, 2) > 0) {
 				char *response = mailimap_read_line(imap);
+				if (strstr(response, "RECENT") != NULL) {
+					//Compute how many recent we have
+					int recent;
+					std::istringstream input(std::string(response).substr(2));
+					input >> recent;
+					mailboxControl[theEmail].availableMessages += recent;
+				}
+			}
+			if (recent >= 0) {
+				mailimap_idle_done(imap);
 				mout.lock();
-				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << " data: " << response << std::endl;
+				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << " (recent=" << recent << ") data: " << response << std::endl;
 				mout.unlock();
 				std::stringstream msg;
 				msg << "To: " << m.email() << ": " << response;
 				for (size_t i = 0; i < m.devTokens().size(); i++) {
-					NotificationPayload np(m.devTokens()[i], msg.str());
+					NotificationPayload np(m.devTokens()[i], msg.str(), mailboxControl[theEmail].availableMessages);
 					notificationQueue->add(np);
-				}
+				}				
+				mailimap_idle(imap);
 			}
-#endif
-
-#else
-			
-/*			int result = mailimap_idle_done(imapControl[m.email()].imap);
-#ifdef DEBUG
-			if(result != MAILIMAP_NO_ERROR){
-			mout.lock();
-			std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " IDLE result is: " << result << std::endl;
-			mout.unlock();
-			}
-#endif			
-*/
-						
-			mailimap_noop(imap);
-			struct mailimap_status_att_list *inattlist = mailimap_status_att_list_new_empty();
-			mailimap_status_att_list_add(inattlist, MAILIMAP_STATUS_ATT_RECENT);
-			struct mailimap_mailbox_data_status *mStatus = 0x00;
-			int result = mailimap_status(imap, "INBOX", inattlist, &mStatus);
-			if(result == MAILIMAP_NO_ERROR){
-#ifdef DEBUG
-				clistiter *citer = clist_begin(mStatus->st_info_list);
-				mailimap_status_info * nx = (mailimap_status_info *)clist_content(citer);
-				if (nx->st_value > 0) {
-					mout.lock();
-					char *response = mailimap_read_line(imap);
-					std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " recent messages in " << mStatus->st_mailbox << ": " << nx->st_value << " clist has " << clist_count(mStatus->st_info_list) << std::endl; 
-					mout.unlock();
-				}
-#endif
-				mailimap_mailbox_data_status_free(mStatus);
-			}
-#endif
 		}
 		else {
 			openConnection(m);

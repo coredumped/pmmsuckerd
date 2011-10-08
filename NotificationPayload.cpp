@@ -47,10 +47,11 @@ namespace pmm {
 		
 	}
 	
-	NotificationPayload::NotificationPayload(const std::string &devToken_, const std::string &_message, const std::string &sndName){
+	NotificationPayload::NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber, const std::string &sndName){
 		msg = _message;
 		_soundName = sndName;
 		devToken = devToken_;
+		_badgeNumber = badgeNumber;
 	}
 	
 	NotificationPayload::NotificationPayload(const NotificationPayload &n){
@@ -63,13 +64,12 @@ namespace pmm {
 		std::stringstream jsonbuilder;
 		std::string encodedMsg = msg;
 		msg_encode(encodedMsg);
-#warning TODO: Remember to compute the icon badge before any notification
 		jsonbuilder << "{";
 		jsonbuilder << "\"aps\":";
 		jsonbuilder << "{";
 		jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
 		jsonbuilder << "\"sound\":\"" << _soundName << "\",";
-		jsonbuilder << "\"badge\":1,";
+		jsonbuilder << "\"badge\":" << _badgeNumber << ",";
 		jsonbuilder << "}";
 		jsonbuilder << "}";
 		return std::string(jsonbuilder.str());

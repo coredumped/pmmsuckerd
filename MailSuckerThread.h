@@ -24,6 +24,7 @@ namespace pmm {
 		std::string email;
 		time_t openedOn;
 		bool isOpened;
+		int availableMessages;
 		MailboxControl();
 		MailboxControl(const MailboxControl &m);
 	};

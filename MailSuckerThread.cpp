@@ -28,12 +28,14 @@ namespace pmm {
 	MailboxControl::MailboxControl(){
 		openedOn = time(0);
 		isOpened = false;
+		availableMessages = 0;
 	}
 	
 	MailboxControl::MailboxControl(const MailboxControl &m){
 		openedOn = m.openedOn;
 		isOpened = m.isOpened;
 		email = m.email;
+		availableMessages = m.availableMessages;
 	}
 	
 	MailSuckerThread::MailSuckerThread(){
