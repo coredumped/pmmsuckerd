@@ -11,6 +11,7 @@
 #include "Mutex.h"
 #include <string>
 #include <vector>
+#include <queue>
 #include <map>
 
 namespace pmm {
@@ -19,27 +20,27 @@ namespace pmm {
 	class SharedQueue {
 	private:
 		Mutex m;
-		std::vector<T>queueData;
+		std::queue<T>queueData;
 	protected:
 	public:
 		SharedQueue(){ }
 		virtual ~SharedQueue(){ }
 		
-		void add(T &entry){
+		/*void add(T &entry){
 			m.lock();
 			try {
-				queueData.push_back(entry);
+				queueData.push(entry);
 			} catch (...) {
 				m.unlock();
 				throw;
 			}
 			m.unlock();
-		}
+		}*/
 		
 		void add(const T &entry){
 			m.lock();
 			try {
-				queueData.push_back(entry);
+				queueData.push(entry);
 			} catch (...) {
 				m.unlock();
 				throw;
@@ -51,7 +52,7 @@ namespace pmm {
 			T val;
 			m.lock();
 			try {
-				val = queueData[0];
+				val = queueData.front();
 			} catch (...) {
 				m.unlock();
 				throw;
@@ -63,8 +64,9 @@ namespace pmm {
 		void extractEntry(T &val){
 			m.lock();
 			try{
-				val = queueData[0];
-				queueData.erase(queueData.begin());
+				val = queueData.front();
+				//queueData.erase(queueData.begin());
+				queueData.pop();
 			}
 			catch(...){
 				m.unlock();

@@ -182,7 +182,7 @@ namespace pmm {
 	}
 	
 	IMAPSuckerThread::MailFetcher::MailFetcher(){
-		
+		availableMessages = 0;
 	}
 	
 	/*void IMAPSuckerThread::MailFetcher::fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages){

@@ -253,7 +253,7 @@ namespace pmm {
 	
 	void APNSNotificationThread::operator()(){
 #ifdef DEBUG
-		size_t i;  
+		size_t i = 0;  
 #endif
 		initSSL();
 		connect2APNS();

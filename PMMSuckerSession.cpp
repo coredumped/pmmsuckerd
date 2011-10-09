@@ -294,11 +294,13 @@ namespace pmm {
 	SuckerSession::SuckerSession() {
 		apiKey = DEFAULT_API_KEY;
 		pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
+		expirationTime = time(0x00) + 600;
 	}
 	
 	SuckerSession::SuckerSession(const std::string &srvURL) {
 		apiKey = DEFAULT_API_KEY;
 		pmmServiceURL = srvURL;
+		expirationTime = time(0x00) + 600;
 	}
 	
 	bool SuckerSession::register2PMM(){
