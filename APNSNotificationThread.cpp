@@ -9,7 +9,9 @@
 #include <iostream>
 #include <sstream>
 #include "openssl/ssl.h"
+#include "openssl/err.h"
 #include <netdb.h>
+#include <cerrno>
 #include "APNSNotificationThread.h"
 #include "Mutex.h"
 #include "UtilityFunctions.h"
@@ -130,6 +132,7 @@ namespace pmm {
 			std::cerr << "Loading certificate... " << _certPath << std::endl;
 			mout.unlock();
 #endif
+#warning TODO: Verify that the certificate has not expired, if it has send a very loud panic alert
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
 				throw SSLException(NULL, 0, "Unable to load certificate file");
 			}
@@ -270,7 +273,8 @@ namespace pmm {
 				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
 				mout.unlock();
 #endif
-				NotificationPayload payload = notificationQueue->extractEntry();
+				NotificationPayload payload;
+				notificationQueue->extractEntry(payload);
 				try {
 					notifyTo(payload.deviceToken(), payload);
 				} 
@@ -283,6 +287,11 @@ namespace pmm {
 						notificationQueue->add(payload);
 					}
 					else{
+#ifdef DEBUG
+						mout.lock();
+						std::cerr << "Got SSL error with code=" << sse1.errorCode() << " errno=" << errno << std::endl;
+						mout.unlock();
+#endif
 						throw;
 					}
 				}
@@ -328,9 +337,39 @@ namespace pmm {
 				case SSL_ERROR_NONE:
 					errbuf << "this is weird, the ssl operation actually succeded but an exception is still thrown, you are a bad programmer.";
 					break;
-				default:
-					errbuf << "unable to complete SSL task";
+				case SSL_ERROR_SYSCALL:
+				{
+					unsigned long theErr = ERR_get_error();
+					if (theErr == 0) {
+						if (sslStatus == 0) {
+							errbuf << "an EOF has been sent through the PIPE, this violates the SSL protocol!!!!";
+						}
+						else if(sslStatus == -1){
+							errbuf << "socket error=" << errno;
+						}
+						else {
+							errbuf << "syscall related exception, all is lost";
+						}
+					}
+					else {
+						char sslErrBuf[4096];
+						ERR_error_string_n(theErr, sslErrBuf, 4095);
+						errbuf << "ssl error: " << sslErrBuf;
+					}
+				}
 					break;
+				default:
+				{
+					unsigned long theErr = ERR_get_error();
+					if (theErr == 0) {
+						errbuf << "unable to complete SSL task";
+					}
+					else {
+						char sslErrBuf[4096];
+						ERR_error_string_n(theErr, sslErrBuf, 4095);
+						errbuf << "ssl error: " << sslErrBuf;						
+					}
+				}
 			}
 			errmsg = errbuf.str();
 		}

@@ -36,6 +36,17 @@ namespace pmm {
 			m.unlock();
 		}
 		
+		void add(const T &entry){
+			m.lock();
+			try {
+				queueData.push_back(entry);
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
+			m.unlock();
+		}
+		
 		T peek(){
 			T val;
 			m.lock();
@@ -49,8 +60,7 @@ namespace pmm {
 			return T(val);			
 		}
 		
-		T extractEntry(){
-			T val;
+		void extractEntry(T &val){
 			m.lock();
 			try{
 				val = queueData[0];
@@ -61,7 +71,6 @@ namespace pmm {
 				throw;
 			}
 			m.unlock();
-			return T(val);
 		}
 		
 		size_t size(){

@@ -13,17 +13,21 @@
 namespace pmm {
 	class NotificationPayload {
 	private:
+		void build();
 	protected:
 		std::string _soundName;
 		std::string msg;
 		std::string devToken;
 		int _badgeNumber;
+		std::string jsonRepresentation;
 	public:
 		NotificationPayload();
 		NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber, const std::string &sndName = "default");
 		NotificationPayload(const NotificationPayload &n);
+		~NotificationPayload();
 		
-		std::string toJSON();
+		//std::string &toJSON();
+		const std::string &toJSON() const;
 		std::string &soundName();
 		std::string &message();
 		std::string &deviceToken();

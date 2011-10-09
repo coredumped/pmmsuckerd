@@ -12,10 +12,16 @@
 #include <sstream>
 #include <poll.h>
 #include "IMAPSuckerThread.h"
+#include "ThreadDispatcher.h"
 #include "libetpan/libetpan.h"
+#include <sqlite3.h>
+
 
 #ifndef DEFAULT_MAX_MAIL_FETCHERS
 #define DEFAULT_MAX_MAIL_FETCHERS 2
+#endif
+#ifndef DEFAULT_FETCH_RETRY_INTERVAL
+#define DEFAULT_FETCH_RETRY_INTERVAL 60
 #endif
 
 namespace pmm {
@@ -91,7 +97,7 @@ namespace pmm {
 		return 0;
 	}
 	
-	static void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const MailAccountInfo &m, int badgeNumber)
+	void IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch, int badgeNumber)
 	{
 		struct mailimap_set * set;
 		struct mailimap_section * section;
@@ -124,6 +130,10 @@ namespace pmm {
 		r = mailimap_uid_fetch(imap, set, fetch_type, &fetch_result);
 		if(etpanOperationFailed(r)){
 #warning Enqueue mail fetch for later
+			IMAPFetchControl ifc = imapFetch;
+			ifc.madeAttempts++;
+			ifc.nextAttempt = time(NULL) + fetchRetryInterval;
+			fetchQueue->add(ifc);
 		}
 		else{
 			//printf("fetch %u\n", (unsigned int) uid);
@@ -136,16 +146,29 @@ namespace pmm {
 			}
 			//Parse e-mail, retrieve FROM and SUBJECT
 			
-			for (size_t i = 0; i < m.devTokens().size(); i++) {
+			for (size_t i = 0; i < imapFetch.mailAccountInfo.devTokens().size(); i++) {
 				//Apply all processing rules before notifying
-				NotificationPayload np(m.devTokens()[i], msg_content, badgeNumber);
+				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], msg_content, badgeNumber);
+				notificationQueue->add(np);
 			}
-			printf("%u has been fetched\n", (unsigned int) uid);
+			//printf("%u has been fetched\n", (unsigned int) uid);
 			
 #warning TODO: insert message UID in databse so we know later that the message has been notified
 			mailimap_fetch_list_free(fetch_result);
 		}
 	}
+	
+	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(){
+		madeAttempts = 0;
+		nextAttempt = 0;
+	}
+	
+	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(const IMAPFetchControl &ifc){
+		mailAccountInfo = ifc.mailAccountInfo;
+		nextAttempt = ifc.nextAttempt;
+		madeAttempts = ifc.madeAttempts;
+	}
+	
 	
 	IMAPSuckerThread::IMAPControl::IMAPControl(){
 		failedLoginAttemptsCount = 0;
@@ -161,51 +184,115 @@ namespace pmm {
 		
 	}
 	
-	void IMAPSuckerThread::MailFetcher::fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages){
-		mInfo = m;
-		myNotificationQueue = notifQueue;
-		availableMessages = recentMessages;
-	}
+	/*void IMAPSuckerThread::MailFetcher::fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages){
+	 mInfo = m;
+	 myNotificationQueue = notifQueue;
+	 availableMessages = recentMessages;
+	 }*/
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
-		if (mInfo.email().size() > 0) {
-			struct mailimap *imap = mailimap_new(0, NULL);
-			int result;
-			if (mInfo.useSSL()) {
-				result = mailimap_ssl_connect(imap, mInfo.serverAddress().c_str(), mInfo.serverPort());
-			}
-			else {
-				result = mailimap_socket_connect(imap, mInfo.serverAddress().c_str(), mInfo.serverPort());
-			}
-			if (etpanOperationFailed(result)) {
-#warning TODO enqueue mail fetching for later
-			}
-			else {
-				clist * fetch_result;
-				struct mailimap_set * set = mailimap_set_new_interval(1, 0); /* fetch in interval 1:* */
-				struct mailimap_fetch_type * fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
-				struct mailimap_fetch_att * fetch_att = mailimap_fetch_att_new_uid();
-				mailimap_fetch_type_new_fetch_att_list_add(fetch_type, fetch_att);				
-				result = mailimap_fetch(imap, set, fetch_type, &fetch_result);
-				if (etpanOperationFailed(result)) {
-#warning TODO: Enque email fetch
-				}
-				else{
-					for(clistiter * cur = clist_begin(fetch_result) ; cur != NULL ; cur = clist_next(cur)) {
-						struct mailimap_msg_att * msg_att;
-						uint32_t uid;
-						msg_att = (struct mailimap_msg_att *)clist_content(cur);
-						uid = get_uid(msg_att);
-						if (uid == 0)
-							continue;
-#warning TODO: Remember not to notify about previously notified messages
-						fetch_msg(imap, uid, myNotificationQueue, mInfo, availableMessages);
+#ifdef DEBUG
+		mout.lock();
+		std::cerr << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") warming up..." << std::endl;
+		mout.unlock();
+#endif
+		sleep(5);
+#ifdef DEBUG
+		mout.lock();
+		std::cerr << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") started!!!" << std::endl;
+		mout.unlock();
+#endif
+		while (true) {
+			while (fetchQueue->size() > 0) {
+				IMAPFetchControl imapFetch;
+				try {
+					fetchQueue->extractEntry(imapFetch);
+					if (imapFetch.madeAttempts > 0 && time(0) < imapFetch.nextAttempt) {
+						if (fetchQueue->size() == 0) {
+							usleep(10);
+						}
+						fetchQueue->add(imapFetch);
+						break;
 					}
-					
-					mailimap_fetch_list_free(fetch_result);
+					struct mailimap *imap = mailimap_new(0, NULL);
+					int result;
+					if (imapFetch.mailAccountInfo.useSSL()) {
+						result = mailimap_ssl_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
+					}
+					else {
+						result = mailimap_socket_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
+					}
+					if (etpanOperationFailed(result)) {
+#warning TODO enqueue mail fetching for later
+						imapFetch.madeAttempts++;
+						imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+						fetchQueue->add(imapFetch);
+					}
+					else {
+						result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
+						if(etpanOperationFailed(result)){
+#warning TODO: Remeber to report the user whenever we have too many login attempts
+#ifdef DEBUG
+							mout.lock();
+							std::cerr << "CRITICAL: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << std::endl;
+							mout.unlock();
+#endif				
+							imapFetch.madeAttempts++;
+							imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+							fetchQueue->add(imapFetch);
+						}
+						else {
+							clist * fetch_result;
+							result = mailimap_select(imap, "INBOX");
+							if (etpanOperationFailed(result)) {
+								imapFetch.madeAttempts++;
+								imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+								fetchQueue->add(imapFetch);
+#ifdef DEBUG
+								mout.lock();
+								std::cerr << "CRITICAL: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << std::endl;
+								mout.unlock();
+#endif				
+								continue;
+							}
+							struct mailimap_set * set = mailimap_set_new_interval(1, 0); /* fetch in interval 1:* */
+							struct mailimap_fetch_type * fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
+							struct mailimap_fetch_att * fetch_att = mailimap_fetch_att_new_uid();
+							mailimap_fetch_type_new_fetch_att_list_add(fetch_type, fetch_att);				
+							result = mailimap_fetch(imap, set, fetch_type, &fetch_result);
+							if (etpanOperationFailed(result)) {
+#warning TODO: Enque email fetch
+								imapFetch.madeAttempts++;
+								imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+								fetchQueue->add(imapFetch);
+							}
+							else{
+#ifdef DEBUG
+								mout.lock();
+								std::cerr << "DEBUG: Just sent FETCH command: " << imap->imap_response << std::endl;
+								mout.unlock();
+#endif
+								for(clistiter * cur = clist_begin(fetch_result) ; cur != NULL ; cur = clist_next(cur)) {
+									struct mailimap_msg_att * msg_att;
+									uint32_t uid;
+									msg_att = (struct mailimap_msg_att *)clist_content(cur);
+									uid = get_uid(msg_att);
+									if (uid == 0)
+										continue;
+#warning TODO: Remember not to notify about previously notified messages
+									fetch_msg(imap, uid, myNotificationQueue, imapFetch, availableMessages);
+								}
+								
+								mailimap_fetch_list_free(fetch_result);
+							}
+						}
+					}
+				} catch (...) {
+					fetchQueue->add(imapFetch);
+					throw ;
 				}
 			}
-			mInfo = MailAccountInfo();
+			sleep(1);
 		}
 	}
 	
@@ -240,9 +327,16 @@ namespace pmm {
 	
 	void IMAPSuckerThread::openConnection(const MailAccountInfo &m){
 		int result;
+		for (size_t i = 0; i < maxMailFetchers; i++) {
+			if (mailFetchers[i].isRunning == false) {
+				mailFetchers[i].myNotificationQueue = notificationQueue;
+				mailFetchers[i].fetchQueue = &imapFetchQueue;
+				pmm::ThreadDispatcher::start(mailFetchers[i]);
+			}
+		}
 		if(imapControl[m.email()].imap == NULL) imapControl[m.email()].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
-		
+		fetchMails(m);		
 		if (m.useSSL()) {
 			result = mailimap_ssl_connect(imapControl[m.email()].imap, m.serverAddress().c_str(), m.serverPort());
 		}
@@ -324,28 +418,29 @@ namespace pmm {
 			mailimap *imap = imapControl[m.email()].imap;
 			mailstream_low *mlow = mailstream_get_low(imap->imap_stream);
 			int fd = mailstream_low_get_fd(mlow);
+			if(fd < 0) throw GenericException("Unable to get a valid FD, check libetpan compilation flags, make sure no cfnetwork support have been cooked in.");
 			struct pollfd pelem;
 			pelem.fd = fd;
 			pelem.events = POLLIN;
 			int recent = -1;
-			while (poll(&pelem, 1, 2) > 0) {
+			while (poll(&pelem, 1, 0) > 0) {
 				char *response = mailimap_read_line(imap);
 				if (strstr(response, "RECENT") != NULL) {
 					//Compute how many recent we have
-					int recent;
 					std::istringstream input(std::string(response).substr(2));
 					input >> recent;
 					mailboxControl[theEmail].availableMessages += recent;
+#ifdef DEBUG
+					mout.lock();
+					std::cerr << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT recent=" << recent << " for " << theEmail << std::endl;
+					mout.unlock();
+#endif
+					fetchMails(m);
 				}
 			}
 			if (recent >= 0) {
 				mailimap_idle_done(imap);
-				mout.lock();
-				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " POLL result is: 0x" << std::hex << pelem.revents << " recent=" << recent <<  std::endl;
-				mout.unlock();
-				std::stringstream msg;
 				//Trigger mail fetching threads
-				fetchMails(m);
 				mailimap_idle(imap);
 			}
 		}
@@ -356,5 +451,8 @@ namespace pmm {
 	
 	void IMAPSuckerThread::fetchMails(const MailAccountInfo &m){
 		//Find and schedule a fetching thread
+		IMAPFetchControl ifc;
+		ifc.mailAccountInfo = m;
+		imapFetchQueue.add(ifc);
 	}
 }

@@ -74,6 +74,7 @@
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8238F494142AF767007F76C0 /* JSONParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONParseException.h; sourceTree = "<group>"; };
 		8238F496142AFA3E007F76C0 /* JSONParseException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSONParseException.cpp; sourceTree = "<group>"; };
+		82571EA914413E0F0047347E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		8290FB93142F47770080BB85 /* MailAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailAccountInfo.h; sourceTree = "<group>"; };
@@ -170,6 +171,7 @@
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				82571EA914413E0F0047347E /* libsqlite3.dylib */,
 				82E5F174143877E900C189D0 /* libcrypto.a */,
 				82E5F175143877E900C189D0 /* libssl.a */,
 				82E5F172143877C400C189D0 /* libetpan.a */,

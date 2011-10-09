@@ -14,8 +14,20 @@
 #include "libetpan/libetpan.h"
 
 namespace pmm {
+	
+	
 	class IMAPSuckerThread : public MailSuckerThread {
 	private:
+
+		class IMAPFetchControl {
+		public:
+			MailAccountInfo mailAccountInfo;
+			time_t nextAttempt;
+			int madeAttempts;
+			IMAPFetchControl();
+			IMAPFetchControl(const IMAPFetchControl &ifc);
+		};
+
 		class IMAPControl {
 		protected:
 		public:
@@ -29,16 +41,20 @@ namespace pmm {
 		
 		class MailFetcher : public GenericThread {
 		private:
-			MailAccountInfo mInfo;
-			SharedQueue<NotificationPayload> *myNotificationQueue;
+			//MailAccountInfo mInfo;
 			int availableMessages;
+			int fetchRetryInterval;
+			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m, int badgeNumber);
 		public:
+			SharedQueue<IMAPFetchControl> *fetchQueue;
+			SharedQueue<NotificationPayload> *myNotificationQueue;
 			MailFetcher();
-			void fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages);
+			//void fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages);
 			void operator()();
 		};
 		
 		std::map<std::string, IMAPControl> imapControl;
+		SharedQueue<IMAPFetchControl> imapFetchQueue;
 		MailFetcher *mailFetchers;
 		size_t maxMailFetchers;
 	protected:

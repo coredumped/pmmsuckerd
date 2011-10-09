@@ -16,10 +16,10 @@ namespace pmm {
 		std::string newString;
 		for (size_t i = 0; i < theMsg.size(); i++) {
 			if (theMsg[i] == '\n') {
-				newString.append("\\n");
+				//newString.append("\\n");
 			}
 			else if (theMsg[i] == '\r') {
-				newString.append("\\r");
+				//newString.append("\\r");
 			}
 			else if (theMsg[i] == '\t') {
 				newString.append("\\t");
@@ -52,15 +52,22 @@ namespace pmm {
 		_soundName = sndName;
 		devToken = devToken_;
 		_badgeNumber = badgeNumber;
+		build();
 	}
 	
 	NotificationPayload::NotificationPayload(const NotificationPayload &n){
 		msg = n.msg;
 		_soundName = n._soundName;
 		devToken = n.devToken;
+		_badgeNumber = n._badgeNumber;
+		build();
 	}
 	
-	std::string NotificationPayload::toJSON(){
+	NotificationPayload::~NotificationPayload(){
+		
+	}
+	
+	void NotificationPayload::build(){
 		std::stringstream jsonbuilder;
 		std::string encodedMsg = msg;
 		msg_encode(encodedMsg);
@@ -72,7 +79,15 @@ namespace pmm {
 		jsonbuilder << "\"badge\":" << _badgeNumber << ",";
 		jsonbuilder << "}";
 		jsonbuilder << "}";
-		return std::string(jsonbuilder.str());
+		jsonRepresentation = jsonbuilder.str();
+	}
+	
+	/*std::string &NotificationPayload::toJSON(){
+		return jsonRepresentation;
+	}*/
+
+	const std::string &NotificationPayload::toJSON() const {
+		return jsonRepresentation;
 	}
 	
 	std::string &NotificationPayload::soundName(){

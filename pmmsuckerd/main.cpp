@@ -127,6 +127,7 @@ int main (int argc, const char * argv[])
 		notifThreads[i].setCertPath(sslCertificatePath);
 		notifThreads[i].setKeyPath(sslPrivateKeyPath);
 		pmm::ThreadDispatcher::start(notifThreads[i]);
+		sleep(1);
 	}
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
