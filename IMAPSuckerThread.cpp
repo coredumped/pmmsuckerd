@@ -15,6 +15,7 @@
 #include "ThreadDispatcher.h"
 #include "libetpan/libetpan.h"
 #include <sqlite3.h>
+#include <string.h>
 
 
 #ifndef DEFAULT_MAX_MAIL_FETCHERS
