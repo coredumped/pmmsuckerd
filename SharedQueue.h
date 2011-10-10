@@ -27,15 +27,15 @@ namespace pmm {
 		virtual ~SharedQueue(){ }
 		
 		/*void add(T &entry){
-			m.lock();
-			try {
-				queueData.push(entry);
-			} catch (...) {
-				m.unlock();
-				throw;
-			}
-			m.unlock();
-		}*/
+		 m.lock();
+		 try {
+		 queueData.push(entry);
+		 } catch (...) {
+		 m.unlock();
+		 throw;
+		 }
+		 m.unlock();
+		 }*/
 		
 		void add(const T &entry){
 			m.lock();
@@ -61,18 +61,22 @@ namespace pmm {
 			return T(val);			
 		}
 		
-		void extractEntry(T &val){
+		bool extractEntry(T &val){
+			bool got_entry = false;;
 			m.lock();
 			try{
-				val = queueData.front();
-				//queueData.erase(queueData.begin());
-				queueData.pop();
+				if (queueData.size() != 0) {
+					val = queueData.front();
+					queueData.pop();
+					got_entry = true;
+				}
 			}
 			catch(...){
 				m.unlock();
 				throw;
 			}
 			m.unlock();
+			return got_entry;
 		}
 		
 		size_t size(){

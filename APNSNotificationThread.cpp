@@ -267,14 +267,15 @@ namespace pmm {
 			}
 #endif
 			//Verify if there are any ending notifications in the notification queue
-			while (notificationQueue->size() > 0) {
+			NotificationPayload payload;
+			while (notificationQueue->extractEntry(payload)) {
 #ifdef DEBUG
 				mout.lock();
 				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
 				mout.unlock();
 #endif
-				NotificationPayload payload;
-				notificationQueue->extractEntry(payload);
+
+
 				try {
 					notifyTo(payload.deviceToken(), payload);
 				} 

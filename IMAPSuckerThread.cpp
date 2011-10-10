@@ -14,7 +14,7 @@
 #include "IMAPSuckerThread.h"
 #include "ThreadDispatcher.h"
 #include "libetpan/libetpan.h"
-#include <sqlite3.h>
+//#include <sqlite3.h>
 #include <string.h>
 
 
@@ -204,10 +204,9 @@ namespace pmm {
 		mout.unlock();
 #endif
 		while (true) {
-			while (fetchQueue->size() > 0) {
-				IMAPFetchControl imapFetch;
+			IMAPFetchControl imapFetch;
+			while (fetchQueue->extractEntry(imapFetch)) {
 				try {
-					fetchQueue->extractEntry(imapFetch);
 					if (imapFetch.madeAttempts > 0 && time(0) < imapFetch.nextAttempt) {
 						if (fetchQueue->size() == 0) {
 							usleep(10);
@@ -426,6 +425,11 @@ namespace pmm {
 			int recent = -1;
 			while (poll(&pelem, 1, 0) > 0) {
 				char *response = mailimap_read_line(imap);
+#ifdef DEBUG
+				mout.lock();
+				std::cerr << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=" << response << " for " << theEmail << std::endl;
+				mout.unlock();
+#endif
 				if (strstr(response, "RECENT") != NULL) {
 					//Compute how many recent we have
 					std::istringstream input(std::string(response).substr(2));
@@ -440,9 +444,10 @@ namespace pmm {
 				}
 			}
 			if (recent >= 0) {
-				mailimap_idle_done(imap);
-				//Trigger mail fetching threads
-				mailimap_idle(imap);
+				int result = mailimap_idle_done(imap);
+				if(etpanOperationFailed(result)) throw GenericException("Unable to send DONE to IMAP after IDLE.");
+				result = mailimap_idle(imap);
+				if(etpanOperationFailed(result)) throw GenericException("Unable to restart IDLE after DONE.");
 			}
 		}
 		else {
