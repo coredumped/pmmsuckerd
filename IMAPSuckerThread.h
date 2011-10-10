@@ -10,6 +10,7 @@
 #define PMM_Sucker_IMAPSuckerThread_h
 #include "MailSuckerThread.h"
 #include "SharedQueue.h"
+#include "FetchedMailsCache.h"
 #include <map>
 #include "libetpan/libetpan.h"
 

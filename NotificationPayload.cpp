@@ -16,10 +16,10 @@ namespace pmm {
 		std::string newString;
 		for (size_t i = 0; i < theMsg.size(); i++) {
 			if (theMsg[i] == '\n') {
-				//newString.append("\\n");
+				newString.append("\\n");
 			}
 			else if (theMsg[i] == '\r') {
-				//newString.append("\\r");
+				newString.append("\\r");
 			}
 			else if (theMsg[i] == '\t') {
 				newString.append("\\t");

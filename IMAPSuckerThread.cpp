@@ -26,7 +26,10 @@
 #endif
 
 namespace pmm {
+#ifdef DEBUG
 	Mutex mout;
+#endif
+	static FetchedMailsCache fetchedMails;
 	
 	static bool etpanOperationFailed(int r)
 	{
@@ -100,6 +103,10 @@ namespace pmm {
 	
 	void IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch, int badgeNumber)
 	{
+		if (fetchedMails.entryExists(imapFetch.mailAccountInfo.email(), uid)) {
+			//Do not fetch or even notify previously fetched e-mails
+			return;
+		}
 		struct mailimap_set * set;
 		struct mailimap_section * section;
 		size_t msg_len;
@@ -108,14 +115,6 @@ namespace pmm {
 		struct mailimap_fetch_att * fetch_att;
 		int r;
 		clist * fetch_result;
-		
-		/*snprintf(filename, sizeof(filename), "download/%u.eml", (unsigned int) uid);
-		 r = stat(filename, &stat_info);
-		 if (r == 0) {
-		 // already cached
-		 printf("%u is already fetched\n", (unsigned int) uid);
-		 return;
-		 }*/
 		
 		set = mailimap_set_new_single(uid);
 		fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
@@ -137,8 +136,6 @@ namespace pmm {
 			fetchQueue->add(ifc);
 		}
 		else{
-			//printf("fetch %u\n", (unsigned int) uid);
-			
 			msg_content = get_msg_content(fetch_result, &msg_len);
 			if (msg_content == NULL) {
 				//fprintf(stderr, "no content\n");
@@ -152,8 +149,6 @@ namespace pmm {
 				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], msg_content, badgeNumber);
 				notificationQueue->add(np);
 			}
-			//printf("%u has been fetched\n", (unsigned int) uid);
-			
 #warning TODO: insert message UID in databse so we know later that the message has been notified
 			mailimap_fetch_list_free(fetch_result);
 		}
@@ -192,7 +187,6 @@ namespace pmm {
 	 }*/
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
-		dispatched = 0;
 #ifdef DEBUG
 		mout.lock();
 		std::cerr << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") warming up..." << std::endl;
@@ -232,7 +226,7 @@ namespace pmm {
 					else {
 						result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
 						if(etpanOperationFailed(result)){
-#warning TODO: Remeber to report the user whenever we have too many login attempts
+#warning TODO: Remember to report the user whenever we have too many login attempts
 #ifdef DEBUG
 							mout.lock();
 							std::cerr << "CRITICAL: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << std::endl;
@@ -243,7 +237,6 @@ namespace pmm {
 							fetchQueue->add(imapFetch);
 						}
 						else {
-							clist * fetch_result;
 							result = mailimap_select(imap, "INBOX");
 							if (etpanOperationFailed(result)) {
 								imapFetch.madeAttempts++;
@@ -256,38 +249,29 @@ namespace pmm {
 #endif				
 								continue;
 							}
-							struct mailimap_set * set = mailimap_set_new_interval(1, 0); /* fetch in interval 1:* */
-							struct mailimap_fetch_type * fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
-							struct mailimap_fetch_att * fetch_att = mailimap_fetch_att_new_uid();
-							mailimap_fetch_type_new_fetch_att_list_add(fetch_type, fetch_att);				
-							result = mailimap_fetch(imap, set, fetch_type, &fetch_result);
+							clist *unseenMails = clist_new();
+							struct mailimap_search_key *sKey = mailimap_search_key_new(MAILIMAP_SEARCH_KEY_UNSEEN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+							result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
 							if (etpanOperationFailed(result)) {
-#warning TODO: Enque email fetch
-								imapFetch.madeAttempts++;
-								imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
-								fetchQueue->add(imapFetch);
+								throw GenericException("Can't find unseen messages, IMAP SEARCH failed miserably");
 							}
-							else{
+#ifdef DEBUG
+							mout.lock();
+							std::cerr << "DEBUG: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << std::endl;
+							mout.unlock();
+#endif
+							int mailCount = 0;
+							for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
+								uint32_t uid;
+								uid = *((uint32_t *)clist_content(cur));
 #ifdef DEBUG
 								mout.lock();
-								std::cerr << "DEBUG: Just sent FETCH command: " << imap->imap_response << std::endl;
+								std::cerr << "DEBUG: " << imapFetch.mailAccountInfo.email() << " got UID=" << uid << std::endl;
 								mout.unlock();
 #endif
-								for(clistiter * cur = clist_begin(fetch_result) ; cur != NULL ; cur = clist_next(cur)) {
-									if(dispatched > 1) break;
-									struct mailimap_msg_att * msg_att;
-									uint32_t uid;
-									msg_att = (struct mailimap_msg_att *)clist_content(cur);
-									uid = get_uid(msg_att);
-									if (uid == 0)
-										continue;
-#warning TODO: Remember not to notify about previously notified messages
-									fetch_msg(imap, uid, myNotificationQueue, imapFetch, availableMessages);
-									dispatched++;
-								}
-								
-								mailimap_fetch_list_free(fetch_result);
+								fetch_msg(imap, uid, myNotificationQueue, imapFetch, ++mailCount);
 							}
+							mailimap_search_result_free(unseenMails);							
 						}
 					}
 				} catch (...) {
@@ -309,10 +293,12 @@ namespace pmm {
 	IMAPSuckerThread::IMAPSuckerThread(){
 		maxMailFetchers = DEFAULT_MAX_MAIL_FETCHERS;
 		mailFetchers = new MailFetcher[maxMailFetchers];
+		//IMAPSuckerThread::fetchedMails.expireOldEntries();
 	}
 	IMAPSuckerThread::IMAPSuckerThread(size_t _maxMailFetchers){
 		maxMailFetchers = _maxMailFetchers;
 		mailFetchers = new MailFetcher[maxMailFetchers];
+		//IMAPSuckerThread::fetchedMails.expireOldEntries();
 	}
 	IMAPSuckerThread::~IMAPSuckerThread(){
 		delete [] mailFetchers;
@@ -433,10 +419,11 @@ namespace pmm {
 				std::cerr << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=" << response << " for " << theEmail << std::endl;
 				mout.unlock();
 #endif
-				if (strstr(response, "RECENT") != NULL) {
+				if (strlen(response) > 0 && strstr(response, "OK Still") == NULL) {
 					//Compute how many recent we have
-					std::istringstream input(std::string(response).substr(2));
-					input >> recent;
+					//std::istringstream input(std::string(response).substr(2));
+					//input >> recent;
+					recent = 1;
 					mailboxControl[theEmail].availableMessages += recent;
 #ifdef DEBUG
 					mout.lock();

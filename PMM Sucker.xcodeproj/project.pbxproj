@@ -14,6 +14,7 @@
 		82571EAD1442B0700047347E /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
 		82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
 		82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
+		82571EB2144363D20047347E /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8290FB96142F47D30080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
@@ -26,7 +27,6 @@
 		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
 		82E5F176143877E900C189D0 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 82E5F174143877E900C189D0 /* libcrypto.a */; };
 		82E5F177143877E900C189D0 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 82E5F175143877E900C189D0 /* libssl.a */; };
-		82E5F1781438785200C189D0 /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
 		82ED5B0B14317FD000444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
 		82ED5B0C143184C800444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
 		82ED5B0F143187EB00444844 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
@@ -152,8 +152,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82571EB2144363D20047347E /* libetpan.framework in Frameworks */,
 				82571EAD1442B0700047347E /* libsqlite3.dylib in Frameworks */,
-				82E5F1781438785200C189D0 /* libetpan.framework in Frameworks */,
 				82E5F176143877E900C189D0 /* libcrypto.a in Frameworks */,
 				82E5F177143877E900C189D0 /* libssl.a in Frameworks */,
 				821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */,

@@ -76,7 +76,7 @@ namespace pmm {
 		sqlite3_stmt *statement;
 		std::stringstream errmsg;
 		char *sztail;
-		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uid='" << uid << "'";		
+		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid='" << uid << "'";		
 		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 		if (errCode != SQLITE_OK) {
 			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
@@ -95,6 +95,12 @@ namespace pmm {
 		}
 		closeDatabase(conn);
 		return ret;
+	}
+	
+	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
+		std::stringstream input;
+		input << uid;
+		return entryExists(email, input.str());
 	}
 	
 	void FetchedMailsCache::expireOldEntries(){
@@ -135,7 +141,7 @@ namespace pmm {
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
 				throw GenericException(errmsg.str());
 			}
-			createCmd.clear();
+			createCmd.str(std::string());
 			createCmd << "CREATE INDEX ftchEmail_IDX ON "  << fetchedMailsTable << " (email)";
 			errCode = sqlite3_exec(conn, createCmd.str().c_str(), 0, 0, &errmsg_s);
 			if (errCode != SQLITE_OK) {
@@ -143,6 +149,7 @@ namespace pmm {
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
 				throw GenericException(errmsg.str());
 			}
+			createCmd.str(std::string());
 			createCmd << "CREATE INDEX ftchTstampl_IDX ON "  << fetchedMailsTable << " (timestamp)";
 			errCode = sqlite3_exec(conn, createCmd.str().c_str(), 0, 0, &errmsg_s);
 			if (errCode != SQLITE_OK) {
@@ -150,7 +157,8 @@ namespace pmm {
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
 				throw GenericException(errmsg.str());
 			}
-			createCmd << "CREATE UNIQUE INDEX ftchEmailUID_IDX ON "  << fetchedMailsTable << " (email,uid)";
+			createCmd.str(std::string());
+			createCmd << "CREATE UNIQUE INDEX ftchEmailUID_IDX ON "  << fetchedMailsTable << " (email,uniqueid)";
 			errCode = sqlite3_exec(conn, createCmd.str().c_str(), 0, 0, &errmsg_s);
 			if (errCode != SQLITE_OK) {
 				closeDatabase(conn);
