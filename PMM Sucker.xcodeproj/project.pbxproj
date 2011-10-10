@@ -11,6 +11,9 @@
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		82571EAD1442B0700047347E /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
+		82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8290FB96142F47D30080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
@@ -75,6 +78,8 @@
 		8238F494142AF767007F76C0 /* JSONParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONParseException.h; sourceTree = "<group>"; };
 		8238F496142AFA3E007F76C0 /* JSONParseException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSONParseException.cpp; sourceTree = "<group>"; };
 		82571EA914413E0F0047347E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		82571EAC1442AC220047347E /* FetchedMailsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchedMailsCache.h; sourceTree = "<group>"; };
+		82571EAE1442B1730047347E /* FetchedMailsCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FetchedMailsCache.cpp; sourceTree = "<group>"; };
 		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		8290FB93142F47770080BB85 /* MailAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailAccountInfo.h; sourceTree = "<group>"; };
@@ -147,6 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82571EAD1442B0700047347E /* libsqlite3.dylib in Frameworks */,
 				82E5F1781438785200C189D0 /* libetpan.framework in Frameworks */,
 				82E5F176143877E900C189D0 /* libcrypto.a in Frameworks */,
 				82E5F177143877E900C189D0 /* libssl.a in Frameworks */,
@@ -286,6 +292,8 @@
 				82ED5B2E1437EF4E00444844 /* IMAPSuckerThread.h */,
 				82ED5B2F1437F01A00444844 /* IMAPSuckerThread.cpp */,
 				82ED5B311437F19900444844 /* SharedVector.h */,
+				82571EAC1442AC220047347E /* FetchedMailsCache.h */,
+				82571EAE1442B1730047347E /* FetchedMailsCache.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -390,6 +398,7 @@
 				82ED5B28143622DA00444844 /* GenericException.cpp in Sources */,
 				82ED5B2C1437ECDB00444844 /* MailSuckerThread.cpp in Sources */,
 				82ED5B301437F01A00444844 /* IMAPSuckerThread.cpp in Sources */,
+				82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +406,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */,
 				82ED5B3214380B3300444844 /* IMAPSuckerThread.cpp in Sources */,
 				82ED5B2D1437ED0200444844 /* MailSuckerThread.cpp in Sources */,
 				82ED5B291436235F00444844 /* GenericException.cpp in Sources */,

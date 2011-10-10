@@ -192,6 +192,7 @@ namespace pmm {
 	 }*/
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
+		dispatched = 0;
 #ifdef DEBUG
 		mout.lock();
 		std::cerr << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") warming up..." << std::endl;
@@ -273,6 +274,7 @@ namespace pmm {
 								mout.unlock();
 #endif
 								for(clistiter * cur = clist_begin(fetch_result) ; cur != NULL ; cur = clist_next(cur)) {
+									if(dispatched > 1) break;
 									struct mailimap_msg_att * msg_att;
 									uint32_t uid;
 									msg_att = (struct mailimap_msg_att *)clist_content(cur);
@@ -281,6 +283,7 @@ namespace pmm {
 										continue;
 #warning TODO: Remember not to notify about previously notified messages
 									fetch_msg(imap, uid, myNotificationQueue, imapFetch, availableMessages);
+									dispatched++;
 								}
 								
 								mailimap_fetch_list_free(fetch_result);
@@ -336,7 +339,7 @@ namespace pmm {
 		}
 		if(imapControl[m.email()].imap == NULL) imapControl[m.email()].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
-		fetchMails(m);		
+		//fetchMails(m);		
 		if (m.useSSL()) {
 			result = mailimap_ssl_connect(imapControl[m.email()].imap, m.serverAddress().c_str(), m.serverPort());
 		}

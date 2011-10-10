@@ -41,6 +41,7 @@ namespace pmm {
 		
 		class MailFetcher : public GenericThread {
 		private:
+			int dispatched;
 			//MailAccountInfo mInfo;
 			int availableMessages;
 			int fetchRetryInterval;

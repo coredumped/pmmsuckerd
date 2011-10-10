@@ -131,12 +131,15 @@ int main (int argc, const char * argv[])
 	}
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
+	if (imapAccounts.size() == 0) {
+		std::cerr << "WARNING: No imap sessions are going to be monitored" << std::endl;
+	}
 	//5. Dispatch polling threads for imap
 	for (size_t k = 0; k < imapAccounts.size(); k++) imapSuckingThreads[k % maxIMAPSuckerThreads].emailAccounts.push_back(imapAccounts[k]);
 	for (size_t i = 0; i < maxIMAPSuckerThreads && imapAccounts.size() > 0; i++) {
-		
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
+		sleep(1);
 	}
 
 	//6. Dispatch polling threads for POP3
