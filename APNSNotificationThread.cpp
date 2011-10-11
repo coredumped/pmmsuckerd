@@ -237,7 +237,8 @@ namespace pmm {
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
-		
+		disconnectFromAPNS();
+		SSL_CTX_free(sslCTX);
 	}
 	
 	void APNSNotificationThread::setKeyPath(const std::string &keyPath){
