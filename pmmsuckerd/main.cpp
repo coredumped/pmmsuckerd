@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <openssl/ssl.h>
+#include <stdlib.h>
 #include "ServerResponse.h"
 #include "PMMSuckerSession.h"
 #include "APNSNotificationThread.h"
@@ -32,7 +33,9 @@
 #ifndef DEFAULT_SS_PRIVATE_KEY_PATH
 #define DEFAULT_SS_PRIVATE_KEY_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
 #endif
+
 void printHelpInfo();
+void emergencyUnregister(int signum);
 
 int main (int argc, const char * argv[])
 {
@@ -141,7 +144,7 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
 		sleep(1);
 	}
-
+	//signal(SIGABRT, emergencyUnregister);
 	//6. Dispatch polling threads for POP3
 	for (size_t i = 0; i < maxPOP3SuckerThreads && pop3Accounts.size() > 0; i++) {
 		for (size_t k = 0; k < emailAccounts.size(); k++) {
@@ -156,6 +159,7 @@ int main (int argc, const char * argv[])
 		//session.performAutoRegister();
 		sleep(10);
 	}
+	session.unregisterFromPMM();
     return 0;
 }
 
@@ -169,4 +173,8 @@ void printHelpInfo() {
 	std::cout << "--max-pop3-threads <number>   Specifies the amount of threads to dispatch for POP3 mailbox sucking" << std::endl;
 	std::cout << "--ssl-certificate  <file>     Path where the SSL certificate for APNS is located" << std::endl;
 	std::cout << "--ssl-private-key  <file>     Path where the SSL certificate private key is located" << std::endl;
+}
+
+void emergencyUnregister(int signum){
+	
 }

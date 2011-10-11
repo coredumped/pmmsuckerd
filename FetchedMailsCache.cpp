@@ -56,7 +56,9 @@ namespace pmm {
 	}
 	
 	FetchedMailsCache::~FetchedMailsCache(){
-		
+		if (dbConn != 0 && sqlite3_threadsafe()) {
+			sqlite3_close(dbConn);
+		}
 	}
 	
 	void FetchedMailsCache::addEntry(const std::string &email, uint32_t uid){

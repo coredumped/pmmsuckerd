@@ -47,11 +47,16 @@ namespace pmm {
 		//Register to the PMM Service server, currently located at Google AppEngine
 		bool register2PMM();
 		
+		//Un-registers from the controller succesfully relinquishing ownership on any monitored mailboxes
+		void unregisterFromPMM();
+		
 		//Asks for membership in order to join the global PMM Service server cluster
 		bool reqMembership(const std::string &petition, const std::string &contactEmail = "");
 
 		//Retrieves configured e-mail accounts located at the remote server so we can poll them later
 		void retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta = false);
+		
+
 	};
 }
 

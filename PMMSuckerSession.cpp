@@ -72,6 +72,7 @@ namespace pmm {
 		static const char *register2PMM = "pmmSuckerReg";
 		static const char *ask4Membership = "pmmSuckerAskMember";
 		static const char *pmmSuckerRequestMailAccounts = "pmmSuckerRequestMailAccounts";
+		static const char *pmmSuckerUnRegister = "pmmSuckerUnReg";
 	};
 	
 #ifdef __APPLE__
@@ -320,6 +321,20 @@ namespace pmm {
 		input >> expirationTime;
 		expirationTime = time(0x00) + expirationTime - 60;
 		return response.status;
+	}
+	
+	void SuckerSession::unregisterFromPMM(){
+		if(this->myID.size() == 0) suckerIdGet(this->myID);
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["suckerID"] = this->myID;
+		params["opType"] = pmm::OperationTypes::pmmSuckerUnRegister;
+#ifdef DEBUG
+		std::cerr << "DEBUG: Un-registering with suckerID=" << params["suckerID"] << std::endl;
+#endif
+		std::string output;
+		executePost(params, output);
+		expirationTime = time(NULL);
 	}
 	
 	bool SuckerSession::reqMembership(const std::string &petition, const std::string &contactEmail){
