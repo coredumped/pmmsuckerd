@@ -9,6 +9,7 @@
 #include "Mutex.h"
 #include <iostream>
 #include <sstream>
+#include <string.h>
 #ifndef DEFAULT_DATA_FILE
 #define DEFAULT_DATA_FILE "fetchedmails.db"
 #endif

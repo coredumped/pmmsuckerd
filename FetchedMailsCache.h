@@ -12,6 +12,9 @@
 #include "Mutex.h"
 #include <sqlite3.h>
 #include <string>
+#ifdef __linux__
+#include <inttypes.h>
+#endif
 
 namespace pmm {
 	class FetchedMailsCache {
