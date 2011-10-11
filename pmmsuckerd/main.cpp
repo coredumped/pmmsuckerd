@@ -35,7 +35,8 @@
 #endif
 
 void printHelpInfo();
-void emergencyUnregister(int signum);
+pmm::SuckerSession *globalSession;
+void emergencyUnregister();
 
 int main (int argc, const char * argv[])
 {
@@ -115,6 +116,8 @@ int main (int argc, const char * argv[])
 #ifdef DEBUG
 	std::cout << "Initial registration succeded!!!" << std::endl;
 #endif
+	globalSession = &session;
+	std::set_terminate(emergencyUnregister);
 	//2. Request accounts to poll
 	std::vector<pmm::MailAccountInfo> emailAccounts;
 	session.retrieveEmailAddresses(emailAccounts, true);
@@ -175,6 +178,8 @@ void printHelpInfo() {
 	std::cout << "--ssl-private-key  <file>     Path where the SSL certificate private key is located" << std::endl;
 }
 
-void emergencyUnregister(int signum){
-	
+void emergencyUnregister(){
+	std::cerr << "Triggering emergency unregister, some unhandled exception ocurred :-(" << std::endl;
+	globalSession->unregisterFromPMM();
+	abort();
 }

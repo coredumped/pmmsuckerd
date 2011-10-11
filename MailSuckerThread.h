@@ -30,6 +30,7 @@ namespace pmm {
 		time_t lastCheck;
 		MailboxControl();
 		MailboxControl(const MailboxControl &m);
+		MailboxControl &operator=(const MailboxControl &m);
 	};
 	
 	class MailSuckerThread : public GenericThread {

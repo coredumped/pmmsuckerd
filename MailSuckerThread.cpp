@@ -46,6 +46,15 @@ namespace pmm {
 		lastCheck = m.lastCheck;
 	}
 	
+	MailboxControl &MailboxControl::operator=(const MailboxControl &m){
+		openedOn = m.openedOn;
+		isOpened = m.isOpened;
+		email = m.email;
+		availableMessages = m.availableMessages;
+		lastCheck = m.lastCheck;
+		return *this;
+	}
+	
 	MailSuckerThread::MailSuckerThread(){
 		iterationWaitMicroSeconds = DEFAULT_WAIT_TIME_BETWEEN_MAIL_CHECKS;
 		maxOpenTime = DEFAULT_MAX_OPEN_TIME;
@@ -65,6 +74,11 @@ namespace pmm {
 			time_t currTime = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
+				if(mCtrl.email.size() == 0){
+					//Initial object creation
+					mCtrl.email = emailAccounts[i].email();
+					mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
+				}
 				//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
 				if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
 				if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);

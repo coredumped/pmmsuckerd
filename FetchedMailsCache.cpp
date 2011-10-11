@@ -30,6 +30,11 @@ namespace pmm {
 		if (sqlite3_threadsafe() && dbConn != 0) {
 			return dbConn;
 		}
+#ifdef DEBUG
+		mout.lock();
+		std::cerr << "DEBUG(Thread=" << (long)pthread_self() << "): Opening database" << std::endl;
+		mout.unlock();
+#endif
 		int errCode = sqlite3_open(datafile.c_str(), &dbConn);
 		if (errCode != SQLITE_OK) {
 			throw GenericException(sqlite3_errmsg(dbConn));
@@ -39,6 +44,11 @@ namespace pmm {
 	
 	void FetchedMailsCache::closeDatabase(sqlite3 *db){
 		if (sqlite3_threadsafe() == 0) {
+#ifdef DEBUG
+			mout.lock();
+			std::cerr << "DEBUG(Thread=" << (long)pthread_self() << "): Closing database" << std::endl;
+			mout.unlock();
+#endif
 			sqlite3_close(db);
 		}
 	}

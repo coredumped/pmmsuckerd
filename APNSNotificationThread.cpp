@@ -269,6 +269,7 @@ namespace pmm {
 #endif
 			//Verify if there are any ending notifications in the notification queue
 			NotificationPayload payload;
+			int notifyCount = 0;
 			while (notificationQueue->extractEntry(payload)) {
 #ifdef DEBUG
 				mout.lock();
@@ -299,6 +300,10 @@ namespace pmm {
 				}
 				catch (...) {
 					notificationQueue->add(payload);
+				}
+				if (++notifyCount > 10) {
+					sleep(5);
+					break;
 				}
 			}
 			usleep(250000);

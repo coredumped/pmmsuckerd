@@ -72,16 +72,6 @@ namespace pmm {
 			bufptr += sizeof(unsigned int);
 		}
 		binaryDevToken.assign(buf, 32);
-#ifdef DEBUG
-		mout.lock();
-		std::cerr << "DEBUG: " << devTokenString << "=";
-		std::cerr.width(2);
-		for(size_t i = 0; i < binaryDevToken.size(); i++){
-			std::cerr << std::hex << (unsigned char)binaryDevToken[i];
-		}
-		std::cerr << std::endl;
-		mout.unlock();
-#endif
 	}
 
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){

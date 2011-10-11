@@ -11,6 +11,8 @@
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		823BD0481444AECD001ED14E /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
+		823BD0491444AECD001ED14E /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0471444AECD001ED14E /* libssl.a */; };
 		82571EAD1442B0700047347E /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
 		82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
 		82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
@@ -25,8 +27,6 @@
 		8293E232142CCD1100F62897 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
 		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
 		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
-		82E5F176143877E900C189D0 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 82E5F174143877E900C189D0 /* libcrypto.a */; };
-		82E5F177143877E900C189D0 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 82E5F175143877E900C189D0 /* libssl.a */; };
 		82ED5B0B14317FD000444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
 		82ED5B0C143184C800444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
 		82ED5B0F143187EB00444844 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
@@ -77,6 +77,8 @@
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8238F494142AF767007F76C0 /* JSONParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONParseException.h; sourceTree = "<group>"; };
 		8238F496142AFA3E007F76C0 /* JSONParseException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSONParseException.cpp; sourceTree = "<group>"; };
+		823BD0461444AECD001ED14E /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../cxxLibraries/openssl-mac/libcrypto.a"; sourceTree = "<group>"; };
+		823BD0471444AECD001ED14E /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../cxxLibraries/openssl-mac/libssl.a"; sourceTree = "<group>"; };
 		82571EA914413E0F0047347E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		82571EAC1442AC220047347E /* FetchedMailsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchedMailsCache.h; sourceTree = "<group>"; };
 		82571EAE1442B1730047347E /* FetchedMailsCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FetchedMailsCache.cpp; sourceTree = "<group>"; };
@@ -89,9 +91,6 @@
 		8293E22F142CCD0000F62897 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.cc"; sourceTree = "<group>"; };
 		8293E230142CCD0000F62897 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.h"; sourceTree = "<group>"; };
 		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
-		82E5F172143877C400C189D0 /* libetpan.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libetpan.a; path = ../DerivedData/PushMeMail/Build/Products/Debug/libetpan.a; sourceTree = "<group>"; };
-		82E5F174143877E900C189D0 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../cxxLibraries/openssl-mac/openssl-1.0.0e/libcrypto.a"; sourceTree = "<group>"; };
-		82E5F175143877E900C189D0 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../cxxLibraries/openssl-mac/openssl-1.0.0e/libssl.a"; sourceTree = "<group>"; };
 		82ED5B071431761400444844 /* APNSNotificationThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APNSNotificationThread.h; sourceTree = "<group>"; };
 		82ED5B09143176B300444844 /* GenericThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericThread.h; sourceTree = "<group>"; };
 		82ED5B0A14317FD000444844 /* GenericThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenericThread.cpp; sourceTree = "<group>"; };
@@ -152,10 +151,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				823BD0481444AECD001ED14E /* libcrypto.a in Frameworks */,
+				823BD0491444AECD001ED14E /* libssl.a in Frameworks */,
 				82571EB2144363D20047347E /* libetpan.framework in Frameworks */,
 				82571EAD1442B0700047347E /* libsqlite3.dylib in Frameworks */,
-				82E5F176143877E900C189D0 /* libcrypto.a in Frameworks */,
-				82E5F177143877E900C189D0 /* libssl.a in Frameworks */,
 				821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */,
 				821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */,
 				82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */,
@@ -177,10 +176,9 @@
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				823BD0461444AECD001ED14E /* libcrypto.a */,
+				823BD0471444AECD001ED14E /* libssl.a */,
 				82571EA914413E0F0047347E /* libsqlite3.dylib */,
-				82E5F174143877E900C189D0 /* libcrypto.a */,
-				82E5F175143877E900C189D0 /* libssl.a */,
-				82E5F172143877C400C189D0 /* libetpan.a */,
 				82ED5B3B143864D700444844 /* libssl.0.9.8.dylib */,
 				82ED5B391438613400444844 /* libetpan.framework */,
 				82ED5B2414355EB700444844 /* libssl.dylib */,
@@ -540,6 +538,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
@@ -559,6 +558,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;
