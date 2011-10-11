@@ -24,6 +24,12 @@
 #ifndef DEFAULT_WAIT_BEFORE_RECONNECT
 #define DEFAULT_WAIT_BEFORE_RECONNECT 15
 #endif
+#ifndef DEFAULT_MAX_NOTIFICATIONS_PER_BURST
+#define DEFAULT_MAX_NOTIFICATIONS_PER_BURST 16
+#endif
+#ifndef DEFAULT_BURST_PAUSE_INTERVAL
+#define DEFAULT_BURST_PAUSE_INTERVAL 10
+#endif
 
 namespace pmm {
 	
@@ -234,6 +240,8 @@ namespace pmm {
 		_useSandbox = false;
 #endif
 		waitTimeBeforeReconnectToAPNS = DEFAULT_WAIT_BEFORE_RECONNECT;
+		maxNotificationsPerBurst = DEFAULT_MAX_NOTIFICATIONS_PER_BURST;
+		maxBurstPauseInterval = DEFAULT_BURST_PAUSE_INTERVAL;
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
@@ -301,8 +309,13 @@ namespace pmm {
 				catch (...) {
 					notificationQueue->add(payload);
 				}
-				if (++notifyCount > 10) {
-					sleep(5);
+				if (++notifyCount > maxNotificationsPerBurst) {
+#ifdef DEBUG
+					mout.lock();
+					std::cerr << "DEBUG: APNSNotificationThread: too many (" << notifyCount << ") notifications in a single burst, sleeping for " << maxBurstPauseInterval << " seconds..." << std::endl;
+					mout.unlock();
+#endif
+					sleep(maxBurstPauseInterval);
 					break;
 				}
 			}

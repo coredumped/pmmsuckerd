@@ -81,6 +81,8 @@ namespace pmm {
 		struct hostent *_host_info;
 		int waitTimeBeforeReconnectToAPNS;
 		std::map<std::string, std::string> devTokenCache;
+		int maxNotificationsPerBurst;
+		int maxBurstPauseInterval;
 	protected:
 		bool sslInitComplete;
 		void initSSL();
