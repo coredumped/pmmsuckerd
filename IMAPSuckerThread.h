@@ -25,6 +25,7 @@ namespace pmm {
 			MailAccountInfo mailAccountInfo;
 			time_t nextAttempt;
 			int madeAttempts;
+			int badgeCounter;
 			IMAPFetchControl();
 			IMAPFetchControl(const IMAPFetchControl &ifc);
 		};
@@ -35,6 +36,7 @@ namespace pmm {
 			struct mailimap *imap;
 			bool idling;
 			int failedLoginAttemptsCount;
+			time_t startedOn;
 			IMAPControl();
 			~IMAPControl();
 			IMAPControl(const IMAPControl &ic);
@@ -46,12 +48,11 @@ namespace pmm {
 			//MailAccountInfo mInfo;
 			int availableMessages;
 			int fetchRetryInterval;
-			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m, int badgeNumber);
+			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);
 		public:
 			SharedQueue<IMAPFetchControl> *fetchQueue;
 			SharedQueue<NotificationPayload> *myNotificationQueue;
 			MailFetcher();
-			//void fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages);
 			void operator()();
 		};
 		

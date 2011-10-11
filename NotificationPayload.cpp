@@ -44,7 +44,7 @@ namespace pmm {
 	}
 
 	NotificationPayload::NotificationPayload(){
-		
+		_badgeNumber = 1;
 	}
 	
 	NotificationPayload::NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber, const std::string &sndName){
@@ -76,16 +76,12 @@ namespace pmm {
 		jsonbuilder << "{";
 		jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
 		jsonbuilder << "\"sound\":\"" << _soundName << "\",";
-		jsonbuilder << "\"badge\":" << _badgeNumber << ",";
+		if(_badgeNumber > 0) jsonbuilder << "\"badge\":" << _badgeNumber << ",";
 		jsonbuilder << "}";
 		jsonbuilder << "}";
 		jsonRepresentation = jsonbuilder.str();
 	}
 	
-	/*std::string &NotificationPayload::toJSON(){
-		return jsonRepresentation;
-	}*/
-
 	const std::string &NotificationPayload::toJSON() const {
 		return jsonRepresentation;
 	}

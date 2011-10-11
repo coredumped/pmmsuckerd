@@ -27,6 +27,8 @@ namespace pmm {
 		FetchedMailsCache(const std::string &_datafile);
 		~FetchedMailsCache();
 		void addEntry(const std::string &email, const std::string &uid);
+		void addEntry(const std::string &email, uint32_t uid);
+		
 		bool entryExists(const std::string &email, const std::string &uid);
 		bool entryExists(const std::string &email, uint32_t uid);
 		

@@ -24,6 +24,9 @@
 #ifndef DEFAULT_FETCH_RETRY_INTERVAL
 #define DEFAULT_FETCH_RETRY_INTERVAL 60
 #endif
+#ifndef DEFAULT_MAX_IMAP_CONNECTION_TIME
+#define DEFAULT_MAX_IMAP_CONNECTION_TIME 1200
+#endif
 
 namespace pmm {
 #ifdef DEBUG
@@ -101,7 +104,7 @@ namespace pmm {
 		return 0;
 	}
 	
-	void IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch, int badgeNumber)
+	void IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch)
 	{
 		if (fetchedMails.entryExists(imapFetch.mailAccountInfo.email(), uid)) {
 			//Do not fetch or even notify previously fetched e-mails
@@ -146,8 +149,9 @@ namespace pmm {
 			
 			for (size_t i = 0; i < imapFetch.mailAccountInfo.devTokens().size(); i++) {
 				//Apply all processing rules before notifying
-				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], msg_content, badgeNumber);
+				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], msg_content, imapFetch.badgeCounter);
 				notificationQueue->add(np);
+				fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
 			}
 #warning TODO: insert message UID in databse so we know later that the message has been notified
 			mailimap_fetch_list_free(fetch_result);
@@ -157,12 +161,14 @@ namespace pmm {
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(){
 		madeAttempts = 0;
 		nextAttempt = 0;
+		badgeCounter = 0;
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(const IMAPFetchControl &ifc){
 		mailAccountInfo = ifc.mailAccountInfo;
 		nextAttempt = ifc.nextAttempt;
 		madeAttempts = ifc.madeAttempts;
+		badgeCounter += ifc.badgeCounter;
 	}
 	
 	
@@ -170,6 +176,7 @@ namespace pmm {
 		failedLoginAttemptsCount = 0;
 		idling = false;
 		imap = NULL;
+		startedOn = time(NULL);
 	}
 	
 	IMAPSuckerThread::IMAPControl::~IMAPControl(){
@@ -179,13 +186,7 @@ namespace pmm {
 	IMAPSuckerThread::MailFetcher::MailFetcher(){
 		availableMessages = 0;
 	}
-	
-	/*void IMAPSuckerThread::MailFetcher::fetchAndReport(const MailAccountInfo &m, SharedQueue<NotificationPayload> *notifQueue, int recentMessages){
-	 mInfo = m;
-	 myNotificationQueue = notifQueue;
-	 availableMessages = recentMessages;
-	 }*/
-	
+		
 	void IMAPSuckerThread::MailFetcher::operator()(){
 #ifdef DEBUG
 		mout.lock();
@@ -260,7 +261,7 @@ namespace pmm {
 							std::cerr << "DEBUG: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << std::endl;
 							mout.unlock();
 #endif
-							int mailCount = 0;
+							imapFetch.badgeCounter = 0;
 							for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
 								uint32_t uid;
 								uid = *((uint32_t *)clist_content(cur));
@@ -269,7 +270,8 @@ namespace pmm {
 								std::cerr << "DEBUG: " << imapFetch.mailAccountInfo.email() << " got UID=" << uid << std::endl;
 								mout.unlock();
 #endif
-								fetch_msg(imap, uid, myNotificationQueue, imapFetch, ++mailCount);
+								imapFetch.badgeCounter++;
+								fetch_msg(imap, uid, myNotificationQueue, imapFetch);
 							}
 							mailimap_search_result_free(unseenMails);							
 						}
@@ -325,7 +327,7 @@ namespace pmm {
 		}
 		if(imapControl[m.email()].imap == NULL) imapControl[m.email()].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
-		//fetchMails(m);		
+		fetchMails(m);		
 		if (m.useSSL()) {
 			result = mailimap_ssl_connect(imapControl[m.email()].imap, m.serverAddress().c_str(), m.serverPort());
 		}
@@ -340,7 +342,7 @@ namespace pmm {
 				std::stringstream errmsg;
 				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 				for (size_t i = 0; m.devTokens().size(); i++) {
-					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str(), ++mailboxControl[m.email()].availableMessages));
+					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
 					notificationQueue->add(msg);
 				}
 				serverConnectAttempts[m.serverAddress()] = 0;
@@ -349,6 +351,7 @@ namespace pmm {
 			mailboxControl[m.email()].isOpened = false;
 		}
 		else {
+			mailboxControl[m.email()].openedOn = time(NULL);
 			//Proceed to login stage
 			result = mailimap_login(imapControl[m.email()].imap, m.username().c_str(), m.password().c_str());
 			if(etpanOperationFailed(result)){
@@ -359,7 +362,7 @@ namespace pmm {
 #warning TODO: Find a better way to notify the user that we're unable to login into their mail account
 					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 					for (size_t i = 0; m.devTokens().size(); i++) {
-						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str(), ++mailboxControl[m.email()].availableMessages));
+						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
 						notificationQueue->add(msg);
 					}
 					serverConnectAttempts[m.serverAddress()] = 0;
@@ -405,6 +408,14 @@ namespace pmm {
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
 			mailimap *imap = imapControl[m.email()].imap;
+			if (imapControl[m.email()].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
+				//Think about closing and re-opening this connection!!!
+				mailimap_idle_done(imap);
+				mailimap_logout(imap);
+				mailimap_close(imap);
+				mailboxControl[theEmail].isOpened = false;
+				return;
+			}
 			mailstream_low *mlow = mailstream_get_low(imap->imap_stream);
 			int fd = mailstream_low_get_fd(mlow);
 			if(fd < 0) throw GenericException("Unable to get a valid FD, check libetpan compilation flags, make sure no cfnetwork support have been cooked in.");
@@ -412,6 +423,7 @@ namespace pmm {
 			pelem.fd = fd;
 			pelem.events = POLLIN;
 			int recent = -1;
+			bool resetIdle = false;
 			while (poll(&pelem, 1, 0) > 0) {
 				char *response = mailimap_read_line(imap);
 #ifdef DEBUG
@@ -423,7 +435,7 @@ namespace pmm {
 					//Compute how many recent we have
 					//std::istringstream input(std::string(response).substr(2));
 					//input >> recent;
-					recent = 1;
+					resetIdle = true;
 					mailboxControl[theEmail].availableMessages += recent;
 #ifdef DEBUG
 					mout.lock();
@@ -433,7 +445,7 @@ namespace pmm {
 					fetchMails(m);
 				}
 			}
-			if (recent >= 0) {
+			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
 				if(etpanOperationFailed(result)) throw GenericException("Unable to send DONE to IMAP after IDLE.");
 				result = mailimap_idle(imap);

@@ -6,6 +6,7 @@
 //  Copyright (c) 2011 fn(x) Software. All rights reserved.
 //
 #include "FetchedMailsCache.h"
+#include "Mutex.h"
 #include <iostream>
 #include <sstream>
 #ifndef DEFAULT_DATA_FILE
@@ -18,6 +19,9 @@
 
 
 namespace pmm {
+#ifdef DEBUG
+	extern Mutex mout;
+#endif
 	
 	static const char *fetchedMailsTable = DEFAULT_FETCHED_MAILS_TABLE_NAME;
 	
@@ -52,6 +56,12 @@ namespace pmm {
 	
 	FetchedMailsCache::~FetchedMailsCache(){
 		
+	}
+	
+	void FetchedMailsCache::addEntry(const std::string &email, uint32_t uid){
+		std::stringstream input;
+		input << uid;
+		addEntry(email, input.str());
 	}
 	
 	void FetchedMailsCache::addEntry(const std::string &email, const std::string &uid){

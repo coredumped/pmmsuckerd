@@ -23,12 +23,19 @@
 #define DEFAULT_MAX_SERVER_CONNECT_FAILURES 10 
 #endif
 
+#ifndef DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL
+#define DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL 3
+#endif
+
 namespace pmm {
+	
+	const int minimumMailCheckInterval = DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL;
 	
 	MailboxControl::MailboxControl(){
 		openedOn = time(0);
 		isOpened = false;
 		availableMessages = 0;
+		lastCheck = 0;
 	}
 	
 	MailboxControl::MailboxControl(const MailboxControl &m){
@@ -36,6 +43,7 @@ namespace pmm {
 		isOpened = m.isOpened;
 		email = m.email;
 		availableMessages = m.availableMessages;
+		lastCheck = m.lastCheck;
 	}
 	
 	MailSuckerThread::MailSuckerThread(){
@@ -60,7 +68,11 @@ namespace pmm {
 				//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
 				if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
 				if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
-				checkEmail(emailAccounts[i]);
+				if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
+					checkEmail(emailAccounts[i]);
+					mCtrl.lastCheck = time(0);
+				}
+
 			}
 			usleep(iterationWaitMicroSeconds);
 		}

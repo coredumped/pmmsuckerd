@@ -19,12 +19,15 @@
 
 namespace pmm {
 	
+	extern const int minimumMailCheckInterval;
+	
 	class MailboxControl {
 	public:
 		std::string email;
 		time_t openedOn;
 		bool isOpened;
 		int availableMessages;
+		time_t lastCheck;
 		MailboxControl();
 		MailboxControl(const MailboxControl &m);
 	};

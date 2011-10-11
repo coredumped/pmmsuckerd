@@ -22,11 +22,10 @@ namespace pmm {
 		std::string jsonRepresentation;
 	public:
 		NotificationPayload();
-		NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber, const std::string &sndName = "default");
+		NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber = 1, const std::string &sndName = "pmm.caf");
 		NotificationPayload(const NotificationPayload &n);
 		~NotificationPayload();
 		
-		//std::string &toJSON();
 		const std::string &toJSON() const;
 		std::string &soundName();
 		std::string &message();
