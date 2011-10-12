@@ -369,7 +369,7 @@ namespace pmm {
 			}
 			mailboxControl[m.email()].isOpened = false;
 			mailimap_free(imapControl[m.email()].imap);
-			
+#warning TODO: delay reconnections			
 		}
 		else {
 			mailboxControl[m.email()].openedOn = time(NULL);
@@ -476,6 +476,7 @@ namespace pmm {
 #endif
 					fetchMails(m);
 				}
+				if(response == NULL) break;
 			}
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
