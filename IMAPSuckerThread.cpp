@@ -355,6 +355,11 @@ namespace pmm {
 #warning TODO: Find a better way to notify the user that we're unable to connect into their mail server
 				std::stringstream errmsg;
 				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
+#ifdef DEBUG
+				mout.lock();
+				std::cerr << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << std::endl;
+				mout.unlock();
+#endif
 				for (size_t i = 0; m.devTokens().size(); i++) {
 					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
 					notificationQueue->add(msg);
@@ -363,6 +368,8 @@ namespace pmm {
 #warning Add method for relinquishing email account monitoring
 			}
 			mailboxControl[m.email()].isOpened = false;
+			mailimap_free(imapControl[m.email()].imap);
+			
 		}
 		else {
 			mailboxControl[m.email()].openedOn = time(NULL);
