@@ -369,6 +369,7 @@ namespace pmm {
 			}
 			mailboxControl[m.email()].isOpened = false;
 			mailimap_free(imapControl[m.email()].imap);
+			imapControl[m.email()].imap = NULL;
 #warning TODO: delay reconnections			
 		}
 		else {
@@ -484,9 +485,6 @@ namespace pmm {
 				result = mailimap_idle(imap);
 				if(etpanOperationFailed(result)) throw GenericException("Unable to restart IDLE after DONE.");
 			}
-		}
-		else {
-			openConnection(m);
 		}
 	}
 	
