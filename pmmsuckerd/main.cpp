@@ -20,6 +20,9 @@
 #include "IMAPSuckerThread.h"
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
+#ifdef __linux__
+#include<signal.h>
+#endif
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
