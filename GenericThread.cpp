@@ -9,6 +9,7 @@
 #include <iostream>
 #include <pthread.h>
 #include "GenericThread.h"
+#include "MTLogger.h"
 
 namespace pmm {
 	GenericThread::GenericThread(){
@@ -21,19 +22,19 @@ namespace pmm {
 	
 	void GenericThread::onStart(){
 #ifdef DEBUG
-		std::cerr << "DEBUG: Starting thread " << (unsigned long)pthread_self() << std::endl;
+		pmm::Log << "DEBUG: Starting thread " << pmm::NL;
 #endif
 	}
 	
 	void GenericThread::operator()(){
 #ifdef DEBUG
-		std::cerr << "DEBUG: Look I am thread "  << (unsigned long)pthread_self() << " running in the background :-)" << std::endl;
+		pmm::Log << "DEBUG: Look I am thread running in the background :-)" << pmm::NL;
 #endif
 	}
 	
 	void GenericThread::onFinish(){
 #ifdef DEBUG
-		std::cerr << "DEBUG: Finishing thread " << (unsigned long)pthread_self() << std::endl;
+		pmm::Log << "DEBUG: Finishing thread " << pmm::NL;
 #endif
 	}
 

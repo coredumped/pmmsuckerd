@@ -262,7 +262,7 @@ namespace pmm {
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		while (true) {
 #ifdef DEBUG
-			if(++i % 400 == 0){
+			if(++i % 2400 == 0){
 				APNSLog << "DEBUG: keepalive still tickling!!!" << pmm::NL;
 			}
 #endif

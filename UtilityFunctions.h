@@ -17,6 +17,8 @@ namespace pmm {
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken);
 	
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts);
+	
+	void nltrim(std::string &s);
 }
 
 #endif

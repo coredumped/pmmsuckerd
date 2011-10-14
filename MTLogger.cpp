@@ -29,7 +29,7 @@ namespace pmm {
 			strftime(buf, 64, "%F %T%z", &tmTime);
 			std::stringstream ldata;
 			if (tag.size() > 0) {
-				ldata << buf << "(0x" << std::hex << (long)pthread_self() << ")" << std::dec << ": ";	
+				ldata << buf << " " << tag << "(0x" << std::hex << (long)pthread_self() << ")" << std::dec << ": ";	
 			}
 			else {
 				ldata << buf << " thread=0x" << std::hex << (long)pthread_self() << std::dec << ": ";	

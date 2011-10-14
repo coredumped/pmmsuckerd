@@ -69,5 +69,9 @@ namespace pmm {
 			}
 		}
 	}
-
+	
+	void nltrim(std::string &s){
+		if(s.size() >= 1 && s[s.size() - 1] == '\n') s = s.substr(0, s.size() - 1);
+		if(s.size() >= 1 && s[s.size() - 1] == '\r') s = s.substr(0, s.size() - 1);
+	}
 }

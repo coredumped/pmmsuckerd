@@ -32,6 +32,7 @@
 #include "ServerResponse.h"
 #include "jsonxx.h"
 #include "UtilityFunctions.h"
+#include "MTLogger.h"
 
 #ifndef DEFAULT_API_KEY
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
@@ -79,12 +80,12 @@ namespace pmm {
 	static void dieOnSecError(OSStatus err){
 		if (err == errSecSuccess) return;
 		CFStringRef errorMessage = SecCopyErrorMessageString(err, NULL);
-		std::cerr << "Unable to generate suckerID: ";
+		pmm::Log << "Unable to generate suckerID: ";
 		if (errorMessage != NULL) {
-			std::cerr << CFStringGetCStringPtr(errorMessage, kCFStringEncodingASCII);
+			pmm::Log << CFStringGetCStringPtr(errorMessage, kCFStringEncodingASCII);
 			CFRelease(errorMessage);
 		}
-		std::cerr << "program aborted!!!" << std::endl;
+		pmm::Log << "program aborted!!!" << pmm::NL;
 		exit(1);
 	}
 #endif
@@ -121,7 +122,7 @@ namespace pmm {
 			dieOnSecError(err);
 			if(item) SecKeychainItemSetAccess(item, access);
 #ifdef DEBUG
-			std::cerr << "DEBUG: Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman) << std::endl;
+			pmm::Log << "DEBUG: Generating suckerID: " << CFStringGetCStringPtr(cfuuid_s, kCFStringEncodingMacRoman) << pmm::NL;
 #endif
 			CFRelease(cfuuid_s);
 			CFRelease(cfuuid);
@@ -148,7 +149,7 @@ namespace pmm {
 				}
 			}
 			if (suckerID.size() == 0) {
-				std::cerr << "Unable to retrieve suckerID, aborting..." << std::endl;
+				pmm::Log << "Unable to retrieve suckerID, aborting..." << pmm::NL;
 				unlink("pmmsucker.conf");
 				exit(1);
 			}
@@ -257,7 +258,7 @@ namespace pmm {
 		}
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
 #ifdef DEBUG
-		std::cerr << "DEBUG: Sending post data: " << encodedPost.str().c_str() << std::endl;
+		pmm::Log << "DEBUG: Sending post data: " << encodedPost.str().c_str() << pmm::NL;
 #endif
 
 	}
@@ -275,12 +276,12 @@ namespace pmm {
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
 #ifdef DEBUG
-			std::cerr << "DEBUG: POST RESPONSE: " << output << std::endl;
+			pmm::Log << "DEBUG: POST RESPONSE: " << output << pmm::NL;
 #endif
 		}
 		else {
 #ifdef DEBUG
-			std::cerr << "DEBUG: Unable to execute POST request to " << dest_url << ": " << errorBuffer << std::endl;
+			pmm::Log << "DEBUG: Unable to execute POST request to " << dest_url << ": " << errorBuffer << pmm::NL;
 #endif
 			int http_errcode; 
 			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
@@ -311,7 +312,7 @@ namespace pmm {
 		params["suckerID"] = this->myID;
 		params["opType"] = pmm::OperationTypes::register2PMM;
 #ifdef DEBUG
-		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
+		pmm::Log << "DEBUG: Registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
 		std::string output;
 		executePost(params, output);
@@ -330,7 +331,7 @@ namespace pmm {
 		params["suckerID"] = this->myID;
 		params["opType"] = pmm::OperationTypes::pmmSuckerUnRegister;
 #ifdef DEBUG
-		std::cerr << "DEBUG: Un-registering with suckerID=" << params["suckerID"] << std::endl;
+		pmm::Log << "DEBUG: Un-registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
 		std::string output;
 		executePost(params, output);
@@ -354,7 +355,7 @@ namespace pmm {
 		::gethostname((char *)myHostname, 260);
 		params["hostname"] = (char *)myHostname;
 #ifdef DEBUG
-		std::cerr << "DEBUG: Registering with suckerID=" << params["suckerID"] << std::endl;
+		pmm::Log << "DEBUG: Registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
 		std::string output;
 		executePost(params, output);
@@ -365,7 +366,7 @@ namespace pmm {
 			std::istringstream input(response.metaData["regInterval"]);
 			input >> expirationTime;
 #ifdef DEBUG
-			std::cerr << "Registered with expiration timestamp: " << expirationTime << std::endl;
+			pmm::Log << "Registered with expiration timestamp: " << expirationTime << pmm::NL;
 #endif
 		}
 		return response.status;
@@ -406,7 +407,7 @@ namespace pmm {
 	void SuckerSession::performAutoRegister(){
 		if (time(0x00) >= expirationTime) {
 #ifdef DEBUG
-			std::cerr << "DEBUG: Session is about to expire re-registering in advance..." << std::endl;
+			pmm::Log << "DEBUG: Session is about to expire re-registering in advance..." << pmm::NL;
 #endif
 			register2PMM();
 		}

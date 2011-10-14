@@ -185,9 +185,9 @@ namespace pmm {
 	}
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
-		pmm::Log << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") warming up..." << pmm::NL;
+		pmm::Log << "DEBUG: IMAP MailFetcher warming up..." << pmm::NL;
 		sleep(1);
-		pmm::Log << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") started!!!" << pmm::NL;
+		pmm::Log << "DEBUG: IMAP MailFetcher started!!!" << pmm::NL;
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
@@ -200,7 +200,7 @@ namespace pmm {
 					break;
 				}
 #ifdef DEBUG
-				pmm::Log << "DEBUG: IMAP MailFetcher(" << (long)pthread_self() << ") Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
+				pmm::Log << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
 #endif
 				struct mailimap *imap = mailimap_new(0, NULL);
 				int result;
@@ -224,7 +224,7 @@ namespace pmm {
 					if(etpanOperationFailed(result)){
 #warning TODO: Remember to report the user whenever we have too many login attempts
 #ifdef DEBUG
-						pmm::Log << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
+						pmm::Log << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
 #endif				
 						imapFetch.madeAttempts++;
 						imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
@@ -237,7 +237,7 @@ namespace pmm {
 							imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
 							fetchQueue->add(imapFetch);
 #ifdef DEBUG
-							pmm::Log << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
+							pmm::Log << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
 #endif				
 							continue;
 						}
@@ -248,7 +248,7 @@ namespace pmm {
 							throw GenericException("Can't find unseen messages, IMAP SEARCH failed miserably");
 						}
 #ifdef DEBUG
-						pmm::Log << "DEBUG: MailFetcher(" << (long)pthread_self() << ") " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
+						pmm::Log << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
 #endif
 						imapFetch.badgeCounter = 0;
 						for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
