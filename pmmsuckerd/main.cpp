@@ -42,6 +42,12 @@
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
 void emergencyUnregister();
+#ifdef __linux__
+//Define a SIGPIPE handler
+static void sigpipe_handle(int x){ 
+	pmm::Log << "Just got SIGPIPE :-(" << pmm::NL;
+}
+#endif
 
 int main (int argc, const char * argv[])
 {
@@ -106,6 +112,9 @@ int main (int argc, const char * argv[])
 	pmm::APNSLog.open("apns.log");
 	pmm::APNSLog.setTag("APNSNotificationThread");
 	pmm::SuckerSession session(pmmServiceURL);
+#ifdef __linux__
+	signal(SIGPIPE, sigpipe_handle);
+#endif
 	//1. Register to PMMService...
 	try {
 		session.register2PMM();
