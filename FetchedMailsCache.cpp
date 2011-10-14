@@ -78,13 +78,20 @@ namespace pmm {
 		sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL) << ",'" << email << "'," << "'" << uid << "')";
 		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 		if (errCode != SQLITE_OK) {
-			closeDatabase(conn);
-			std::stringstream errmsg;
-			errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+			if (errCode != SQLITE_CONSTRAINT) {
+				CacheLog << "Duplicate entry in database: " << email << "(" << uid << ") resetting database..." << pmm::NL;
+				closeDatabase(conn);
+				dbConn = 0;
+			}
+			else{
+				closeDatabase(conn);
+				std::stringstream errmsg;
+				errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
 #ifdef DEBUG
-			CacheLog << errmsg.str() << pmm::NL;
+				CacheLog << errmsg.str() << pmm::NL;
 #endif
-			throw GenericException(errmsg.str());
+				throw GenericException(errmsg.str());
+			}
 		}
 		closeDatabase(conn);
 	}

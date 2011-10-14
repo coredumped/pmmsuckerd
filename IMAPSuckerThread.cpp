@@ -375,7 +375,7 @@ namespace pmm {
 #ifdef DEBUG
 				pmm::Log << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << m.email() << pmm::NL;
 #endif
-				mailstream_debug = 1;
+				//mailstream_debug = 1;
 				result = mailimap_select(imapControl[m.email()].imap, "INBOX");
 				if(etpanOperationFailed(result)){
 					throw GenericException("Unable to select INBOX folder");
