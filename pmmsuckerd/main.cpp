@@ -10,6 +10,7 @@
 #include <sstream>
 #include <openssl/ssl.h>
 #include <stdlib.h>
+#include <fstream>
 #include "ServerResponse.h"
 #include "PMMSuckerSession.h"
 #include "APNSNotificationThread.h"
@@ -18,6 +19,7 @@
 #include "NotificationPayload.h"
 #include "IMAPSuckerThread.h"
 #include "UtilityFunctions.h"
+#include "MTLogger.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
@@ -33,6 +35,9 @@
 #ifndef DEFAULT_SS_PRIVATE_KEY_PATH
 #define DEFAULT_SS_PRIVATE_KEY_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
 #endif
+#ifndef DEFAULT_LOGFILE
+#define DEFAULT_LOGFILE "pmmsuckerd.log"
+#endif
 
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
@@ -41,6 +46,7 @@ void emergencyUnregister();
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
+	std::string logFilePath = DEFAULT_LOGFILE;
 	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
 	size_t maxIMAPSuckerThreads = DEFAULT_MAX_IMAP_POLLING_THREADS;
 	size_t maxPOP3SuckerThreads = DEFAULT_MAX_POP3_POLLING_THREADS;
@@ -90,7 +96,12 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--ssl-private-key") == 0 && (i + 1) < argc){
 			sslPrivateKeyPath = argv[++i];
 		}
+		else if(arg.compare("--log") == 0 && (i + 1) < argc){
+			logFilePath = argv[++i];
+		}
 	}
+	std::ofstream logStream(logFilePath);
+	pmm::Log.setOutputStream(&logStream);
 	pmm::SuckerSession session(pmmServiceURL);
 	//1. Register to PMMService...
 	try {
@@ -98,17 +109,20 @@ int main (int argc, const char * argv[])
 	} catch (pmm::ServerResponseException &se1) {
 		if (se1.errorCode == pmm::PMM_ERROR_SUCKER_DENIED) {
 			std::cerr << "Unable to register, permission denied." << std::endl;
+			pmm::Log << "Unable to register, permission denied." << pmm::NL;
 			try{
 				//Try to ask for membership automatically or report if a membership has already been asked
 				session.reqMembership("Automated membership petition, please help!!!");
 				std::cerr << "Membership request issued to pmm controller, try again later" << std::endl;
 			}
 			catch(pmm::ServerResponseException  &se2){ 
+				pmm::Log << "Failed to request membership automatically: " << se2.errorDescription << pmm::NL;
 				std::cerr << "Failed to request membership automatically: " << se2.errorDescription << std::endl;
 			}
 		}
 		else {
 			std::cerr << "Unable to register: " << se1.errorDescription << std::endl;
+			pmm::Log << "Unable to register: " << se1.errorDescription << pmm::NL;
 		}
 		return 1;
 	}
@@ -137,12 +151,9 @@ int main (int argc, const char * argv[])
 	}
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
-	if (imapAccounts.size() == 0) {
-		std::cerr << "WARNING: No imap sessions are going to be monitored" << std::endl;
-	}
 	//5. Dispatch polling threads for imap
 	for (size_t k = 0; k < imapAccounts.size(); k++) imapSuckingThreads[k % maxIMAPSuckerThreads].emailAccounts.push_back(imapAccounts[k]);
-	for (size_t i = 0; i < maxIMAPSuckerThreads && imapAccounts.size() > 0; i++) {
+	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
 		sleep(1);

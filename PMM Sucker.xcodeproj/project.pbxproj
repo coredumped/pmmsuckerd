@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		821BBCE61445EB680023DF32 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		821BBCE71445EB820023DF32 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
 		8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		823BD0481444AECD001ED14E /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
@@ -75,6 +77,8 @@
 /* Begin PBXFileReference section */
 		821675BB14283DA800F8FF70 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		821BBCE31445EB270023DF32 /* MTLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTLogger.h; sourceTree = "<group>"; };
+		821BBCE51445EB680023DF32 /* MTLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MTLogger.cpp; sourceTree = "<group>"; };
 		8238F494142AF767007F76C0 /* JSONParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONParseException.h; sourceTree = "<group>"; };
 		8238F496142AFA3E007F76C0 /* JSONParseException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSONParseException.cpp; sourceTree = "<group>"; };
 		823BD0461444AECD001ED14E /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../cxxLibraries/openssl-mac/libcrypto.a"; sourceTree = "<group>"; };
@@ -292,6 +296,8 @@
 				82ED5B311437F19900444844 /* SharedVector.h */,
 				82571EAC1442AC220047347E /* FetchedMailsCache.h */,
 				82571EAE1442B1730047347E /* FetchedMailsCache.cpp */,
+				821BBCE31445EB270023DF32 /* MTLogger.h */,
+				821BBCE51445EB680023DF32 /* MTLogger.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -397,6 +403,7 @@
 				82ED5B2C1437ECDB00444844 /* MailSuckerThread.cpp in Sources */,
 				82ED5B301437F01A00444844 /* IMAPSuckerThread.cpp in Sources */,
 				82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */,
+				821BBCE61445EB680023DF32 /* MTLogger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,6 +411,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				821BBCE71445EB820023DF32 /* MTLogger.cpp in Sources */,
 				82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */,
 				82ED5B3214380B3300444844 /* IMAPSuckerThread.cpp in Sources */,
 				82ED5B2D1437ED0200444844 /* MailSuckerThread.cpp in Sources */,

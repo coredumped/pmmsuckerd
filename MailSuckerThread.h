@@ -14,6 +14,7 @@
 #include "MailAccountInfo.h"
 #include "SharedQueue.h"
 #include "NotificationPayload.h"
+#include "MTLogger.h"
 #include <string>
 #include <map>
 

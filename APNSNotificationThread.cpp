@@ -269,7 +269,7 @@ namespace pmm {
 		while (true) {
 #ifdef DEBUG
 			i++;
-			if(i % 40 == 0){
+			if(i % 400 == 0){
 				mout.lock();
 				std::cout << "DEBUG: APNSNotificationThread=0x" << std::hex << (long)pthread_self() << " keepalive still tickling!!! pending=" << notificationQueue->size() << std::endl;
 				mout.unlock();
