@@ -11,16 +11,15 @@
 #include <time.h>
 
 namespace pmm {
-	MTLogger cerr(std::cerr);
-	MTLogger cout(std::cout);
+	MTLogger cerr(&std::cerr);
+	MTLogger cout(&std::cout);
 	
-	MSLogger Log;
+	MTLogger Log;
 	static const char _nlBuf[] = { '\n', 0x00, '\n' };
 	std::string NL(_nlBuf, 3);
 	
 	void MTLogger::initLogline(){
-		std::string initial = streamMap[pthread_self()].str();
-		if (initial.size() == 0) {
+		if (streamMap[pthread_self()].size() == 0) {
 			if (outputStream == NULL) {
 				outputStream = &std::cerr;
 			}
@@ -30,10 +29,9 @@ namespace pmm {
 			struct tm tmTime;
 			gmtime_r(&theTime, &tmTime);
 			strftime(buf, 64, "%F %T%z", &tmTime);
-			streamMap[pthread_self()] << buf << " thread=0x";
-			streamMap[pthread_self()] << std::hex << (long)pthread_self();
-			streamMap[pthread_self()] << std::dec;
-			streamMap[pthread_self()] << ": ";
+			std::stringstream ldata;
+			ldata << buf << " thread=0x" << std::hex << (long)pthread_self() << std::dec << ": ";
+			streamMap[pthread_self()] = ldata.str();
 		}
 	}
 	
@@ -52,15 +50,21 @@ namespace pmm {
 	MTLogger &MTLogger::operator<<(int val){
 		m.lock();
 		initLogline();
-		streamMap[pthread_self()] << val;
+		std::stringstream ldata;
+		ldata << streamMap[pthread_self()] << val;
+		streamMap[pthread_self()] = ldata.str();
 		m.unlock();		
+		return *this;
 	}
 	
 	MTLogger &MTLogger::operator<<(long val){
 		m.lock();
 		initLogline();
-		streamMap[pthread_self()] << val;
+		std::stringstream ldata;
+		ldata << streamMap[pthread_self()] << val;
+		streamMap[pthread_self()] = ldata.str();
 		m.unlock();
+		return *this;
 	}
 	
 	MTLogger &MTLogger::operator<<(const std::string &s){
@@ -68,22 +72,29 @@ namespace pmm {
 		initLogline();
 		if (s.compare(pmm::NL) == 0) {
 			//Flush contents
-			outputStream->operator<<(streamMap[pthread_self()].str());
+			std::stringstream ldata;
+			outputStream->operator<<(streamMap[pthread_self()].c_str());
 			outputStream->operator<<("\n");
 			outputStream->flush();
-			streamMap[pthread_self()].str(std::string());
+			streamMap.erase(pthread_self());
 		}
 		else {
-			streamMap[pthread_self()] << s;
+			std::stringstream ldata;
+			ldata << streamMap[pthread_self()] << s;
+			streamMap[pthread_self()] = ldata.str();
 		}
 		m.unlock();
+		return *this;
 	}
 	
 	MTLogger &MTLogger::operator<<(double d){
 		m.lock();
 		initLogline();
-		streamMap[pthread_self()] << d;
+		std::stringstream ldata;
+		ldata << streamMap[pthread_self()] << d;
+		streamMap[pthread_self()] = ldata.str();
 		m.unlock();
+		return *this;
 	}
 	
 }

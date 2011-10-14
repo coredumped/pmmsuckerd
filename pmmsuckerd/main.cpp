@@ -100,7 +100,7 @@ int main (int argc, const char * argv[])
 			logFilePath = argv[++i];
 		}
 	}
-	std::ofstream logStream(logFilePath);
+	std::ofstream logStream(logFilePath.c_str());
 	pmm::Log.setOutputStream(&logStream);
 	pmm::SuckerSession session(pmmServiceURL);
 	//1. Register to PMMService...

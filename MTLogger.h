@@ -9,7 +9,6 @@
 #ifndef PMM_Sucker_MTLogger_h
 #define PMM_Sucker_MTLogger_h
 #include"Mutex.h"
-#include <fstream>
 #include <string>
 #include <sstream>
 #include <map>
@@ -20,7 +19,7 @@ namespace pmm {
 	private:
 		Mutex m;
 	protected:
-		std::map<pthread_t, std::stringstream> streamMap;
+		std::map<pthread_t, std::string> streamMap;
 		std::ostream *outputStream;
 		void initLogline();
 	public:
@@ -34,9 +33,9 @@ namespace pmm {
 		MTLogger &operator<<(const std::string &s);
 		MTLogger &operator<<(double d);
 		
-		operator std::ostream(){
+		/*operator std::ostream(){
 			return *outputStream;
-		}
+		}*/
 	};
 	
 	extern MTLogger cerr;
