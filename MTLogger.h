@@ -21,13 +21,11 @@ namespace pmm {
 		Mutex m;
 	protected:
 		std::map<pthread_t, std::string> streamMap;
-		std::ofstream *outputStream;
+		std::ofstream outputStream;
 		void initLogline();
 	public:
 		MTLogger();
-		MTLogger(std::ofstream *outputStream_);
-		
-		void setOutputStream(std::ofstream *outputStream_);
+		void open(const std::string &path);
 		
 		MTLogger &operator<<(int val);
 		MTLogger &operator<<(long val);

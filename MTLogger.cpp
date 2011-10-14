@@ -18,8 +18,8 @@ namespace pmm {
 	
 	void MTLogger::initLogline(){
 		if (streamMap[pthread_self()].size() == 0) {
-			if (outputStream == NULL) {
-				outputStream = new std::ofstream("mtlogger.log");
+			if (!outputStream.is_open()) {
+				outputStream.open("mtlogger.log");
 			}
 			char buf[128];
 			time_t theTime;
@@ -34,17 +34,13 @@ namespace pmm {
 	}
 	
 	MTLogger::MTLogger(){
-		outputStream = NULL;
+		//outputStream.open("mtlogger.log");
+	}
+	void MTLogger::open(const std::string &path){
+		outputStream.open(path.c_str());
 	}
 	
-	MTLogger::MTLogger(std::ofstream *outputStream_){
-		outputStream = outputStream_;
-	}
-	
-	void MTLogger::setOutputStream(std::ofstream *outputStream_){
-		outputStream = outputStream_;		
-	}
-	
+		
 	MTLogger &MTLogger::operator<<(int val){
 		m.lock();
 		initLogline();
@@ -71,9 +67,9 @@ namespace pmm {
 		if (s.compare(pmm::NL) == 0) {
 			//Flush contents
 			std::stringstream ldata;
-			outputStream->operator<<(streamMap[pthread_self()].c_str());
-			outputStream->operator<<("\n");
-			outputStream->flush();
+			outputStream << streamMap[pthread_self()];
+			outputStream << "\n";
+			outputStream.flush();
 			streamMap.erase(pthread_self());
 		}
 		else {
