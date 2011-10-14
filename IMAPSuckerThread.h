@@ -70,6 +70,8 @@ namespace pmm {
 		IMAPSuckerThread(size_t _maxMailFetchers);
 		virtual ~IMAPSuckerThread();
 	};
+	
+	extern FetchedMailsCache fetchedMails;
 }
 
 #endif

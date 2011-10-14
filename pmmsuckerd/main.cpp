@@ -101,6 +101,10 @@ int main (int argc, const char * argv[])
 		}
 	}
 	pmm::Log.open(logFilePath);
+	pmm::CacheLog.open("mailcache.log");
+	pmm::CacheLog.setTag("FetchedMailsCache");
+	pmm::APNSLog.open("apns.log");
+	pmm::APNSLog.setTag("APNSNotificationThread");
 	pmm::SuckerSession session(pmmServiceURL);
 	//1. Register to PMMService...
 	try {

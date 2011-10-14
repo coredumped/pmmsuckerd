@@ -28,7 +28,12 @@ namespace pmm {
 			gmtime_r(&theTime, &tmTime);
 			strftime(buf, 64, "%F %T%z", &tmTime);
 			std::stringstream ldata;
-			ldata << buf << " thread=0x" << std::hex << (long)pthread_self() << std::dec << ": ";
+			if (tag.size() > 0) {
+				ldata << buf << "(0x" << std::hex << (long)pthread_self() << ")" << std::dec << ": ";	
+			}
+			else {
+				ldata << buf << " thread=0x" << std::hex << (long)pthread_self() << std::dec << ": ";	
+			}
 			streamMap[pthread_self()] = ldata.str();
 		}
 	}
@@ -40,6 +45,10 @@ namespace pmm {
 		outputStream.open(path.c_str());
 	}
 	
+	void MTLogger::setTag(const std::string &_tag){
+		tag = _tag;
+	}
+
 		
 	MTLogger &MTLogger::operator<<(int val){
 		m.lock();

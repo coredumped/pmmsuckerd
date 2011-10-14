@@ -32,10 +32,8 @@
 #endif
 
 namespace pmm {
-	
-#ifdef DEBUG
-	extern Mutex mout;
-#endif
+	MTLogger APNSLog;
+
 	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength)
 	{
 		bool rtn = true;
@@ -78,6 +76,9 @@ namespace pmm {
 			memcpy(binaryMessagePt, payloadBuff, payloadLength);
 			binaryMessagePt += payloadLength;
 			int sslRetCode;
+#ifdef DEBUG
+			APNSLog << "DEBUG: Sending " << (int)(binaryMessagePt - binaryMessageBuff) << " bytes payload..." << pmm::NL;
+#endif
 			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
 			}
@@ -90,12 +91,7 @@ namespace pmm {
 					throw SSLException(sslPtr, sslRetCode, "Unable to read response code");
 				}
 #ifdef DEBUG
-				mout.lock();
-				std::streamsize _w = std::cerr.width();
-				std::cerr.width(2);
-				std::cerr << "DEBUG: APNS Response: 0x" << std::hex << (int)apnsRetCode[0] << " 0x" << std::hex << (int)apnsRetCode[1] << " 0x" << std::hex << (int)apnsRetCode[2] << " 0x" << std::hex << (int)apnsRetCode[3] << " 0x" << std::hex << (int)apnsRetCode[4] << " 0x" << std::hex << (int)apnsRetCode[5] << std::endl; 
-				std::cerr.width(_w);
-				mout.unlock();
+				APNSLog << "DEBUG: APNS Response: " << (int)apnsRetCode[0] << " " << (int)apnsRetCode[1] << " " << (int)apnsRetCode[2] << " " << (int)apnsRetCode[3] << " " << (int)apnsRetCode[4] << " " << (int)apnsRetCode[5] << pmm::NL; 
 #endif
 				if (apnsRetCode[1] != 0) {
 					std::stringstream errmsg;
@@ -103,6 +99,9 @@ namespace pmm {
 					throw GenericException(errmsg.str());
 				}
 			}
+#ifdef DEBUG
+			APNSLog << "DEBUG: payload sent!!!" << pmm::NL;
+#endif
 		}
 		return rtn;
 	}
@@ -118,6 +117,7 @@ namespace pmm {
 				//Fatal error, stop daemon, notify pmm service inmediately so it can release all e-mail
 				//accounts from this pmm sucker inmediatelly
 				std::cerr << "Unable to create SSL context" << std::endl;
+				APNSLog << "Can't create SSL context, aborting application!!!" << pmm::NL;
 				abort();
 			}
 			std::string caPath;
@@ -134,9 +134,7 @@ namespace pmm {
 				throw SSLException(NULL, 0, "Unable to verify CA location.");
 			}
 #ifdef DEBUG
-			mout.lock();
-			std::cerr << "Loading certificate... " << _certPath << std::endl;
-			mout.unlock();
+			APNSLog << "Loading certificate: " << _certPath << pmm::NL;
 #endif
 #warning TODO: Verify that the certificate has not expired, if it has send a very loud panic alert
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
@@ -155,9 +153,7 @@ namespace pmm {
 	void APNSNotificationThread::connect2APNS(){
 		initSSL();
 #ifdef DEBUG
-		mout.lock();
-		std::cerr << "DEBUG: Connecting to APNS server..." << std::endl;
-		mout.unlock();
+		APNSLog << "DEBUG: Connecting to APNS server..." << pmm::NL;
 #endif
 		_socket = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);       
 		if(_socket == -1)
@@ -202,11 +198,7 @@ namespace pmm {
 		{
 			throw SSLException(apnsConnection, err, "APNS SSL Connection");
 		}
-#ifdef DEBUG
-		mout.lock();
-		std::cerr << "DEBUG: Successfully connected to APNS service. thread=0x" << std::hex << (long)pthread_self() << std::endl;
-		mout.unlock();
-#endif
+		APNSLog << "DEBUG: Successfully connected to APNS service" << pmm::NL;
 	}
 	
 	void APNSNotificationThread::ifNotConnectedToAPNSThenConnect(){
@@ -264,15 +256,14 @@ namespace pmm {
 #ifdef DEBUG
 		size_t i = 0;  
 #endif
+		pmm::Log << "Starting APNSNotificationThread..." << pmm::NL;
 		initSSL();
 		connect2APNS();
+		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		while (true) {
 #ifdef DEBUG
-			i++;
-			if(i % 400 == 0){
-				mout.lock();
-				std::cout << "DEBUG: APNSNotificationThread=0x" << std::hex << (long)pthread_self() << " keepalive still tickling!!! pending=" << notificationQueue->size() << std::endl;
-				mout.unlock();
+			if(++i % 400 == 0){
+				APNSLog << "DEBUG: keepalive still tickling!!!" << pmm::NL;
 			}
 #endif
 			//Verify if there are any ending notifications in the notification queue
@@ -280,12 +271,8 @@ namespace pmm {
 			int notifyCount = 0;
 			while (notificationQueue->extractEntry(payload)) {
 #ifdef DEBUG
-				mout.lock();
-				std::cout << "DEBUG: There are " << notificationQueue->size() << " elements in the notification queue." << std::endl;
-				mout.unlock();
+				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
 #endif
-
-
 				try {
 					notifyTo(payload.deviceToken(), payload);
 				} 
@@ -298,11 +285,7 @@ namespace pmm {
 						notificationQueue->add(payload);
 					}
 					else{
-#ifdef DEBUG
-						mout.lock();
-						std::cerr << "Got SSL error with code=" << sse1.errorCode() << " errno=" << errno << std::endl;
-						mout.unlock();
-#endif
+						APNSLog << "Got SSL error with code=" << sse1.errorCode() << " errno=" << errno << " aborting!!!" << pmm::NL;
 						throw;
 					}
 				}
@@ -310,11 +293,7 @@ namespace pmm {
 					notificationQueue->add(payload);
 				}
 				if (++notifyCount > maxNotificationsPerBurst) {
-#ifdef DEBUG
-					mout.lock();
-					std::cerr << "DEBUG: APNSNotificationThread: too many (" << notifyCount << ") notifications in a single burst, sleeping for " << maxBurstPauseInterval << " seconds..." << std::endl;
-					mout.unlock();
-#endif
+					APNSLog << "Too many (" << notifyCount << ") notifications in a single burst, sleeping for " << maxBurstPauseInterval << " seconds..." << pmm::NL;
 					sleep(maxBurstPauseInterval);
 					break;
 				}
@@ -327,9 +306,7 @@ namespace pmm {
 		//Add some code here for god sake!!!
 		std::string jsonMsg = msg.toJSON();
 #ifdef DEBUG
-		mout.lock();
-		std::cout << "DEBUG: Sending notification " << jsonMsg << std::endl;
-		mout.unlock();
+		APNSLog << "DEBUG: Sending notification " << jsonMsg << pmm::NL;
 #endif
 		if (devTokenCache.find(devToken) == devTokenCache.end()) {
 			std::string binaryDevToken;

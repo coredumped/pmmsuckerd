@@ -23,9 +23,11 @@ namespace pmm {
 		std::map<pthread_t, std::string> streamMap;
 		std::ofstream outputStream;
 		void initLogline();
+		std::string tag;
 	public:
 		MTLogger();
 		void open(const std::string &path);
+		void setTag(const std::string &_tag);
 		
 		MTLogger &operator<<(int val);
 		MTLogger &operator<<(long val);

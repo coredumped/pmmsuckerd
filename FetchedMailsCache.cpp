@@ -20,9 +20,7 @@
 
 
 namespace pmm {
-#ifdef DEBUG
-	extern Mutex mout;
-#endif
+	MTLogger CacheLog;
 	
 	static const char *fetchedMailsTable = DEFAULT_FETCHED_MAILS_TABLE_NAME;
 	
@@ -31,9 +29,7 @@ namespace pmm {
 			return dbConn;
 		}
 #ifdef DEBUG
-		mout.lock();
-		std::cerr << "DEBUG(Thread=" << (long)pthread_self() << "): Opening database" << std::endl;
-		mout.unlock();
+		CacheLog << "DEBUG: Opening database" << pmm::NL;
 #endif
 		int errCode = sqlite3_open(datafile.c_str(), &dbConn);
 		if (errCode != SQLITE_OK) {
@@ -45,9 +41,7 @@ namespace pmm {
 	void FetchedMailsCache::closeDatabase(sqlite3 *db){
 		if (sqlite3_threadsafe() == 0) {
 #ifdef DEBUG
-			mout.lock();
-			std::cerr << "DEBUG(Thread=" << (long)pthread_self() << "): Closing database" << std::endl;
-			mout.unlock();
+			CacheLog << "DEBUG: Closing database" << pmm::NL;
 #endif
 			sqlite3_close(db);
 		}
@@ -87,6 +81,9 @@ namespace pmm {
 			closeDatabase(conn);
 			std::stringstream errmsg;
 			errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
 			throw GenericException(errmsg.str());
 		}
 		closeDatabase(conn);
@@ -104,6 +101,9 @@ namespace pmm {
 		if (errCode != SQLITE_OK) {
 			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
 			throw GenericException(errmsg.str());
 		}
 		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
@@ -114,6 +114,9 @@ namespace pmm {
 		if(errCode != SQLITE_DONE){
 			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
 			throw GenericException(errmsg.str());			
 		}
 		closeDatabase(conn);
@@ -140,6 +143,9 @@ namespace pmm {
 		if (errCode != SQLITE_OK) {
 			errmsg << "Unable to execute query " << sqlCmd << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
 			throw GenericException(errmsg.str());
 		}
 		bool gotFetchedMailsTable = false;
@@ -150,6 +156,9 @@ namespace pmm {
 		if(errCode != SQLITE_DONE){
 			errmsg << "Unable to retrieve values from query: " << sqlCmd << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
 			throw GenericException(errmsg.str());			
 		}
 		if(!gotFetchedMailsTable){
@@ -162,6 +171,9 @@ namespace pmm {
 			if (errCode != SQLITE_OK) {
 				closeDatabase(conn);
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+				CacheLog << errmsg.str() << pmm::NL;
+#endif
 				throw GenericException(errmsg.str());
 			}
 			createCmd.str(std::string());
@@ -170,6 +182,9 @@ namespace pmm {
 			if (errCode != SQLITE_OK) {
 				closeDatabase(conn);
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+				CacheLog << errmsg.str() << pmm::NL;
+#endif
 				throw GenericException(errmsg.str());
 			}
 			createCmd.str(std::string());
@@ -178,6 +193,9 @@ namespace pmm {
 			if (errCode != SQLITE_OK) {
 				closeDatabase(conn);
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+				CacheLog << errmsg.str() << pmm::NL;
+#endif
 				throw GenericException(errmsg.str());
 			}
 			createCmd.str(std::string());
@@ -186,6 +204,9 @@ namespace pmm {
 			if (errCode != SQLITE_OK) {
 				closeDatabase(conn);
 				errmsg << "Unable to execute command: " << createCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+				CacheLog << errmsg.str() << pmm::NL;
+#endif
 				throw GenericException(errmsg.str());
 			}
 		}

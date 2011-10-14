@@ -10,6 +10,7 @@
 #define PMM_Sucker_FetchedMailsCache_h
 #include "GenericException.h"
 #include "Mutex.h"
+#include "MTLogger.h"
 #include <sqlite3.h>
 #include <string>
 #ifdef __linux__
@@ -37,6 +38,8 @@ namespace pmm {
 		
 		void expireOldEntries();
 	};
+	
+	extern MTLogger CacheLog;
 }
 
 

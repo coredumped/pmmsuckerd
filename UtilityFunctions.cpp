@@ -16,9 +16,6 @@
 #include "Mutex.h"
 
 namespace pmm {
-#ifdef DEBUG
-	extern Mutex mout;
-#endif
 	
 	static inline bool isURLEncodable(char c){
 		static const char *urlEncodableCharacters = "$&+,/:;=?@<>#%{}|\\^~[]` ";		
@@ -46,18 +43,6 @@ namespace pmm {
 		}
 		if(replaceHappened) theString.assign(urlEncodedString.str());
 	}
-	
-	/*void devToken2Binary(std::string devTokenString, std::string &binaryDevToken){
-		std::stringstream binbuilder;
-		for (size_t i = 0; i < 64; i+=2) {
-			std::string hex_s = devTokenString.substr(i, 2);
-			int unit = 0;
-			sscanf(hex_s.c_str(), "%x", &unit);
-			binbuilder << std::hex << htonl(unit);
-			//binaryDevToken.append(sizeof(char), (char)unit);
-		}
-		binaryDevToken = binbuilder.str();
-	}*/
 	
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken){
 		char buf[32];

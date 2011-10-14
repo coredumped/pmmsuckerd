@@ -19,7 +19,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "openssl/ssl.h"
-
+#include "MTLogger.h"
 
 #ifndef APPLE_SANDBOX_HOST
 #define APPLE_SANDBOX_HOST          "gateway.sandbox.push.apple.com"
@@ -50,6 +50,8 @@
 
 
 namespace pmm {
+	
+	extern MTLogger APNSLog;
 	
 	class SSLException : public GenericException {
 	private:
