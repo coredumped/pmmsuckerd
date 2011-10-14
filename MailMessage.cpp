@@ -10,6 +10,7 @@
 #include "MTLogger.h"
 #include "libetpan/libetpan.h"
 #include "MailMessage.h"
+#include "UtilityFunctions.h"
 
 namespace pmm {
 	MailMessage::MailMessage(){
@@ -28,11 +29,17 @@ namespace pmm {
 	
 	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){
 		size_t indx;
+		struct mailimf_fields *fields;
+#ifdef USE_IMF
 		struct mailimf_message *result;
 		mailimf_message_parse(rawMessage.c_str(), rawMessage.size(), &indx, &result);
-		
-		
-		for (clistiter *iter = clist_begin(result->msg_fields->fld_list); iter != clist_end(result->msg_fields->fld_list); iter = iter->next) {
+		fields = result->msg_fields->fld_list;
+#else
+		struct mailmime *result;
+		int retCode = mailmime_parse(rawMessage.c_str(), rawMessage.size(), &indx, &result);
+		fields = result->mm_data.mm_message.mm_fields;
+#endif
+		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
 			struct mailimf_field *field = (struct mailimf_field *)clist_content(iter);
 			pmm::Log << field->fld_type << pmm::NL;
 			switch (field->fld_type) {
@@ -60,6 +67,10 @@ namespace pmm {
 			}
 			
 		}
+#ifdef USE_IMF
 		mailimf_message_free(result);
+#else
+		mailmime_free(result);
+#endif
 	}
 }
