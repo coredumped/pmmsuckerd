@@ -11,8 +11,6 @@
 #include <time.h>
 
 namespace pmm {
-	MTLogger cerr(&std::cerr);
-	MTLogger cout(&std::cout);
 	
 	MTLogger Log;
 	static const char _nlBuf[] = { '\n', 0x00, '\n' };
@@ -21,7 +19,7 @@ namespace pmm {
 	void MTLogger::initLogline(){
 		if (streamMap[pthread_self()].size() == 0) {
 			if (outputStream == NULL) {
-				outputStream = &std::cerr;
+				outputStream = new std::ofstream("mtlogger.log");
 			}
 			char buf[128];
 			time_t theTime;
@@ -39,11 +37,11 @@ namespace pmm {
 		outputStream = NULL;
 	}
 	
-	MTLogger::MTLogger(std::ostream *outputStream_){
+	MTLogger::MTLogger(std::ofstream *outputStream_){
 		outputStream = outputStream_;
 	}
 	
-	void MTLogger::setOutputStream(std::ostream *outputStream_){
+	void MTLogger::setOutputStream(std::ofstream *outputStream_){
 		outputStream = outputStream_;		
 	}
 	
