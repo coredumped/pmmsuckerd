@@ -55,6 +55,9 @@ namespace pmm {
 				continue;
 			}
 			* p_msg_size = item->att_data.att_static->att_data.att_body_section->sec_length;
+#ifdef DEBUG
+			pmm::Log << "Got RAW message: " << item->att_data.att_static->att_data.att_body_section->sec_body_part << pmm::NL;
+#endif
 			return item->att_data.att_static->att_data.att_body_section->sec_body_part;
 		}
 		return NULL;

@@ -47,6 +47,8 @@
 		82ED5B2D1437ED0200444844 /* MailSuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2B1437ECDA00444844 /* MailSuckerThread.cpp */; };
 		82ED5B301437F01A00444844 /* IMAPSuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2F1437F01A00444844 /* IMAPSuckerThread.cpp */; };
 		82ED5B3214380B3300444844 /* IMAPSuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2F1437F01A00444844 /* IMAPSuckerThread.cpp */; };
+		82F857AB1448A825000B43B8 /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
+		82F857AC1448A845000B43B8 /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
 		82F86B301425A457006ACFEB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F86B2F1425A457006ACFEB /* Cocoa.framework */; };
 		82F86B3A1425A458006ACFEB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B381425A458006ACFEB /* InfoPlist.strings */; };
 		82F86B3C1425A458006ACFEB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B3B1425A458006ACFEB /* main.m */; };
@@ -117,6 +119,8 @@
 		82ED5B311437F19900444844 /* SharedVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedVector.h; sourceTree = "<group>"; };
 		82ED5B391438613400444844 /* libetpan.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libetpan.framework; path = ../DerivedData/PushMeMail/Build/Products/Debug/libetpan.framework; sourceTree = "<group>"; };
 		82ED5B3B143864D700444844 /* libssl.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.0.9.8.dylib; path = usr/lib/libssl.0.9.8.dylib; sourceTree = SDKROOT; };
+		82F857A81448A797000B43B8 /* MailMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailMessage.h; sourceTree = "<group>"; };
+		82F857AA1448A825000B43B8 /* MailMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MailMessage.cpp; sourceTree = "<group>"; };
 		82F86B2B1425A457006ACFEB /* PMM Sucker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PMM Sucker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		82F86B2F1425A457006ACFEB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		82F86B321425A458006ACFEB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -298,6 +302,8 @@
 				82571EAE1442B1730047347E /* FetchedMailsCache.cpp */,
 				821BBCE31445EB270023DF32 /* MTLogger.h */,
 				821BBCE51445EB680023DF32 /* MTLogger.cpp */,
+				82F857A81448A797000B43B8 /* MailMessage.h */,
+				82F857AA1448A825000B43B8 /* MailMessage.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -404,6 +410,7 @@
 				82ED5B301437F01A00444844 /* IMAPSuckerThread.cpp in Sources */,
 				82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */,
 				821BBCE61445EB680023DF32 /* MTLogger.cpp in Sources */,
+				82F857AB1448A825000B43B8 /* MailMessage.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,6 +418,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82F857AC1448A845000B43B8 /* MailMessage.cpp in Sources */,
 				821BBCE71445EB820023DF32 /* MTLogger.cpp in Sources */,
 				82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */,
 				82ED5B3214380B3300444844 /* IMAPSuckerThread.cpp in Sources */,
