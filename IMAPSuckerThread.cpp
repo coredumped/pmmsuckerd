@@ -13,6 +13,7 @@
 #include <poll.h>
 #include "IMAPSuckerThread.h"
 #include "ThreadDispatcher.h"
+#include "MailMessage.h"
 #include "libetpan/libetpan.h"
 #include <string.h>
 
@@ -28,7 +29,7 @@
 #endif
 
 namespace pmm {
-
+	
 	FetchedMailsCache fetchedMails;
 	
 	static bool etpanOperationFailed(int r)
@@ -58,6 +59,8 @@ namespace pmm {
 #ifdef DEBUG
 			pmm::Log << "Got RAW message: " << item->att_data.att_static->att_data.att_body_section->sec_body_part << pmm::NL;
 #endif
+			MailMessage tm;
+			MailMessage::parse(tm, item->att_data.att_static->att_data.att_body_section->sec_body_part);
 			return item->att_data.att_static->att_data.att_body_section->sec_body_part;
 		}
 		return NULL;
@@ -405,11 +408,11 @@ namespace pmm {
 	void IMAPSuckerThread::checkEmail(const MailAccountInfo &m){
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
-/*#ifdef DEBUG
-			mout.lock();
-			pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") checkMail " << theEmail << pmm::NL;
-			mout.unlock();
-#endif*/
+			/*#ifdef DEBUG
+			 mout.lock();
+			 pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") checkMail " << theEmail << pmm::NL;
+			 mout.unlock();
+			 #endif*/
 			mailimap *imap = imapControl[m.email()].imap;
 			if (imapControl[m.email()].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
 				//Think about closing and re-opening this connection!!!
@@ -438,15 +441,20 @@ namespace pmm {
 				}
 #endif
 				if (response != NULL && strlen(response) > 0 && strstr(response, "OK Still") == NULL) {
-					//Compute how many recent we have
-					//std::istringstream input(std::string(response).substr(2));
-					//input >> recent;
-					resetIdle = true;
-					mailboxControl[theEmail].availableMessages += recent;
+					if (strstr(response, "EXPUNGE") != NULL) {
+#warning Expire old messages here
+					}
+					else {
+						//Compute how many recent we have
+						//std::istringstream input(std::string(response).substr(2));
+						//input >> recent;
+						resetIdle = true;
+						mailboxControl[theEmail].availableMessages += recent;
 #ifdef DEBUG
-					pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
+						pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
 #endif
-					fetchMails(m);
+						fetchMails(m);
+					}
 				}
 				if(response == NULL) break;
 			}

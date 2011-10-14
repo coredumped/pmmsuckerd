@@ -9,6 +9,7 @@
 #include "MTLogger.h"
 #include <iostream>
 #include <time.h>
+#include <sys/stat.h>
 
 namespace pmm {
 	
@@ -42,6 +43,13 @@ namespace pmm {
 		//outputStream.open("mtlogger.log");
 	}
 	void MTLogger::open(const std::string &path){
+		struct stat st;
+		if(stat(path.c_str(), &st) == 0){
+			//Backup old file
+			std::string newname = path;
+			newname.append(".old");
+			rename(path.c_str(), newname.c_str());
+		}
 		outputStream.open(path.c_str());
 	}
 	

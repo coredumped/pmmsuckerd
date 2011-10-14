@@ -20,6 +20,7 @@ namespace pmm {
 		MailMessage();
 		MailMessage(const std::string &_from, const std::string &_subject);
 		MailMessage(const MailMessage &m);
+		static void parse(MailMessage &m, const std::string &rawMessage);
 	};
 }
 
