@@ -154,7 +154,7 @@ namespace pmm {
 				//Apply all processing rules before notifying
 				std::stringstream nMsg;
 				nMsg << theMessage.from << "\n" << theMessage.subject;
-				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], msg_content, imapFetch.badgeCounter);
+				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], nMsg.str(), imapFetch.badgeCounter);
 				notificationQueue->add(np);
 				if(i == 0) fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
 			}
