@@ -43,7 +43,7 @@ namespace pmm {
 		return true;
 	}
 	
-	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size)
+	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size, MailMessage &tm)
 	{
 		clistiter * cur;
 		/* iterate on each result of one given message */
@@ -56,17 +56,16 @@ namespace pmm {
 				continue;
 			}
 			* p_msg_size = item->att_data.att_static->att_data.att_body_section->sec_length;
-#ifdef DEBUG
+/*#ifdef DEBUG
 			pmm::Log << "Got RAW message: " << item->att_data.att_static->att_data.att_body_section->sec_body_part << pmm::NL;
-#endif
-			MailMessage tm;
+#endif*/
 			MailMessage::parse(tm, item->att_data.att_static->att_data.att_body_section->sec_body_part);
 			return item->att_data.att_static->att_data.att_body_section->sec_body_part;
 		}
 		return NULL;
 	}
 	
-	static char * get_msg_content(clist * fetch_result, size_t * p_msg_size)
+	static char * get_msg_content(clist * fetch_result, size_t * p_msg_size, MailMessage &tm)
 	{
 		clistiter * cur;
 		
@@ -77,7 +76,7 @@ namespace pmm {
 			char * msg_content;
 			
 			msg_att = (struct mailimap_msg_att *)clist_content(cur);
-			msg_content = get_msg_att_msg_content(msg_att, &msg_size);
+			msg_content = get_msg_att_msg_content(msg_att, &msg_size, tm);
 			if (msg_content == NULL) {
 				continue;
 			}
@@ -142,7 +141,8 @@ namespace pmm {
 			fetchQueue->add(ifc);
 		}
 		else{
-			msg_content = get_msg_content(fetch_result, &msg_len);
+			MailMessage theMessage;
+			msg_content = get_msg_content(fetch_result, &msg_len, theMessage);
 			if (msg_content == NULL) {
 				//fprintf(stderr, "no content\n");
 				mailimap_fetch_list_free(fetch_result);
@@ -152,11 +152,12 @@ namespace pmm {
 			
 			for (size_t i = 0; i < imapFetch.mailAccountInfo.devTokens().size(); i++) {
 				//Apply all processing rules before notifying
+				std::stringstream nMsg;
+				nMsg << theMessage.from << "\n" << theMessage.subject;
 				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], msg_content, imapFetch.badgeCounter);
 				notificationQueue->add(np);
 				if(i == 0) fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
 			}
-#warning TODO: insert message UID in databse so we know later that the message has been notified
 			mailimap_fetch_list_free(fetch_result);
 		}
 	}
