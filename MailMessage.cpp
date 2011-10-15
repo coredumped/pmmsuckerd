@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <stdlib.h>
 #include "MTLogger.h"
 #include "libetpan/libetpan.h"
 #include "MailMessage.h"
