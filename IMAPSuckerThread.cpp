@@ -123,12 +123,13 @@ namespace pmm {
 		
 		set = mailimap_set_new_single(uid);
 		fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
-		//section = mailimap_section_new(NULL);
-		clist *hdrsList = clist_new();
+		section = mailimap_section_new(NULL);
+#warning TODO: Find a way to only retrieve the most meaningful header fields
+		/*clist *hdrsList = clist_new();
 		clist_append(hdrsList, (void *)"FROM");
 		clist_append(hdrsList, (void *)"SUBJECT");
 		struct mailimap_header_list *hdrs = mailimap_header_list_new(hdrsList);
-		section = mailimap_section_new_header_fields(hdrs);
+		section = mailimap_section_new_header_fields(hdrs);*/
 		fetch_att = mailimap_fetch_att_new_body_peek_section(section);
 		mailimap_fetch_type_new_fetch_att_list_add(fetch_type, fetch_att);
 		
@@ -160,6 +161,10 @@ namespace pmm {
 			}
 			mailimap_fetch_list_free(fetch_result);
 		}
+		mailimap_fetch_att_free(fetch_att);
+		mailimap_section_free(section);
+		mailimap_fetch_type_free(fetch_type);
+		mailimap_set_free(set);
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(){
