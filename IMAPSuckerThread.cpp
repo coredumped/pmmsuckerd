@@ -162,8 +162,6 @@ namespace pmm {
 			mailimap_fetch_list_free(fetch_result);
 		}
 		mailimap_fetch_att_free(fetch_att);
-		mailimap_section_free(section);
-		mailimap_fetch_type_free(fetch_type);
 		mailimap_set_free(set);
 	}
 	
