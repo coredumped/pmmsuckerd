@@ -401,7 +401,7 @@ namespace pmm {
 							  devTokens,
 							  o.get<jsonxx::Object>(i).get<bool>("useSSL")
 							  );
-			m.quota = o.get<jsonxx::Object>(i).get<bool>("quota");
+			m.quota = o.get<jsonxx::Object>(i).get<jsonxx::number>("quota");
 			if(m.quota <= 0){
 				m.quota = 0;
 				m.isEnabled = false;
