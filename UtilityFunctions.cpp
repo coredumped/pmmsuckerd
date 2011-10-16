@@ -31,10 +31,13 @@ namespace pmm {
 	void url_encode(std::string &theString){
 		std::stringstream urlEncodedString;
 		bool replaceHappened = false;
-		urlEncodedString.width(2);
+
 		for (size_t i = 0; i < theString.size(); i++) {
 			if (isURLEncodable(theString[i])) {
+				size_t _w = urlEncodedString.width();
+				urlEncodedString.width(2);
 				urlEncodedString << "%" << std::hex << (int)theString[i];
+				urlEncodedString.width(_w);
 				replaceHappened = true;
 			}
 			else {
