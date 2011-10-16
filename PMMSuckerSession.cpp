@@ -415,7 +415,27 @@ namespace pmm {
 	}
 	
 	void SuckerSession::reportQuotas(std::map<std::string, int> &quotas){
-		
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerQuotaUpdate;
+		params["suckerID"] = this->myID;
+		std::stringstream package;
+		for (std::map<std::string, int>::iterator iter = quotas.begin(); iter != quotas.end(); iter++) {
+			package << iter->first << "|" << iter->second << "\n";
+		}
+		params["quotaPayload"] = package.str();
+		std::string output;
+		pmm::ServerResponse response(output);
+		if(response.status){
+#ifdef DEBUG
+			pmm::Log << "Quota info sent successfully" << pmm::NL;
+#endif
+			quotas.clear();
+		}
+		else {
+			pmm::Log << "Unable to send quota updates: " << response.errorDescription << pmm::NL;
+		}
 	}
 }
 

@@ -31,7 +31,8 @@
 #define DEFAULT_BURST_PAUSE_INTERVAL 10
 #endif
 #ifndef DEFAULT_MAX_CONNECTION_INTERVAL
-#define DEFAULT_MAX_CONNECTION_INTERVAL 7200
+//#define DEFAULT_MAX_CONNECTION_INTERVAL 7200
+#define DEFAULT_MAX_CONNECTION_INTERVAL 300
 #endif
 
 namespace pmm {
@@ -205,7 +206,6 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::ifNotConnectedToAPNSThenConnect(){
-		maxConnectionInterval = DEFAULT_MAX_CONNECTION_INTERVAL;
 		if(_socket == -1) connect2APNS();
 	}
 	
@@ -235,6 +235,7 @@ namespace pmm {
 		waitTimeBeforeReconnectToAPNS = DEFAULT_WAIT_BEFORE_RECONNECT;
 		maxNotificationsPerBurst = DEFAULT_MAX_NOTIFICATIONS_PER_BURST;
 		maxBurstPauseInterval = DEFAULT_BURST_PAUSE_INTERVAL;
+		maxConnectionInterval = DEFAULT_MAX_CONNECTION_INTERVAL;
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
@@ -265,10 +266,11 @@ namespace pmm {
 		while (true) {
 			time_t currTime = time(NULL);
 			if(currTime - start > maxConnectionInterval){
-				APNSLog << "Max connection time reached, reconnecting..." << pmm::NL;
+				APNSLog << "Max connection time (" << (currTime - start) << " > " << maxConnectionInterval << ") reached, reconnecting..." << pmm::NL;
 				disconnectFromAPNS();
 				initSSL();
 				connect2APNS();
+				APNSLog << "Re-connected succesfully!!!" << pmm::NL;
 				start = time(NULL);
 			}
 #ifdef DEBUG

@@ -187,12 +187,12 @@ int main (int argc, const char * argv[])
 	}
 	//7. After registration time ends, close every connection, return to Step 1
 	int tic = 1;
+	std::map<std::string, int> quotas;
 	while (true) {
 		//session.performAutoRegister();
 		if (tic % 2 == 0) {
 			//Process quota updates if any
 			if (quotaUpdateVector.size() > 0) {
-				std::map<std::string, int> quotas;
 				quotaUpdateVector.beginCriticalSection();
 				for (size_t i = 0; i < quotaUpdateVector.unlockedSize(); i++) {
 					if (quotas.find(quotaUpdateVector.atUnlocked(i)) == quotas.end()) {
@@ -203,9 +203,10 @@ int main (int argc, const char * argv[])
 				quotaUpdateVector.unlockedClear();
 				quotaUpdateVector.endCriticalSection();
 				//Report quota changes to pmm service.
+				session.reportQuotas(quotas);
+				//In case we failed to report any quotas the service will re-report them again
 			}
 		}
-		
 		//Send quota changes if there are any
 		sleep(1);
 	}
