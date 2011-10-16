@@ -426,6 +426,7 @@ namespace pmm {
 		}
 		params["quotaPayload"] = package.str();
 		std::string output;
+		executePost(params, output);
 		pmm::ServerResponse response(output);
 		if(response.status){
 #ifdef DEBUG
