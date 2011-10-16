@@ -57,7 +57,10 @@ namespace pmm {
 		void retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta = false);
 
 		//Report quota changes to mailboxes
-		void reportQuotas(std::map<std::string, int> &quotas);
+		bool reportQuotas(std::map<std::string, int> &quotas);
+		
+		//Get a list of commands to perform as requested by the controller
+		void getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun);
 	};
 }
 

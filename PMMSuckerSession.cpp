@@ -401,6 +401,14 @@ namespace pmm {
 							  devTokens,
 							  o.get<jsonxx::Object>(i).get<bool>("useSSL")
 							  );
+			m.quota = o.get<jsonxx::Object>(i).get<bool>("quota");
+			if(m.quota <= 0){
+				m.quota = 0;
+				m.isEnabled = false;
+			}
+			else {
+				m.isEnabled = true;
+			}
 			emailAddresses.push_back(m);			
 		}
 	}
@@ -414,7 +422,8 @@ namespace pmm {
 		}
 	}
 	
-	void SuckerSession::reportQuotas(std::map<std::string, int> &quotas){
+	bool SuckerSession::reportQuotas(std::map<std::string, int> &quotas){
+		bool ret = false;
 		performAutoRegister();
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
@@ -433,11 +442,16 @@ namespace pmm {
 #ifdef DEBUG
 			pmm::Log << "Quota info sent successfully" << pmm::NL;
 #endif
-			quotas.clear();
+			ret = true;
 		}
 		else {
 			pmm::Log << "Unable to send quota updates: " << response.errorDescription << pmm::NL;
 		}
+		return ret;
+	}
+	
+	void SuckerSession::getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun){
+		
 	}
 }
 

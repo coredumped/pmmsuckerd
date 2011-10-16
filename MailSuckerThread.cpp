@@ -81,11 +81,14 @@ namespace pmm {
 						mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
 					}
 					//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
-					if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
-					if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
-					if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
-						checkEmail(emailAccounts[i]);
-						mCtrl.lastCheck = time(0);
+					MailAccountInfo mInfo = emailAccounts[i];
+					if (mInfo.isEnabled) {
+						if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
+						if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
+						if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
+							checkEmail(emailAccounts[i]);
+							mCtrl.lastCheck = time(0);
+						}
 					}
 				}
 			}

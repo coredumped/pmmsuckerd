@@ -190,7 +190,7 @@ int main (int argc, const char * argv[])
 	std::map<std::string, int> quotas;
 	while (true) {
 		//session.performAutoRegister();
-		if (tic % 2 == 0) {
+		if (tic % 10 == 0) {
 			//Process quota updates if any
 			if (quotaUpdateVector.size() > 0) {
 				quotaUpdateVector.beginCriticalSection();
@@ -203,7 +203,35 @@ int main (int argc, const char * argv[])
 				quotaUpdateVector.unlockedClear();
 				quotaUpdateVector.endCriticalSection();
 				//Report quota changes to pmm service.
-				session.reportQuotas(quotas);
+				if(session.reportQuotas(quotas)){
+					for (std::map<std::string, int>::iterator iter = quotas.begin(); iter != quotas.end(); iter++) {
+						for (size_t j = 0; j < maxIMAPSuckerThreads; j++) {
+							imapSuckingThreads[j].emailAccounts.beginCriticalSection();
+							for (size_t k = 0; k < imapSuckingThreads[j].emailAccounts.unlockedSize(); k++) {
+								if (imapSuckingThreads[j].emailAccounts.atUnlocked(k).email().compare(iter->first) == 0) {
+									imapSuckingThreads[j].emailAccounts.atUnlocked(k).quota -= iter->second;
+									if(imapSuckingThreads[j].emailAccounts.atUnlocked(k).quota <= 0){
+										imapSuckingThreads[j].emailAccounts.atUnlocked(k).isEnabled = false;
+									}
+								}
+							}
+							imapSuckingThreads[j].emailAccounts.endCriticalSection();
+						}
+						/*for (size_t j = 0; j < maxPOP3SuckerThreads; j++) {
+							pop3SuckingThreads[j].emailAccounts.beginCriticalSection();
+							for (size_t k = 0; k < pop3SuckingThreads[j].emailAccounts.unlockedSize(); k++) {
+								if (pop3SuckingThreads[j].emailAccounts.atUnlocked(k).email().compare(iter->first) == 0) {
+									pop3SuckingThreads[j].emailAccounts.atUnlocked(k).quota -= iter->second;
+									if(pop3SuckingThreads[j].emailAccounts.atUnlocked(k).quota <= 0){
+										pop3SuckingThreads[j].emailAccounts.atUnlocked(k).isEnabled = false;
+									}
+								}
+							}
+							pop3SuckingThreads[j].emailAccounts.endCriticalSection();
+						}*/						
+					}
+					quotas.clear();
+				}
 				//In case we failed to report any quotas the service will re-report them again
 			}
 		}
