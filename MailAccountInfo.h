@@ -40,6 +40,8 @@ namespace pmm {
 		const std::vector<std::string> &devTokens() const;
 		bool useSSL();
 		bool useSSL() const;
+		bool isEnabled;
+		int quota;
 	};
 }
 

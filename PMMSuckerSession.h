@@ -55,8 +55,9 @@ namespace pmm {
 
 		//Retrieves configured e-mail accounts located at the remote server so we can poll them later
 		void retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta = false);
-		
 
+		//Report quota changes to mailboxes
+		void reportQuotas(std::map<std::string, int> &quotas);
 	};
 }
 

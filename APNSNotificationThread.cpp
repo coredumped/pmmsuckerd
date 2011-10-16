@@ -30,6 +30,9 @@
 #ifndef DEFAULT_BURST_PAUSE_INTERVAL
 #define DEFAULT_BURST_PAUSE_INTERVAL 10
 #endif
+#ifndef DEFAULT_MAX_CONNECTION_INTERVAL
+#define DEFAULT_MAX_CONNECTION_INTERVAL 7200
+#endif
 
 namespace pmm {
 	MTLogger APNSLog;
@@ -202,6 +205,7 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::ifNotConnectedToAPNSThenConnect(){
+		maxConnectionInterval = DEFAULT_MAX_CONNECTION_INTERVAL;
 		if(_socket == -1) connect2APNS();
 	}
 	
@@ -211,15 +215,12 @@ namespace pmm {
 		{
 			throw SSLException(apnsConnection, err, "SSL shutdown");
 		}    
-		
 		err = close(_socket);
 		if(err == -1)
 		{
 			throw GenericException("Can't close socket client APNS socket");
 		}    
-		
 		SSL_free(apnsConnection);    
-		SSL_CTX_free(sslCTX);
 	}
 	
 	
@@ -260,7 +261,16 @@ namespace pmm {
 		initSSL();
 		connect2APNS();
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
+		time_t start = time(NULL);
 		while (true) {
+			time_t currTime = time(NULL);
+			if(currTime - start > maxConnectionInterval){
+				APNSLog << "Max connection time reached, reconnecting..." << pmm::NL;
+				disconnectFromAPNS();
+				initSSL();
+				connect2APNS();
+				start = time(NULL);
+			}
 #ifdef DEBUG
 			if(++i % 2400 == 0){
 				APNSLog << "DEBUG: keepalive still tickling!!!" << pmm::NL;
@@ -280,6 +290,7 @@ namespace pmm {
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
 						//Connection close, force reconnect
 						_socket = -1;
+						disconnectFromAPNS();
 						sleep(waitTimeBeforeReconnectToAPNS);
 						connect2APNS();
 						notificationQueue->add(payload);

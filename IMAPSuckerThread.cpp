@@ -157,7 +157,10 @@ namespace pmm {
 				nMsg << theMessage.from << "\n" << theMessage.subject;
 				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], nMsg.str(), imapFetch.badgeCounter);
 				notificationQueue->add(np);
-				if(i == 0) fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
+				if(i == 0){
+					fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
+					quotaUpdateVector->push_back(imapFetch.mailAccountInfo.email());
+				}
 			}
 			mailimap_fetch_list_free(fetch_result);
 		}
@@ -323,6 +326,7 @@ namespace pmm {
 			if (mailFetchers[i].isRunning == false) {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
 				mailFetchers[i].fetchQueue = &imapFetchQueue;
+				mailFetchers[i].quotaUpdateVector = quotaUpdateVector;
 				pmm::ThreadDispatcher::start(mailFetchers[i]);
 				first_connection = true;
 			}

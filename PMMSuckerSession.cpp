@@ -74,6 +74,7 @@ namespace pmm {
 		static const char *ask4Membership = "pmmSuckerAskMember";
 		static const char *pmmSuckerRequestMailAccounts = "pmmSuckerRequestMailAccounts";
 		static const char *pmmSuckerUnRegister = "pmmSuckerUnReg";
+		static const char *pmmSuckerQuotaUpdate = "pmmSuckerQuotaUpdate";
 	};
 	
 #ifdef __APPLE__
@@ -411,6 +412,10 @@ namespace pmm {
 #endif
 			register2PMM();
 		}
+	}
+	
+	void SuckerSession::reportQuotas(std::map<std::string, int> &quotas){
+		
 	}
 }
 

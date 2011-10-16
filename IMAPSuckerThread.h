@@ -52,6 +52,7 @@ namespace pmm {
 		public:
 			SharedQueue<IMAPFetchControl> *fetchQueue;
 			SharedQueue<NotificationPayload> *myNotificationQueue;
+			SharedVector<std::string> *quotaUpdateVector;
 			MailFetcher();
 			void operator()();
 		};

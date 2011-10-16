@@ -96,6 +96,31 @@ namespace pmm {
 			}
 			m.unlock();
 		}
+		
+		void beginCriticalSection(){
+			m.lock();
+		}
+		
+		T &getValue(size_t idx){
+			return dataVec[idx];
+		}
+		
+		void unlockedClear(){
+			dataVec.clear();
+		}
+		
+		size_t unlockedSize(){
+			return dataVec.size();
+		}
+		
+		T &atUnlocked(size_t i){
+			return dataVec[i];
+		}
+		
+		void endCriticalSection(){
+			m.unlock();
+		}
+
 	};
 }
 

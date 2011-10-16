@@ -62,6 +62,7 @@ int main (int argc, const char * argv[])
 	std::string sslCertificatePath = DEFAULT_SSL_CERTIFICATE_PATH;
 	std::string sslPrivateKeyPath = DEFAULT_SS_PRIVATE_KEY_PATH;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
+	pmm::SharedVector<std::string> quotaUpdateVector;
 	SSL_library_init();
 	SSL_load_error_strings();
 	for (int i = 1; i < argc; i++) {
@@ -170,6 +171,7 @@ int main (int argc, const char * argv[])
 	for (size_t k = 0; k < imapAccounts.size(); k++) imapSuckingThreads[k % maxIMAPSuckerThreads].emailAccounts.push_back(imapAccounts[k]);
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
+		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
 		sleep(1);
 	}
@@ -184,9 +186,28 @@ int main (int argc, const char * argv[])
 		//pmm::ThreadDispatcher::start(pop3SuckingThreads[i]);
 	}
 	//7. After registration time ends, close every connection, return to Step 1
+	int tic = 1;
 	while (true) {
 		//session.performAutoRegister();
-		sleep(10);
+		if (tic % 2 == 0) {
+			//Process quota updates if any
+			if (quotaUpdateVector.size() > 0) {
+				std::map<std::string, int> quotas;
+				quotaUpdateVector.beginCriticalSection();
+				for (size_t i = 0; i < quotaUpdateVector.unlockedSize(); i++) {
+					if (quotas.find(quotaUpdateVector.atUnlocked(i)) == quotas.end()) {
+						quotas[quotaUpdateVector.atUnlocked(i)] = 0;
+					}
+					quotas[quotaUpdateVector.atUnlocked(i)] = quotas[quotaUpdateVector.atUnlocked(i)] + 1;
+				}
+				quotaUpdateVector.unlockedClear();
+				quotaUpdateVector.endCriticalSection();
+				//Report quota changes to pmm service.
+			}
+		}
+		
+		//Send quota changes if there are any
+		sleep(1);
 	}
 	session.unregisterFromPMM();
     return 0;

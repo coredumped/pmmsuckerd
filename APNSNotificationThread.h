@@ -85,6 +85,7 @@ namespace pmm {
 		std::map<std::string, std::string> devTokenCache;
 		int maxNotificationsPerBurst;
 		int maxBurstPauseInterval;
+		int maxConnectionInterval;
 	protected:
 		bool sslInitComplete;
 		void initSSL();

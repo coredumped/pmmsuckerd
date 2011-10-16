@@ -60,6 +60,7 @@ namespace pmm {
 		maxOpenTime = DEFAULT_MAX_OPEN_TIME;
 		notificationQueue = NULL;
 		maxServerReconnects = DEFAULT_MAX_SERVER_CONNECT_FAILURES;
+		quotaUpdateVector = NULL;
 	}
 	
 	MailSuckerThread::~MailSuckerThread(){
@@ -67,26 +68,26 @@ namespace pmm {
 	}
 
 	void MailSuckerThread::operator()(){
-		if (notificationQueue == NULL) {
-			throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
-		}
+		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
+		if (quotaUpdateVector == NULL) throw GenericException("quotaUpdateQueue is still NULL, it must point to a valid notification queue.");
 		while (true) {
 			time_t currTime = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
-				MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
-				if(mCtrl.email.size() == 0){
-					//Initial object creation
-					mCtrl.email = emailAccounts[i].email();
-					mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
+				if (emailAccounts[i].isEnabled) {
+					MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
+					if(mCtrl.email.size() == 0){
+						//Initial object creation
+						mCtrl.email = emailAccounts[i].email();
+						mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
+					}
+					//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
+					if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
+					if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
+					if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
+						checkEmail(emailAccounts[i]);
+						mCtrl.lastCheck = time(0);
+					}
 				}
-				//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
-				if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
-				if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
-				if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
-					checkEmail(emailAccounts[i]);
-					mCtrl.lastCheck = time(0);
-				}
-
 			}
 			usleep(iterationWaitMicroSeconds);
 		}
