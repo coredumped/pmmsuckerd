@@ -208,7 +208,10 @@ int main (int argc, const char * argv[])
 			}
 		}
 		//Send quota changes if there are any
+
+		//Sleep for second, we don't want to hog the CPU right?
 		sleep(1);
+		tic++;
 	}
 	session.unregisterFromPMM();
     return 0;
