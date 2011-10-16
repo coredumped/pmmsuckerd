@@ -74,7 +74,7 @@ namespace pmm {
 		static const char *ask4Membership = "pmmSuckerAskMember";
 		static const char *pmmSuckerRequestMailAccounts = "pmmSuckerRequestMailAccounts";
 		static const char *pmmSuckerUnRegister = "pmmSuckerUnReg";
-		static const char *pmmSuckerQuotaUpdate = "pmmSuckerQuotaUpdate";
+		static const char *pmmSuckerQuotaUpdate = "zpmmSuckerQuotaUpdate";
 	};
 	
 #ifdef __APPLE__
@@ -422,7 +422,8 @@ namespace pmm {
 		params["suckerID"] = this->myID;
 		std::stringstream package;
 		for (std::map<std::string, int>::iterator iter = quotas.begin(); iter != quotas.end(); iter++) {
-			package << iter->first << "|" << iter->second << "\n";
+			if(iter != quotas.begin()) package << "\r\n";
+			package << iter->first << "|" << iter->second;
 		}
 		params["quotaPayload"] = package.str();
 		std::string output;
