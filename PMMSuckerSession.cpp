@@ -114,8 +114,8 @@ namespace pmm {
 		UInt32 suckerIDItemLength;
 		void *suckerIDItemString;
 		err = SecKeychainFindGenericPassword(NULL, strlen(DEFAULT_SEC_SERVICE_NAME), DEFAULT_SEC_SERVICE_NAME, 
-									   strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
-									   &suckerIDItemLength, &suckerIDItemString, &item);
+											 strlen(DEFAULT_SEC_ITEM_ACCOUNT), DEFAULT_SEC_ITEM_ACCOUNT, 
+											 &suckerIDItemLength, &suckerIDItemString, &item);
 		dieOnSecError(err);
 		if (err != noErr) {
 			//Create UUID
@@ -179,33 +179,33 @@ namespace pmm {
 #endif
 	}
 	
-
-	/*static inline bool isURLEncodable(char c){
-		static const char *urlEncodableCharacters = "$&+,/:;=?@<>#%{}|\\^~[]` ";		
-		if (c <= 0x1F || c >= 0x7f) {
-			return true;
-		}
-		if (index(urlEncodableCharacters, c) != NULL) {
-			return true;
-		}
-		return false;
-	}
 	
-	static void url_encode(std::string &theString){
-		std::stringstream urlEncodedString;
-		bool replaceHappened = false;
-		for (size_t i = 0; i < theString.size(); i++) {
-			if (isURLEncodable(theString[i])) {
-				urlEncodedString << "%" << std::hex << (int)theString[i];
-				replaceHappened = true;
-			}
-			else {
-				char tbuf[2] = { theString[i], 0x00 };
-				urlEncodedString << tbuf;
-			}
-		}
-		if(replaceHappened) theString.assign(urlEncodedString.str());
-	}*/
+	/*static inline bool isURLEncodable(char c){
+	 static const char *urlEncodableCharacters = "$&+,/:;=?@<>#%{}|\\^~[]` ";		
+	 if (c <= 0x1F || c >= 0x7f) {
+	 return true;
+	 }
+	 if (index(urlEncodableCharacters, c) != NULL) {
+	 return true;
+	 }
+	 return false;
+	 }
+	 
+	 static void url_encode(std::string &theString){
+	 std::stringstream urlEncodedString;
+	 bool replaceHappened = false;
+	 for (size_t i = 0; i < theString.size(); i++) {
+	 if (isURLEncodable(theString[i])) {
+	 urlEncodedString << "%" << std::hex << (int)theString[i];
+	 replaceHappened = true;
+	 }
+	 else {
+	 char tbuf[2] = { theString[i], 0x00 };
+	 urlEncodedString << tbuf;
+	 }
+	 }
+	 if(replaceHappened) theString.assign(urlEncodedString.str());
+	 }*/
 	
 	class DataBuffer {
 	public:
@@ -237,13 +237,13 @@ namespace pmm {
 			return buffer;
 		}
 	};
-
+	
 	static size_t gotDataFromServer(char *ptr, size_t size, size_t nmemb, void *userdata){
 		DataBuffer *realData = (DataBuffer *)userdata;
 		if(realData->appendData(ptr, size * nmemb) == NULL) return 0;
 		return size * nmemb;
 	}
-
+	
 	static void preparePostRequest(CURL *www, std::map<std::string, std::string> &postData, DataBuffer *buffer, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
 		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
 		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
@@ -267,7 +267,7 @@ namespace pmm {
 #ifdef DEBUG
 		pmm::Log << "DEBUG: Sending post data: " << encodedPost.str().c_str() << pmm::NL;
 #endif
-
+		
 	}
 	
 	static void executePost(std::map<std::string, std::string> &postData, std::string &output, CURL *wwwx = NULL, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
@@ -298,7 +298,7 @@ namespace pmm {
 		if(wwwx == NULL) curl_easy_cleanup(www);
 	}
 	
-///////////////////////// SUCKER SESSION METHODS ////////////////////////////
+	///////////////////////// SUCKER SESSION METHODS ////////////////////////////
 	
 	SuckerSession::SuckerSession() {
 		apiKey = DEFAULT_API_KEY;
@@ -465,29 +465,23 @@ namespace pmm {
 		params["suckerID"] = this->myID;
 		std::string output;
 		executePost(params, output);
-		pmm::ServerResponse response(output);
-		if(response.status){
-			std::istringstream input(output);
-			jsonxx::Array o;
-			jsonxx::Array::parse(input, o);
-			for (unsigned int i = 0; i < o.size(); i++) {
-				std::map<std::string, std::map<std::string, std::string> > item;
-				std::string cmdName = o.get<jsonxx::Object>(i).get<std::string>("command");
-				std::map<std::string, std::string> parmsMap;
-				for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").size(); j++) {
-					std::map<std::string, jsonxx::Value *> theMap = o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").get<jsonxx::Object>(j).kv_map();
-					for (std::map<std::string, jsonxx::Value *>::iterator iter = theMap.begin(); iter != theMap.end(); iter++) {
-						parmsMap[iter->first] = iter->second->get<std::string>();
-					}
+		std::istringstream input(output);
+		jsonxx::Array o;
+		jsonxx::Array::parse(input, o);
+		for (unsigned int i = 0; i < o.size(); i++) {
+			std::map<std::string, std::map<std::string, std::string> > item;
+			std::string cmdName = o.get<jsonxx::Object>(i).get<std::string>("command");
+			std::map<std::string, std::string> parmsMap;
+			for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").size(); j++) {
+				std::map<std::string, jsonxx::Value *> theMap = o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").get<jsonxx::Object>(j).kv_map();
+				for (std::map<std::string, jsonxx::Value *>::iterator iter = theMap.begin(); iter != theMap.end(); iter++) {
+					parmsMap[iter->first] = iter->second->get<std::string>();
 				}
-				item[cmdName] = parmsMap;
-				tasksToRun.push_back(item);
-				tCount++;
-			}			
-		}
-		else {
-			pmm::Log << "Unable to retrieve commands from server: " << response.errorDescription << pmm::NL;
-		}
+			}
+			item[cmdName] = parmsMap;
+			tasksToRun.push_back(item);
+			tCount++;
+		}			
 		return tCount;
 	}
 }
