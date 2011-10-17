@@ -118,6 +118,8 @@ int main (int argc, const char * argv[])
 	pmm::CacheLog.setTag("FetchedMailsCache");
 	pmm::APNSLog.open("apns.log");
 	pmm::APNSLog.setTag("APNSNotificationThread");
+	pmm::imapLog.open("imap-fetch.log");
+	pmm::imapLog.setTag("IMAPSuckerThread");
 	pmm::SuckerSession session(pmmServiceURL);
 #ifdef __linux__
 	signal(SIGPIPE, sigpipe_handle);

@@ -139,6 +139,53 @@ namespace pmm {
 	void FetchedMailsCache::expireOldEntries(){
 #warning TODO: Implement a way to expire old e-mail entries plus a trigger to activate it
 	}
+	
+	void FetchedMailsCache::removeMultipleEntries(const std::string &email, const std::vector<uint32_t> &uidList){
+		if(uidList.size() == 0) return;
+		sqlite3 *conn = openDatabase();
+		char *errmsg_s;
+		std::stringstream sqlCmd;
+		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid IN (";
+		for (size_t i = 0; i < uidList.size(); i++) {
+			if (i == 0) sqlCmd << (int)uidList[i];
+			else sqlCmd << "," << (int)uidList[i];
+		}
+		sqlCmd << ")";
+		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+		if (errCode != SQLITE_OK) {
+				closeDatabase(conn);
+				std::stringstream errmsg;
+				errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+				CacheLog << errmsg.str() << pmm::NL;
+#endif
+				throw GenericException(errmsg.str());
+		}
+		closeDatabase(conn);
+	}
+	void FetchedMailsCache::removeEntriesNotInSet(const std::string &email, const std::vector<uint32_t> &uidSet){
+		if(uidSet.size() == 0) return;
+		sqlite3 *conn = openDatabase();
+		char *errmsg_s;
+		std::stringstream sqlCmd;
+		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid NOT IN (";
+		for (size_t i = 0; i < uidSet.size(); i++) {
+			if (i == 0) sqlCmd << (int)uidSet[i];
+			else sqlCmd << "," << (int)uidSet[i];
+		}
+		sqlCmd << ")";
+		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+		if (errCode != SQLITE_OK) {
+			closeDatabase(conn);
+			std::stringstream errmsg;
+			errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());
+		}
+		closeDatabase(conn);		
+	}
 
 	void FetchedMailsCache::verifyTables(){
 		sqlite3 *conn = openDatabase();

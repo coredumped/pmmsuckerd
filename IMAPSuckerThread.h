@@ -73,6 +73,7 @@ namespace pmm {
 	};
 	
 	extern FetchedMailsCache fetchedMails;
+	extern MTLogger imapLog;
 }
 
 #endif

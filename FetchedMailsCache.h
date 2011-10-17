@@ -13,6 +13,7 @@
 #include "MTLogger.h"
 #include <sqlite3.h>
 #include <string>
+#include <vector>
 #ifdef __linux__
 #include <inttypes.h>
 #endif
@@ -37,6 +38,8 @@ namespace pmm {
 		bool entryExists(const std::string &email, uint32_t uid);
 		
 		void expireOldEntries();
+		void removeMultipleEntries(const std::string &email, const std::vector<uint32_t> &uidList);
+		void removeEntriesNotInSet(const std::string &email, const std::vector<uint32_t> &uidSet);
 	};
 	
 	extern MTLogger CacheLog;

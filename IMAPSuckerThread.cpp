@@ -29,7 +29,7 @@
 #endif
 
 namespace pmm {
-	
+	MTLogger imapLog;
 	FetchedMailsCache fetchedMails;
 	
 	static bool etpanOperationFailed(int r)
@@ -195,9 +195,9 @@ namespace pmm {
 	}
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
-		pmm::Log << "DEBUG: IMAP MailFetcher warming up..." << pmm::NL;
+		pmm::imapLog << "DEBUG: IMAP MailFetcher warming up..." << pmm::NL;
 		sleep(1);
-		pmm::Log << "DEBUG: IMAP MailFetcher started!!!" << pmm::NL;
+		pmm::imapLog << "DEBUG: IMAP MailFetcher started!!!" << pmm::NL;
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
@@ -210,7 +210,7 @@ namespace pmm {
 					break;
 				}
 #ifdef DEBUG
-				pmm::Log << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
+				pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
 #endif
 				struct mailimap *imap = mailimap_new(0, NULL);
 				int result;
@@ -226,7 +226,7 @@ namespace pmm {
 					imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
 					fetchQueue->add(imapFetch);
 #ifdef DEBUG
-					pmm::Log << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
+					pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
 #endif				
 				}
 				else {
@@ -234,7 +234,7 @@ namespace pmm {
 					if(etpanOperationFailed(result)){
 #warning TODO: Remember to report the user whenever we have too many login attempts
 #ifdef DEBUG
-						pmm::Log << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
+						pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
 #endif				
 						imapFetch.madeAttempts++;
 						imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
@@ -247,7 +247,7 @@ namespace pmm {
 							imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
 							fetchQueue->add(imapFetch);
 #ifdef DEBUG
-							pmm::Log << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
+							pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
 #endif				
 							continue;
 						}
@@ -258,17 +258,26 @@ namespace pmm {
 							throw GenericException("Can't find unseen messages, IMAP SEARCH failed miserably");
 						}
 #ifdef DEBUG
-						pmm::Log << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
+						pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
 #endif
 						imapFetch.badgeCounter = 0;
+						std::vector<uint32_t> uidSet;
 						for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
 							uint32_t uid;
 							uid = *((uint32_t *)clist_content(cur));
 #ifdef DEBUG
-							pmm::Log << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
+							pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
 #endif
 							imapFetch.badgeCounter++;
 							fetch_msg(imap, uid, myNotificationQueue, imapFetch);
+							uidSet.push_back(uid);
+						}
+						//Remove old entries if the current time is a multiple of 60 seconds
+						if (time(NULL) % 60 == 0) {
+#ifdef DEBUG
+							pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
+#endif
+							fetchedMails.removeEntriesNotInSet(imapFetch.mailAccountInfo.email(), uidSet);
 						}
 						mailimap_search_result_free(unseenMails);	
 						mailimap_logout(imap);
@@ -345,7 +354,7 @@ namespace pmm {
 				std::stringstream errmsg;
 				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 #ifdef DEBUG
-				pmm::Log << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
+				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
 #endif
 				for (size_t i = 0; m.devTokens().size(); i++) {
 					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
@@ -384,7 +393,7 @@ namespace pmm {
 			else {
 				//Start IMAP IDLE processing...
 #ifdef DEBUG
-				pmm::Log << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << m.email() << pmm::NL;
+				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << m.email() << pmm::NL;
 #endif
 				//mailstream_debug = 1;
 				result = mailimap_select(imapControl[m.email()].imap, "INBOX");
@@ -404,7 +413,7 @@ namespace pmm {
 				imapControl[m.email()].startedOn = time(NULL);
 				//sleep(1);
 #ifdef DEBUG
-				pmm::Log << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " is being succesfully monitored!!!" << pmm::NL;
+				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif
 			}
 		}
@@ -417,7 +426,7 @@ namespace pmm {
 			if (imapControl[m.email()].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
 				//Think about closing and re-opening this connection!!!
 #ifdef DEBUG
-				pmm::Log << "Max connection time account for " << m.email() << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
+				pmm::imapLog << "Max connection time account for " << m.email() << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
 #endif
 				mailimap_idle_done(imap);
 				mailimap_logout(imap);
@@ -437,10 +446,10 @@ namespace pmm {
 				char *response = mailimap_read_line(imap);
 #ifdef DEBUG
 				if(response != NULL){
-					pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=" << response << " for " << theEmail << pmm::NL;
+					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=" << response << " for " << theEmail << pmm::NL;
 				}
 				else {
-					pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << pmm::NL;
+					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << pmm::NL;
 				}
 #endif
 				if (response != NULL && strlen(response) > 0 && strstr(response, "OK Still") == NULL) {
@@ -454,7 +463,7 @@ namespace pmm {
 						resetIdle = true;
 						mailboxControl[theEmail].availableMessages += recent;
 #ifdef DEBUG
-						pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
+						pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
 #endif
 						fetchMails(m);
 					}
@@ -464,7 +473,7 @@ namespace pmm {
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
 				if(etpanOperationFailed(result)){
-					pmm::Log << "Unable to send DONE to IMAP after IDLE for: " << m.email() << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
+					pmm::imapLog << "Unable to send DONE to IMAP after IDLE for: " << m.email() << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
 					mailimap_idle_done(imap);
 					mailimap_logout(imap);
 					mailimap_close(imap);
