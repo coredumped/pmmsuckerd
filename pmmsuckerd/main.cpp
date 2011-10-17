@@ -219,7 +219,7 @@ int main (int argc, const char * argv[])
 		if(tic % 30 == 0){
 			std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
 			int nTasks = session.getPendingTasks(tasksToRun);
-			for (int i = 0, ; i < nTasks; i++) {
+			for (int i = 0 ; i < nTasks; i++) {
 				//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
 				std::map<std::string, std::map<std::string, std::string> >::iterator iter = tasksToRun[i].begin();
 				std::string command = iter->first;
