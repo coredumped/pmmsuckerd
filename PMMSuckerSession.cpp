@@ -75,7 +75,13 @@ namespace pmm {
 		static const char *pmmSuckerRequestMailAccounts = "pmmSuckerRequestMailAccounts";
 		static const char *pmmSuckerUnRegister = "pmmSuckerUnReg";
 		static const char *pmmSuckerQuotaUpdate = "zpmmSuckerQuotaUpdate";
+		static const char *pmmSuckerCommandRetrieve = "pmmSuckerCommandRetrieve";
 	};
+	
+	namespace Commands {
+		const char *quotaExceeded = "quotaExceeded";
+		const char *shutdown = "shutdown";
+	}
 	
 #ifdef __APPLE__
 	static void dieOnSecError(OSStatus err){
@@ -450,8 +456,39 @@ namespace pmm {
 		return ret;
 	}
 	
-	void SuckerSession::getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun){
-		
+	int SuckerSession::getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun){
+		int tCount = 0;
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerCommandRetrieve;
+		params["suckerID"] = this->myID;
+		std::string output;
+		executePost(params, output);
+		pmm::ServerResponse response(output);
+		if(response.status){
+			std::istringstream input(output);
+			jsonxx::Array o;
+			jsonxx::Array::parse(input, o);
+			for (unsigned int i = 0; i < o.size(); i++) {
+				std::map<std::string, std::map<std::string, std::string> > item;
+				std::string cmdName = o.get<jsonxx::Object>(i).get<std::string>("command");
+				std::map<std::string, std::string> parmsMap;
+				for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").size(); j++) {
+					std::map<std::string, jsonxx::Value *> theMap = o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").get<jsonxx::Object>(j).kv_map();
+					for (std::map<std::string, jsonxx::Value *>::iterator iter = theMap.begin(); iter != theMap.end(); iter++) {
+						parmsMap[iter->first] = iter->second->get<std::string>();
+					}
+				}
+				item[cmdName] = parmsMap;
+				tasksToRun.push_back(item);
+				tCount++;
+			}			
+		}
+		else {
+			pmm::Log << "Unable to retrieve commands from server: " << response.errorDescription << pmm::NL;
+		}
+		return tCount;
 	}
 }
 

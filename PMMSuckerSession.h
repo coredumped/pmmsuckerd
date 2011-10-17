@@ -60,8 +60,13 @@ namespace pmm {
 		bool reportQuotas(std::map<std::string, int> &quotas);
 		
 		//Get a list of commands to perform as requested by the controller
-		void getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun);
+		int getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun);
 	};
+	
+	namespace Commands {
+		extern const char *quotaExceeded;
+		extern const char *shutdown;
+	}
 }
 
 

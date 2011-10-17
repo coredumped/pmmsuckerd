@@ -52,6 +52,9 @@ static void sigpipe_handle(int x){
 }
 #endif
 
+void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
+void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
+
 int main (int argc, const char * argv[])
 {
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
@@ -188,8 +191,8 @@ int main (int argc, const char * argv[])
 	//7. After registration time ends, close every connection, return to Step 1
 	int tic = 1;
 	std::map<std::string, int> quotas;
-	while (true) {
-		//session.performAutoRegister();
+	bool keepRunning = true;
+	while (keepRunning) {
 		if (tic % 10 == 0) {
 			//Process quota updates if any
 			if (quotaUpdateVector.size() > 0) {
@@ -204,39 +207,32 @@ int main (int argc, const char * argv[])
 				quotaUpdateVector.endCriticalSection();
 				//Report quota changes to pmm service.
 				if(session.reportQuotas(quotas)){
-					for (std::map<std::string, int>::iterator iter = quotas.begin(); iter != quotas.end(); iter++) {
-						for (size_t j = 0; j < maxIMAPSuckerThreads; j++) {
-							imapSuckingThreads[j].emailAccounts.beginCriticalSection();
-							for (size_t k = 0; k < imapSuckingThreads[j].emailAccounts.unlockedSize(); k++) {
-								if (imapSuckingThreads[j].emailAccounts.atUnlocked(k).email().compare(iter->first) == 0) {
-									imapSuckingThreads[j].emailAccounts.atUnlocked(k).quota -= iter->second;
-									if(imapSuckingThreads[j].emailAccounts.atUnlocked(k).quota <= 0){
-										imapSuckingThreads[j].emailAccounts.atUnlocked(k).isEnabled = false;
-									}
-								}
-							}
-							imapSuckingThreads[j].emailAccounts.endCriticalSection();
-						}
-						/*for (size_t j = 0; j < maxPOP3SuckerThreads; j++) {
-							pop3SuckingThreads[j].emailAccounts.beginCriticalSection();
-							for (size_t k = 0; k < pop3SuckingThreads[j].emailAccounts.unlockedSize(); k++) {
-								if (pop3SuckingThreads[j].emailAccounts.atUnlocked(k).email().compare(iter->first) == 0) {
-									pop3SuckingThreads[j].emailAccounts.atUnlocked(k).quota -= iter->second;
-									if(pop3SuckingThreads[j].emailAccounts.atUnlocked(k).quota <= 0){
-										pop3SuckingThreads[j].emailAccounts.atUnlocked(k).isEnabled = false;
-									}
-								}
-							}
-							pop3SuckingThreads[j].emailAccounts.endCriticalSection();
-						}*/						
-					}
+					updateAccountQuotas(imapSuckingThreads, maxIMAPSuckerThreads, quotas);
+					//updateAccountQuotas(pop3SuckingThreads, maxPOP3SuckerThreads, quotas);
 					quotas.clear();
 				}
 				//In case we failed to report any quotas the service will re-report them again
 			}
 		}
-		//Send quota changes if there are any
-
+		if(tic % 30 == 0){
+			std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
+			int nTasks = session.getPendingTasks(tasksToRun);
+			for (int i = 0; i < nTasks; i++) {
+				//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
+				std::map<std::string, std::map<std::string, std::string> >::iterator iter;
+				std::string command = iter->first;
+				std::map<std::string, std::string> parameters = iter->second;
+				if(command.compare("shutdown") == 0){
+					keepRunning = false;
+					break;
+				}
+				else if (command.compare(pmm::Commands::quotaExceeded) == 0){
+					disableAccountsWithExceededQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+					//disableAccountsWithExceededQuota(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+				}
+				///TODO: Apply quota increases in case the user has paid some
+			}
+		}
 		//Sleep for second, we don't want to hog the CPU right?
 		sleep(1);
 		tic++;
@@ -261,4 +257,38 @@ void emergencyUnregister(){
 	std::cerr << "Triggering emergency unregister, some unhandled exception ocurred :-(" << std::endl;
 	globalSession->unregisterFromPMM();
 	abort();
+}
+
+void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts){
+	//Disable email accounts that require it
+	for (size_t k = 0; k < nElems; k++) {
+		mailSuckerThreads[k].emailAccounts.beginCriticalSection();
+		for (std::map<std::string, std::string>::iterator iter2 = accounts.begin(); iter2 != accounts.end(); iter2++) {
+			for (size_t l = 0; l < mailSuckerThreads[k].emailAccounts.unlockedSize(); l++) {
+				if (mailSuckerThreads[k].emailAccounts.atUnlocked(l).email().compare(iter2->second) == 0) {
+					mailSuckerThreads[k].emailAccounts.atUnlocked(l).quota = 0;
+					mailSuckerThreads[k].emailAccounts.atUnlocked(l).isEnabled = false;
+					break;
+				}
+			}
+		}	
+		mailSuckerThreads[k].emailAccounts.endCriticalSection();
+	}
+}
+
+void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo){
+	for (std::map<std::string, int>::iterator iter = quotaInfo.begin(); iter != quotaInfo.end(); iter++) {
+		for (size_t j = 0; j < nElems; j++) {
+			mailSuckerThreads[j].emailAccounts.beginCriticalSection();
+			for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize(); k++) {
+				if (mailSuckerThreads[j].emailAccounts.atUnlocked(k).email().compare(iter->first) == 0) {
+					mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota -= iter->second;
+					if(mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota <= 0){
+						mailSuckerThreads[j].emailAccounts.atUnlocked(k).isEnabled = false;
+					}
+				}
+			}
+			mailSuckerThreads[j].emailAccounts.endCriticalSection();
+		}
+	}
 }

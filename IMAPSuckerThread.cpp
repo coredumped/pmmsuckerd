@@ -56,9 +56,6 @@ namespace pmm {
 				continue;
 			}
 			* p_msg_size = item->att_data.att_static->att_data.att_body_section->sec_length;
-/*#ifdef DEBUG
-			pmm::Log << "Got RAW message: " << item->att_data.att_static->att_data.att_body_section->sec_body_part << pmm::NL;
-#endif*/
 			MailMessage::parse(tm, item->att_data.att_static->att_data.att_body_section->sec_body_part);
 			return item->att_data.att_static->att_data.att_body_section->sec_body_part;
 		}
@@ -416,14 +413,12 @@ namespace pmm {
 	void IMAPSuckerThread::checkEmail(const MailAccountInfo &m){
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
-			/*#ifdef DEBUG
-			 mout.lock();
-			 pmm::Log << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") checkMail " << theEmail << pmm::NL;
-			 mout.unlock();
-			 #endif*/
 			mailimap *imap = imapControl[m.email()].imap;
 			if (imapControl[m.email()].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
 				//Think about closing and re-opening this connection!!!
+#ifdef DEBUG
+				pmm::Log << "Max connection time account for " << m.email() << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
+#endif
 				mailimap_idle_done(imap);
 				mailimap_logout(imap);
 				mailimap_close(imap);
@@ -468,9 +463,17 @@ namespace pmm {
 			}
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
-				if(etpanOperationFailed(result)) throw GenericException("Unable to send DONE to IMAP after IDLE.");
-				result = mailimap_idle(imap);
-				if(etpanOperationFailed(result)) throw GenericException("Unable to restart IDLE after DONE.");
+				if(etpanOperationFailed(result)){
+					pmm::Log << "Unable to send DONE to IMAP after IDLE for: " << m.email() << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
+					mailimap_idle_done(imap);
+					mailimap_logout(imap);
+					mailimap_close(imap);
+					mailboxControl[theEmail].isOpened = false;
+				}
+				else {
+					result = mailimap_idle(imap);
+					if(etpanOperationFailed(result)) throw GenericException("Unable to restart IDLE after DONE.");
+				}
 			}
 		}
 	}
