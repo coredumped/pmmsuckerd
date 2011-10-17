@@ -466,17 +466,16 @@ namespace pmm {
 		std::string output;
 		executePost(params, output);
 		std::istringstream input(output);
+		//[{"command":"quotaExceeded","parameters":{"i0":"juan.guerrero@fnxsoftware.com"}}]
 		jsonxx::Array o;
 		jsonxx::Array::parse(input, o);
 		for (unsigned int i = 0; i < o.size(); i++) {
 			std::map<std::string, std::map<std::string, std::string> > item;
 			std::string cmdName = o.get<jsonxx::Object>(i).get<std::string>("command");
 			std::map<std::string, std::string> parmsMap;
-			for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").size(); j++) {
-				std::map<std::string, jsonxx::Value *> theMap = o.get<jsonxx::Object>(i).get<jsonxx::Array>("parameters").get<jsonxx::Object>(j).kv_map();
-				for (std::map<std::string, jsonxx::Value *>::iterator iter = theMap.begin(); iter != theMap.end(); iter++) {
-					parmsMap[iter->first] = iter->second->get<std::string>();
-				}
+			std::map<std::string, jsonxx::Value *> theMap = o.get<jsonxx::Object>(i).get<jsonxx::Object>("parameters").kv_map();
+			for (std::map<std::string, jsonxx::Value *>::iterator iter = theMap.begin(); iter != theMap.end(); iter++) {
+				parmsMap[iter->first] = iter->second->get<std::string>();
 			}
 			item[cmdName] = parmsMap;
 			tasksToRun.push_back(item);
