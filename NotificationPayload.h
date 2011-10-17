@@ -9,6 +9,7 @@
 #ifndef PMM_Sucker_NotificationPayload_h
 #define PMM_Sucker_NotificationPayload_h
 #include<string>
+#include "MailMessage.h"
 
 namespace pmm {
 	class NotificationPayload {
@@ -25,6 +26,7 @@ namespace pmm {
 		NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber = 1, const std::string &sndName = "pmm.caf");
 		NotificationPayload(const NotificationPayload &n);
 		~NotificationPayload();
+		MailMessage origMailMessage;
 		
 		const std::string &toJSON() const;
 		std::string &soundName();

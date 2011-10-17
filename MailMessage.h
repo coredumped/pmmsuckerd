@@ -15,8 +15,10 @@ namespace pmm {
 	private:
 	protected:
 	public:
+		std::string to;
 		std::string from;
 		std::string subject;
+		time_t dateOfArrival;
 		MailMessage();
 		MailMessage(const std::string &_from, const std::string &_subject);
 		MailMessage(const MailMessage &m);

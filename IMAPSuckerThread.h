@@ -37,6 +37,7 @@ namespace pmm {
 			bool idling;
 			int failedLoginAttemptsCount;
 			time_t startedOn;
+			int maxIDLEConnectionTime;
 			IMAPControl();
 			~IMAPControl();
 			IMAPControl(const IMAPControl &ic);

@@ -27,6 +27,10 @@
 #ifndef DEFAULT_MAX_IMAP_CONNECTION_TIME
 #define DEFAULT_MAX_IMAP_CONNECTION_TIME 1200
 #endif
+#ifndef DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME
+#define DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME 1200
+#endif
+
 
 namespace pmm {
 	MTLogger imapLog;
@@ -140,6 +144,7 @@ namespace pmm {
 		}
 		else{
 			MailMessage theMessage;
+			theMessage.to = imapFetch.mailAccountInfo.email();
 			msg_content = get_msg_content(fetch_result, &msg_len, theMessage);
 			if (msg_content == NULL) {
 				//fprintf(stderr, "no content\n");
@@ -153,6 +158,7 @@ namespace pmm {
 				std::stringstream nMsg;
 				nMsg << theMessage.from << "\n" << theMessage.subject;
 				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], nMsg.str(), imapFetch.badgeCounter);
+				np.origMailMessage = theMessage;
 				notificationQueue->add(np);
 				if(i == 0){
 					fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
@@ -184,6 +190,7 @@ namespace pmm {
 		idling = false;
 		imap = NULL;
 		startedOn = time(NULL);
+		maxIDLEConnectionTime = DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME;
 	}
 	
 	IMAPSuckerThread::IMAPControl::~IMAPControl(){
@@ -428,9 +435,11 @@ namespace pmm {
 #ifdef DEBUG
 				pmm::imapLog << "Max connection time account for " << m.email() << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
 #endif
-				mailimap_idle_done(imap);
-				mailimap_logout(imap);
+				//mailimap_idle_done(imap);
+				//mailimap_logout(imap);
 				mailimap_close(imap);
+				mailimap_free(imap);
+				imapControl[m.email()].imap = NULL;
 				mailboxControl[theEmail].isOpened = false;
 				return;
 			}
@@ -449,7 +458,13 @@ namespace pmm {
 					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=" << response << " for " << theEmail << pmm::NL;
 				}
 				else {
-					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << pmm::NL;
+					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << ", re-connecting..." << pmm::NL;
+					mailimap_close(imap);
+					mailimap_free(imap);
+					imapControl[m.email()].imap = NULL;
+					imapControl[m.email()].failedLoginAttemptsCount = 0;
+					mailboxControl[theEmail].isOpened = false;
+					return;
 				}
 #endif
 				if (response != NULL && strlen(response) > 0 && strstr(response, "OK Still") == NULL) {

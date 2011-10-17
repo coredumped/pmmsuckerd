@@ -8,6 +8,9 @@
 
 #include <iostream>
 #include <stdlib.h>
+#ifdef __linux__
+#include <string.h>
+#endif
 #include "MTLogger.h"
 #include "libetpan/libetpan.h"
 #include "MailMessage.h"
@@ -26,6 +29,8 @@ namespace pmm {
 	MailMessage::MailMessage(const MailMessage &m){
 		from = m.from;
 		subject = m.subject;
+		to = m.to;
+		dateOfArrival = m.dateOfArrival;
 	}
 	
 	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){
@@ -82,6 +87,21 @@ namespace pmm {
 					pmm::Log << "DEBUG: Subject=\"" << m.subject << "\"" << pmm::NL;
 #endif
 					if (m.from.size() > 0 && m.subject.size() > 0) break;
+				}
+					break;
+				case MAILIMF_FIELD_ORIG_DATE:
+				{
+					struct mailimf_date_time *origDate = field->fld_data.fld_orig_date->dt_date_time;
+					struct tm tDate;
+					memset(&tDate, 0, sizeof(tm));
+					tDate.tm_year = origDate->dt_year;
+					tDate.tm_mon = origDate->dt_month;
+					tDate.tm_mday = origDate->dt_day;
+					tDate.tm_hour = origDate->dt_hour;
+					tDate.tm_min = origDate->dt_min;
+					tDate.tm_sec = origDate->dt_sec;
+					tDate.tm_gmtoff = origDate->dt_zone;
+					m.dateOfArrival = mktime(&tDate);
 				}
 					break;
 				default:
