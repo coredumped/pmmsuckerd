@@ -78,7 +78,7 @@ namespace pmm {
 		sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL) << ",'" << email << "'," << "'" << uid << "')";
 		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 		if (errCode != SQLITE_OK) {
-			if (errCode != SQLITE_CONSTRAINT) {
+			if (errCode == SQLITE_CONSTRAINT) {
 				CacheLog << "Duplicate entry in database: " << email << "(" << uid << ") resetting database..." << pmm::NL;
 				closeDatabase(conn);
 				dbConn = 0;
