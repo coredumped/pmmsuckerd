@@ -37,6 +37,8 @@ namespace pmm {
 		serverPort_ = m.serverPort_;
 		devTokens_ = m.devTokens_;
 		useSSL_ = m.useSSL_;
+		quota = m.quota;
+		isEnabled = m.isEnabled;
 	}
 	
 	const std::string &MailAccountInfo::email() const {
