@@ -76,6 +76,7 @@ namespace pmm {
 		static const char *pmmSuckerUnRegister = "pmmSuckerUnReg";
 		static const char *pmmSuckerQuotaUpdate = "zpmmSuckerQuotaUpdate";
 		static const char *pmmSuckerCommandRetrieve = "pmmSuckerCommandRetrieve";
+		static const char *pmmSuckerUploadMessage = "pmmSuckerUploadMessage";
 	};
 	
 	namespace Commands {
@@ -493,7 +494,7 @@ namespace pmm {
 		performAutoRegister();
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
-		params["opType"] = pmm::OperationTypes::pmmSuckerCommandRetrieve;
+		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMessage;
 		params["suckerID"] = this->myID;
 
 		params["emailAccount"] = np.origMailMessage.to;
