@@ -343,6 +343,7 @@ namespace pmm {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
 				mailFetchers[i].fetchQueue = &imapFetchQueue;
 				mailFetchers[i].quotaUpdateVector = quotaUpdateVector;
+				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
 				pmm::ThreadDispatcher::start(mailFetchers[i]);
 				first_connection = true;
 			}
