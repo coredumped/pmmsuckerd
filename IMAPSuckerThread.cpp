@@ -163,6 +163,7 @@ namespace pmm {
 				if(i == 0){
 					fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
 					quotaUpdateVector->push_back(imapFetch.mailAccountInfo.email());
+					pmmStorageQueue->add(np);
 				}
 			}
 			mailimap_fetch_list_free(fetch_result);
@@ -199,9 +200,11 @@ namespace pmm {
 	
 	IMAPSuckerThread::MailFetcher::MailFetcher(){
 		availableMessages = 0;
+		pmmStorageQueue = NULL;
 	}
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
+		if (pmmStorageQueue == NULL) throw GenericException("Can't continue like this, the pmmStorageQueue is null!!!");
 		pmm::imapLog << "DEBUG: IMAP MailFetcher warming up..." << pmm::NL;
 		sleep(1);
 		pmm::imapLog << "DEBUG: IMAP MailFetcher started!!!" << pmm::NL;

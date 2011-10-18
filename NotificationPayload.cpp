@@ -64,6 +64,7 @@ namespace pmm {
 		devToken = n.devToken;
 		_badgeNumber = n._badgeNumber;
 		build();
+		origMailMessage = n.origMailMessage;
 	}
 	
 	NotificationPayload::~NotificationPayload(){
@@ -111,6 +112,10 @@ namespace pmm {
 	}
 	
 	std::string &NotificationPayload::soundName(){
+		return _soundName;
+	}
+
+	const std::string &NotificationPayload::soundName() const {
 		return _soundName;
 	}
 	

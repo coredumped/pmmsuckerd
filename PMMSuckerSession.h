@@ -14,6 +14,8 @@
 #endif
 #include<string>
 #include "MailAccountInfo.h"
+#include "NotificationPayload.h"
+#include "Mutex.h"
 
 namespace pmm {
 	/** Exception thrown whenever we received an error response from a remote server */
@@ -38,6 +40,7 @@ namespace pmm {
 		std::string myID;
 		std::string apiKey;
 		time_t expirationTime;
+		Mutex timeM;
 	protected:
 		void performAutoRegister();
 	public:
@@ -61,6 +64,9 @@ namespace pmm {
 		
 		//Get a list of commands to perform as requested by the controller
 		int getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun);
+		
+		//Upload notification messages to server
+		void uploadNotificationMessage(const NotificationPayload &np);
 	};
 	
 	namespace Commands {

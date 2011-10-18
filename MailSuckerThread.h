@@ -49,6 +49,7 @@ namespace pmm {
 	public:
 		SharedVector<MailAccountInfo> emailAccounts;
 		SharedQueue<NotificationPayload> *notificationQueue;
+		SharedQueue<NotificationPayload> *pmmStorageQueue;
 		SharedVector<std::string> *quotaUpdateVector;
 
 		MailSuckerThread();

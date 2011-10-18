@@ -20,6 +20,7 @@
 #include "IMAPSuckerThread.h"
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
+#include "MessageUploaderThread.h"
 #ifdef __linux__
 #include<signal.h>
 #endif
@@ -31,6 +32,9 @@
 #endif
 #ifndef DEFAULT_MAX_IMAP_POLLING_THREADS
 #define DEFAULT_MAX_IMAP_POLLING_THREADS 2
+#endif
+#ifndef DEFAULT_MAX_MESSAGE_UPLOADER_THREADS
+#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 4
 #endif
 #ifndef DEFAULT_SSL_CERTIFICATE_PATH
 #define DEFAULT_SSL_CERTIFICATE_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
@@ -62,10 +66,12 @@ int main (int argc, const char * argv[])
 	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
 	size_t maxIMAPSuckerThreads = DEFAULT_MAX_IMAP_POLLING_THREADS;
 	size_t maxPOP3SuckerThreads = DEFAULT_MAX_POP3_POLLING_THREADS;
+	size_t maxMessageUploaderThreads = DEFAULT_MAX_MESSAGE_UPLOADER_THREADS;
 	std::string sslCertificatePath = DEFAULT_SSL_CERTIFICATE_PATH;
 	std::string sslPrivateKeyPath = DEFAULT_SS_PRIVATE_KEY_PATH;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	pmm::SharedVector<std::string> quotaUpdateVector;
+	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
 	SSL_library_init();
 	SSL_load_error_strings();
 	for (int i = 1; i < argc; i++) {
@@ -160,6 +166,7 @@ int main (int argc, const char * argv[])
 #warning TODO: Save email accounts to local datastore, perform full database cleanup
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
+	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
@@ -170,6 +177,11 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(notifThreads[i]);
 		sleep(1);
 	}
+	for (size_t i = 0; i < maxMessageUploaderThreads; i++) {
+		msgUploaderThreads[i].session = &session;
+		msgUploaderThreads[i].pmmStorageQueue = &pmmStorageQueue;
+		pmm::ThreadDispatcher::start(msgUploaderThreads[i]);
+	}
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
 	//5. Dispatch polling threads for imap
@@ -177,6 +189,7 @@ int main (int argc, const char * argv[])
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
+		imapSuckingThreads[i].pmmStorageQueue = &pmmStorageQueue;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
 		sleep(1);
 	}

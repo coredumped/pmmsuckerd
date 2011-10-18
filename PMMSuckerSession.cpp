@@ -326,8 +326,10 @@ namespace pmm {
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
 		std::istringstream input(response.metaData["expiration"]);
+		timeM.lock();
 		input >> expirationTime;
 		expirationTime = time(0x00) + expirationTime - 60;
+		timeM.unlock();
 		return response.status;
 	}
 	
@@ -420,7 +422,10 @@ namespace pmm {
 	}
 	
 	void SuckerSession::performAutoRegister(){
-		if (time(0x00) >= expirationTime) {
+		timeM.lock();
+		time_t theExpirationTime = expirationTime;
+		timeM.unlock();
+		if (time(0x00) >= theExpirationTime) {
 #ifdef DEBUG
 			pmm::Log << "DEBUG: Session is about to expire re-registering in advance..." << pmm::NL;
 #endif
@@ -482,6 +487,27 @@ namespace pmm {
 			tCount++;
 		}			
 		return tCount;
+	}
+	
+	void SuckerSession::uploadNotificationMessage(const NotificationPayload &np){
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerCommandRetrieve;
+		params["suckerID"] = this->myID;
+
+		params["emailAccount"] = np.origMailMessage.to;
+		std::stringstream nVal;
+		nVal << np.origMailMessage.dateOfArrival;
+		params["tStamp"] = nVal.str();
+		params["from"] = np.origMailMessage.from;
+		params["subject"] = np.origMailMessage.subject;
+		params["sound"] = np.soundName();
+		std::string output;
+		executePost(params, output);
+		if (output.find("OK") == output.npos) {
+			pmm::Log << "Unable to upload message to " << np.origMailMessage.to << pmm::NL;
+		}
 	}
 }
 

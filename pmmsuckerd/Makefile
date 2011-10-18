@@ -20,11 +20,12 @@ all: pmmsuckerd
 pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o \
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
-		MTLogger.o MailMessage.o
+		MTLogger.o MailMessage.o MessageUploaderThread.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
-				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o $(LIBS)
+				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
+				MessageUploaderThread.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -61,6 +62,9 @@ SharedQueue.o: ../SharedQueue.cpp ../SharedQueue.h
 
 MTLogger.o: ../MTLogger.cpp ../MTLogger.h
 	$(GCC) $(CFLAGS) -c -o MTLogger.o ../MTLogger.cpp
+
+MessageUploaderThread.o: ../MessageUploaderThread.cpp ../MessageUploaderThread.h
+	$(GCC) $(CFLAGS) -c -o MessageUploaderThread.o ../MessageUploaderThread.cpp
 
 MailMessage.o: ../MailMessage.cpp ../MailMessage.h
 	$(GCC) $(CFLAGS) -c -o MailMessage.o ../MailMessage.cpp

@@ -30,6 +30,7 @@ namespace pmm {
 		
 		const std::string &toJSON() const;
 		std::string &soundName();
+		const std::string &soundName() const;
 		std::string &message();
 		std::string &deviceToken();
 	};
