@@ -221,34 +221,44 @@ int main (int argc, const char * argv[])
 				quotaUpdateVector.unlockedClear();
 				quotaUpdateVector.endCriticalSection();
 				//Report quota changes to pmm service.
-				if(session.reportQuotas(quotas)){
-					updateAccountQuotas(imapSuckingThreads, maxIMAPSuckerThreads, quotas);
-					//updateAccountQuotas(pop3SuckingThreads, maxPOP3SuckerThreads, quotas);
-					quotas.clear();
+				try{
+					if(session.reportQuotas(quotas)){
+						updateAccountQuotas(imapSuckingThreads, maxIMAPSuckerThreads, quotas);
+						//updateAccountQuotas(pop3SuckingThreads, maxPOP3SuckerThreads, quotas);
+						quotas.clear();
+					}
+				}
+				catch(pmm::HTTPException &htex0){
+					pmm::Log << "Unable to update upstream quotas due to: " << htex0.errorMessage() << ", I will retry in the next cycle" << pmm::NL;
 				}
 				//In case we failed to report any quotas the service will re-report them again
 			}
 		}
 		if(tic % 30 == 0){
-			std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
-			int nTasks = session.getPendingTasks(tasksToRun);
-			for (int i = 0 ; i < nTasks; i++) {
-				//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
-				std::map<std::string, std::map<std::string, std::string> >::iterator iter = tasksToRun[i].begin();
-				std::string command = iter->first;
-				std::map<std::string, std::string> parameters = iter->second;
-				if(command.compare("shutdown") == 0){
-					keepRunning = false;
-					break;
+			try{
+				std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
+				int nTasks = session.getPendingTasks(tasksToRun);
+				for (int i = 0 ; i < nTasks; i++) {
+					//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
+					std::map<std::string, std::map<std::string, std::string> >::iterator iter = tasksToRun[i].begin();
+					std::string command = iter->first;
+					std::map<std::string, std::string> parameters = iter->second;
+					if(command.compare("shutdown") == 0){
+						keepRunning = false;
+						break;
+					}
+					else if (command.compare(pmm::Commands::quotaExceeded) == 0){
+						disableAccountsWithExceededQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+						//disableAccountsWithExceededQuota(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+					}
+					///TODO: Apply quota increases in case the user has paid some
 				}
-				else if (command.compare(pmm::Commands::quotaExceeded) == 0){
-					disableAccountsWithExceededQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-					//disableAccountsWithExceededQuota(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
-				}
-				///TODO: Apply quota increases in case the user has paid some
+			}
+			catch(pmm::HTTPException &htex1){
+				pmm::Log << "CRITICAL: Got " << htex1.errorMessage() << " while trying to retrieve pending tasks, I'll retry in the next cycle, in the meantime please verify the logs" << pmm::NL;
 			}
 		}
-		//Sleep for second, we don't want to hog the CPU right?
+		//Sleep for a second, we don't want to hog the CPU right?
 		sleep(1);
 		tic++;
 	}

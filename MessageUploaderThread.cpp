@@ -27,10 +27,16 @@ namespace pmm {
 		while (true) {
 			NotificationPayload np;
 			while (pmmStorageQueue->extractEntry(np)) {
-				session->uploadNotificationMessage(np);
+				try {
 #ifdef DEBUG
-				pmm::Log << "Uploading message to: " << np.origMailMessage.to << pmm::NL;
+					pmm::Log << "Uploading message to: " << np.origMailMessage.to << pmm::NL;
 #endif
+					session->uploadNotificationMessage(np);
+				} catch (pmm::HTTPException &htex1) {
+					pmm::Log << "Can't upload message due to: " << htex1.errorMessage() << ", will retry in the next cycle." << pmm::NL;
+					sleep(1);
+					pmmStorageQueue->add(np);
+				}
 			}
 			usleep(250000);
 		}
