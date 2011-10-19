@@ -19,6 +19,9 @@ namespace pmm {
 	class MTLogger {
 	private:
 		Mutex m;
+		size_t writtenBytes;
+		size_t maxLogSize;
+		std::string logPath;
 	protected:
 		std::map<pthread_t, std::string> streamMap;
 		std::ofstream outputStream;

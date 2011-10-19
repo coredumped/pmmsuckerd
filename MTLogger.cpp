@@ -11,6 +11,10 @@
 #include <time.h>
 #include <sys/stat.h>
 
+#ifndef MAX_LOG_SIZE
+#define MAX_LOG_SIZE 1073741824
+#endif
+
 namespace pmm {
 	
 	MTLogger Log;
@@ -20,7 +24,8 @@ namespace pmm {
 	void MTLogger::initLogline(){
 		if (streamMap[pthread_self()].size() == 0) {
 			if (!outputStream.is_open()) {
-				outputStream.open("mtlogger.log");
+				logPath = "mtlogger.log";
+				outputStream.open(logPath.c_str());
 			}
 			char buf[128];
 			time_t theTime;
@@ -30,10 +35,10 @@ namespace pmm {
 			strftime(buf, 64, "%F %T%z", &tmTime);
 			std::stringstream ldata;
 			if (tag.size() > 0) {
-				ldata << buf << " " << tag << "(0x" << std::hex << (long)pthread_self() << ")" << std::dec << ": ";	
+				ldata << buf << " " << tag << "(Thread=0x" << std::hex << (long)pthread_self() << ")" << std::dec << ": ";	
 			}
 			else {
-				ldata << buf << " thread=0x" << std::hex << (long)pthread_self() << std::dec << ": ";	
+				ldata << buf << " [Thread=0x" << std::hex << (long)pthread_self() << std::dec << "]: ";	
 			}
 			streamMap[pthread_self()] = ldata.str();
 		}
@@ -41,15 +46,25 @@ namespace pmm {
 	
 	MTLogger::MTLogger(){
 		//outputStream.open("mtlogger.log");
+		writtenBytes = 0;
+		maxLogSize = MAX_LOG_SIZE;
 	}
 	void MTLogger::open(const std::string &path){
 		struct stat st;
 		if(stat(path.c_str(), &st) == 0){
 			//Backup old file
-			std::string newname = path;
-			newname.append(".old");
-			rename(path.c_str(), newname.c_str());
+			if (st.st_size > 2 * maxLogSize) {
+				unlink(path.c_str());
+				std::cerr << path << " is too big (" << (st.st_size / (1024 * 1024)) << " MB), erasing it..." << std::endl;
+			}
+			else {
+				std::string newname = path;
+				newname.append(".old");
+				rename(path.c_str(), newname.c_str());
+			}
 		}
+		writtenBytes = 0;
+		logPath = path;
 		outputStream.open(path.c_str());
 	}
 	
@@ -88,11 +103,17 @@ namespace pmm {
 			outputStream << "\n";
 			outputStream.flush();
 			streamMap.erase(pthread_self());
+			if(writtenBytes > maxLogSize){
+				//Tricky part we must rotate the log and compress the previous one
+				outputStream.close();
+				open(logPath);
+			}
 		}
 		else {
 			std::stringstream ldata;
 			ldata << streamMap[pthread_self()] << s;
 			streamMap[pthread_self()] = ldata.str();
+			writtenBytes += streamMap[pthread_self()].size();
 		}
 		m.unlock();
 		return *this;
