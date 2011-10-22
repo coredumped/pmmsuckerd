@@ -70,7 +70,7 @@ namespace pmm {
 						if ((s2pos = m.subject.find_first_of("?", s1pos + 2)) != m.subject.npos) {
 							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
 #warning Find out what are we going to do with Languages that use encodings different than utf-8
-							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newFrom);
+							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, sourceEncoding.c_str(), &newFrom);
 							m.from = newFrom;
 							free(newFrom);
 						}
