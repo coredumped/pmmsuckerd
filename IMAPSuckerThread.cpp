@@ -364,7 +364,7 @@ namespace pmm {
 			serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
 			if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 				//Max reconnect exceeded, notify user
-#warning TODO: Find a better way to notify the user that we're unable to connect into their mail server
+#warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
 				std::stringstream errmsg;
 				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 #ifdef DEBUG
@@ -391,7 +391,7 @@ namespace pmm {
 				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
 					std::stringstream errmsg;
-#warning TODO: Find a better way to notify the user that we're unable to login into their mail account
+#warning TODO: Find a better way to notify the user that we are unable to login into their mail account
 					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
 					for (size_t i = 0; m.devTokens().size(); i++) {
 						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));

@@ -68,7 +68,7 @@ namespace pmm {
 						//Find source encoding
 						size_t s2pos;
 						if ((s2pos = m.from.find_first_of("?", s1pos + 2)) != m.from.npos) {
-							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
+							std::string sourceEncoding = m.from.substr(s1pos + 2, s2pos - s1pos - 2);
 							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, sourceEncoding.c_str(), &newFrom);
 							m.from = newFrom;
 							free(newFrom);
