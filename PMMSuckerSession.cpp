@@ -234,6 +234,7 @@ namespace pmm {
 				free(buffer);
 				memcpy(tmpbuf + size, data, dataSize);
 				buffer = tmpbuf;
+				size += dataSize;
 			}
 			return buffer;
 		}
