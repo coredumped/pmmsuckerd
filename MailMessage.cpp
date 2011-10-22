@@ -31,6 +31,7 @@ namespace pmm {
 		subject = m.subject;
 		to = m.to;
 		dateOfArrival = m.dateOfArrival;
+		msgUid = m.msgUid;
 	}
 	
 	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){
@@ -59,6 +60,22 @@ namespace pmm {
 					else{
 						m.from = mbox->mb_display_name;
 					}
+					size_t s1pos; 
+					if ((s1pos = m.from.find("=?")) != m.from.npos) {
+						//Encoded with RFC 2047, let's decode this damn thing!!!
+						size_t indx2 = 0;
+						char *newFrom;
+						//Find source encoding
+						size_t s2pos;
+						if ((s2pos = m.subject.find_first_of("?", s1pos + 2)) != m.subject.npos) {
+							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
+#warning Find out what are we going to do with Languages that use encodings different than utf-8
+							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newFrom);
+							m.from = newFrom;
+							free(newFrom);
+						}
+					}
+
 #ifdef DEBUG
 					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
 #endif

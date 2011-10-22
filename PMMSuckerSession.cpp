@@ -504,6 +504,7 @@ namespace pmm {
 		params["from"] = np.origMailMessage.from;
 		params["subject"] = np.origMailMessage.subject;
 		params["sound"] = np.soundName();
+		params["msgUID"] = np.origMailMessage.msgUid;
 		std::string output;
 		executePost(params, output);
 		if (output.find("OK") == output.npos) {

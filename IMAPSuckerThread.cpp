@@ -145,6 +145,9 @@ namespace pmm {
 		else{
 			MailMessage theMessage;
 			theMessage.to = imapFetch.mailAccountInfo.email();
+			std::stringstream msgUid_s;
+			msgUid_s << (int)uid;
+			theMessage.msgUid = msgUid_s.str();
 			msg_content = get_msg_content(fetch_result, &msg_len, theMessage);
 			if (msg_content == NULL) {
 				//fprintf(stderr, "no content\n");

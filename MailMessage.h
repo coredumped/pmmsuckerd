@@ -19,6 +19,7 @@ namespace pmm {
 		std::string from;
 		std::string subject;
 		time_t dateOfArrival;
+		std::string msgUid;
 		MailMessage();
 		MailMessage(const std::string &_from, const std::string &_subject);
 		MailMessage(const MailMessage &m);
