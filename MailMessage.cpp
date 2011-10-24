@@ -48,6 +48,7 @@ namespace pmm {
 #endif
 		m.from = "";
 		m.subject = "";
+		bool gotTime = false;
 		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
 			struct mailimf_field *field = (struct mailimf_field *)clist_content(iter);
 			pmm::Log << field->fld_type << pmm::NL;
@@ -78,7 +79,7 @@ namespace pmm {
 #ifdef DEBUG
 					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
 #endif
-					if (m.from.size() > 0 && m.subject.size() > 0) break;
+					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
 				}
 					break;
 				case MAILIMF_FIELD_SUBJECT:
@@ -102,7 +103,7 @@ namespace pmm {
 #ifdef DEBUG
 					pmm::Log << "DEBUG: Subject=\"" << m.subject << "\"" << pmm::NL;
 #endif
-					if (m.from.size() > 0 && m.subject.size() > 0) break;
+					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
 				}
 					break;
 				case MAILIMF_FIELD_ORIG_DATE:
@@ -118,6 +119,8 @@ namespace pmm {
 					tDate.tm_sec = origDate->dt_sec;
 					tDate.tm_gmtoff = origDate->dt_zone;
 					m.dateOfArrival = mktime(&tDate);
+					gotTime = true;
+					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
 				}
 					break;
 				default:
