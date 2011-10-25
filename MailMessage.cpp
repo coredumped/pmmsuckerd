@@ -126,7 +126,23 @@ namespace pmm {
 				default:
 					break;
 			}
-			
+		}
+		if (m.subject.size() == 0) {
+			//Retrieve the first 256 bytes of the body message
+			size_t bIndx = 0;
+			char *msgBody;
+			size_t msgBodyLength;
+			mailmime_base64_body_parse(rawMessage.c_str(), rawMessage.size(), &bIndx, &msgBody, &msgBodyLength);
+			if (msgBodyLength <= 0) {
+				m.subject = "(No Subject)";
+			}
+			else if (msgBodyLength < 256) {
+				m.subject.assign(msgBody, msgBodyLength);
+			}
+			else {
+				m.subject.assign(msgBody, 256);
+			}
+			if(msgBodyLength > 0) free(msgBody);
 		}
 #ifdef USE_IMF
 		mailimf_message_free(result);
