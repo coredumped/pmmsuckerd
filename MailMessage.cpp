@@ -17,6 +17,40 @@
 #include "UtilityFunctions.h"
 
 namespace pmm {
+	
+	static void getMIMEData(struct mailmime_data * data, std::stringstream &outputStream)
+	{
+		switch (data->dt_type) {
+			case MAILMIME_DATA_TEXT:
+				outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
+				break;
+		}
+	}
+
+	static void getMIMEMsgBody(struct mailmime * mime, std::stringstream &outputStream)
+	{
+		clistiter * cur;		
+		switch (mime->mm_type) {
+			case MAILMIME_SINGLE:
+				getMIMEData(mime->mm_data.mm_single, outputStream);
+				break;
+			case MAILMIME_MULTIPLE:
+				for(cur = clist_begin(mime->mm_data.mm_multipart.mm_mp_list) ; cur != NULL ; cur = clist_next(cur)) {
+					getMIMEMsgBody((struct mailmime *)clist_content(cur), outputStream);
+				}
+				break;
+				
+			case MAILMIME_MESSAGE:
+				if (mime->mm_data.mm_message.mm_fields) {					
+					if (mime->mm_data.mm_message.mm_msg_mime != NULL) {
+						getMIMEMsgBody(mime->mm_data.mm_message.mm_msg_mime, outputStream);
+					}
+					break;
+				}
+		}
+	}
+
+	
 	MailMessage::MailMessage(){
 		
 	}
@@ -128,20 +162,18 @@ namespace pmm {
 			}
 		}
 		if (m.subject.size() == 0) {
-			//Retrieve the first 256 bytes of the body message
-			size_t bIndx = 0;
-			struct mailimf_body *body;
-			mailimf_body_parse(rawMessage.c_str(), rawMessage.size(), &bIndx, &body);
-			if (body->bd_size <= 0) {
-				m.subject = "(No Subject)";
-			}
-			else if (body->bd_size < 256) {
-				m.subject.assign(body->bd_text, body->bd_size);
+			std::stringstream msgBody;
+			getMIMEMsgBody(result, msgBody);
+#ifdef DEBUG
+		pmm:Log << "Message Body: " << msgBody.str() << pmm::NL;
+#endif
+			std::string theBody = msgBody.str();
+			if(theBody.size() > 0 && theBody.size() < 256){
+				m.subject.assign(theBody.c_str(), theBody.size());
 			}
 			else {
-				m.subject.assign(body->bd_text, 256);
+				m.subject.assign(theBody.c_str(), 256);
 			}
-			mailimf_body_free(body);
 		}
 #ifdef USE_IMF
 		mailimf_message_free(result);
