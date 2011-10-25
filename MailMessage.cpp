@@ -130,19 +130,18 @@ namespace pmm {
 		if (m.subject.size() == 0) {
 			//Retrieve the first 256 bytes of the body message
 			size_t bIndx = 0;
-			char *msgBody;
-			size_t msgBodyLength;
-			mailmime_base64_body_parse(rawMessage.c_str(), rawMessage.size(), &bIndx, &msgBody, &msgBodyLength);
-			if (msgBodyLength <= 0) {
+			struct mailimf_body *body;
+			mailimf_body_parse(rawMessage.c_str(), rawMessage.size(), &bIndx, &body);
+			if (body->bd_size <= 0) {
 				m.subject = "(No Subject)";
 			}
-			else if (msgBodyLength < 256) {
-				m.subject.assign(msgBody, msgBodyLength);
+			else if (body->bd_size < 256) {
+				m.subject.assign(body->bd_text, body->bd_size);
 			}
 			else {
-				m.subject.assign(msgBody, 256);
+				m.subject.assign(body->bd_text, 256);
 			}
-			if(msgBodyLength > 0) free(msgBody);
+			mailimf_body_free(body);
 		}
 #ifdef USE_IMF
 		mailimf_message_free(result);
