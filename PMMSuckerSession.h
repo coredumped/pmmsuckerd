@@ -72,6 +72,7 @@ namespace pmm {
 	namespace Commands {
 		extern const char *quotaExceeded;
 		extern const char *shutdown;
+		extern const char *accountPropertyChanged;
 	}
 }
 

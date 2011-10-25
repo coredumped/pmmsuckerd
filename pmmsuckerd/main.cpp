@@ -58,6 +58,7 @@ static void sigpipe_handle(int x){
 
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
+void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 
 int main (int argc, const char * argv[])
 {
@@ -251,6 +252,14 @@ int main (int argc, const char * argv[])
 						disableAccountsWithExceededQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
 						//disableAccountsWithExceededQuota(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
 					}
+					else if (command.compare(pmm::Commands::accountPropertyChanged) == 0){
+						if (parameters["mailboxType"].compare("IMAP") == 0) {
+							updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+						}
+						/*else {
+							//Do the same for pop3
+						}*/
+					}
 					///TODO: Apply quota increases in case the user has paid some
 				}
 			}
@@ -316,4 +325,42 @@ void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems
 			mailSuckerThreads[j].emailAccounts.endCriticalSection();
 		}
 	}
+}
+
+void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo) {
+	std::string mailAccount = mailAccountInfo["email"];
+	bool accountFound = false;
+	for (size_t j = 0; j < nElems && !accountFound; j++) {
+		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
+		for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize() && !accountFound; k++) {
+			if (mailAccount.compare(mailSuckerThreads[j].emailAccounts.atUnlocked(k).email()) == 0) {
+				//Update all metadata;
+				int serverPort, _useSSL;
+				bool useSSL;
+				std::stringstream input(mailAccountInfo["serverPort"]);
+				input >> serverPort;
+				std::stringstream input2(mailAccountInfo["useSSL"]);
+				input2 >> _useSSL;
+				if(_useSSL == 0) useSSL = false;
+				else useSSL = true;
+				//Build new devtoken vector
+				std::vector<std::string> devTokens;
+				std::string devToken_s = mailAccountInfo["devTokens"];
+				size_t cpos;
+				while ((cpos = devToken_s.find(",")) != devToken_s.npos) {
+					std::string dTok = devToken_s.substr(0, cpos);
+					devTokens.push_back(dTok);
+					devToken_s = devToken_s.substr(cpos + 1);
+				}
+				if(devToken_s.size() > 0) devTokens.push_back(devToken_s);
+				mailSuckerThreads[j].emailAccounts.atUnlocked(k).updateInfo(mailAccountInfo["password"], 
+																		   mailAccountInfo["serverAddress"], 
+																		   serverPort, 
+																		   devTokens, 
+																		   useSSL);
+				accountFound = true;
+			}
+		}
+		mailSuckerThreads[j].emailAccounts.endCriticalSection();
+	}	
 }

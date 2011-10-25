@@ -174,6 +174,9 @@ namespace pmm {
 			else {
 				m.subject.assign(theBody.c_str(), 256);
 			}
+			while (m.subject[0] == '\r' || m.subject[0] == '\n') {
+				m.subject = m.subject.substr(1);
+			}
 		}
 #ifdef USE_IMF
 		mailimf_message_free(result);

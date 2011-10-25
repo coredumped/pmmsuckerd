@@ -42,6 +42,10 @@ namespace pmm {
 		bool useSSL() const;
 		bool isEnabled;
 		int quota;
+		
+		void updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 				
+					   const std::vector<std::string> &devTokens__, bool useSSL__);
+
 	};
 }
 
