@@ -316,7 +316,6 @@ void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, 
 #ifdef DEBUG
 					pmm::Log << "disableAccountsWithExceededQuota: disabling monitoring for: " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << pmm::NL;
 #endif
-					break;
 				}
 			}
 		}	
