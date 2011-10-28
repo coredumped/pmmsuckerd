@@ -24,7 +24,13 @@ namespace pmm {
 	public:
 		SharedVector(){ }
 		virtual ~SharedVector(){ }
-
+		
+		SharedVector(const SharedVector<T> &v){
+			v.m.lock();
+			dataVec = v.dataVec;
+			v.m.unlock();
+		}
+		
 		void push_back(const T &o){
 			m.lock();
 			try {
@@ -36,7 +42,7 @@ namespace pmm {
 			m.unlock();
 		}
 		
-		void operator=(const std::vector<T> &v){
+		SharedVector<T> &operator=(const std::vector<T> &v){
 			m.lock();
 			try {
 				dataVec = v;
@@ -45,7 +51,18 @@ namespace pmm {
 				throw;
 			}
 			m.unlock();
-			
+			return *this;
+		}
+		
+		SharedVector<T> &operator=(const SharedVector<T> &v){
+			std::vector<T> newVec;
+			v.m.lock();
+			newVec = v.dataVec;
+			v.m.unlock();
+			m.lock();
+			dataVec = newVec;
+			m.unlock();
+			return *this;
 		}
 		
 		void addVector(const std::vector<T> &v){

@@ -74,7 +74,11 @@ namespace pmm {
 		while (true) {
 			time_t currTime = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
-				if (emailAccounts[i].isEnabled) {
+				if (emailAccounts[i].isEnabled == true) {
+					if (emailAccounts[i].quota <= 0) {
+						emailAccounts[i].isEnabled = false;
+						continue;
+					}
 					MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
 					if(mCtrl.email.size() == 0){
 						//Initial object creation
@@ -82,14 +86,11 @@ namespace pmm {
 						mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
 					}
 					//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
-					MailAccountInfo mInfo = emailAccounts[i];
-					if (mInfo.isEnabled) {
-						if (maxOpenTime > 0 && currTime - mCtrl.openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
-						if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
-						if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
-							checkEmail(emailAccounts[i]);
-							mCtrl.lastCheck = time(0);
-						}
+					if (maxOpenTime > 0 && currTime - mailboxControl[emailAccounts[i].email()].openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
+					if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
+					if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
+						checkEmail(emailAccounts[i]);
+						mailboxControl[emailAccounts[i].email()].lastCheck = time(0);
 					}
 				}
 			}

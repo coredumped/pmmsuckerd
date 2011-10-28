@@ -59,6 +59,8 @@ static void sigpipe_handle(int x){
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
+void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
+
 
 int main (int argc, const char * argv[])
 {
@@ -260,6 +262,15 @@ int main (int argc, const char * argv[])
 							//Do the same for pop3
 						}*/
 					}
+					else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
+						if (parameters["mailboxType"].compare("IMAP") == 0) {
+							//updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							updateMailAccountQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+						}
+						/*else {
+						 //Do the same for pop3
+						 }*/
+					}
 					///TODO: Apply quota increases in case the user has paid some
 				}
 			}
@@ -302,6 +313,9 @@ void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, 
 				if (mailSuckerThreads[k].emailAccounts.atUnlocked(l).email().compare(iter2->second) == 0) {
 					mailSuckerThreads[k].emailAccounts.atUnlocked(l).quota = 0;
 					mailSuckerThreads[k].emailAccounts.atUnlocked(l).isEnabled = false;
+#ifdef DEBUG
+					pmm::Log << "disableAccountsWithExceededQuota: disabling monitoring for: " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << pmm::NL;
+#endif
 					break;
 				}
 			}
@@ -319,7 +333,15 @@ void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems
 					mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota -= iter->second;
 					if(mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota <= 0){
 						mailSuckerThreads[j].emailAccounts.atUnlocked(k).isEnabled = false;
+#ifdef DEBUG
+						pmm::Log << "updateAccountQuotas: disabling monitoring for: " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << pmm::NL;
+#endif
 					}
+#ifdef DEBUG
+					else {
+						pmm::Log << "updateAccountQuotas: " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << " has been notified " << iter->second << " times, remaining=" << mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota << pmm::NL;
+					}
+#endif
 				}
 			}
 			mailSuckerThreads[j].emailAccounts.endCriticalSection();
@@ -364,3 +386,24 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 		mailSuckerThreads[j].emailAccounts.endCriticalSection();
 	}	
 }
+
+void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
+	std::string mailAccount = mailAccountInfo["emailAddress"];
+	bool accountFound = false;
+	for (size_t j = 0; j < nElems && !accountFound; j++) {
+		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
+		for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize() && !accountFound; k++) {
+			if (mailAccount.compare(mailSuckerThreads[j].emailAccounts.atUnlocked(k).email()) == 0) {
+				//Retrieve quota value
+				std::stringstream input(mailAccountInfo["quota"]);
+				int newQuota;
+				input >> newQuota;
+				mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota = newQuota;
+				mailSuckerThreads[j].emailAccounts.atUnlocked(k).isEnabled = true;
+				accountFound = true;
+			}
+		}
+		mailSuckerThreads[j].emailAccounts.endCriticalSection();
+	}		
+}
+

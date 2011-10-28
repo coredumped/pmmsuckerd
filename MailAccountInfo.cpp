@@ -88,10 +88,10 @@ namespace pmm {
 	
 	void MailAccountInfo::updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 
 									 const std::vector<std::string> &devTokens__, bool useSSL__){
-		password_ = password__;
-		serverAddress_ = serverAddress__;
-		serverPort_ = serverPort__;
-		devTokens_ = devTokens__;
+		if(password__.size() > 0) password_ = password__;
+		if(serverAddress__.size() > 0) serverAddress_ = serverAddress__;
+		if(serverPort__ > 0) serverPort_ = serverPort__;
+		if(devTokens__.size() > 0) devTokens_ = devTokens__;
 		useSSL_ = useSSL__;
 	}
 

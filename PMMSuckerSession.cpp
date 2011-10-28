@@ -83,6 +83,7 @@ namespace pmm {
 		const char *quotaExceeded = "quotaExceeded";
 		const char *shutdown = "shutdown";
 		const char *accountPropertyChanged = "accountPropertyChanged";
+		const char *mailAccountQuotaChanged = "mailAccountQuotaChanged";
 	}
 	
 #ifdef __APPLE__

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "Mutex.h"
 
 namespace pmm {
 	class MailAccountInfo {
@@ -40,7 +41,7 @@ namespace pmm {
 		const std::vector<std::string> &devTokens() const;
 		bool useSSL();
 		bool useSSL() const;
-		bool isEnabled;
+		AtomicFlag isEnabled;
 		int quota;
 		
 		void updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 				

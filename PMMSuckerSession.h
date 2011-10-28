@@ -73,6 +73,7 @@ namespace pmm {
 		extern const char *quotaExceeded;
 		extern const char *shutdown;
 		extern const char *accountPropertyChanged;
+		extern const char *mailAccountQuotaChanged;
 	}
 }
 

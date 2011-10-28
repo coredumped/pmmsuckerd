@@ -20,10 +20,15 @@ namespace pmm {
 	
 	static void getMIMEData(struct mailmime_data * data, std::stringstream &outputStream)
 	{
-		switch (data->dt_type) {
-			case MAILMIME_DATA_TEXT:
-				outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
-				break;
+		if (data->dt_type == MAILMIME_DATA_TEXT) {
+			switch (data->dt_encoding) {
+				case MAILMIME_MECHANISM_BASE64:
+					//Decode base64 encoding
+					break;
+				default:
+					outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
+					break;
+			}
 		}
 	}
 

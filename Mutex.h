@@ -32,6 +32,13 @@ namespace pmm {
 		bool get();
 		void toggle();
 		
+		operator bool (){
+			bool v;
+			lock();
+			v = theFlag;
+			unlock();
+			return v;
+		}
 
 		
 		bool operator=(bool newValue);
@@ -41,6 +48,71 @@ namespace pmm {
 		bool operator!=(bool anotherValue);
 		bool operator!=(AtomicFlag &another);
 	};
+	
+	template <class T>
+	class AtomicVar : protected Mutex {
+	private:
+		T theValue;
+	protected:
+	public:
+		AtomicVar(){}
+		AtomicVar(T initialValue):T(initialValue){ }
+		void set(T newValue){
+			lock();
+			theValue = newValue;
+			unlock();
+		}
+		T get(){
+			T v;
+			lock();
+			v = theValue;
+			unlock();
+			return v;
+		}
+		operator T (){
+			T v;
+			lock();
+			v = theValue;
+			unlock();
+			return v;
+		}
+		T operator=(T newValue){
+			set(newValue);
+			return newValue;
+		}
+		bool operator==(T anotherValue){
+			bool ret = false;
+			lock();
+			if (theValue == anotherValue) ret = true;
+			unlock();
+			return ret;
+		}
+		bool operator==(AtomicVar<T> &another){
+			bool ret = false;
+			T anotherValue = another.get();
+			lock();
+			if (theValue == anotherValue) ret = true;
+			unlock();
+			return ret;			
+		}
+		
+		T operator!=(bool anotherValue){
+			bool ret = true;
+			lock();
+			if (theValue == anotherValue) ret = false;
+			unlock();
+			return ret;			
+		}
+		T operator!=(AtomicVar<T> &another){
+			bool ret = true;
+			T anotherValue = another.get();
+			lock();
+			if (theValue == anotherValue) ret = false;
+			unlock();
+			return ret;						
+		}
+	};
+
 }
 
 #endif
