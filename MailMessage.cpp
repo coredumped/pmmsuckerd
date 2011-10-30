@@ -158,6 +158,10 @@ namespace pmm {
 					tDate.tm_sec = origDate->dt_sec;
 					tDate.tm_gmtoff = origDate->dt_zone;
 					m.dateOfArrival = mktime(&tDate);
+#ifdef DEBUG
+					time_t _crTime = time(0);
+					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " currTstamp=" << _crTime << " diff=" << (m.dateOfArrival - _crTime) << pmm::NL;
+#endif
 					gotTime = true;
 					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
 				}

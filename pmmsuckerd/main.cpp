@@ -399,6 +399,7 @@ void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nEl
 				input >> newQuota;
 				mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota = newQuota;
 				mailSuckerThreads[j].emailAccounts.atUnlocked(k).isEnabled = true;
+				pmm::Log << "Increasing quota of " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << " to " << newQuota << pmm::NL;
 				accountFound = true;
 			}
 		}
