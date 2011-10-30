@@ -387,7 +387,7 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 }
 
 void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
-	std::string mailAccount = mailAccountInfo["emailAddress"];
+	std::string mailAccount = mailAccountInfo["email"];
 	bool accountFound = false;
 	for (size_t j = 0; j < nElems && !accountFound; j++) {
 		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
