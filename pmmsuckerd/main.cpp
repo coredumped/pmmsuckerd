@@ -401,6 +401,9 @@ void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nEl
 	for (size_t j = 0; j < nElems && !accountFound; j++) {
 		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
 		for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize() && !accountFound; k++) {
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Comparing " << mailAccount << " AND " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << pmm::NL;
+#endif
 			if (mailAccount.compare(mailSuckerThreads[j].emailAccounts.atUnlocked(k).email()) == 0) {
 				//Retrieve quota value
 				std::stringstream input(mailAccountInfo["quota"]);

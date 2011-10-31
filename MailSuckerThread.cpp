@@ -10,6 +10,7 @@
 #include <time.h>
 #include <map>
 #include "MailSuckerThread.h"
+#include "MTLogger.h"
 
 #ifndef DEFAULT_WAIT_TIME_BETWEEN_MAIL_CHECKS
 #define DEFAULT_WAIT_TIME_BETWEEN_MAIL_CHECKS 250000
@@ -71,6 +72,11 @@ namespace pmm {
 		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
 		if (quotaUpdateVector == NULL) throw GenericException("quotaUpdateQueue is still NULL, it must point to a valid notification queue.");
 		if (pmmStorageQueue == NULL) throw GenericException("Can't continue like this, the pmmStorageQueue is null!!!");
+#ifdef DEBUG
+		for (size_t i = 0; i < emailAccounts.size(); i++) {
+			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
+		}
+#endif
 		while (true) {
 			time_t currTime = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
