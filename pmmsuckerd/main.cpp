@@ -188,7 +188,13 @@ int main (int argc, const char * argv[])
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
 	//5. Dispatch polling threads for imap
-	for (size_t k = 0; k < imapAccounts.size(); k++) imapSuckingThreads[k % maxIMAPSuckerThreads].emailAccounts.push_back(imapAccounts[k]);
+	size_t asIdx = 0;
+	for (size_t k = 0; k < imapAccounts.size(); k++){
+		imapSuckingThreads[asIdx++].emailAccounts.push_back(imapAccounts[k]);
+		if (asIdx >= maxIMAPSuckerThreads) {
+			asIdx = 0;
+		}
+	}
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
