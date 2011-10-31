@@ -33,6 +33,7 @@ namespace pmm {
 		const std::string &soundName() const;
 		std::string &message();
 		std::string &deviceToken();
+		bool isSystemNotification;
 	};
 }
 

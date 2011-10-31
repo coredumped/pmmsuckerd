@@ -59,7 +59,7 @@ static void sigpipe_handle(int x){
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
-void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
+void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 
 int main (int argc, const char * argv[])
@@ -386,8 +386,11 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 	}	
 }
 
-void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
+void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue){
 	std::string mailAccount = mailAccountInfo["email"];
+#ifdef DEBUG
+	pmm::Log << "DEBUG: Geting ready to update quotas for account " << mailAccount << pmm::NL;
+#endif
 	bool accountFound = false;
 	for (size_t j = 0; j < nElems && !accountFound; j++) {
 		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
@@ -400,7 +403,17 @@ void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nEl
 				mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota = newQuota;
 				mailSuckerThreads[j].emailAccounts.atUnlocked(k).isEnabled = true;
 				pmm::Log << "Increasing quota of " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << " to " << newQuota << pmm::NL;
+				std::stringstream incNotif;
+				incNotif << "We have incremented your notification quota by " << newQuota << ".\nThanks for showing us some love!";
+				for (size_t npi = 0; npi < mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens().size(); npi++) {
+					NotificationPayload np(mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens()[npi], incNotif.str());
+					np.isSystemNotification = true;
+					notificationQueue->add(np);
+				}
 				accountFound = true;
+#ifdef DEBUG
+				pmm::Log << "Quota increase notification sent to: " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << pmm::NL;
+#endif
 			}
 		}
 		mailSuckerThreads[j].emailAccounts.endCriticalSection();

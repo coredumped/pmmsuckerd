@@ -48,6 +48,7 @@ namespace pmm {
 
 	NotificationPayload::NotificationPayload(){
 		_badgeNumber = 1;
+		isSystemNotification = false;
 	}
 	
 	NotificationPayload::NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber, const std::string &sndName){
@@ -55,6 +56,7 @@ namespace pmm {
 		_soundName = sndName;
 		devToken = devToken_;
 		_badgeNumber = badgeNumber;
+		isSystemNotification = false;
 		build();
 	}
 	
@@ -65,6 +67,7 @@ namespace pmm {
 		_badgeNumber = n._badgeNumber;
 		build();
 		origMailMessage = n.origMailMessage;
+		isSystemNotification = n.isSystemNotification;
 	}
 	
 	NotificationPayload::~NotificationPayload(){
