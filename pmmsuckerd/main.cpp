@@ -265,7 +265,7 @@ int main (int argc, const char * argv[])
 					else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
 						if (parameters["mailboxType"].compare("IMAP") == 0) {
 							//updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-							updateMailAccountQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							updateMailAccountQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters, &notificationQueue);
 						}
 						/*else {
 						 //Do the same for pop3
@@ -406,7 +406,7 @@ void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nEl
 				std::stringstream incNotif;
 				incNotif << "We have incremented your notification quota by " << newQuota << ".\nThanks for showing us some love!";
 				for (size_t npi = 0; npi < mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens().size(); npi++) {
-					NotificationPayload np(mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens()[npi], incNotif.str());
+					pmm::NotificationPayload np(mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens()[npi], incNotif.str());
 					np.isSystemNotification = true;
 					notificationQueue->add(np);
 				}
