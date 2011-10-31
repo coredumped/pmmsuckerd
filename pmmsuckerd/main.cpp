@@ -399,6 +399,9 @@ void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nEl
 #endif
 	bool accountFound = false;
 	for (size_t j = 0; j < nElems && !accountFound; j++) {
+#ifdef DEBUG
+		pmm::Log << "DEBUG: Checking sucker thread " << (int)j << pmm::NL;
+#endif
 		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
 		for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize() && !accountFound; k++) {
 #ifdef DEBUG
