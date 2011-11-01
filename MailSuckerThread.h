@@ -15,6 +15,7 @@
 #include "SharedQueue.h"
 #include "NotificationPayload.h"
 #include "MTLogger.h"
+#include "DataTypes.h"
 #include <string>
 #include <map>
 
@@ -51,6 +52,7 @@ namespace pmm {
 		SharedQueue<NotificationPayload> *notificationQueue;
 		SharedQueue<NotificationPayload> *pmmStorageQueue;
 		SharedVector<std::string> *quotaUpdateVector;
+		SharedQueue<QuotaIncreasePetition> *quotaIncreaseQueue;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();

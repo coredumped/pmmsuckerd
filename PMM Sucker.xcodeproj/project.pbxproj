@@ -21,6 +21,8 @@
 		82571EB2144363D20047347E /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
+		82805982145FB18200E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
+		82805983145FB1B400E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
 		8290FB96142F47D30080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
 		8290FB99142F508B0080BB85 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
 		8290FB9A142F51930080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
@@ -92,6 +94,8 @@
 		82571EAE1442B1730047347E /* FetchedMailsCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FetchedMailsCache.cpp; sourceTree = "<group>"; };
 		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
+		8280597F145FB0E600E7B614 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
+		82805981145FB18100E7B614 /* DataTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataTypes.cpp; sourceTree = "<group>"; };
 		8290FB93142F47770080BB85 /* MailAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailAccountInfo.h; sourceTree = "<group>"; };
 		8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MailAccountInfo.cpp; sourceTree = "<group>"; };
 		8290FB97142F502D0080BB85 /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mutex.h; sourceTree = "<group>"; };
@@ -310,6 +314,8 @@
 				82F857AA1448A825000B43B8 /* MailMessage.cpp */,
 				82F857BF144D4D02000B43B8 /* MessageUploaderThread.h */,
 				82F857C1144D4DA5000B43B8 /* MessageUploaderThread.cpp */,
+				8280597F145FB0E600E7B614 /* DataTypes.h */,
+				82805981145FB18100E7B614 /* DataTypes.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -418,6 +424,7 @@
 				821BBCE61445EB680023DF32 /* MTLogger.cpp in Sources */,
 				82F857AB1448A825000B43B8 /* MailMessage.cpp in Sources */,
 				82F857C2144D4DA5000B43B8 /* MessageUploaderThread.cpp in Sources */,
+				82805982145FB18200E7B614 /* DataTypes.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -425,6 +432,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82805983145FB1B400E7B614 /* DataTypes.cpp in Sources */,
 				82F857C3144D4DC1000B43B8 /* MessageUploaderThread.cpp in Sources */,
 				82F857AC1448A845000B43B8 /* MailMessage.cpp in Sources */,
 				821BBCE71445EB820023DF32 /* MTLogger.cpp in Sources */,

@@ -59,7 +59,7 @@ static void sigpipe_handle(int x){
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
-void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
+//void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 
 int main (int argc, const char * argv[])
@@ -75,6 +75,7 @@ int main (int argc, const char * argv[])
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	pmm::SharedVector<std::string> quotaUpdateVector;
 	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
+	pmm::SharedQueue<pmm::QuotaIncreasePetition> quotaIncreaseQueue;
 	SSL_library_init();
 	SSL_load_error_strings();
 	for (int i = 1; i < argc; i++) {
@@ -199,6 +200,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
 		imapSuckingThreads[i].pmmStorageQueue = &pmmStorageQueue;
+		imapSuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
 		sleep(1);
 	}
@@ -269,13 +271,20 @@ int main (int argc, const char * argv[])
 						}*/
 					}
 					else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
+						pmm::QuotaIncreasePetition p;
+						p.emailAddress = parameters["email"];
+						std::stringstream input(parameters["quota"]);
+						input >> p.quotaValue;
+						quotaIncreaseQueue.add(p);
+						/*
 						if (parameters["mailboxType"].compare("IMAP") == 0) {
-							//updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-							updateMailAccountQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters, &notificationQueue);
+							//updateMailAccountQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters, &notificationQueue);
+							
 						}
-						/*else {
+						 //else {
 						 //Do the same for pop3
-						 }*/
+						 //}
+						*/
 					}
 					///TODO: Apply quota increases in case the user has paid some
 				}
@@ -392,7 +401,7 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 	}	
 }
 
-void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue){
+/*void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue){
 	std::string mailAccount = mailAccountInfo["email"];
 #ifdef DEBUG
 	pmm::Log << "DEBUG: Geting ready to update quotas for account " << mailAccount << pmm::NL;
@@ -430,5 +439,5 @@ void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nEl
 		}
 		mailSuckerThreads[j].emailAccounts.endCriticalSection();
 	}		
-}
+}*/
 

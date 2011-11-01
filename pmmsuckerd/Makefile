@@ -20,12 +20,12 @@ all: pmmsuckerd
 pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o \
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
-		MTLogger.o MailMessage.o MessageUploaderThread.o
+		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
 				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
-				MessageUploaderThread.o $(LIBS)
+				MessageUploaderThread.o DataTypes.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -83,6 +83,9 @@ MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h
 
 IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h
 	$(GCC) $(CFLAGS) -c -o IMAPSuckerThread.o ../IMAPSuckerThread.cpp
+
+DataTypes.o: ../DataTypes.cpp ../DataTypes.h
+	$(GCC) $(CFLAGS) -c -o DataTypes.o ../DataTypes.cpp
 
 clean:
 	rm -f *.o pmmsuckerd

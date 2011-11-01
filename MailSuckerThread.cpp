@@ -62,6 +62,7 @@ namespace pmm {
 		notificationQueue = NULL;
 		maxServerReconnects = DEFAULT_MAX_SERVER_CONNECT_FAILURES;
 		quotaUpdateVector = NULL;
+		quotaIncreaseQueue = NULL;
 	}
 	
 	MailSuckerThread::~MailSuckerThread(){
@@ -72,6 +73,7 @@ namespace pmm {
 		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
 		if (quotaUpdateVector == NULL) throw GenericException("quotaUpdateQueue is still NULL, it must point to a valid notification queue.");
 		if (pmmStorageQueue == NULL) throw GenericException("Can't continue like this, the pmmStorageQueue is null!!!");
+		if (quotaIncreaseQueue == NULL) throw GenericException("Can't continue like this, the quotaIncreaseQueue is null!!!");
 #ifdef DEBUG
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
@@ -80,6 +82,24 @@ namespace pmm {
 		while (true) {
 			time_t currTime = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				QuotaIncreasePetition p;
+				if(quotaIncreaseQueue->extractEntry(p)){
+					//Verify if we should upgrade quotas on an account
+					if (emailAccounts[i].email().compare(p.emailAddress) == 0) {
+						emailAccounts.beginCriticalSection();
+						emailAccounts.atUnlocked(i).quota = p.quotaValue;
+						emailAccounts.atUnlocked(i).isEnabled = true;
+						std::stringstream incNotif;
+						incNotif << "We have incremented your notification quota by " << p.quotaValue << ".\nThanks for showing us some love!";
+						for (size_t npi = 0; npi < emailAccounts.atUnlocked(i).devTokens().size(); npi++) {
+							NotificationPayload np(emailAccounts.atUnlocked(i).devTokens()[npi], incNotif.str());
+							np.isSystemNotification = true;
+							notificationQueue->add(np);
+						}
+						emailAccounts.endCriticalSection();
+					}
+					else quotaIncreaseQueue->add(p);
+				}
 				if (emailAccounts[i].isEnabled == true) {
 					if (emailAccounts[i].quota <= 0) {
 						emailAccounts[i].isEnabled = false;
