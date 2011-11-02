@@ -471,7 +471,10 @@ namespace pmm {
 				}
 				else {
 					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << ", re-connecting..." << pmm::NL;
-					mailimap_close(imap);
+					if (imap->imap_stream) {
+						mailstream_close(imap->imap_stream);
+						imap->imap_stream = NULL;
+					}
 					mailimap_free(imap);
 					imapControl[m.email()].imap = NULL;
 					imapControl[m.email()].failedLoginAttemptsCount = 0;

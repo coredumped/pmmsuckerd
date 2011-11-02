@@ -74,6 +74,7 @@ namespace pmm {
 		extern const char *shutdown;
 		extern const char *accountPropertyChanged;
 		extern const char *mailAccountQuotaChanged;
+		extern const char *newMailAccountRegistered;
 	}
 }
 
