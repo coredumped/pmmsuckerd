@@ -33,9 +33,17 @@
 #ifndef DEFAULT_MAX_CONNECTION_INTERVAL
 #define DEFAULT_MAX_CONNECTION_INTERVAL 7200
 #endif
+#ifdef __linux__
+#include<signal.h>
+#endif
 
 namespace pmm {
 	MTLogger APNSLog;
+
+	static void apns_sigpipe_handle(int x){ 
+		pmm::APNSLog << "Just got a SIGPIPE :-(" << pmm::NL;
+	}
+
 
 	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength)
 	{
@@ -258,6 +266,9 @@ namespace pmm {
 		size_t i = 0;  
 #endif
 		pmm::Log << "Starting APNSNotificationThread..." << pmm::NL;
+#ifdef __linux__
+		signal(SIGPIPE, sigpipe_handle);
+#endif
 		initSSL();
 		connect2APNS();
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
