@@ -51,8 +51,8 @@ namespace pmm {
 		if (sslPtr && deviceTokenBinary && payloadBuff && payloadLength)
 		{
 			uint8_t command = 1; /* command number */
-			char binaryMessageBuff[sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) +
-								   DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE];
+			char *binaryMessageBuff = new char[sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) +
+											   DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE];
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
 			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = 1234;
@@ -91,8 +91,10 @@ namespace pmm {
 			APNSLog << "DEBUG: Sending " << (int)(binaryMessagePt - binaryMessageBuff) << " bytes payload..." << pmm::NL;
 #endif
 			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
+				delete [] binaryMessageBuff;
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
 			}
+			delete [] binaryMessageBuff;
 			if (SSL_pending(sslPtr) > 0) {
 				char apnsRetCode[6] = {0, 0, 0, 0, 0, 0};
 				do{
@@ -267,7 +269,7 @@ namespace pmm {
 #endif
 		pmm::Log << "Starting APNSNotificationThread..." << pmm::NL;
 #ifdef __linux__
-		signal(SIGPIPE, sigpipe_handle);
+		signal(SIGPIPE, apns_sigpipe_handle);
 #endif
 		initSSL();
 		connect2APNS();

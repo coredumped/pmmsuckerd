@@ -87,6 +87,7 @@ namespace pmm {
 #endif
 		m.from = "";
 		m.subject = "";
+		m.dateOfArrival = time(0);
 		bool gotTime = false;
 		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
 			struct mailimf_field *field = (struct mailimf_field *)clist_content(iter);
@@ -148,9 +149,9 @@ namespace pmm {
 				case MAILIMF_FIELD_ORIG_DATE:
 				{
 					struct mailimf_date_time *origDate = field->fld_data.fld_orig_date->dt_date_time;
-					struct tm tDate;
+					struct tm tDate = { 0 };
 					memset(&tDate, 0, sizeof(tm));
-					tDate.tm_year = origDate->dt_year;
+					tDate.tm_year = origDate->dt_year - 1900;
 					tDate.tm_mon = origDate->dt_month;
 					tDate.tm_mday = origDate->dt_day;
 					tDate.tm_hour = origDate->dt_hour;
