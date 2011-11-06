@@ -51,8 +51,8 @@ namespace pmm {
 		if (sslPtr && deviceTokenBinary && payloadBuff && payloadLength)
 		{
 			uint8_t command = 1; /* command number */
-			char *binaryMessageBuff = new char[sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) +
-											   DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE];
+			size_t bufSize = sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) + DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE + payloadLength;
+			char *binaryMessageBuff = new char[bufSize];
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
 			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = 1234;
