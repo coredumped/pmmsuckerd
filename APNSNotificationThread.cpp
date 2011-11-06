@@ -51,7 +51,7 @@ namespace pmm {
 		if (sslPtr && deviceTokenBinary && payloadBuff && payloadLength)
 		{
 			uint8_t command = 1; /* command number */
-			size_t bufSize = sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) + DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE + payloadLength;
+			size_t bufSize = sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) + DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE;
 			char *binaryMessageBuff = new char[bufSize];
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
@@ -269,7 +269,7 @@ namespace pmm {
 #endif
 		pmm::Log << "Starting APNSNotificationThread..." << pmm::NL;
 #ifdef __linux__
-		signal(SIGPIPE, apns_sigpipe_handle);
+		//signal(SIGPIPE, apns_sigpipe_handle);
 #endif
 		initSSL();
 		connect2APNS();
