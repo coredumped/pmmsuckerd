@@ -152,7 +152,7 @@ namespace pmm {
 					struct tm tDate = { 0 };
 					memset(&tDate, 0, sizeof(tm));
 					tDate.tm_year = origDate->dt_year - 1900;
-					tDate.tm_mon = origDate->dt_month;
+					tDate.tm_mon = origDate->dt_month - 1;
 					tDate.tm_mday = origDate->dt_day;
 					tDate.tm_hour = origDate->dt_hour;
 					tDate.tm_min = origDate->dt_min;
