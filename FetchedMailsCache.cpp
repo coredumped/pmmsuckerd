@@ -75,7 +75,9 @@ namespace pmm {
 		sqlite3 *conn = openDatabase();
 		char *errmsg_s;
 		std::stringstream sqlCmd;
-		sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL) << ",'" << email << "'," << "'" << uid << "')";
+		sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL);
+		sqlCmd << ",'" << email << "',";
+		sqlCmd << "'" << uid << "' )";
 		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 		if (errCode != SQLITE_OK) {
 			if (errCode == SQLITE_CONSTRAINT) {
@@ -132,7 +134,7 @@ namespace pmm {
 	
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		std::stringstream input;
-		input << uid;
+		input << (int)uid;
 		return entryExists(email, input.str());
 	}
 	
