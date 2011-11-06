@@ -97,15 +97,14 @@ namespace pmm {
 		}
 		closeDatabase(conn);
 	}
-	
-	bool FetchedMailsCache::entryExists(const std::string &email, const std::string &uid){
+	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		bool ret = false;
 		sqlite3 *conn = openDatabase();
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
 		std::stringstream errmsg;
 		char *sztail;
-		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid='" << uid << "'";		
+		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid='" << (int)uid << "'";		
 		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 		if (errCode != SQLITE_OK) {
 			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
@@ -132,11 +131,11 @@ namespace pmm {
 		return ret;
 	}
 	
-	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
-		std::stringstream input;
-		input << (int)uid;
-		std::string uid_s = input.str();
-		return entryExists(email, uid_s);
+	bool FetchedMailsCache::entryExists(const std::string &email, const std::string &uid){
+		std::stringstream input(uid);
+		int uid_v;
+		input >> uid_v ;
+		return entryExists(email, uid_v);
 	}
 	
 	void FetchedMailsCache::expireOldEntries(){
