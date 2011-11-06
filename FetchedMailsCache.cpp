@@ -135,7 +135,8 @@ namespace pmm {
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		std::stringstream input;
 		input << (int)uid;
-		return entryExists(email, input.str());
+		std::string uid_s = input.str();
+		return entryExists(email, uid_s);
 	}
 	
 	void FetchedMailsCache::expireOldEntries(){
