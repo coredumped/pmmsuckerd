@@ -174,9 +174,6 @@ namespace pmm {
 		if (m.subject.size() == 0) {
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
-#ifdef DEBUG
-		pmm:Log << "Message Body: " << msgBody.str() << pmm::NL;
-#endif
 			std::string theBody = msgBody.str();
 			if(theBody.size() > 0 && theBody.size() < 256){
 				m.subject.assign(theBody.c_str(), theBody.size());

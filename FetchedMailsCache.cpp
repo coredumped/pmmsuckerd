@@ -102,11 +102,12 @@ namespace pmm {
 		sqlite3 *conn = openDatabase();
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
-		std::stringstream errmsg;
+
 		char *sztail;
 		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid='" << (int)uid << "'";		
 		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 		if (errCode != SQLITE_OK) {
+			std::stringstream errmsg;
 			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
 #ifdef DEBUG
@@ -120,6 +121,7 @@ namespace pmm {
 			}
 		}
 		if(errCode != SQLITE_DONE){
+			std::stringstream errmsg;
 			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
 #ifdef DEBUG
