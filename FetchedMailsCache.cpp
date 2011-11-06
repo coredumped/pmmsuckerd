@@ -120,10 +120,11 @@ namespace pmm {
 			}
 		}
 		if(errCode != SQLITE_DONE){
-			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd << " due to: " << sqlite3_errmsg(conn);
+			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
 			closeDatabase(conn);
 #ifdef DEBUG
 			CacheLog << errmsg.str() << pmm::NL;
+			pmm::Log << errmsg.str() << pmm::NL;
 #endif
 			throw GenericException(errmsg.str());			
 		}
