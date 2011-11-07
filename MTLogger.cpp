@@ -22,6 +22,9 @@ namespace pmm {
 	std::string NL(_nlBuf, 3);
 	
 	void MTLogger::initLogline(){
+		if (streamMap.find(pthread_self()) == streamMap.end()){
+			streamMap[pthread_self()] = "";
+		}
 		if (streamMap[pthread_self()].size() == 0) {
 			if (!outputStream.is_open()) {
 				logPath = "mtlogger.log";
