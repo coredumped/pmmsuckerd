@@ -26,19 +26,18 @@ namespace pmm {
 		return NULL;
 	}
 	
-	void ThreadDispatcher::start(GenericThread &gt){
+	void ThreadDispatcher::start(GenericThread &gt, size_t stackSize){
 		pthread_t theThread;
 		pthread_attr_t attr;
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-/*#ifdef __APPLE__
-		size_t stackSize;
-		pthread_attr_getstacksize(&attr, &stackSize);
-		mout.lock();
-		std::cerr << "Creating thread " << (long)&theThread << " with " << stackSize << " stack size" << std::endl;
-		mout.unlock();
-		pthread_attr_setstacksize(&attr, 1024 * 2048);
-#endif*/
+		if(stackSize > 1024){
+			//pthread_attr_getstacksize(&attr, &stackSize);
+			/*mout.lock();
+			 std::cerr << "Creating thread " << (long)&theThread << " with " << stackSize << " stack size" << std::endl;
+			 mout.unlock();*/
+			pthread_attr_setstacksize(&attr, stackSize);
+		}
 		int retval = pthread_create(&theThread, &attr, (void * (*)(void *))runThreadInBackground, (void *)&gt);
 		if (retval == EAGAIN) {
 			throw ThreadExecutionException("There are not enough resources to start a new thread");

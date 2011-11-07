@@ -17,7 +17,7 @@ namespace pmm {
 	protected:
 	public:
 		/** Starts a background execution of a GenericThread object */
-		static void start(GenericThread &gt);
+		static void start(GenericThread &gt, size_t stackSize = 0);
 	};
 	
 	class ThreadExecutionException {

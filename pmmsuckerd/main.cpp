@@ -45,6 +45,9 @@
 #ifndef DEFAULT_LOGFILE
 #define DEFAULT_LOGFILE "pmmsuckerd.log"
 #endif
+#ifndef DEFAULT_THREAD_STACK_SIZE
+#define DEFAULT_THREAD_STACK_SIZE 8388608
+#endif
 
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
@@ -70,6 +73,7 @@ int main (int argc, const char * argv[])
 	size_t maxIMAPSuckerThreads = DEFAULT_MAX_IMAP_POLLING_THREADS;
 	size_t maxPOP3SuckerThreads = DEFAULT_MAX_POP3_POLLING_THREADS;
 	size_t maxMessageUploaderThreads = DEFAULT_MAX_MESSAGE_UPLOADER_THREADS;
+	size_t threadStackSize = DEFAULT_THREAD_STACK_SIZE;
 	std::string sslCertificatePath = DEFAULT_SSL_CERTIFICATE_PATH;
 	std::string sslPrivateKeyPath = DEFAULT_SS_PRIVATE_KEY_PATH;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
@@ -178,13 +182,13 @@ int main (int argc, const char * argv[])
 		notifThreads[i].notificationQueue = &notificationQueue;
 		notifThreads[i].setCertPath(sslCertificatePath);
 		notifThreads[i].setKeyPath(sslPrivateKeyPath);
-		pmm::ThreadDispatcher::start(notifThreads[i]);
+		pmm::ThreadDispatcher::start(notifThreads[i], threadStackSize);
 		sleep(1);
 	}
 	for (size_t i = 0; i < maxMessageUploaderThreads; i++) {
 		msgUploaderThreads[i].session = &session;
 		msgUploaderThreads[i].pmmStorageQueue = &pmmStorageQueue;
-		pmm::ThreadDispatcher::start(msgUploaderThreads[i]);
+		pmm::ThreadDispatcher::start(msgUploaderThreads[i], threadStackSize);
 	}
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
@@ -201,7 +205,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
 		imapSuckingThreads[i].pmmStorageQueue = &pmmStorageQueue;
 		imapSuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
-		pmm::ThreadDispatcher::start(imapSuckingThreads[i]);
+		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
 	//signal(SIGABRT, emergencyUnregister);
