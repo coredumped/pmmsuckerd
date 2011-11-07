@@ -52,7 +52,7 @@ namespace pmm {
 		{
 			uint8_t command = 1; /* command number */
 			size_t bufSize = sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) + DEVICE_BINARY_SIZE + sizeof(uint16_t) + MAXPAYLOAD_SIZE;
-			char *binaryMessageBuff = new char(bufSize);
+			char binaryMessageBuff[bufSize];
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
 			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = 1234;
@@ -91,10 +91,10 @@ namespace pmm {
 			APNSLog << "DEBUG: Sending " << (int)(binaryMessagePt - binaryMessageBuff) << " bytes payload..." << pmm::NL;
 #endif
 			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
-				delete binaryMessageBuff;
+				//delete binaryMessageBuff;
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
 			}
-			delete binaryMessageBuff;
+			//delete binaryMessageBuff;
 			if (SSL_pending(sslPtr) > 0) {
 				char apnsRetCode[6] = {0, 0, 0, 0, 0, 0};
 				do{
