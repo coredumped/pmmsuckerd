@@ -172,6 +172,10 @@ namespace pmm {
 			}
 		}
 		if (m.subject.size() == 0) {
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Computing subject from: " << pmm::NL;
+			pmm::Log << rawMessage << pmm::NL;
+#endif
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
 			std::string theBody = msgBody.str();
