@@ -197,6 +197,12 @@ namespace pmm {
 			while (m.subject[0] == '\r' || m.subject[0] == '\n') {
 				m.subject = m.subject.substr(1);
 			}
+			if (m.subject.size() > 0) {
+				size_t thePos;
+				if ((thePos = m.subject.find("\r\n")) != m.subject.npos) {
+					m.subject = m.subject.substr(0, thePos);
+				}
+			}
 		}
 #ifdef USE_IMF
 		mailimf_message_free(result);

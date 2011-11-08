@@ -82,8 +82,8 @@ namespace pmm {
 		jsonbuilder << "\"aps\":";
 		jsonbuilder << "{";
 		jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
-		jsonbuilder << "\"sound\":\"" << _soundName << "\",";
-		if(_badgeNumber > 0) jsonbuilder << "\"badge\":" << _badgeNumber << ",";
+		jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+		if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 		jsonbuilder << "}";
 		jsonbuilder << "}";
 		if (jsonbuilder.str().size() > MAXPAYLOAD_SIZE) {
@@ -91,19 +91,18 @@ namespace pmm {
 			jsonbuilder << "{";
 			jsonbuilder << "\"aps\":";
 			jsonbuilder << "{";
-			jsonbuilder << "\"sound\":\"" << _soundName << "\",";
-			if(_badgeNumber > 0) jsonbuilder << "\"badge\":" << _badgeNumber << ",";
+			jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 			jsonbuilder << "}";
 			jsonbuilder << "}";
-			
 			size_t maxMsgLength = jsonbuilder.str().size() - 3;
 			jsonbuilder.str(std::string());
 			jsonbuilder << "{";
 			jsonbuilder << "\"aps\":";
 			jsonbuilder << "{";
 			jsonbuilder << "\"alert\":\"" << encodedMsg.substr(0, maxMsgLength) << "...\",";
-			jsonbuilder << "\"sound\":\"" << _soundName << "\",";
-			if(_badgeNumber > 0) jsonbuilder << "\"badge\":" << _badgeNumber << ",";
+			jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 			jsonbuilder << "}";
 			jsonbuilder << "}";			
 		}
