@@ -23,7 +23,16 @@ namespace pmm {
 		if (data->dt_type == MAILMIME_DATA_TEXT) {
 			switch (data->dt_encoding) {
 				case MAILMIME_MECHANISM_BASE64:
+				{
 					//Decode base64 encoding
+					char *decodedMsg;
+					size_t decodedSize, indx = 0;
+					int r = mailmime_base64_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize);
+					if (r == MAILIMF_NO_ERROR) {
+						outputStream.write(decodedMsg, decodedSize);
+						mailmime_decoded_part_free(decodedMsg);
+					}
+				}
 					break;
 				default:
 					outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
