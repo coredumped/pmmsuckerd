@@ -11,6 +11,7 @@
 #include <map>
 #include "MailSuckerThread.h"
 #include "MTLogger.h"
+#include "libetpan/libetpan.h"
 
 #ifndef DEFAULT_WAIT_TIME_BETWEEN_MAIL_CHECKS
 #define DEFAULT_WAIT_TIME_BETWEEN_MAIL_CHECKS 250000
@@ -31,6 +32,18 @@
 namespace pmm {
 	
 	const int minimumMailCheckInterval = DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL;
+	
+	bool etpanOperationFailed(int r)
+	{
+		if (r == MAILIMAP_NO_ERROR)
+			return false;
+		if (r == MAILIMAP_NO_ERROR_AUTHENTICATED)
+			return false;
+		if (r == MAILIMAP_NO_ERROR_NON_AUTHENTICATED)
+			return false;
+		return true;
+	}
+
 	
 	MailboxControl::MailboxControl(){
 		openedOn = time(0);

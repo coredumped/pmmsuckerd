@@ -65,6 +65,8 @@
 		82F86B5B1425A810006ACFEB /* pmmsuckerd.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82F86B5A1425A810006ACFEB /* pmmsuckerd.1 */; };
 		82F86B601425B0AD006ACFEB /* README in Resources */ = {isa = PBXBuildFile; fileRef = 82F86B5F1425B0AD006ACFEB /* README */; };
 		82F86B641425B618006ACFEB /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
+		82FA4DB21469C7B300A21B11 /* POP3SuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */; };
+		82FA4DB31469C80B00A21B11 /* POP3SuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -151,6 +153,8 @@
 		82F86B5F1425B0AD006ACFEB /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		82F86B621425B54B006ACFEB /* PMMSuckerSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMMSuckerSession.h; sourceTree = "<group>"; };
 		82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMMSuckerSession.cpp; sourceTree = "<group>"; };
+		82FA4DAF1469C4D800A21B11 /* POP3SuckerThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POP3SuckerThread.h; sourceTree = "<group>"; };
+		82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = POP3SuckerThread.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -316,6 +320,8 @@
 				82F857C1144D4DA5000B43B8 /* MessageUploaderThread.cpp */,
 				8280597F145FB0E600E7B614 /* DataTypes.h */,
 				82805981145FB18100E7B614 /* DataTypes.cpp */,
+				82FA4DAF1469C4D800A21B11 /* POP3SuckerThread.h */,
+				82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -425,6 +431,7 @@
 				82F857AB1448A825000B43B8 /* MailMessage.cpp in Sources */,
 				82F857C2144D4DA5000B43B8 /* MessageUploaderThread.cpp in Sources */,
 				82805982145FB18200E7B614 /* DataTypes.cpp in Sources */,
+				82FA4DB21469C7B300A21B11 /* POP3SuckerThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +439,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82FA4DB31469C80B00A21B11 /* POP3SuckerThread.cpp in Sources */,
 				82805983145FB1B400E7B614 /* DataTypes.cpp in Sources */,
 				82F857C3144D4DC1000B43B8 /* MessageUploaderThread.cpp in Sources */,
 				82F857AC1448A845000B43B8 /* MailMessage.cpp in Sources */,

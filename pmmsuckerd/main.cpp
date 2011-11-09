@@ -18,6 +18,7 @@
 #include "SharedQueue.h"
 #include "NotificationPayload.h"
 #include "IMAPSuckerThread.h"
+#include "POP3SuckerThread.h"
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
 #include "MessageUploaderThread.h"
@@ -48,6 +49,9 @@
 #ifndef DEFAULT_THREAD_STACK_SIZE
 #define DEFAULT_THREAD_STACK_SIZE 8388608
 #endif
+#ifndef DEFAULT_COMMAND_POLLING_INTERVAL
+#define DEFAULT_COMMAND_POLLING_INTERVAL 60
+#endif
 
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
@@ -76,6 +80,7 @@ int main (int argc, const char * argv[])
 	size_t threadStackSize = DEFAULT_THREAD_STACK_SIZE;
 	std::string sslCertificatePath = DEFAULT_SSL_CERTIFICATE_PATH;
 	std::string sslPrivateKeyPath = DEFAULT_SS_PRIVATE_KEY_PATH;
+	int commandPollingInterval = DEFAULT_COMMAND_POLLING_INTERVAL;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	pmm::SharedVector<std::string> quotaUpdateVector;
 	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
@@ -126,6 +131,10 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--log") == 0 && (i + 1) < argc){
 			logFilePath = argv[++i];
 		}
+		else if(arg.compare("--command-polling-interval") == 0 && (i + 1) < argc){
+			std::stringstream input(argv[++i]);
+			input >> commandPollingInterval;			
+		}
 	}
 	pmm::Log.open(logFilePath);
 	pmm::CacheLog.open("mailcache.log");
@@ -134,6 +143,8 @@ int main (int argc, const char * argv[])
 	pmm::APNSLog.setTag("APNSNotificationThread");
 	pmm::imapLog.open("imap-fetch.log");
 	pmm::imapLog.setTag("IMAPSuckerThread");
+	pmm::pop3Log.open("pop3-fetch.log");
+	pmm::pop3Log.setTag("POP3SuckerThread");
 	pmm::SuckerSession session(pmmServiceURL);
 #ifdef __linux__
 	signal(SIGPIPE, sigpipe_handle);
@@ -176,6 +187,7 @@ int main (int argc, const char * argv[])
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
+	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
 		//2. Start thread
@@ -208,15 +220,21 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
-	//signal(SIGABRT, emergencyUnregister);
 	//6. Dispatch polling threads for POP3
-	for (size_t i = 0; i < maxPOP3SuckerThreads && pop3Accounts.size() > 0; i++) {
-		for (size_t k = 0; k < emailAccounts.size(); k++) {
-			if (k % (2 + i) == 0) {
-				//pop3SuckingThreads[i].emailAccounts.push_back(emailAccounts[k]);
-			}
+	asIdx = 0;
+	for (size_t k = 0; k < pop3Accounts.size(); k++) {
+		pop3SuckingThreads[asIdx++].emailAccounts.push_back(pop3Accounts[k]);
+		if (asIdx >= maxPOP3SuckerThreads) {
+			asIdx = 0;
 		}
-		//pmm::ThreadDispatcher::start(pop3SuckingThreads[i]);
+	}
+	for (size_t i = 0; i < maxPOP3SuckerThreads; i++) {
+		pop3SuckingThreads[i].notificationQueue = &notificationQueue;
+		pop3SuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
+		pop3SuckingThreads[i].pmmStorageQueue = &pmmStorageQueue;
+		pop3SuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
+		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
+		sleep(1);
 	}
 	//7. After registration time ends, close every connection, return to Step 1
 	int tic = 1;
@@ -249,7 +267,7 @@ int main (int argc, const char * argv[])
 				//In case we failed to report any quotas the service will re-report them again
 			}
 		}
-		if(tic % 30 == 0){
+		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
 				std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
 				int nTasks = session.getPendingTasks(tasksToRun);
@@ -270,9 +288,9 @@ int main (int argc, const char * argv[])
 						if (parameters["mailboxType"].compare("IMAP") == 0) {
 							updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
 						}
-						/*else {
-							//Do the same for pop3
-						}*/
+						else {
+							updateAccountProperties(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+						}
 					}
 					else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
 						pmm::QuotaIncreasePetition p;
@@ -280,17 +298,7 @@ int main (int argc, const char * argv[])
 						std::stringstream input(parameters["quota"]);
 						input >> p.quotaValue;
 						quotaIncreaseQueue.add(p);
-						/*
-						if (parameters["mailboxType"].compare("IMAP") == 0) {
-							//updateMailAccountQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters, &notificationQueue);
-							
-						}
-						 //else {
-						 //Do the same for pop3
-						 //}
-						*/
 					}
-					///TODO: Apply quota increases in case the user has paid some
 				}
 			}
 			catch(pmm::HTTPException &htex1){
@@ -404,44 +412,4 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 		mailSuckerThreads[j].emailAccounts.endCriticalSection();
 	}	
 }
-
-/*void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue){
-	std::string mailAccount = mailAccountInfo["email"];
-#ifdef DEBUG
-	pmm::Log << "DEBUG: Geting ready to update quotas for account " << mailAccount << pmm::NL;
-#endif
-	bool accountFound = false;
-	for (size_t j = 0; j < nElems && !accountFound; j++) {
-#ifdef DEBUG
-		pmm::Log << "DEBUG: Checking sucker thread " << (int)j << pmm::NL;
-#endif
-		mailSuckerThreads[j].emailAccounts.beginCriticalSection();
-		for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize() && !accountFound; k++) {
-#ifdef DEBUG
-			pmm::Log << "DEBUG: Comparing " << mailAccount << " AND " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << pmm::NL;
-#endif
-			if (mailAccount.compare(mailSuckerThreads[j].emailAccounts.atUnlocked(k).email()) == 0) {
-				//Retrieve quota value
-				std::stringstream input(mailAccountInfo["quota"]);
-				int newQuota;
-				input >> newQuota;
-				mailSuckerThreads[j].emailAccounts.atUnlocked(k).quota = newQuota;
-				mailSuckerThreads[j].emailAccounts.atUnlocked(k).isEnabled = true;
-				pmm::Log << "Increasing quota of " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << " to " << newQuota << pmm::NL;
-				std::stringstream incNotif;
-				incNotif << "We have incremented your notification quota by " << newQuota << ".\nThanks for showing us some love!";
-				for (size_t npi = 0; npi < mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens().size(); npi++) {
-					pmm::NotificationPayload np(mailSuckerThreads[j].emailAccounts.atUnlocked(k).devTokens()[npi], incNotif.str());
-					np.isSystemNotification = true;
-					notificationQueue->add(np);
-				}
-				accountFound = true;
-#ifdef DEBUG
-				pmm::Log << "Quota increase notification sent to: " << mailSuckerThreads[j].emailAccounts.atUnlocked(k).email() << pmm::NL;
-#endif
-			}
-		}
-		mailSuckerThreads[j].emailAccounts.endCriticalSection();
-	}		
-}*/
 

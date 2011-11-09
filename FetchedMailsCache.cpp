@@ -141,6 +141,52 @@ namespace pmm {
 		return entryExists(email, uid_v);
 	}
 	
+	bool FetchedMailsCache::hasAllThesePOP3Entries(const std::string &email, carray *msgList){
+		bool ret = false;
+		sqlite3 *conn = openDatabase();
+		std::stringstream sqlCmd;
+		sqlite3_stmt *statement;
+		char *sztail;
+		int msgCount = carray_count(msgList);
+		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid IN (";
+		for (int i = 0; i < msgCount; i++) {
+			struct mailpop3_msg_info *msg_info = (struct mailpop3_msg_info *)carray_get(msgList, i);
+			if(i == 0) sqlCmd << "'" << msg_info->msg_uidl << "'";
+			else sqlCmd << ", '" << msg_info->msg_uidl << "'";
+		}
+		sqlCmd << ")";
+		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
+		if (errCode != SQLITE_OK) {
+			std::stringstream errmsg;
+			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());
+		}
+		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
+			if (sqlite3_column_int(statement, 0) == msgCount) {
+				ret = true;
+			}
+			else {
+				//Determine if there are any new entries
+			}
+		}
+		if(errCode != SQLITE_DONE){
+			std::stringstream errmsg;
+			errmsg << "Unable to verify if a list of entries exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+			pmm::Log << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());			
+		}
+		closeDatabase(conn);
+		return ret;		
+	}
+	
 	void FetchedMailsCache::expireOldEntries(){
 #warning TODO: Implement a way to expire old e-mail entries plus a trigger to activate it
 	}

@@ -20,12 +20,12 @@ all: pmmsuckerd
 pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o \
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
-		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o
+		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
 				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
-				MessageUploaderThread.o DataTypes.o $(LIBS)
+				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -54,7 +54,7 @@ GenericException.o: ../GenericException.cpp ../GenericException.h
 APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h
 	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
 
-ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h
+ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h ../GenericThread.h
 	$(GCC) $(CFLAGS) -c -o ThreadDispatcher.o ../ThreadDispatcher.cpp
 
 SharedQueue.o: ../SharedQueue.cpp ../SharedQueue.h
@@ -63,7 +63,7 @@ SharedQueue.o: ../SharedQueue.cpp ../SharedQueue.h
 MTLogger.o: ../MTLogger.cpp ../MTLogger.h
 	$(GCC) $(CFLAGS) -c -o MTLogger.o ../MTLogger.cpp
 
-MessageUploaderThread.o: ../MessageUploaderThread.cpp ../MessageUploaderThread.h
+MessageUploaderThread.o: ../MessageUploaderThread.cpp ../MessageUploaderThread.h ../MailMessage.h
 	$(GCC) $(CFLAGS) -c -o MessageUploaderThread.o ../MessageUploaderThread.cpp
 
 MailMessage.o: ../MailMessage.cpp ../MailMessage.h
@@ -78,11 +78,14 @@ UtilityFunctions.o: ../UtilityFunctions.cpp ../UtilityFunctions.h
 FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h
 	$(GCC) $(CFLAGS) -c -o FetchedMailsCache.o ../FetchedMailsCache.cpp
 
-MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h
+MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h
 	$(GCC) $(CFLAGS) -c -o MailSuckerThread.o ../MailSuckerThread.cpp
 
-IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h
+IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h
 	$(GCC) $(CFLAGS) -c -o IMAPSuckerThread.o ../IMAPSuckerThread.cpp
+
+POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h
+	$(GCC) $(CFLAGS) -c -o POP3SuckerThread.o ../POP3SuckerThread.cpp
 
 DataTypes.o: ../DataTypes.cpp ../DataTypes.h
 	$(GCC) $(CFLAGS) -c -o DataTypes.o ../DataTypes.cpp

@@ -11,6 +11,7 @@
 #include "GenericException.h"
 #include "Mutex.h"
 #include "MTLogger.h"
+#include "libetpan/libetpan.h"
 #include <sqlite3.h>
 #include <string>
 #include <vector>
@@ -36,6 +37,8 @@ namespace pmm {
 		
 		bool entryExists(const std::string &email, const std::string &uid);
 		bool entryExists(const std::string &email, uint32_t uid);
+		
+		bool hasAllThesePOP3Entries(const std::string &email, carray *msgList);
 		
 		void expireOldEntries();
 		void removeMultipleEntries(const std::string &email, const std::vector<uint32_t> &uidList);

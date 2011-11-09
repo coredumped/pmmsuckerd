@@ -59,6 +59,8 @@ namespace pmm {
 		
 		virtual void operator()();
 	};
+	
+	bool etpanOperationFailed(int r);
 }
 
 

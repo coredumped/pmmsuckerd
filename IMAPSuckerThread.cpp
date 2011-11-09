@@ -36,17 +36,6 @@ namespace pmm {
 	MTLogger imapLog;
 	FetchedMailsCache fetchedMails;
 	
-	static bool etpanOperationFailed(int r)
-	{
-		if (r == MAILIMAP_NO_ERROR)
-			return false;
-		if (r == MAILIMAP_NO_ERROR_AUTHENTICATED)
-			return false;
-		if (r == MAILIMAP_NO_ERROR_NON_AUTHENTICATED)
-			return false;
-		return true;
-	}
-	
 	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size, MailMessage &tm)
 	{
 		clistiter * cur;
@@ -397,7 +386,7 @@ namespace pmm {
 					//Max reconnect exceeded, notify user
 					std::stringstream errmsg;
 #warning TODO: Find a better way to notify the user that we are unable to login into their mail account
-					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
+					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
 					for (size_t i = 0; m.devTokens().size(); i++) {
 						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
 						notificationQueue->add(msg);
@@ -432,7 +421,7 @@ namespace pmm {
 				imapControl[m.email()].startedOn = time(NULL);
 				//sleep(1);
 #ifdef DEBUG
-				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << m.email() << " is being succesfully monitored!!!" << pmm::NL;
+				pmm::imapLog << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif
 			}
 		}
@@ -493,7 +482,7 @@ namespace pmm {
 						resetIdle = true;
 						mailboxControl[theEmail].availableMessages += recent;
 #ifdef DEBUG
-						pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
+						pmm::imapLog << "DEBUG: IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
 #endif
 						fetchMails(m);
 					}
