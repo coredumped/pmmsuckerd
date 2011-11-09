@@ -33,17 +33,11 @@
 #ifndef DEFAULT_MAX_CONNECTION_INTERVAL
 #define DEFAULT_MAX_CONNECTION_INTERVAL 7200
 #endif
-#ifdef __linux__
-#include<signal.h>
-#endif
+#include <pthread.h>
+#include <signal.h>
 
 namespace pmm {
 	MTLogger APNSLog;
-
-	static void apns_sigpipe_handle(int x){ 
-		pmm::APNSLog << "Just got a SIGPIPE :-(" << pmm::NL;
-	}
-
 
 	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength)
 	{
@@ -178,8 +172,8 @@ namespace pmm {
 		_server_addr.sin_family      = AF_INET;
 		_server_addr.sin_port        = htons(_useSandbox ? APPLE_SANDBOX_PORT : APPLE_PORT);
 		_host_info = gethostbyname(_useSandbox ? APPLE_SANDBOX_HOST : APPLE_HOST);
-		int enable_nosigpipe = 1;
 #ifndef __linux__
+		int enable_nosigpipe = 1;
 		setsockopt(_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)enable_nosigpipe, (socklen_t)sizeof(int));
 #endif
 		if(_host_info)
@@ -268,9 +262,15 @@ namespace pmm {
 		size_t i = 0;  
 #endif
 		pmm::Log << "Starting APNSNotificationThread..." << pmm::NL;
-#ifdef __linux__
-		//signal(SIGPIPE, apns_sigpipe_handle);
+#ifdef DEBUG
+		APNSLog << "Masking SIGPIPE..." << pmm::NL;
 #endif
+		sigset_t bSignal;
+		sigemptyset(&bSignal);
+		sigaddset(&bSignal, SIGPIPE);
+		if(pthread_sigmask(SIG_BLOCK, &bSignal, NULL) != 0){
+			APNSLog << "WARNING: Unable to block SIGPIPE, if a persistent APNS connection is cut unexpectedly we might crash!!!" << pmm::NL;
+		}
 		initSSL();
 		connect2APNS();
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;

@@ -22,9 +22,6 @@
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
 #include "MessageUploaderThread.h"
-#ifdef __linux__
-#include<signal.h>
-#endif
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
@@ -56,12 +53,6 @@
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
 void emergencyUnregister();
-#ifdef __linux__
-//Define a SIGPIPE handler
-static void sigpipe_handle(int x){ 
-	pmm::Log << "Just got SIGPIPE :-(" << pmm::NL;
-}
-#endif
 
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
@@ -146,9 +137,6 @@ int main (int argc, const char * argv[])
 	pmm::pop3Log.open("pop3-fetch.log");
 	pmm::pop3Log.setTag("POP3SuckerThread");
 	pmm::SuckerSession session(pmmServiceURL);
-#ifdef __linux__
-	signal(SIGPIPE, sigpipe_handle);
-#endif
 	//1. Register to PMMService...
 	try {
 		session.register2PMM();
