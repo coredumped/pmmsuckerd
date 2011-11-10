@@ -68,6 +68,9 @@ namespace pmm {
 		}
 		writtenBytes = 0;
 		logPath = path;
+		if (outputStream.is_open()) {
+			outputStream.close();
+		}
 		outputStream.open(path.c_str());
 	}
 	
