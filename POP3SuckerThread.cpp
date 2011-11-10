@@ -272,14 +272,14 @@ namespace pmm {
 				mailboxControl[theEmail].isOpened = false;
 				return;
 			}
-			carray *msgList = NULL;
-			int r = mailpop3_list(pop3, &msgList);
-			if (etpanOperationFailed(r)) {
-				if(pop3->pop3_response != NULL) pop3Log << "Unable to perform LIST on " << theEmail << ": " << pop3->pop3_response << ", will try again in the next cycle" << pmm::NL;
-				else pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
-			}
-			else {
-				if(currTime - pop3Control[m.email()].lastCheck > DEFAULT_POP3_MINIMUM_CHECK_INTERVAL){
+			if(currTime - pop3Control[m.email()].lastCheck > DEFAULT_POP3_MINIMUM_CHECK_INTERVAL){
+				carray *msgList = NULL;
+				int r = mailpop3_list(pop3, &msgList);
+				if (etpanOperationFailed(r)) {
+					if(pop3->pop3_response != NULL) pop3Log << "Unable to perform LIST on " << theEmail << ": " << pop3->pop3_response << ", will try again in the next cycle" << pmm::NL;
+					else pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
+				}
+				else {
 					//Got e-mail list
 					if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)){
 						fetchMails(m);	
