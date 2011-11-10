@@ -135,10 +135,40 @@ namespace pmm {
 	}
 	
 	bool FetchedMailsCache::entryExists(const std::string &email, const std::string &uid){
-		std::stringstream input(uid);
-		int uid_v;
-		input >> uid_v ;
-		return entryExists(email, uid_v);
+		bool ret = false;
+		sqlite3 *conn = openDatabase();
+		std::stringstream sqlCmd;
+		sqlite3_stmt *statement;
+		
+		char *sztail;
+		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE email='" << email << "' AND uniqueid='" << uid << "'";		
+		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
+		if (errCode != SQLITE_OK) {
+			std::stringstream errmsg;
+			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());
+		}
+		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
+			if (sqlite3_column_int(statement, 0) > 0) {
+				ret = true;
+			}
+		}
+		if(errCode != SQLITE_DONE){
+			std::stringstream errmsg;
+			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			closeDatabase(conn);
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+			pmm::Log << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());			
+		}
+		closeDatabase(conn);
+		return ret;
 	}
 	
 	bool FetchedMailsCache::hasAllThesePOP3Entries(const std::string &email, carray *msgList){
