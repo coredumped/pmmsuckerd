@@ -69,7 +69,6 @@ namespace pmm {
 				}
 				if(etpanOperationFailed(result)){
 					pop3Log << "Unable to retreive messages for: " << m.email() << " can't connect to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
-					fetchQueue->add(m);
 					mailpop3_free(pop3);
 					sleep(1);
 					break;
@@ -78,7 +77,6 @@ namespace pmm {
 					result = mailpop3_login(pop3, m.username().c_str(), m.password().c_str());
 					if(etpanOperationFailed(result)){
 						pop3Log << "Unable to retreive messages for: " << m.email() << " can't login to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
-						fetchQueue->add(m);
 						sleep(1);						
 					}
 					else {
@@ -86,7 +84,6 @@ namespace pmm {
 						result = mailpop3_list(pop3, &msgList);
 						if(etpanOperationFailed(result)){
 							pop3Log << "Unable to retreive messages for: " << m.email() << ": etpan code=" << result << pmm::NL;
-							fetchQueue->add(m);
 							sleep(1);							
 						}
 						else {
