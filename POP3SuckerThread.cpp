@@ -81,7 +81,7 @@ namespace pmm {
 						carray *msgList;
 						result = mailpop3_list(pop3, &msgList);
 						if(etpanOperationFailed(result)){
-							pop3Log << "Unable to retreive messages for: " << m.email() << ": " << pop3->pop3_response << pmm::NL;
+							pop3Log << "Unable to retreive messages for: " << m.email() << ": etpan code=" << result << pmm::NL;
 							fetchQueue->add(m);
 							sleep(1);							
 						}
