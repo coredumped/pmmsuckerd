@@ -27,6 +27,14 @@
 #define DEFAULT_POP3_MINIMUM_CHECK_INTERVAL 5
 #endif
 
+#ifndef DEFAULT_HOTMAIL_CHECK_INTERVAL
+#define DEFAULT_HOTMAIL_CHECK_INTERVAL 30
+#endif
+
+#ifndef MAX_CHECK_INTERVAL
+#define MAX_CHECK_INTERVAL 120
+#endif
+
 namespace pmm {
 	MTLogger pop3Log;
 	
@@ -139,6 +147,7 @@ namespace pmm {
 		lastCheck = time(NULL);
 		msgCount = 0;
 		mailboxSize = 0;
+		minimumCheckInterval = DEFAULT_POP3_MINIMUM_CHECK_INTERVAL;
 	}
 	
 	POP3SuckerThread::POP3Control::~POP3Control(){
@@ -150,6 +159,7 @@ namespace pmm {
 		startedOn = pc.startedOn;
 		msgCount = pc.msgCount;
 		mailboxSize = pc.mailboxSize;
+		minimumCheckInterval = pc.minimumCheckInterval;
 	}
 	
 	POP3SuckerThread::POP3SuckerThread(){
@@ -192,6 +202,9 @@ namespace pmm {
 #ifdef DEBUG
 		pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif		
+		if(m.email().find("hotmail.com") != m.email().npos){
+			pop3Control[m.email()].minimumCheckInterval = DEFAULT_HOTMAIL_CHECK_INTERVAL;
+		}
 		/*
 		int result;
 		if(pop3Control[m.email()].pop3 == NULL){ 
@@ -274,7 +287,7 @@ namespace pmm {
 				mailboxControl[theEmail].isOpened = false;
 				return;
 			}
-			if(currTime - pop3Control[m.email()].lastCheck > DEFAULT_POP3_MINIMUM_CHECK_INTERVAL){
+			if(currTime - pop3Control[m.email()].lastCheck > pop3Control[m.email()].minimumCheckInterval){
 				/*carray *msgList = NULL;
 				int r = mailpop3_list(pop3, &msgList);
 				if (etpanOperationFailed(r)) {

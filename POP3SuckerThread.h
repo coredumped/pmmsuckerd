@@ -23,6 +23,7 @@ namespace pmm {
 			size_t msgCount;
 			size_t mailboxSize;
 			time_t lastCheck;
+			int minimumCheckInterval;
 
 			POP3Control();
 			~POP3Control();
