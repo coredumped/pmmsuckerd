@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <stdlib.h>
 #include "POP3SuckerThread.h"
 #include "ThreadDispatcher.h"
 
@@ -16,6 +17,10 @@
 
 #ifndef DEFAULT_MAX_POP3_FETCHER_THREADS
 #define DEFAULT_MAX_POP3_FETCHER_THREADS 2
+#endif
+
+#ifndef DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL
+#define DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL 43200
 #endif
 
 namespace pmm {
@@ -91,25 +96,29 @@ namespace pmm {
 									theMessage.msgUid = info->msg_uidl;
 									result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
 									if(etpanOperationFailed(result)){
-										pop3Log << "Unable to retrieve message " << info->msg_uidl << " from " << m.email() << ": " << pop3->pop3_response << pmm::NL;
+										pop3Log << "Unable to retrieve message " << info->msg_uidl << " from " << m.email() << ": etpan code=" << result << pmm::NL;
 									}
 									else {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
 										mailpop3_retr_free(msgBuffer);
-										for (size_t i = 0; i < m.devTokens().size(); i++) {
-											//Apply all processing rules before notifying
-											std::stringstream nMsg;
-											nMsg << theMessage.from << "\n" << theMessage.subject;
-											NotificationPayload np(m.devTokens()[i], nMsg.str(), i + 1);
-											np.origMailMessage = theMessage;
-											notificationQueue->add(np);
-											if(i == 0){
-												fetchedMails.addEntry(m.email(), info->msg_uidl);
-												quotaUpdateVector->push_back(m.email());
-												pmmStorageQueue->add(np);
+										if (abs(time(NULL) - theMessage.dateOfArrival) > DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL) {
+											fetchedMails.addEntry(m.email(), info->msg_uidl);
+										}
+										else {
+											for (size_t i = 0; i < m.devTokens().size(); i++) {
+												//Apply all processing rules before notifying
+												std::stringstream nMsg;
+												nMsg << theMessage.from << "\n" << theMessage.subject;
+												NotificationPayload np(m.devTokens()[i], nMsg.str(), i + 1);
+												np.origMailMessage = theMessage;
+												notificationQueue->add(np);
+												if(i == 0){
+													fetchedMails.addEntry(m.email(), info->msg_uidl);
+													quotaUpdateVector->push_back(m.email());
+													pmmStorageQueue->add(np);
+												}
 											}
 										}
-
 									}
 								}
 							}
