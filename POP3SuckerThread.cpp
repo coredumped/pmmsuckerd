@@ -178,7 +178,7 @@ namespace pmm {
 	}
 	
 	void POP3SuckerThread::openConnection(const MailAccountInfo &m){
-		bool first_connection = false;
+		//bool first_connection = false;
 		if (pop3Fetcher == NULL) {
 			pop3Log << "Instantiating pop3 message fetching threads for the first time..." << pmm::NL;
 			pop3Fetcher = new POP3FetcherThread[maxPOP3FetcherThreads];
@@ -188,14 +188,14 @@ namespace pmm {
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				ThreadDispatcher::start(pop3Fetcher[i], 8 * 1024 * 1024);
-				first_connection = true;
+				//first_connection = true;
 			}
 		}
 		int result;
 		if(pop3Control[m.email()].pop3 == NULL){ 
 			pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
 		}
-		if(first_connection) fetchMails(m);
+		//if(first_connection) fetchMails(m);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
 		if (m.useSSL()) {
 			result = mailpop3_ssl_connect(pop3Control[m.email()].pop3, m.serverAddress().c_str(), m.serverPort());
