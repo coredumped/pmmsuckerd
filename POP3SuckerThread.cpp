@@ -96,7 +96,7 @@ namespace pmm {
 									theMessage.msgUid = info->msg_uidl;
 									result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
 									if(etpanOperationFailed(result)){
-										pop3Log << "Unable to retrieve message " << info->msg_uidl << " from " << m.email() << ": etpan code=" << result << pmm::NL;
+										pop3Log << "Unable to download message " << info->msg_uidl << " from " << m.email() << ": etpan code=" << result << pmm::NL;
 									}
 									else {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
@@ -188,9 +188,15 @@ namespace pmm {
 		if(pop3Control[m.email()].pop3 == NULL){ 
 			pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
 			//First connection attempt, retrieve e-mails manually
+			mailboxControl[m.email()].isOpened = true;
+			mailboxControl[m.email()].openedOn = time(0x00);
+			pop3Control[m.email()].startedOn = time(NULL);
+#ifdef DEBUG
+			pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
+#endif
 			fetchMails(m);
 		}
-		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
+		/*if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
 		if (m.useSSL()) {
 			result = mailpop3_ssl_connect(pop3Control[m.email()].pop3, m.serverAddress().c_str(), m.serverPort());
 		}
@@ -248,8 +254,7 @@ namespace pmm {
 				pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif
 			}
-		}
-		
+		}*/
 	}
 	
 	void POP3SuckerThread::checkEmail(const MailAccountInfo &m){
@@ -266,7 +271,7 @@ namespace pmm {
 				mailboxControl[theEmail].isOpened = false;
 				return;
 			}
-			carray *msgList = NULL;
+			/*carray *msgList = NULL;
 			int r = mailpop3_list(pop3, &msgList);
 			if (etpanOperationFailed(r)) {
 				pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
@@ -283,7 +288,7 @@ namespace pmm {
 				}
 				carray_free(msgList);
 				pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
-			}
+			}*/
 		}
 	}
 	
