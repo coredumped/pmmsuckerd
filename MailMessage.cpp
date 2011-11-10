@@ -180,7 +180,7 @@ namespace pmm {
 					break;
 			}
 		}
-		if (m.subject.size() == 0) {
+		if (m.subject.size() == 0 || m.subject.compare("Fw:") == 0 || m.subject.compare("Re:") == 0 || m.subject.compare("FW:") == 0 || m.subject.compare("RE") == 0 || m.subject.compare("Rv:") == 0 || m.subject.compare("RV:") == 0) {
 #ifdef DEBUG
 			pmm::Log << "DEBUG: Computing subject from: " << pmm::NL;
 			pmm::Log << rawMessage << pmm::NL;

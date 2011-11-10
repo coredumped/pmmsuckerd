@@ -274,16 +274,16 @@ namespace pmm {
 			else {
 				//Got e-mail list
 				if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)) fetchMails(m);
+				//Reset mailpop3 list info
+				for(int i = 0; i < carray_count(msgList); i++){
+					struct mailpop3_msg_info *msg = (struct mailpop3_msg_info *)carray_get(msgList, i);
+					if (msg->msg_uidl != NULL)
+						free(msg->msg_uidl);
+					free(msg);
+				}
+				carray_free(msgList);
+				pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
 			}
-			//Reset mailpop3 list info
-			for(int i = 0; i < carray_count(msgList); i++){
-				struct mailpop3_msg_info *msg = (struct mailpop3_msg_info *)carray_get(msgList, i);
-				if (msg->msg_uidl != NULL)
-					free(msg->msg_uidl);
-				free(msg);
-			}
-			carray_free(msgList);
-			pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
 		}
 	}
 	
