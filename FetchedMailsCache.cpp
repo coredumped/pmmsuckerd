@@ -155,9 +155,6 @@ namespace pmm {
 			else sqlCmd << ", '" << msg_info->msg_uidl << "'";
 		}
 		sqlCmd << ")";
-#ifdef DEBUG
-		CacheLog << "Verifying if multiple POP3 entries exists in our database: " << sqlCmd.str() << pmm::NL;
-#endif
 		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 		if (errCode != SQLITE_OK) {
 			std::stringstream errmsg;
@@ -169,7 +166,11 @@ namespace pmm {
 			throw GenericException(errmsg.str());
 		}
 		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
-			if (sqlite3_column_int(statement, 0) == msgCount) {
+			int countval = sqlite3_column_int(statement, 0);
+#ifdef DEBUG
+			CacheLog << "Verifying if multiple POP3 entries exists in our database: " << sqlCmd.str() << " given=" << msgCount << " db has=" << countval << pmm::NL;
+#endif
+			if (countval == msgCount) {
 				ret = true;
 			}
 			else {
