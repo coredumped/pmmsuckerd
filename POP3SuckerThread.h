@@ -22,6 +22,7 @@ namespace pmm {
 			time_t startedOn;
 			size_t msgCount;
 			size_t mailboxSize;
+			time_t lastCheck;
 
 			POP3Control();
 			~POP3Control();

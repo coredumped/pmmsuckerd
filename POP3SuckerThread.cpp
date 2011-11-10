@@ -23,6 +23,10 @@
 #define DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL 43200
 #endif
 
+#ifndef DEFAULT_POP3_MINIMUM_CHECK_INTERVAL
+#define DEFAULT_POP3_MINIMUM_CHECK_INTERVAL 5
+#endif
+
 namespace pmm {
 	MTLogger pop3Log;
 	
@@ -135,6 +139,7 @@ namespace pmm {
 	POP3SuckerThread::POP3Control::POP3Control(){
 		pop3 = NULL;
 		startedOn = time(NULL);
+		lastCheck = time(NULL);
 		msgCount = 0;
 		mailboxSize = 0;
 	}
@@ -173,6 +178,7 @@ namespace pmm {
 	}
 	
 	void POP3SuckerThread::openConnection(const MailAccountInfo &m){
+		bool first_connection = false;
 		if (pop3Fetcher == NULL) {
 			pop3Log << "Instantiating pop3 message fetching threads for the first time..." << pmm::NL;
 			pop3Fetcher = new POP3FetcherThread[maxPOP3FetcherThreads];
@@ -182,14 +188,14 @@ namespace pmm {
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				ThreadDispatcher::start(pop3Fetcher[i], 8 * 1024 * 1024);
+				first_connection = true;
 			}
 		}
 		int result;
 		if(pop3Control[m.email()].pop3 == NULL){ 
 			pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
-			//First connection attempt, retrieve e-mails manually
-			fetchMails(m);
 		}
+		if(first_connection) fetchMails(m);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
 		if (m.useSSL()) {
 			result = mailpop3_ssl_connect(pop3Control[m.email()].pop3, m.serverAddress().c_str(), m.serverPort());
@@ -254,8 +260,9 @@ namespace pmm {
 	void POP3SuckerThread::checkEmail(const MailAccountInfo &m){
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
+			time_t currTime = time(NULL);
 			mailpop3 *pop3 = pop3Control[m.email()].pop3;
-			if (pop3Control[m.email()].startedOn + DEFAULT_MAX_POP3_CONNECTION_TIME < time(NULL)) {
+			if (pop3Control[m.email()].startedOn + DEFAULT_MAX_POP3_CONNECTION_TIME < currTime) {
 				//Think about closing and re-opening this connection!!!
 #ifdef DEBUG
 				pmm::pop3Log << "Max connection time for account " << m.email() << " exceeded (" << DEFAULT_MAX_POP3_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
@@ -268,22 +275,26 @@ namespace pmm {
 			carray *msgList = NULL;
 			int r = mailpop3_list(pop3, &msgList);
 			if (etpanOperationFailed(r)) {
-				pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
+				if(pop3->pop3_response != NULL) pop3Log << "Unable to perform LIST on " << theEmail << ": " << pop3->pop3_response << ", will try again in the next cycle" << pmm::NL;
+				else pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
 			}
 			else {
-				//Got e-mail list
-				if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)){
-					fetchMails(m);	
+				if(currTime - pop3Control[m.email()].lastCheck > DEFAULT_POP3_MINIMUM_CHECK_INTERVAL){
+					//Got e-mail list
+					if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)){
+						fetchMails(m);	
+					}
+					//Reset mailpop3 list info
+					for(int i = 0; i < carray_count(msgList); i++){
+						struct mailpop3_msg_info *msg = (struct mailpop3_msg_info *)carray_get(msgList, i);
+						if (msg->msg_uidl != NULL)
+							free(msg->msg_uidl);
+						free(msg);
+					}
+					carray_free(msgList);
+					pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
+					pop3Control[m.email()].lastCheck = currTime;
 				}
-				//Reset mailpop3 list info
-				for(int i = 0; i < carray_count(msgList); i++){
-					struct mailpop3_msg_info *msg = (struct mailpop3_msg_info *)carray_get(msgList, i);
-					if (msg->msg_uidl != NULL)
-						free(msg->msg_uidl);
-					free(msg);
-				}
-				carray_free(msgList);
-				pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
 			}
 		}
 	}
