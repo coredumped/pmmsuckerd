@@ -23,6 +23,9 @@ namespace pmm {
 	
 	POP3SuckerThread::POP3FetcherThread::POP3FetcherThread(){
 		fetchQueue = NULL;
+		notificationQueue = NULL;
+		quotaUpdateVector = NULL;
+		pmmStorageQueue = NULL;
 	}
 	
 	POP3SuckerThread::POP3FetcherThread::~POP3FetcherThread(){
@@ -33,10 +36,87 @@ namespace pmm {
 		if (fetchQueue == NULL) {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL fetchQueue.");
 		}
+		if (notificationQueue == NULL) {
+			throw GenericException("Unable to start a POP3 message fetching thread with a NULL notificationQueue.");
+		}
+		if (pmmStorageQueue == NULL) {
+			throw GenericException("Unable to start a POP3 message fetching thread with a NULL pmmStorageQueue.");
+		}
+		if (quotaUpdateVector == NULL) {
+			throw GenericException("Unable to start a POP3 message fetching thread with a NULL quotaUpdateVector.");
+		}
+
 		while (true) {
 			MailAccountInfo m;
 			while (fetchQueue->extractEntry(m)) {
 				//Fetch messages for account here!!!
+				mailpop3 *pop3 = mailpop3_new(0, 0);
+				int result;
+				if (m.useSSL()) {
+					result = mailpop3_ssl_connect(pop3, m.serverAddress().c_str(), m.serverPort());
+				}
+				else {
+					result = mailpop3_socket_connect(pop3, m.serverAddress().c_str(), m.serverPort());
+				}
+				if(etpanOperationFailed(result)){
+					pop3Log << "Unable to retreive messages for: " << m.email() << " can't connect to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
+					fetchQueue->add(m);
+					mailpop3_free(pop3);
+					sleep(1);
+					break;
+				}
+				else {
+					result = mailpop3_login(pop3, m.username().c_str(), m.password().c_str());
+					if(etpanOperationFailed(result)){
+						pop3Log << "Unable to retreive messages for: " << m.email() << " can't login to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
+						fetchQueue->add(m);
+						sleep(1);						
+					}
+					else {
+						carray *msgList;
+						result = mailpop3_list(pop3, &msgList);
+						if(etpanOperationFailed(result)){
+							pop3Log << "Unable to retreive messages for: " << m.email() << ": " << pop3->pop3_response << pmm::NL;
+							fetchQueue->add(m);
+							sleep(1);							
+						}
+						else {
+							for (int i = 0; i < carray_count(msgList); i++) {
+								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
+								if (!fetchedMails.entryExists(m.email(), info->msg_uidl)) {
+									//Perform real message retrieval
+									char *msgBuffer;
+									size_t msgSize;
+									MailMessage theMessage;
+									theMessage.msgUid = info->msg_uidl;
+									result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
+									if(etpanOperationFailed(result)){
+										pop3Log << "Unable to retrieve message " << info->msg_uidl << " from " << m.email() << ": " << pop3->pop3_response << pmm::NL;
+									}
+									else {
+										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
+										mailpop3_retr_free(msgBuffer);
+										for (size_t i = 0; i < m.devTokens().size(); i++) {
+											//Apply all processing rules before notifying
+											std::stringstream nMsg;
+											nMsg << theMessage.from << "\n" << theMessage.subject;
+											NotificationPayload np(m.devTokens()[i], nMsg.str(), i + 1);
+											np.origMailMessage = theMessage;
+											notificationQueue->add(np);
+											if(i == 0){
+												fetchedMails.addEntry(m.email(), info->msg_uidl);
+												quotaUpdateVector->push_back(m.email());
+												pmmStorageQueue->add(np);
+											}
+										}
+
+									}
+								}
+							}
+						}
+					}
+				}
+				mailpop3_free(pop3);
 			}
 			usleep(250000);
 		}
@@ -89,12 +169,15 @@ namespace pmm {
 			pop3Fetcher = new POP3FetcherThread[maxPOP3FetcherThreads];
 			for (size_t i = 0; i < maxPOP3FetcherThreads; i++) {
 				pop3Fetcher[i].fetchQueue = &fetchQueue;
-				
+				pop3Fetcher[i].notificationQueue = notificationQueue;
+				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
+				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				ThreadDispatcher::start(pop3Fetcher[i], 8 * 1024 * 1024);
 			}
 		}
 		int result;
-		if(pop3Control[m.email()].pop3 == NULL){ pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
+		if(pop3Control[m.email()].pop3 == NULL){ 
+			pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
 			//First connection attempt, retrieve e-mails manually
 			fetchMails(m);
 		}

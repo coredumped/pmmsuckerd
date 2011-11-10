@@ -22,6 +22,7 @@ namespace pmm {
 			time_t startedOn;
 			size_t msgCount;
 			size_t mailboxSize;
+
 			POP3Control();
 			~POP3Control();
 			POP3Control(const POP3Control &pc);
@@ -29,7 +30,10 @@ namespace pmm {
 		
 		class POP3FetcherThread : public GenericThread {
 		public:
+			SharedQueue<NotificationPayload> *notificationQueue;
 			SharedQueue<MailAccountInfo> *fetchQueue;
+			SharedQueue<NotificationPayload> *pmmStorageQueue;
+			SharedVector<std::string> *quotaUpdateVector;
 			POP3FetcherThread();
 			~POP3FetcherThread();
 			void operator()();
