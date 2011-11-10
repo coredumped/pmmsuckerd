@@ -161,6 +161,8 @@ namespace pmm {
 		msgCount = pc.msgCount;
 		mailboxSize = pc.mailboxSize;
 		minimumCheckInterval = pc.minimumCheckInterval;
+		lastCheck = pc.lastCheck;
+		startedOn = pc.startedOn;
 	}
 	
 	POP3SuckerThread::POP3SuckerThread(){
