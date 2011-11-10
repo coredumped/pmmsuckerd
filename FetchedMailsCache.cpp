@@ -155,6 +155,9 @@ namespace pmm {
 			else sqlCmd << ", '" << msg_info->msg_uidl << "'";
 		}
 		sqlCmd << ")";
+#ifdef DEBUG
+		CacheLog << "Verifying if multiple POP3 entries exists in our database: " << sqlCmd.str() << pmm::NL;
+#endif
 		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 		if (errCode != SQLITE_OK) {
 			std::stringstream errmsg;

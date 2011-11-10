@@ -12,7 +12,7 @@
 #include "ThreadDispatcher.h"
 
 #ifndef DEFAULT_MAX_POP3_CONNECTION_TIME
-#define DEFAULT_MAX_POP3_CONNECTION_TIME 5
+#define DEFAULT_MAX_POP3_CONNECTION_TIME 500
 #endif
 
 #ifndef DEFAULT_MAX_POP3_FETCHER_THREADS
@@ -188,15 +188,9 @@ namespace pmm {
 		if(pop3Control[m.email()].pop3 == NULL){ 
 			pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
 			//First connection attempt, retrieve e-mails manually
-			mailboxControl[m.email()].isOpened = true;
-			mailboxControl[m.email()].openedOn = time(0x00);
-			pop3Control[m.email()].startedOn = time(NULL);
-#ifdef DEBUG
-			pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
-#endif
 			fetchMails(m);
 		}
-		/*if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
+		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
 		if (m.useSSL()) {
 			result = mailpop3_ssl_connect(pop3Control[m.email()].pop3, m.serverAddress().c_str(), m.serverPort());
 		}
@@ -254,7 +248,7 @@ namespace pmm {
 				pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif
 			}
-		}*/
+		}
 	}
 	
 	void POP3SuckerThread::checkEmail(const MailAccountInfo &m){
@@ -271,14 +265,16 @@ namespace pmm {
 				mailboxControl[theEmail].isOpened = false;
 				return;
 			}
-			/*carray *msgList = NULL;
+			carray *msgList = NULL;
 			int r = mailpop3_list(pop3, &msgList);
 			if (etpanOperationFailed(r)) {
 				pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
 			}
 			else {
 				//Got e-mail list
-				if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)) fetchMails(m);
+				if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)){
+					fetchMails(m);	
+				}
 				//Reset mailpop3 list info
 				for(int i = 0; i < carray_count(msgList); i++){
 					struct mailpop3_msg_info *msg = (struct mailpop3_msg_info *)carray_get(msgList, i);
@@ -288,7 +284,7 @@ namespace pmm {
 				}
 				carray_free(msgList);
 				pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
-			}*/
+			}
 		}
 	}
 	
