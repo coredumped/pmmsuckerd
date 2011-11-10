@@ -283,7 +283,7 @@ namespace pmm {
 				free(msg);
 			}
 			carray_free(msgList);
-			pop3->pop3_msg_tab = NULL;
+			pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
 		}
 	}
 	
