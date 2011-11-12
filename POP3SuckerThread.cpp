@@ -114,6 +114,7 @@ namespace pmm {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 										}
 										else {
+											theMessage.to = m.email();
 											for (size_t i = 0; i < m.devTokens().size(); i++) {
 												//Apply all processing rules before notifying
 												std::stringstream nMsg;
@@ -180,10 +181,6 @@ namespace pmm {
 
 	
 	void POP3SuckerThread::closeConnection(const MailAccountInfo &m){
-		/*if (mailboxControl[m.email()].isOpened) {
-			mailpop3_free(pop3Control[m.email()].pop3);
-			pop3Control[m.email()].pop3 = NULL;
-		}*/
 		mailboxControl[m.email()].isOpened = false;
 	}
 	
@@ -208,71 +205,6 @@ namespace pmm {
 		if(m.email().find("hotmail.com") != m.email().npos){
 			pop3Control[m.email()].minimumCheckInterval = DEFAULT_HOTMAIL_CHECK_INTERVAL;
 		}
-		/*
-		int result;
-		if(pop3Control[m.email()].pop3 == NULL){ 
-			pop3Control[m.email()].pop3 = mailpop3_new(0, NULL);
-		}
-		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
-		if (m.useSSL()) {
-			result = mailpop3_ssl_connect(pop3Control[m.email()].pop3, m.serverAddress().c_str(), m.serverPort());
-		}
-		else {
-			result = mailpop3_socket_connect(pop3Control[m.email()].pop3, m.serverAddress().c_str(), m.serverPort());
-		}
-		if(etpanOperationFailed(result)){
-			serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
-			if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
-				//Max reconnect exceeded, notify user
-#warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
-				std::stringstream errmsg;
-				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
-				pmm::pop3Log << errmsg.str() << pmm::NL;
-				for (size_t i = 0; m.devTokens().size(); i++) {
-					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
-					notificationQueue->add(msg);
-				}
-				serverConnectAttempts[m.serverAddress()] = 0;
-#warning Add method for relinquishing email account monitoring
-			}
-			mailboxControl[m.email()].isOpened = false;
-			mailpop3_free(pop3Control[m.email()].pop3);
-			pop3Control[m.email()].pop3 = NULL;
-#warning TODO: delay reconnections			
-		}
-		else {
-			mailboxControl[m.email()].openedOn = time(NULL);
-			//Proceed to login stage
-			result = mailpop3_login(pop3Control[m.email()].pop3, m.username().c_str(), m.password().c_str());
-			if(etpanOperationFailed(result)){
-				serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
-				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
-					//Max reconnect exceeded, notify user
-					std::stringstream errmsg;
-#warning TODO: Find a better way to notify the user that we are unable to login into their mail account
-					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
-					for (size_t i = 0; m.devTokens().size(); i++) {
-						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
-						notificationQueue->add(msg);
-					}
-					serverConnectAttempts[m.serverAddress()] = 0;
-#warning Add method for relinquishing email account monitoring
-				}
-				mailpop3_free(pop3Control[m.email()].pop3);
-				pop3Control[m.email()].pop3 = NULL;
-				mailboxControl[m.email()].isOpened = false;
-			}
-			else {
-				//Report successfull login
-				mailboxControl[m.email()].isOpened = true;
-				mailboxControl[m.email()].openedOn = time(0x00);
-				pop3Control[m.email()].startedOn = time(NULL);
-#ifdef DEBUG
-				pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
-#endif
-			}
-		}
-		 */
 	}
 	
 	void POP3SuckerThread::checkEmail(const MailAccountInfo &m){
@@ -291,28 +223,6 @@ namespace pmm {
 				return;
 			}
 			if(currTime - pop3Control[m.email()].lastCheck > pop3Control[m.email()].minimumCheckInterval){
-				/*carray *msgList = NULL;
-				int r = mailpop3_list(pop3, &msgList);
-				if (etpanOperationFailed(r)) {
-					if(pop3->pop3_response != NULL) pop3Log << "Unable to perform LIST on " << theEmail << ": " << pop3->pop3_response << ", will try again in the next cycle" << pmm::NL;
-					else pop3Log << "Unable to perform LIST on " << theEmail << ", will try again in the next cycle" << pmm::NL;
-				}
-				else {
-					//Got e-mail list
-					if(!fetchedMails.hasAllThesePOP3Entries(theEmail, msgList)){
-						fetchMails(m);	
-					}
-					//Reset mailpop3 list info
-					for(int i = 0; i < carray_count(msgList); i++){
-						struct mailpop3_msg_info *msg = (struct mailpop3_msg_info *)carray_get(msgList, i);
-						if (msg->msg_uidl != NULL)
-							free(msg->msg_uidl);
-						free(msg);
-					}
-					carray_free(msgList);
-					pop3Control[m.email()].pop3->pop3_msg_tab = NULL;
-
-				}*/
 				fetchMails(m);
 				pop3Control[m.email()].lastCheck = currTime;
 			}
