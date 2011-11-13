@@ -22,9 +22,9 @@ namespace pmm {
 		std::string password_;
 		std::string serverAddress_;
 		int serverPort_;
-		std::vector<std::string> devTokens_;
 		bool useSSL_;
 	public:
+		std::vector<std::string> devTokens_;
 		MailAccountInfo();
 		MailAccountInfo(const std::string &email__, const std::string &mailboxType__, const std::string &username__, 
 						const std::string &password__, const std::string &serverAddress__, int serverPort__, 

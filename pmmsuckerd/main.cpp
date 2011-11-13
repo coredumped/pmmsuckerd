@@ -58,6 +58,7 @@ void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, 
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount);
+void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, const std::string &devToken);
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 
@@ -295,6 +296,11 @@ int main (int argc, const char * argv[])
 							addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
 						}
 					}
+					else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
+						for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
+							relinquishDevTokenNotification(imapSuckingThreads, maxIMAPSuckerThreads, relIter->second);
+						}
+					}
 					else {
 						pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 					}
@@ -444,7 +450,24 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 #endif
 }
 
-
+void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, const std::string &devToken) {
+	pmm::Log << "Relinquishing notifications to " << devToken << pmm::NL;
+	for (size_t i = 0; i < nElems; i++) {
+		mailSuckerThreads[i].emailAccounts.beginCriticalSection();
+		for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
+			pmm::MailAccountInfo m = mailSuckerThreads[i].emailAccounts.atUnlocked(j);
+			for (size_t k = 0; k < m.devTokens().size(); k++) {
+				if (m.devTokens()[k].compare(devToken) == 0) {
+					//Erase the devToken
+					mailSuckerThreads[i].emailAccounts.atUnlocked(j).devTokens_.erase(mailSuckerThreads[i].emailAccounts.atUnlocked(j).devTokens_.begin() + k);
+					pmm::Log << mailSuckerThreads[i].emailAccounts.atUnlocked(j).email() << " will no longuer receive notifications to device " << devToken << pmm::NL;
+					break;
+				}
+			}
+		}
+		mailSuckerThreads[i].emailAccounts.endCriticalSection();
+	}
+}
 
 
 
