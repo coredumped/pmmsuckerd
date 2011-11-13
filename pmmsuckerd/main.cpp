@@ -342,6 +342,14 @@ void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, 
 #ifdef DEBUG
 					pmm::Log << "disableAccountsWithExceededQuota: disabling monitoring for: " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << pmm::NL;
 #endif
+					std::vector<std::string> dt = mailSuckerThreads[k].emailAccounts.atUnlocked(l).devTokens();
+					std::stringstream msg;
+					msg << "You have ran out of quota on " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << ", you may purchase more to keep receiving notifications.";
+					for (size_t z = 0; z < dt.size(); z++) {
+						pmm::NotificationPayload np(dt[z], msg.str());
+						np.isSystemNotification = false;
+						mailSuckerThreads[k].notificationQueue->add(np);
+					}
 				}
 			}
 		}	
@@ -421,6 +429,13 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 		if(idx >= nElems) idx = 0;
 		*assignationIndex = idx;
 		pmm::Log << "Adding " << emailAccount << " to " << m.mailboxType() << " monitoring." << pmm::NL;
+		std::stringstream msg;
+		msg << "Monitoring of " + emailAccount + " has been enabled :-)";
+		for (size_t i = 0; m.devTokens().size(); i++) {
+			pmm::NotificationPayload np(m.devTokens()[i], msg.str());
+			np.isSystemNotification = true;
+			mailSuckerThreads[0].notificationQueue->add(np);
+		}
 	}
 #ifdef DEBUG
 	else {

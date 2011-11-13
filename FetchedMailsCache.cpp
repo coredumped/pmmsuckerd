@@ -123,6 +123,7 @@ namespace pmm {
 		if(errCode != SQLITE_DONE){
 			std::stringstream errmsg;
 			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			sqlite3_finalize(statement);
 			closeDatabase(conn);
 #ifdef DEBUG
 			CacheLog << errmsg.str() << pmm::NL;
@@ -130,6 +131,7 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());			
 		}
+		sqlite3_finalize(statement);
 		closeDatabase(conn);
 		return ret;
 	}
@@ -160,6 +162,7 @@ namespace pmm {
 		if(errCode != SQLITE_DONE){
 			std::stringstream errmsg;
 			errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			sqlite3_finalize(statement);
 			closeDatabase(conn);
 #ifdef DEBUG
 			CacheLog << errmsg.str() << pmm::NL;
@@ -167,6 +170,7 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());			
 		}
+		sqlite3_finalize(statement);
 		closeDatabase(conn);
 		return ret;
 	}
@@ -210,6 +214,7 @@ namespace pmm {
 		if(errCode != SQLITE_DONE){
 			std::stringstream errmsg;
 			errmsg << "Unable to verify if a list of entries exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+			sqlite3_finalize(statement);
 			closeDatabase(conn);
 #ifdef DEBUG
 			CacheLog << errmsg.str() << pmm::NL;
@@ -217,6 +222,7 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());			
 		}
+		sqlite3_finalize(statement);
 		closeDatabase(conn);
 		return ret;		
 	}
@@ -294,6 +300,7 @@ namespace pmm {
 		}
 		if(errCode != SQLITE_DONE){
 			errmsg << "Unable to retrieve values from query: " << sqlCmd << " due to: " << sqlite3_errmsg(conn);
+			sqlite3_finalize(statement);
 			closeDatabase(conn);
 #ifdef DEBUG
 			CacheLog << errmsg.str() << pmm::NL;
@@ -349,6 +356,7 @@ namespace pmm {
 				throw GenericException(errmsg.str());
 			}
 		}
+		sqlite3_finalize(statement);
 		closeDatabase(conn);
 	}
 }
