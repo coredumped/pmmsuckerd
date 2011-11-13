@@ -444,10 +444,9 @@ namespace pmm {
 		time_t theExpirationTime = expirationTime;
 		timeM.unlock();
 		if (time(0x00) >= theExpirationTime) {
-#ifdef DEBUG
-			pmm::Log << "DEBUG: Session is about to expire re-registering in advance..." << pmm::NL;
-#endif
+			pmm::Log << "Session is about to expire re-registering in advance..." << pmm::NL;
 			register2PMM();
+			pmm::Log << "Registration successful!!!" << pmm::NL;
 		}
 	}
 	

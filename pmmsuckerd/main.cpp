@@ -47,7 +47,7 @@
 #define DEFAULT_THREAD_STACK_SIZE 8388608
 #endif
 #ifndef DEFAULT_COMMAND_POLLING_INTERVAL
-#define DEFAULT_COMMAND_POLLING_INTERVAL 60
+#define DEFAULT_COMMAND_POLLING_INTERVAL 45
 #endif
 
 void printHelpInfo();
@@ -228,6 +228,7 @@ int main (int argc, const char * argv[])
 	std::map<std::string, int> quotas;
 	bool keepRunning = true;
 	while (keepRunning) {
+		session.performAutoRegister();
 		if (tic % 10 == 0) {
 			//Process quota updates if any
 			if (quotaUpdateVector.size() > 0) {
