@@ -76,23 +76,19 @@ namespace pmm {
 					result = mailpop3_socket_connect(pop3, m.serverAddress().c_str(), m.serverPort());
 				}
 				if(etpanOperationFailed(result)){
-					pop3Log << "Unable to retreive messages for: " << m.email() << " can't connect to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
-					mailpop3_free(pop3);
-					sleep(1);
-					break;
+					pop3Log << "Unable to retrieve messages for: " << m.email() << " can't connect to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
 				}
 				else {
 					result = mailpop3_login(pop3, m.username().c_str(), m.password().c_str());
 					if(etpanOperationFailed(result)){
-						pop3Log << "Unable to retreive messages for: " << m.email() << " can't login to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
-						sleep(1);						
+						pop3Log << "Unable to retrieve messages for: " << m.email() << " can't login to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
 					}
 					else {
 						carray *msgList;
 						result = mailpop3_list(pop3, &msgList);
 						if(etpanOperationFailed(result)){
-							pop3Log << "Unable to retreive messages for: " << m.email() << ": etpan code=" << result << pmm::NL;
-							sleep(1);							
+							if (pop3->pop3_response != NULL) pop3Log << "Unable to retrieve messages for: " << m.email() << ": etpan code=" << result << " response: " << pop3->pop3_response << pmm::NL;
+							else pop3Log << "Unable to retrieve messages for: " << m.email() << ": etpan code=" << result << pmm::NL;						
 						}
 						else {
 							for (int i = 0; i < carray_count(msgList); i++) {

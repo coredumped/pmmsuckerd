@@ -386,12 +386,15 @@ namespace pmm {
 		return response.status;
 	}
 	
-	void SuckerSession::retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta){
+	void SuckerSession::retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, const std::string &specificEmail, bool performDelta){
 		performAutoRegister();
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::pmmSuckerRequestMailAccounts;
 		params["suckerID"] = this->myID;
+		if(specificEmail.size() > 0){
+			params["emailAddress"] = specificEmail;
+		}
 		std::string output;
 		executePost(params, output);
 		//ServerResponse xresp(output);
@@ -424,6 +427,16 @@ namespace pmm {
 			}
 			emailAddresses.push_back(m);			
 		}
+	}
+	
+	bool SuckerSession::retrieveEmailAddressInfo(MailAccountInfo &m, const std::string &emailAddress){
+		std::vector<MailAccountInfo> data;
+		retrieveEmailAddresses(data, emailAddress);
+		if(data.size() > 0){
+			m = data[0];
+			return true;
+		}
+		return false;
 	}
 	
 	void SuckerSession::performAutoRegister(){

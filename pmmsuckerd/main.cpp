@@ -57,6 +57,7 @@ void emergencyUnregister();
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
+void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount);
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 
@@ -76,6 +77,7 @@ int main (int argc, const char * argv[])
 	pmm::SharedVector<std::string> quotaUpdateVector;
 	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
 	pmm::SharedQueue<pmm::QuotaIncreasePetition> quotaIncreaseQueue;
+	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
 	SSL_library_init();
 	SSL_load_error_strings();
 	for (int i = 1; i < argc; i++) {
@@ -168,9 +170,8 @@ int main (int argc, const char * argv[])
 	std::set_terminate(emergencyUnregister);
 	//2. Request accounts to poll
 	std::vector<pmm::MailAccountInfo> emailAccounts;
-	session.retrieveEmailAddresses(emailAccounts, true);
+	session.retrieveEmailAddresses(emailAccounts);
 	//3. Save email accounts to local datastore, perform full database cleanup
-#warning TODO: Save email accounts to local datastore, perform full database cleanup
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
@@ -193,11 +194,10 @@ int main (int argc, const char * argv[])
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
 	//5. Dispatch polling threads for imap
-	size_t asIdx = 0;
 	for (size_t k = 0; k < imapAccounts.size(); k++){
-		imapSuckingThreads[asIdx++].emailAccounts.push_back(imapAccounts[k]);
-		if (asIdx >= maxIMAPSuckerThreads) {
-			asIdx = 0;
+		imapSuckingThreads[imapAssignationIndex++].emailAccounts.push_back(imapAccounts[k]);
+		if (imapAssignationIndex >= maxIMAPSuckerThreads) {
+			imapAssignationIndex = 0;
 		}
 	}
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
@@ -209,11 +209,10 @@ int main (int argc, const char * argv[])
 		sleep(1);
 	}
 	//6. Dispatch polling threads for POP3
-	asIdx = 0;
 	for (size_t k = 0; k < pop3Accounts.size(); k++) {
-		pop3SuckingThreads[asIdx++].emailAccounts.push_back(pop3Accounts[k]);
-		if (asIdx >= maxPOP3SuckerThreads) {
-			asIdx = 0;
+		pop3SuckingThreads[popAssignationIndex++].emailAccounts.push_back(pop3Accounts[k]);
+		if (popAssignationIndex >= maxPOP3SuckerThreads) {
+			popAssignationIndex = 0;
 		}
 	}
 	for (size_t i = 0; i < maxPOP3SuckerThreads; i++) {
@@ -286,6 +285,17 @@ int main (int argc, const char * argv[])
 						std::stringstream input(parameters["quota"]);
 						input >> p.quotaValue;
 						quotaIncreaseQueue.add(p);
+					}
+					else if (command.compare(pmm::Commands::newMailAccountRegistered) == 0){
+						if (parameters["mailboxType"].compare("IMAP") == 0) {
+							addNewEmailAccount(session, imapSuckingThreads, maxIMAPSuckerThreads, &imapAssignationIndex, parameters["email"]);
+						}
+						else {
+							addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
+						}
+					}
+					else {
+						pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 					}
 				}
 			}
@@ -400,4 +410,31 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 		mailSuckerThreads[j].emailAccounts.endCriticalSection();
 	}	
 }
+
+void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount) {
+	//First retrieve information about the account...
+	pmm::MailAccountInfo m;
+	if(session.retrieveEmailAddressInfo(m, emailAccount)){
+		size_t idx = *assignationIndex;
+		mailSuckerThreads[idx++].emailAccounts.push_back(m);
+		if(idx >= nElems) idx = 0;
+		*assignationIndex = idx;
+		pmm::Log << "Adding " << emailAccount << " to " << m.mailboxType() << " monitoring." << pmm::NL;
+	}
+#ifdef DEBUG
+	else {
+		pmm::Log << "WARNING: No information returned from app engine regarding " << emailAccount << ", perhaps it is being monitored by another sucker?" << pmm::NL;
+	}
+#endif
+}
+
+
+
+
+
+
+
+
+
+
 

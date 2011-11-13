@@ -57,7 +57,13 @@ namespace pmm {
 		bool reqMembership(const std::string &petition, const std::string &contactEmail = "");
 
 		//Retrieves configured e-mail accounts located at the remote server so we can poll them later
-		void retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, bool performDelta = false);
+		// @parameter emailAddresses has a vector of addresses to be polled by this pmmSucker
+		// @parameter specificEmail is to be used as a filter, if given only information related to that email will be retrieved
+		// @parameter performDelta brings all available e-mail accounts that do not have an associated sucker
+		void retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, const std::string &specificEmail = "", bool performDelta = false);
+		
+		// Retrieves information about an specific e-mail address, this address will automatically be assigned to this sucker
+		bool retrieveEmailAddressInfo(MailAccountInfo &m, const std::string &emailAddress);
 
 		//Report quota changes to mailboxes
 		bool reportQuotas(std::map<std::string, int> &quotas);
