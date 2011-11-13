@@ -42,13 +42,17 @@ namespace pmm {
 		time_t expirationTime;
 		Mutex timeM;
 	protected:
-		void performAutoRegister();
+
 	public:
 		SuckerSession();
 		SuckerSession(const std::string &srvURL);
+
 		
 		//Register to the PMM Service server, currently located at Google AppEngine
 		bool register2PMM();
+		
+		//Performs automatic re-registration is for some reason we're running out of time :-)
+		void performAutoRegister();
 		
 		//Un-registers from the controller succesfully relinquishing ownership on any monitored mailboxes
 		void unregisterFromPMM();
