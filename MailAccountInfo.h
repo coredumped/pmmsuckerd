@@ -23,8 +23,8 @@ namespace pmm {
 		std::string serverAddress_;
 		int serverPort_;
 		bool useSSL_;
-	public:
 		std::vector<std::string> devTokens_;
+	public:
 		MailAccountInfo();
 		MailAccountInfo(const std::string &email__, const std::string &mailboxType__, const std::string &username__, 
 						const std::string &password__, const std::string &serverAddress__, int serverPort__, 
@@ -47,6 +47,8 @@ namespace pmm {
 		void updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 				
 					   const std::vector<std::string> &devTokens__, bool useSSL__);
 
+		void deviceTokenAdd(const std::string &newDevToken);
+		void deviceTokenRemove(const std::string &oldDevToken);
 	};
 }
 

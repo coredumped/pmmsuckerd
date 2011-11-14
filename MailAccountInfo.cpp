@@ -95,4 +95,22 @@ namespace pmm {
 		useSSL_ = useSSL__;
 	}
 
+	void MailAccountInfo::deviceTokenAdd(const std::string &newDevToken){
+		for (size_t i = 0; i < devTokens_.size(); i++) {
+			if (newDevToken.compare(devTokens_[i]) == 0) {
+				return;
+			}
+		}
+		devTokens_.push_back(newDevToken);
+	}
+	
+	void MailAccountInfo::deviceTokenRemove(const std::string &oldDevToken){
+		for(size_t i = 0; i < devTokens_.size(); i++){
+			if (oldDevToken.compare(devTokens_[i]) == 0) {
+				devTokens_.erase(devTokens_.begin() + i);
+				break;
+			}
+		}
+	}
+
 }
