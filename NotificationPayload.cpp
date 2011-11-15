@@ -41,7 +41,8 @@ namespace pmm {
 				std::stringstream hconv;
 				hconv.fill('0');
 				hconv.width(4);
-				hconv << std::right << std::hex << (unsigned char)theMsg[i];
+				
+				hconv << std::right << std::hex << (int)((unsigned char)theMsg[i]);
 				newString.append(hconv.str());
 			}
 			else {
