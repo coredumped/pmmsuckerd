@@ -36,6 +36,14 @@ namespace pmm {
 			else if (theMsg[i] == '\'') {
 				newString.append("\\'");
 			}
+			else if (theMsg[i] >= 0x7f) {
+				newString.append("\\u");
+				std::stringstream hconv;
+				hconv.fill('0');
+				hconv.width(4);
+				hconv << std::right << std::hex << (int)theMsg[i];
+				newString.append(hconv.str());
+			}
 			else {
 				char tbuf[2] = { theMsg[i], 0x00};
 				newString.append(tbuf);
