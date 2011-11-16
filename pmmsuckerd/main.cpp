@@ -299,6 +299,7 @@ int main (int argc, const char * argv[])
 					else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
 						for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
 							relinquishDevTokenNotification(imapSuckingThreads, maxIMAPSuckerThreads, relIter->second);
+							relinquishDevTokenNotification(pop3SuckingThreads, maxPOP3SuckerThreads, relIter->second);
 						}
 					}
 					else {
