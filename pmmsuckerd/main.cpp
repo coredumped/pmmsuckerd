@@ -466,7 +466,7 @@ void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, si
 				if (m.devTokens()[k].compare(devToken) == 0) {
 					//Erase the devToken
 					mailSuckerThreads[i].emailAccounts.atUnlocked(j).deviceTokenRemove(devToken);
-					pmm::Log << mailSuckerThreads[i].emailAccounts.atUnlocked(j).email() << " will no longuer receive notifications to device " << devToken << pmm::NL;
+					pmm::Log << mailSuckerThreads[i].emailAccounts.atUnlocked(j).email() << " will no longer receive notifications on device " << devToken << pmm::NL;
 					break;
 				}
 			}
