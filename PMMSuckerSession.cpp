@@ -87,6 +87,7 @@ namespace pmm {
 		const char *newMailAccountRegistered = "newMailAccountRegitered";
 		const char *relinquishDevToken = "relinquishDevToken";
 		const char *deleteEmailAccount = "deleteEmailAccount";
+		const char *refreshDeviceTokenList = "refreshDeviceTokenList";
 	}
 	
 #ifdef __APPLE__

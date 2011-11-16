@@ -87,6 +87,7 @@ namespace pmm {
 		extern const char *newMailAccountRegistered;
 		extern const char *relinquishDevToken;
 		extern const char *deleteEmailAccount;
+		extern const char *refreshDeviceTokenList;
 	}
 }
 

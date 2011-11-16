@@ -59,6 +59,7 @@ void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount);
 void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, const std::string &devToken);
+void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &params);
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 
@@ -302,6 +303,10 @@ int main (int argc, const char * argv[])
 							relinquishDevTokenNotification(pop3SuckingThreads, maxPOP3SuckerThreads, relIter->second);
 						}
 					}
+					else if (command.compare(pmm::Commands::refreshDeviceTokenList) == 0){
+						updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+						updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+					}
 					else {
 						pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 					}
@@ -470,8 +475,25 @@ void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, si
 	}
 }
 
-
-
+void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &params) {
+	for (size_t i = 0; i < nElems; i++) {
+		mailSuckerThreads[i].emailAccounts.beginCriticalSection();
+		for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
+			if(params.size() == 0) return;
+			pmm::MailAccountInfo m = mailSuckerThreads[i].emailAccounts.atUnlocked(j);
+			for (std::map<std::string, std::string>::iterator iter = params.begin(); iter != params.end(); iter++) {
+				std::string email = iter->first;
+				std::string devToken = iter->second;
+				if (m.email().compare(email) == 0) {
+					pmm::Log << "Adding device " << devToken << " as recipient for messages of: " << email << pmm::NL;
+					mailSuckerThreads[i].emailAccounts.atUnlocked(j).deviceTokenAdd(devToken);
+					break;
+				}
+			}
+		}
+		mailSuckerThreads[i].emailAccounts.endCriticalSection();
+	}	
+}
 
 
 
