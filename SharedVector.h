@@ -106,7 +106,7 @@ namespace pmm {
 		void erase(size_t idx) {
 			m.lock();
 			try {
-				dataVec.erase(idx);
+				dataVec.erase(dataVec.begin() + idx);
 			} catch (...) {
 				m.unlock();
 				throw ;

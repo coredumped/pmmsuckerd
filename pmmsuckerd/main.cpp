@@ -58,6 +58,7 @@ void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, 
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount);
+void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, const std::string &devToken);
 void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &params);
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
@@ -307,6 +308,10 @@ int main (int argc, const char * argv[])
 						updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
 						updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
 					}
+					else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){
+						removeEmailAccount(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+						removeEmailAccount(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+					}
 					else {
 						pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 					}
@@ -454,6 +459,24 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 		pmm::Log << "WARNING: No information returned from app engine regarding " << emailAccount << ", perhaps it is being monitored by another sucker?" << pmm::NL;
 	}
 #endif
+}
+
+void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
+	if(mailAccountInfo.size() == 0) return;
+	for (size_t i = 0; i < nElems; i++) {
+		mailSuckerThreads[i].emailAccounts.beginCriticalSection();
+		for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
+			pmm::MailAccountInfo m = mailSuckerThreads[i].emailAccounts.atUnlocked(j);
+			if (m.email().compare(mailAccountInfo["email"]) == 0) {
+				pmm::Log << "Removing e-mail account " << m.email() << " because it was deleted from the client app" << pmm::NL;
+				mailSuckerThreads[i].emailAccounts.erase(j);
+				mailSuckerThreads[i].emailAccounts.endCriticalSection();
+				mailAccountInfo.erase(m.email());
+				return;
+			}
+		}
+		mailSuckerThreads[i].emailAccounts.endCriticalSection();
+	}	
 }
 
 void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, const std::string &devToken) {
