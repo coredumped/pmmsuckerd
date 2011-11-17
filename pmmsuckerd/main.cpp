@@ -260,60 +260,62 @@ int main (int argc, const char * argv[])
 		}
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
-				std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
-				int nTasks = session.getPendingTasks(tasksToRun);
-				for (int i = 0 ; i < nTasks; i++) {
-					//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
-					std::map<std::string, std::map<std::string, std::string> >::iterator iter = tasksToRun[i].begin();
-					std::string command = iter->first;
-					std::map<std::string, std::string> parameters = iter->second;
-					if(command.compare("shutdown") == 0){
-						keepRunning = false;
-						break;
-					}
-					else if (command.compare(pmm::Commands::quotaExceeded) == 0){
-						disableAccountsWithExceededQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-						//disableAccountsWithExceededQuota(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
-					}
-					else if (command.compare(pmm::Commands::accountPropertyChanged) == 0){
-						if (parameters["mailboxType"].compare("IMAP") == 0) {
-							updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+				if(session.fnxHashPendingTasks()){
+					std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
+					int nTasks = session.getPendingTasks(tasksToRun);
+					for (int i = 0 ; i < nTasks; i++) {
+						//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
+						std::map<std::string, std::map<std::string, std::string> >::iterator iter = tasksToRun[i].begin();
+						std::string command = iter->first;
+						std::map<std::string, std::string> parameters = iter->second;
+						if(command.compare("shutdown") == 0){
+							keepRunning = false;
+							break;
+						}
+						else if (command.compare(pmm::Commands::quotaExceeded) == 0){
+							disableAccountsWithExceededQuota(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							//disableAccountsWithExceededQuota(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+						}
+						else if (command.compare(pmm::Commands::accountPropertyChanged) == 0){
+							if (parameters["mailboxType"].compare("IMAP") == 0) {
+								updateAccountProperties(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							}
+							else {
+								updateAccountProperties(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+							}
+						}
+						else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
+							pmm::QuotaIncreasePetition p;
+							p.emailAddress = parameters["email"];
+							std::stringstream input(parameters["quota"]);
+							input >> p.quotaValue;
+							quotaIncreaseQueue.add(p);
+						}
+						else if (command.compare(pmm::Commands::newMailAccountRegistered) == 0){
+							if (parameters["mailboxType"].compare("IMAP") == 0) {
+								addNewEmailAccount(session, imapSuckingThreads, maxIMAPSuckerThreads, &imapAssignationIndex, parameters["email"]);
+							}
+							else {
+								addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
+							}
+						}
+						else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
+							for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
+								relinquishDevTokenNotification(imapSuckingThreads, maxIMAPSuckerThreads, relIter->second);
+								relinquishDevTokenNotification(pop3SuckingThreads, maxPOP3SuckerThreads, relIter->second);
+							}
+						}
+						else if (command.compare(pmm::Commands::refreshDeviceTokenList) == 0){
+							updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+						}
+						else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){
+							removeEmailAccount(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							removeEmailAccount(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
 						}
 						else {
-							updateAccountProperties(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 						}
-					}
-					else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
-						pmm::QuotaIncreasePetition p;
-						p.emailAddress = parameters["email"];
-						std::stringstream input(parameters["quota"]);
-						input >> p.quotaValue;
-						quotaIncreaseQueue.add(p);
-					}
-					else if (command.compare(pmm::Commands::newMailAccountRegistered) == 0){
-						if (parameters["mailboxType"].compare("IMAP") == 0) {
-							addNewEmailAccount(session, imapSuckingThreads, maxIMAPSuckerThreads, &imapAssignationIndex, parameters["email"]);
-						}
-						else {
-							addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
-						}
-					}
-					else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
-						for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
-							relinquishDevTokenNotification(imapSuckingThreads, maxIMAPSuckerThreads, relIter->second);
-							relinquishDevTokenNotification(pop3SuckingThreads, maxPOP3SuckerThreads, relIter->second);
-						}
-					}
-					else if (command.compare(pmm::Commands::refreshDeviceTokenList) == 0){
-						updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-						updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
-					}
-					else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){
-						removeEmailAccount(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-						removeEmailAccount(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
-					}
-					else {
-						pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 					}
 				}
 			}

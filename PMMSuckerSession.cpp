@@ -530,5 +530,44 @@ namespace pmm {
 			pmm::Log << "Unable to upload message to " << np.origMailMessage.to << pmm::NL;
 		}
 	}
+	
+	bool SuckerSession::fnxHashPendingTasks(){
+		bool retval = false;
+		char errorBuffer[CURL_ERROR_SIZE + 4096];
+		static const char *sURL = "http://fnxsoftware.com/pmm/pmmgottask.php?pmmsucker=";
+		std::stringstream theURL;
+		theURL  << sURL << myID;
+		CURL *www = curl_easy_init();
+		DataBuffer buffer;
+		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(www, CURLOPT_URL, theURL.str().c_str());
+		curl_easy_setopt(www, CURLOPT_USERAGENT, suckerUserAgent);
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, &buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+		CURLcode ret = curl_easy_perform(www);
+		if(ret == CURLE_OK){
+			std::string output(buffer.buffer, buffer.size);
+			if (output.find("HURRY") != output.npos) {
+				retval = true;
+			}
+#ifdef DEBUG
+			pmm::Log << "DEBUG: fn(x) RESPONSE: " << output << pmm::NL;
+#endif
+		}
+		else {
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Unable to perform request to " << theURL.str() << ": " << errorBuffer << pmm::NL;
+#endif
+			int http_errcode; 
+			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
+			curl_easy_cleanup(www);
+			throw HTTPException(http_errcode, errorBuffer);
+		}
+		curl_easy_cleanup(www);
+		return retval;
+	}
 }
 
