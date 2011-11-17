@@ -260,7 +260,14 @@ int main (int argc, const char * argv[])
 		}
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
+				bool doCmdCheck = false;
 				if(session.fnxHashPendingTasks()){
+					doCmdCheck = true;
+				}
+				if (tic % 900 == 0) { //At least go to app engine every 15 minutes
+					doCmdCheck = true;
+				}
+				if(doCmdCheck){
 					std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
 					int nTasks = session.getPendingTasks(tasksToRun);
 					for (int i = 0 ; i < nTasks; i++) {
