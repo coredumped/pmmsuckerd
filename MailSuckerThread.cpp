@@ -104,8 +104,9 @@ namespace pmm {
 						emailAccounts.atUnlocked(i).isEnabled = true;
 						std::stringstream incNotif;
 						incNotif << "We have incremented your notification quota on " << emailAccounts[i].email() << " by " << p.quotaValue << ".\nThanks for showing us some love!";
-						for (size_t npi = 0; npi < emailAccounts.atUnlocked(i).devTokens().size(); npi++) {
-							NotificationPayload np(emailAccounts.atUnlocked(i).devTokens()[npi], incNotif.str());
+						std::vector<std::string> myDevTokens = emailAccounts.atUnlocked(i).devTokens();
+						for (size_t npi = 0; npi < myDevTokens.size(); npi++) {
+							NotificationPayload np(myDevTokens[npi], incNotif.str());
 							np.isSystemNotification = true;
 							notificationQueue->add(np);
 						}

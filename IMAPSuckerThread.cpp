@@ -144,12 +144,12 @@ namespace pmm {
 				return;
 			}
 			//Parse e-mail, retrieve FROM and SUBJECT
-			
-			for (size_t i = 0; i < imapFetch.mailAccountInfo.devTokens().size(); i++) {
+			std::vector<std::string> myDevTokens = imapFetch.mailAccountInfo.devTokens();
+			for (size_t i = 0; i < myDevTokens.size(); i++) {
 				//Apply all processing rules before notifying
 				std::stringstream nMsg;
 				nMsg << theMessage.from << "\n" << theMessage.subject;
-				NotificationPayload np(imapFetch.mailAccountInfo.devTokens()[i], nMsg.str(), imapFetch.badgeCounter);
+				NotificationPayload np(myDevTokens[i], nMsg.str(), imapFetch.badgeCounter);
 				np.origMailMessage = theMessage;
 				notificationQueue->add(np);
 				if(i == 0){
@@ -364,8 +364,9 @@ namespace pmm {
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
 #endif
+				std::vector<std::string> myDevTokens = m.devTokens();
 				for (size_t i = 0; m.devTokens().size(); i++) {
-					NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
+					NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
 					notificationQueue->add(msg);
 				}
 				serverConnectAttempts[m.serverAddress()] = 0;
@@ -387,8 +388,9 @@ namespace pmm {
 					std::stringstream errmsg;
 #warning TODO: Find a better way to notify the user that we are unable to login into their mail account
 					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
+					std::vector<std::string> myDevTokens = m.devTokens();
 					for (size_t i = 0; m.devTokens().size(); i++) {
-						NotificationPayload msg(NotificationPayload(m.devTokens()[i], errmsg.str()));
+						NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
 						notificationQueue->add(msg);
 					}
 					serverConnectAttempts[m.serverAddress()] = 0;

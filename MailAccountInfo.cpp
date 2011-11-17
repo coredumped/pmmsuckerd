@@ -68,11 +68,7 @@ namespace pmm {
 	int MailAccountInfo::serverPort() const {
 		return serverPort_;
 	}
-	
-	std::vector<std::string> MailAccountInfo::devTokens(){
-		return std::vector<std::string>(devTokens_);
-	}
-	
+		
 	const std::vector<std::string> &MailAccountInfo::devTokens() const{
 		return devTokens_;
 	}

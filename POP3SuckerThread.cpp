@@ -111,11 +111,12 @@ namespace pmm {
 										}
 										else {
 											theMessage.to = m.email();
-											for (size_t i = 0; i < m.devTokens().size(); i++) {
+											std::vector<std::string> myDevTokens = m.devTokens();
+											for (size_t i = 0; i < myDevTokens.size(); i++) {
 												//Apply all processing rules before notifying
 												std::stringstream nMsg;
 												nMsg << theMessage.from << "\n" << theMessage.subject;
-												NotificationPayload np(m.devTokens()[i], nMsg.str(), i + 1);
+												NotificationPayload np(myDevTokens[i], nMsg.str(), i + 1);
 												np.origMailMessage = theMessage;
 												notificationQueue->add(np);
 												if(i == 0){

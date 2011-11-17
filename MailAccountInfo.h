@@ -37,7 +37,6 @@ namespace pmm {
 		const std::string &serverAddress() const;
 		int serverPort();
 		int serverPort() const;
-		std::vector<std::string> devTokens();
 		const std::vector<std::string> &devTokens() const;
 		bool useSSL();
 		bool useSSL() const;
