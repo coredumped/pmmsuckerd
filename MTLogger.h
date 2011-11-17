@@ -36,6 +36,8 @@ namespace pmm {
 		MTLogger &operator<<(long val);
 		MTLogger &operator<<(const std::string &s);
 		MTLogger &operator<<(double d);
+		
+		void flush();
 	};
 		
 	extern MTLogger Log;

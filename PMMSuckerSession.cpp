@@ -291,7 +291,10 @@ namespace pmm {
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
 #ifdef DEBUG
-			pmm::Log << "DEBUG: POST RESPONSE: " << output << pmm::NL;
+			if(output.size() > 0){
+				pmm::Log << "DEBUG: POST RESPONSE: " << output;
+				pmm::Log.flush();
+			}
 #endif
 		}
 		else {
@@ -554,7 +557,7 @@ namespace pmm {
 				retval = true;
 			}
 #ifdef DEBUG
-			pmm::Log << "DEBUG: fn(x) RESPONSE: " << output << pmm::NL;
+			if(output.size() > 0) pmm::Log << "DEBUG: fn(x) RESPONSE: " << output << pmm::NL;
 #endif
 		}
 		else {

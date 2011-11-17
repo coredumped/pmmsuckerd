@@ -135,4 +135,18 @@ namespace pmm {
 		return *this;
 	}
 	
+	void MTLogger::flush(){
+		m.lock();
+		initLogline();
+		std::stringstream ldata;
+		outputStream << streamMap[pthread_self()];
+		outputStream.flush();
+		streamMap.erase(pthread_self());
+		if(writtenBytes > maxLogSize){
+			//Tricky part we must rotate the log and compress the previous one
+			outputStream.close();
+			open(logPath);
+		}
+		m.unlock();
+	}
 }
