@@ -550,6 +550,9 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
 		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+#ifdef DEBUG
+		pmm::Log << "DEBUG: Requesting pending tasks to fn(x): " << theURL.str() << pmm::NL;
+#endif
 		CURLcode ret = curl_easy_perform(www);
 		if(ret == CURLE_OK){
 			std::string output(buffer.buffer, buffer.size);
