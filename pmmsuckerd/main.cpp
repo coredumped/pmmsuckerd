@@ -448,8 +448,9 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 		pmm::Log << "Adding " << emailAccount << " to " << m.mailboxType() << " monitoring." << pmm::NL;
 		std::stringstream msg;
 		msg << "Monitoring of " + emailAccount + " has been enabled :-)";
-		for (size_t i = 0; m.devTokens().size(); i++) {
-			pmm::NotificationPayload np(m.devTokens()[i], msg.str());
+		std::vector<std::string> myDevTokens = m.devTokens();
+		for (size_t i = 0; myDevTokens.size(); i++) {
+			pmm::NotificationPayload np(myDevTokens[i], msg.str());
 			np.isSystemNotification = true;
 			mailSuckerThreads[0].notificationQueue->add(np);
 		}
@@ -485,8 +486,9 @@ void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, si
 		mailSuckerThreads[i].emailAccounts.beginCriticalSection();
 		for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
 			pmm::MailAccountInfo m = mailSuckerThreads[i].emailAccounts.atUnlocked(j);
-			for (size_t k = 0; k < m.devTokens().size(); k++) {
-				if (m.devTokens()[k].compare(devToken) == 0) {
+			std::vector<std::string> myDevTokens = m.devTokens();
+			for (size_t k = 0; k < myDevTokens.size(); k++) {
+				if (myDevTokens[k].compare(devToken) == 0) {
 					//Erase the devToken
 					mailSuckerThreads[i].emailAccounts.atUnlocked(j).deviceTokenRemove(devToken);
 					pmm::Log << mailSuckerThreads[i].emailAccounts.atUnlocked(j).email() << " will no longer receive notifications on device " << devToken << pmm::NL;
