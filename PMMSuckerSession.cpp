@@ -336,7 +336,7 @@ namespace pmm {
 		executePost(params, output);
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
-		std::istringstream input(response.metaData["expiration"]);
+		std::istringstream input(response.metaData["regInterval"]);
 		int delta = 120;
 		input >> delta;
 		timeM.lock();
