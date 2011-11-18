@@ -114,23 +114,26 @@ namespace pmm {
 					}
 					else quotaIncreaseQueue->add(p);
 				}
-				if (emailAccounts[i].isEnabled == true) {
-					if (emailAccounts[i].quota <= 0) {
-						emailAccounts[i].isEnabled = false;
-						continue;
-					}
-					MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
-					if(mCtrl.email.size() == 0){
-						//Initial object creation
-						mCtrl.email = emailAccounts[i].email();
-						mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
-					}
-					//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
-					if (maxOpenTime > 0 && currTime - mailboxControl[emailAccounts[i].email()].openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
-					if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
-					if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
-						checkEmail(emailAccounts[i]);
-						mailboxControl[emailAccounts[i].email()].lastCheck = time(0);
+				if (emailAccounts[i].devTokens().size() > 0) {
+					//Monitor mailboxes only if they have at least one associated device
+					if (emailAccounts[i].isEnabled == true) {
+						if (emailAccounts[i].quota <= 0) {
+							emailAccounts[i].isEnabled = false;
+							continue;
+						}
+						MailboxControl mCtrl = mailboxControl[emailAccounts[i].email()];
+						if(mCtrl.email.size() == 0){
+							//Initial object creation
+							mCtrl.email = emailAccounts[i].email();
+							mailboxControl[emailAccounts[i].email()].email = emailAccounts[i].email();
+						}
+						//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
+						if (maxOpenTime > 0 && currTime - mailboxControl[emailAccounts[i].email()].openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
+						if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
+						if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
+							checkEmail(emailAccounts[i]);
+							mailboxControl[emailAccounts[i].email()].lastCheck = time(0);
+						}
 					}
 				}
 			}
