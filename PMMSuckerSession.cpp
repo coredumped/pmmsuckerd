@@ -337,9 +337,11 @@ namespace pmm {
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
 		std::istringstream input(response.metaData["expiration"]);
+		int delta = 120;
+		input >> delta;
 		timeM.lock();
-		input >> expirationTime;
-		expirationTime = time(0x00) + expirationTime - 60;
+		expirationTime = time(0x00) + delta - 60;
+		pmm::Log << "Registered with expiration timestamp: " << expirationTime << pmm::NL;
 		timeM.unlock();
 		return response.status;
 	}
