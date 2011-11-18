@@ -312,8 +312,15 @@ namespace pmm {
 						notificationQueue->add(payload);
 					}
 					else{
-						APNSLog << "Got SSL error with code=" << sse1.errorCode() << " errno=" << errno << " aborting!!!" << pmm::NL;
-						throw;
+						if(errno == 32){
+							APNSLog << "CRITICAL: Got a broken pipe, forcing reconnection timer..." << pmm::NL;
+							start = 0;
+							notificationQueue->add(payload);
+						}
+						else {
+							APNSLog << "Got SSL error with code=" << sse1.errorCode() << " errno=" << errno << " aborting!!!" << pmm::NL;
+							throw;
+						}
 					}
 				}
 				catch (...) {

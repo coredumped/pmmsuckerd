@@ -340,7 +340,7 @@ namespace pmm {
 		int delta = 120;
 		input >> delta;
 		timeM.lock();
-		expirationTime = time(0x00) + delta - 60;
+		expirationTime = time(0x00) + delta - 90;
 		pmm::Log << "Registered with expiration timestamp: " << expirationTime << pmm::NL;
 		timeM.unlock();
 		return response.status;
