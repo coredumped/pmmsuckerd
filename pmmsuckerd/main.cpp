@@ -482,6 +482,7 @@ void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems,
 				mailSuckerThreads[i].emailAccounts.erase(j);
 				mailSuckerThreads[i].emailAccounts.endCriticalSection();
 				mailAccountInfo.erase(m.email());
+				mailSuckerThreads[i].emailAccounts.endCriticalSection();
 				return;
 			}
 		}
