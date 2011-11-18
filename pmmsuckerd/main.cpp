@@ -47,7 +47,7 @@
 #define DEFAULT_THREAD_STACK_SIZE 8388608
 #endif
 #ifndef DEFAULT_COMMAND_POLLING_INTERVAL
-#define DEFAULT_COMMAND_POLLING_INTERVAL 45
+#define DEFAULT_COMMAND_POLLING_INTERVAL 30
 #endif
 
 void printHelpInfo();
@@ -458,7 +458,7 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 		std::stringstream msg;
 		msg << "Monitoring of " + emailAccount + " has been enabled :-)";
 		std::vector<std::string> myDevTokens = m.devTokens();
-		for (size_t i = 0; myDevTokens.size(); i++) {
+		for (size_t i = 0; i < myDevTokens.size(); i++) {
 			pmm::NotificationPayload np(myDevTokens[i], msg.str());
 			np.isSystemNotification = true;
 			mailSuckerThreads[0].notificationQueue->add(np);
@@ -478,7 +478,7 @@ void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems,
 		for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
 			std::string theEmail = mailSuckerThreads[i].emailAccounts.atUnlocked(j).email();
 			if (theEmail.compare(mailAccountInfo["email"]) == 0) {
-				pmm::Log << "Removing e-mail account " << theEmail << " because it was deleted from the client app" << pmm::NL;
+				pmm::Log << "Removing e-mail account " << mailAccountInfo["email"] << " because it was deleted from the client app." << pmm::NL;
 				mailSuckerThreads[i].emailAccounts.erase(j);
 				mailSuckerThreads[i].emailAccounts.endCriticalSection();
 				mailAccountInfo.erase(theEmail);
