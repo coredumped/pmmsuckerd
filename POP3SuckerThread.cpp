@@ -93,6 +93,7 @@ namespace pmm {
 						else {
 							for (int i = 0; i < carray_count(msgList); i++) {
 								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
+								if (info->msg_uidl == NULL) continue;
 								if (!fetchedMails.entryExists(m.email(), info->msg_uidl)) {
 									//Perform real message retrieval
 									char *msgBuffer;
