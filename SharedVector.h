@@ -126,6 +126,10 @@ namespace pmm {
 			dataVec.clear();
 		}
 		
+		void unlockedErase(size_t idx) {
+			dataVec.erase(dataVec.begin() + idx);
+		}
+		
 		size_t unlockedSize(){
 			return dataVec.size();
 		}

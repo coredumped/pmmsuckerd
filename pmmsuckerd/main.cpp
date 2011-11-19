@@ -479,7 +479,7 @@ void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems,
 			std::string theEmail = mailSuckerThreads[i].emailAccounts.atUnlocked(j).email();
 			if (theEmail.compare(mailAccountInfo["email"]) == 0) {
 				pmm::Log << "Removing e-mail account " << mailAccountInfo["email"] << " because it was deleted from the client app." << pmm::NL;
-				mailSuckerThreads[i].emailAccounts.erase(j);
+				mailSuckerThreads[i].emailAccounts.unlockedErase(j);
 				mailSuckerThreads[i].emailAccounts.endCriticalSection();
 				mailAccountInfo.erase(theEmail);
 				return;
