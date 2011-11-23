@@ -231,7 +231,13 @@ int main (int argc, const char * argv[])
 	std::map<std::string, int> quotas;
 	bool keepRunning = true;
 	while (keepRunning) {
-		session.performAutoRegister();
+		try {
+			session.performAutoRegister();
+		} catch (pmm::HTTPException &httex) {
+			pmm::Log << "CRITICAL: Unable to re-register, something's wrong with app engine: " << httex.errorMessage() << pmm::NL;
+			sleep(1);
+			continue;
+		}
 		if (tic % 10 == 0) {
 			//Process quota updates if any
 			if (quotaUpdateVector.size() > 0) {
