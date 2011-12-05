@@ -88,6 +88,8 @@ namespace pmm {
 		const char *relinquishDevToken = "relinquishDevToken";
 		const char *deleteEmailAccount = "deleteEmailAccount";
 		const char *refreshDeviceTokenList = "refreshDeviceTokenList";
+		const char *silentModeSet = "silentModeSet";
+		const char *silentModeClear = "silentModeClear";
 	}
 	
 #ifdef __APPLE__

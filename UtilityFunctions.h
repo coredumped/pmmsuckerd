@@ -9,6 +9,7 @@
 #ifndef PMM_Sucker_UtilityFunctions_h
 #define PMM_Sucker_UtilityFunctions_h
 #include <string>
+#include <sqlite3.h>
 #include "MailAccountInfo.h"
 
 namespace pmm {
@@ -19,6 +20,7 @@ namespace pmm {
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts);
 	
 	void nltrim(std::string &s);
+	bool tableExists(sqlite3 *dbConn, const std::string &tablename);
 }
 
 #endif

@@ -22,6 +22,7 @@
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
 #include "MessageUploaderThread.h"
+#include "SilentMode.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
@@ -325,6 +326,12 @@ int main (int argc, const char * argv[])
 						else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){
 							removeEmailAccount(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
 							removeEmailAccount(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+						}
+						else if (command.compare(pmm::Commands::silentModeSet) == 0){
+							pmm::SilentMode::set(parameters["email"], atoi(parameters["startHour"].c_str()), atoi(parameters["startMinute"].c_str()), atoi(parameters["endHour"].c_str()), atoi(parameters["endMinute"].c_str()));
+						}
+						else if (command.compare(pmm::Commands::silentModeClear) == 0){
+							pmm::SilentMode::clear(parameters["email"]);
 						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;

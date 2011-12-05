@@ -14,6 +14,8 @@
 #include <string.h>
 #include "UtilityFunctions.h"
 #include "Mutex.h"
+#include "GenericException.h"
+#include "MTLogger.h"
 
 namespace pmm {
 	
@@ -79,5 +81,35 @@ namespace pmm {
 	void nltrim(std::string &s){
 		if(s.size() >= 1 && s[s.size() - 1] == '\n') s = s.substr(0, s.size() - 1);
 		if(s.size() >= 1 && s[s.size() - 1] == '\r') s = s.substr(0, s.size() - 1);
+	}
+	
+	bool tableExists(sqlite3 *dbConn, const std::string &tablename){
+		std::string sqlCmd = "SELECT name FROM sqlite_master";
+		sqlite3_stmt *statement;
+		std::stringstream errmsg;
+		char *sztail;
+		int errCode = sqlite3_prepare_v2(dbConn, sqlCmd.c_str(), (int)sqlCmd.size(), &statement, (const char **)&sztail);
+		if (errCode != SQLITE_OK) {
+			errmsg << "Unable to execute query " << sqlCmd << " due to: " << sqlite3_errmsg(dbConn);
+#ifdef DEBUG
+			pmm::Log << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());
+		}
+		bool gotTable = false;
+		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
+			char *theTable = (char *)sqlite3_column_text(statement, 0);
+			if (tablename.compare(theTable) == 0) gotTable = true;
+		}
+		if(errCode != SQLITE_DONE){
+			errmsg << "Unable to retrieve values from query: " << sqlCmd << " due to: " << sqlite3_errmsg(dbConn);
+			sqlite3_finalize(statement);
+#ifdef DEBUG
+			pmm::Log << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());			
+		}
+		sqlite3_finalize(statement);
+		return gotTable;
 	}
 }

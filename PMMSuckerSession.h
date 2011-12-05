@@ -91,6 +91,8 @@ namespace pmm {
 		extern const char *relinquishDevToken;
 		extern const char *deleteEmailAccount;
 		extern const char *refreshDeviceTokenList;
+		extern const char *silentModeSet;
+		extern const char *silentModeClear;
 	}
 }
 

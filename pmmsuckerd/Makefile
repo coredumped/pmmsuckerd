@@ -20,12 +20,12 @@ all: pmmsuckerd
 pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o \
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
-		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o
+		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
 				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
-				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o $(LIBS)
+				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -51,7 +51,7 @@ GenericThread.o: ../GenericThread.cpp ../GenericThread.h
 GenericException.o: ../GenericException.cpp ../GenericException.h
 	$(GCC) $(CFLAGS) -c -o GenericException.o ../GenericException.cpp
 
-APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h
+APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h ../SilentMode.h
 	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
 
 ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h ../GenericThread.h
@@ -89,6 +89,9 @@ POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerT
 
 DataTypes.o: ../DataTypes.cpp ../DataTypes.h
 	$(GCC) $(CFLAGS) -c -o DataTypes.o ../DataTypes.cpp
+
+SilentMode.o: ../SilentMode.cpp ../SilentMode.h
+	$(GCC) $(CFLAGS) -c -o SilentMode.o ../SilentMode.cpp
 
 clean:
 	rm -f *.o pmmsuckerd
