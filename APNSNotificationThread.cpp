@@ -15,6 +15,7 @@
 #include "APNSNotificationThread.h"
 #include "Mutex.h"
 #include "UtilityFunctions.h"
+#include "SilentMode.h"
 #ifndef DEVICE_BINARY_SIZE
 #define DEVICE_BINARY_SIZE 32
 #endif
@@ -300,7 +301,11 @@ namespace pmm {
 				//Verify here if we should notify the event or not
 #warning TODO: Remeber to add the notification filtering code here
 				try {
-					notifyTo(payload.deviceToken(), payload);
+					time_t theTime;
+					time(&theTime);
+					struct tm tmTime;
+					gmtime_r(&theTime, &tmTime);					
+					if(!SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)) notifyTo(payload.deviceToken(), payload);
 				} 
 				catch (SSLException &sse1){
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
