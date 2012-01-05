@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "POP3SuckerThread.h"
 #include "ThreadDispatcher.h"
+#include "QuotaDB.h"
 
 #ifndef DEFAULT_MAX_POP3_CONNECTION_TIME
 #define DEFAULT_MAX_POP3_CONNECTION_TIME 500
@@ -122,6 +123,9 @@ namespace pmm {
 												notificationQueue->add(np);
 												if(i == 0){
 													fetchedMails.addEntry(m.email(), info->msg_uidl);
+													if(!QuotaDB::decrease(m.email())){
+														pop3Log << "ATTENTION: Account " << m.email() << " has ran out of quota!" << pmm::NL;
+													}
 													quotaUpdateVector->push_back(m.email());
 													pmmStorageQueue->add(np);
 												}

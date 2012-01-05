@@ -23,6 +23,7 @@
 #include "MTLogger.h"
 #include "MessageUploaderThread.h"
 #include "SilentMode.h"
+#include "QuotaDB.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
@@ -175,7 +176,11 @@ int main (int argc, const char * argv[])
 	//2. Request accounts to poll
 	std::vector<pmm::MailAccountInfo> emailAccounts;
 	session.retrieveEmailAddresses(emailAccounts);
-	//3. Save email accounts to local datastore, perform full database cleanup
+	//3. Save email account information to local datastore, perform full database cleanup
+	pmm::QuotaDB::clearData();
+	for (size_t i = 0; i < emailAccounts.size(); i++) {
+		pmm::QuotaDB::set(emailAccounts[i].email(), emailAccounts[i].quota);
+	}
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
@@ -264,6 +269,12 @@ int main (int argc, const char * argv[])
 				}
 				//In case we failed to report any quotas the service will re-report them again
 			}
+		}
+		if(tic % 86400 == 0){
+			//Cleanup the fetch mail cache database
+			pmm::Log << "Expiring old POP3 e-mail previews from cache..." << pmm::NL;
+			//pmm::FetchedMailsCache fCache;
+			//fCache.expireOldEntries();
 		}
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{

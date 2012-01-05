@@ -11,6 +11,7 @@
 #include <map>
 #include "MailSuckerThread.h"
 #include "MTLogger.h"
+#include "QuotaDB.h"
 #include "libetpan/libetpan.h"
 
 #ifndef DEFAULT_WAIT_TIME_BETWEEN_MAIL_CHECKS
@@ -117,6 +118,10 @@ namespace pmm {
 				if (emailAccounts[i].devTokens().size() > 0) {
 					//Monitor mailboxes only if they have at least one associated device
 					if (emailAccounts[i].isEnabled == true) {
+						if (QuotaDB::remaning(emailAccounts[i].email()) <= 0) {
+							emailAccounts[i].isEnabled = false;
+							continue;
+						}
 						if (emailAccounts[i].quota <= 0) {
 							emailAccounts[i].isEnabled = false;
 							continue;

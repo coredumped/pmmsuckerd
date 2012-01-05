@@ -229,6 +229,21 @@ namespace pmm {
 	
 	void FetchedMailsCache::expireOldEntries(){
 #warning TODO: Implement a way to expire old e-mail entries plus a trigger to activate it
+		sqlite3 *conn = openDatabase();
+		char *errmsg_s;
+		std::stringstream sqlCmd;
+		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE timestamp < " << (int)time(NULL) - 5184000;
+		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+		if (errCode != SQLITE_OK) {
+			closeDatabase(conn);
+			std::stringstream errmsg;
+			errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());
+		}
+		closeDatabase(conn);
 	}
 	
 	void FetchedMailsCache::removeMultipleEntries(const std::string &email, const std::vector<uint32_t> &uidList){

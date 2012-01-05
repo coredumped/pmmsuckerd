@@ -12,6 +12,9 @@
 #ifndef MAXPAYLOAD_SIZE
 #define MAXPAYLOAD_SIZE 256
 #endif
+#ifndef DEFAULT_SILENT_SOUND
+#define DEFAULT_SILENT_SOUND "sln.caf"
+#endif
 
 namespace pmm {
 	
@@ -136,5 +139,9 @@ namespace pmm {
 
 	std::string &NotificationPayload::deviceToken(){
 		return devToken;
+	}
+	
+	void NotificationPayload::useSilentSound(){
+		
 	}
 }

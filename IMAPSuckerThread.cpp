@@ -16,7 +16,7 @@
 #include "MailMessage.h"
 #include "libetpan/libetpan.h"
 #include <string.h>
-
+#include "QuotaDB.h"
 
 #ifndef DEFAULT_MAX_MAIL_FETCHERS
 #define DEFAULT_MAX_MAIL_FETCHERS 2
@@ -154,6 +154,9 @@ namespace pmm {
 				notificationQueue->add(np);
 				if(i == 0){
 					fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
+					if (!QuotaDB::decrease(imapFetch.mailAccountInfo.email())) {
+						imapLog << "ATTENTION: Account " << imapFetch.mailAccountInfo.email() << " has ran out of quota!!!" << pmm::NL;
+					}
 					quotaUpdateVector->push_back(imapFetch.mailAccountInfo.email());
 					pmmStorageQueue->add(np);
 				}
