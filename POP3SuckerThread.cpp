@@ -125,6 +125,11 @@ namespace pmm {
 													fetchedMails.addEntry(m.email(), info->msg_uidl);
 													if(!QuotaDB::decrease(m.email())){
 														pop3Log << "ATTENTION: Account " << m.email() << " has ran out of quota!" << pmm::NL;
+														std::stringstream msg;
+														msg << "You have ran out of quota on " << m.email() << ", you may purchase more to keep receiving notifications.";
+														pmm::NotificationPayload npi(myDevTokens[i], msg.str());
+														npi.isSystemNotification = true;
+														notificationQueue->add(npi);
 													}
 													quotaUpdateVector->push_back(m.email());
 													pmmStorageQueue->add(np);

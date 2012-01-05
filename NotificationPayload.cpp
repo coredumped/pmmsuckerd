@@ -142,6 +142,7 @@ namespace pmm {
 	}
 	
 	void NotificationPayload::useSilentSound(){
-		
+		_soundName = DEFAULT_SILENT_SOUND;
+		build();
 	}
 }

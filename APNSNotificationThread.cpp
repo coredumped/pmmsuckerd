@@ -304,8 +304,11 @@ namespace pmm {
 					time_t theTime;
 					time(&theTime);
 					struct tm tmTime;
-					gmtime_r(&theTime, &tmTime);					
-					if(!SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)) notifyTo(payload.deviceToken(), payload);
+					gmtime_r(&theTime, &tmTime);		
+					if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){
+						payload.useSilentSound();
+					}
+					notifyTo(payload.deviceToken(), payload);
 				} 
 				catch (SSLException &sse1){
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
