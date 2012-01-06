@@ -26,13 +26,18 @@ namespace pmm {
 	static bool _initialized = false;
 	static const char *quota_table = DEFAULT_QUOTA_DB_TABLE;
 	static const char *quota_datafile = DEFAULT_QUOTA_DB_DATAFILE;
+	static sqlite3 *_uniqueConn = NULL;
 	
 	static sqlite3 *_connect2QuotaDB(){
 		sqlite3 *dbConn = NULL;
-		int errcode = sqlite3_open(quota_datafile, &dbConn);
-		if (errcode != SQLITE_OK) {
-			throw GenericException(sqlite3_errmsg(dbConn));
+		if (_uniqueConn == NULL) {
+			int errcode = sqlite3_open(quota_datafile, &dbConn);
+			if (errcode != SQLITE_OK) {
+				throw GenericException(sqlite3_errmsg(dbConn));
+			}
+			_uniqueConn = dbConn;
 		}
+		else dbConn = _uniqueConn;
 		return dbConn;
 	}
 	
@@ -75,7 +80,7 @@ namespace pmm {
 				throw GenericException(errmsg.str());
 			}
 		}
-		if(conn == NULL) sqlite3_close(dbConn);
+		//if(conn == NULL) sqlite3_close(dbConn);
 		_initialized = true;
 	}
 	
@@ -95,7 +100,7 @@ namespace pmm {
 		}	
 		//Retrieve remaing quota
 		quotaval = _remainingQuotaGet(emailAccount, dbConn);
-		sqlite3_close(dbConn);		
+		//sqlite3_close(dbConn);		
 		if(quotaval <= 0) return false;
 		return true;
 	}
@@ -113,7 +118,7 @@ namespace pmm {
 			pmm::Log << errmsg.str() << pmm::NL;
 			throw GenericException(errmsg.str());			
 		}	
-		if(conn == NULL) sqlite3_close(dbConn);
+		//if(conn == NULL) sqlite3_close(dbConn);
 	}
 	
 	void QuotaDB::increase(const std::string &emailAccount, int value){
@@ -128,7 +133,7 @@ namespace pmm {
 			pmm::Log << errmsg.str() << pmm::NL;
 			throw GenericException(errmsg.str());			
 		}	
-		sqlite3_close(dbConn);				
+		//sqlite3_close(dbConn);				
 	}
 	
 	void QuotaDB::clearData(){
@@ -143,14 +148,14 @@ namespace pmm {
 			pmm::Log << errmsg.str() << pmm::NL;
 			throw GenericException(errmsg.str());			
 		}	
-		sqlite3_close(dbConn);						
+		//sqlite3_close(dbConn);						
 	}
 	
 	int QuotaDB::remaning(const std::string &emailAccount){
 		int retval;
 		sqlite3 *dbConn = _connect2QuotaDB();
 		retval = _remainingQuotaGet(emailAccount, dbConn);
-		sqlite3_close(dbConn);
+		//sqlite3_close(dbConn);
 		return retval;
 	}
 	
