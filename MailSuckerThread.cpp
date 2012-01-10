@@ -100,6 +100,7 @@ namespace pmm {
 				if(quotaIncreaseQueue->extractEntry(p)){
 					//Verify if we should upgrade quotas on an account
 					if (emailAccounts[i].email().compare(p.emailAddress) == 0) {
+						QuotaDB::set(emailAccounts[i].email(), p.quotaValue);
 						emailAccounts.beginCriticalSection();
 						emailAccounts.atUnlocked(i).quota = p.quotaValue;
 						emailAccounts.atUnlocked(i).isEnabled = true;
