@@ -200,7 +200,7 @@ namespace pmm {
 				pop3Fetcher[i].notificationQueue = notificationQueue;
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
-				ThreadDispatcher::start(pop3Fetcher[i], 8 * 1024 * 1024);
+				ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 			}
 		}
 		mailboxControl[m.email()].isOpened = true;
