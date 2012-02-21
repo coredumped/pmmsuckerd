@@ -41,7 +41,7 @@ namespace pmm {
 		if (__prefDB == NULL) {
 			if(sqlite3_open(prefDBDatafile, &__prefDB) != SQLITE_OK){
 				pmm::Log << "Unable to open " << prefDBDatafile << " datafile: " << sqlite3_errmsg(__prefDB) << pmm::NL;
-				abort();
+				throw GenericException(sqlite3_errmsg(__prefDB));
 			}
 			//Create preferences table if it does not exists
 			if(!pmm::tableExists(__prefDB, prefTable)){
@@ -83,9 +83,9 @@ namespace pmm {
 			sqlite3_finalize(statement);
 		}
 		else {
-			const char *errmsg = sqlite3_errmsg(db);
+			const char *errmsg = sqlite3_errmsg(dbConn);
 			pmm::Log << "Unable to retrieve default alert tone for " << emailAccount << ": " << errmsg << " using " << sqlCmd.str() << pmm::NL;
-			throw GenericException(sqlite3_errmsg(db));
+			throw GenericException(sqlite3_errmsg(dbConn));
 		}
 		if (alertTonePath.size() == 0) {
 			alertTonePath = "pmm.caf";
