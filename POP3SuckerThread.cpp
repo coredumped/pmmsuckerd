@@ -117,8 +117,10 @@ namespace pmm {
 											for (size_t i = 0; i < myDevTokens.size(); i++) {
 												//Apply all processing rules before notifying
 												std::stringstream nMsg;
+												std::string alertTone;
+												PreferenceEngine::defaultAlertTone(alertTone, m.email()); //Here we retrieve the user alert tone
 												nMsg << theMessage.from << "\n" << theMessage.subject;
-												NotificationPayload np(myDevTokens[i], nMsg.str(), i + 1);
+												NotificationPayload np(myDevTokens[i], nMsg.str(), i + 1, alertTone);
 												np.origMailMessage = theMessage;
 												notificationQueue->add(np);
 												if(i == 0){

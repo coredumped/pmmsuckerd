@@ -24,6 +24,7 @@
 #include "MessageUploaderThread.h"
 #include "SilentMode.h"
 #include "QuotaDB.h"
+#include "UserPreferences.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 2
 #endif
@@ -82,6 +83,8 @@ int main (int argc, const char * argv[])
 	pmm::SharedVector<std::string> quotaUpdateVector;
 	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
 	pmm::SharedQueue<pmm::QuotaIncreasePetition> quotaIncreaseQueue;
+	pmm::SharedQueue<pmm::PreferenceQueueItem> preferenceSetQueue;
+	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
 	SSL_library_init();
 	SSL_load_error_strings();
@@ -144,6 +147,7 @@ int main (int argc, const char * argv[])
 	pmm::pop3Log.open("pop3-fetch.log");
 	pmm::pop3Log.setTag("POP3SuckerThread");
 	pmm::SuckerSession session(pmmServiceURL);
+	preferenceEngine.preferenceQueue = &preferenceSetQueue;
 	//1. Register to PMMService...
 	try {
 		session.register2PMM();
@@ -200,6 +204,8 @@ int main (int argc, const char * argv[])
 		msgUploaderThreads[i].pmmStorageQueue = &pmmStorageQueue;
 		pmm::ThreadDispatcher::start(msgUploaderThreads[i], threadStackSize);
 	}
+	//Initiate Preference Management Engine
+	pmm::ThreadDispatcher::start(preferenceEngine, threadStackSize);
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
 	pmm::splitEmailAccounts(emailAccounts, imapAccounts, pop3Accounts);
 	//5. Dispatch polling threads for imap
@@ -343,6 +349,16 @@ int main (int argc, const char * argv[])
 						}
 						else if (command.compare(pmm::Commands::silentModeClear) == 0){
 							pmm::SilentMode::clear(parameters["email"]);
+						}
+						else if (command.compare(pmm::Commands::refreshUserPreference) == 0){
+							pmm::PreferenceQueueItem prefItem;
+							prefItem.emailAccount = parameters["email"];
+							prefItem.settingKey = parameters["settingKey"];
+							prefItem.settingValue = parameters["settingValue"];
+							preferenceSetQueue.add(prefItem);
+							if (getenv("DEBUG")) {
+								pmm::Log << "Refreshing user(" << prefItem.emailAccount << ") " << prefItem.settingKey << "=" << prefItem.settingValue << pmm::NL;
+							}
 						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;

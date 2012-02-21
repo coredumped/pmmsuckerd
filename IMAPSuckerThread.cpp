@@ -147,9 +147,13 @@ namespace pmm {
 			std::vector<std::string> myDevTokens = imapFetch.mailAccountInfo.devTokens();
 			for (size_t i = 0; i < myDevTokens.size(); i++) {
 				//Apply all processing rules before notifying
+				std::string alertTone;
 				std::stringstream nMsg;
 				nMsg << theMessage.from << "\n" << theMessage.subject;
-				NotificationPayload np(myDevTokens[i], nMsg.str(), imapFetch.badgeCounter);
+				
+				PreferenceEngine::defaultAlertTone(alertTone, imapFetch.mailAccountInfo.email()); //Here we retrieve the user alert tone
+				
+				NotificationPayload np(myDevTokens[i], nMsg.str(), imapFetch.badgeCounter, alertTone);
 				np.origMailMessage = theMessage;
 				notificationQueue->add(np);
 				if(i == 0){

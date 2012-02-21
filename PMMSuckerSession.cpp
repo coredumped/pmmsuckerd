@@ -90,6 +90,7 @@ namespace pmm {
 		const char *refreshDeviceTokenList = "refreshDeviceTokenList";
 		const char *silentModeSet = "silentModeSet";
 		const char *silentModeClear = "silentModeClear";
+		const char *refreshUserPreference = "refreshUserPreference";
 	}
 	
 #ifdef __APPLE__

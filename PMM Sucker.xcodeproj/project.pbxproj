@@ -33,6 +33,8 @@
 		8293E232142CCD1100F62897 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
 		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
 		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
+		82B6109414F2A2FC00975C32 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
+		82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
 		82BD8EBD148BBB4B008DDEA1 /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
 		82BD8EBE148BBB87008DDEA1 /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
 		82ED5B0B14317FD000444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
@@ -111,6 +113,8 @@
 		8293E22F142CCD0000F62897 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.cc"; sourceTree = "<group>"; };
 		8293E230142CCD0000F62897 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.h"; sourceTree = "<group>"; };
 		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
+		82B6109114F2A28200975C32 /* UserPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserPreferences.h; sourceTree = "<group>"; };
+		82B6109314F2A2FC00975C32 /* UserPreferences.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserPreferences.cpp; sourceTree = "<group>"; };
 		82BD8EBA148BBAAA008DDEA1 /* SilentMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SilentMode.h; sourceTree = "<group>"; };
 		82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SilentMode.cpp; sourceTree = "<group>"; };
 		82ED5B071431761400444844 /* APNSNotificationThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APNSNotificationThread.h; sourceTree = "<group>"; };
@@ -334,6 +338,8 @@
 				82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */,
 				8217B24214B5DCEA00E45AA0 /* QuotaDB.h */,
 				8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */,
+				82B6109114F2A28200975C32 /* UserPreferences.h */,
+				82B6109314F2A2FC00975C32 /* UserPreferences.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -446,6 +452,7 @@
 				82FA4DB21469C7B300A21B11 /* POP3SuckerThread.cpp in Sources */,
 				82BD8EBD148BBB4B008DDEA1 /* SilentMode.cpp in Sources */,
 				8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */,
+				82B6109414F2A2FC00975C32 /* UserPreferences.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -453,6 +460,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */,
 				8217B24614B5E01100E45AA0 /* QuotaDB.cpp in Sources */,
 				82BD8EBE148BBB87008DDEA1 /* SilentMode.cpp in Sources */,
 				82FA4DB31469C80B00A21B11 /* POP3SuckerThread.cpp in Sources */,

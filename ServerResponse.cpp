@@ -3,7 +3,7 @@
 //  PMM Sucker
 //
 //  Created by Juan V. Guerrero on 9/21/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 fn(x) Software. All rights reserved.
 //
 
 #include <iostream>
@@ -35,7 +35,6 @@ namespace pmm {
 						std::cerr << "METADATA: " << iter->first << "=" << metaData[iter->first] << std::endl;
 #endif
 					}
-					
 				}
 			}
 			if (obj.has<std::string>(errorDescriptionMember)) {
@@ -63,5 +62,4 @@ namespace pmm {
 			throw JSONParseException("Unable to parser server response, at least the \"status\" field must be present");
 		}
 	}
-
 }

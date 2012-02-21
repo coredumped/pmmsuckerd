@@ -10,6 +10,7 @@
 #define PMM_Sucker_POP3SuckerThread_h
 #include "MailSuckerThread.h"
 #include "FetchedMailsCache.h"
+#include "UserPreferences.h"
 #include "libetpan/libetpan.h"
 #include <map>
 

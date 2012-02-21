@@ -11,6 +11,7 @@
 #include "MailSuckerThread.h"
 #include "SharedQueue.h"
 #include "FetchedMailsCache.h"
+#include "UserPreferences.h"
 #include <map>
 #include "libetpan/libetpan.h"
 
