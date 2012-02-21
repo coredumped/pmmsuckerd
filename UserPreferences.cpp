@@ -51,7 +51,7 @@ namespace pmm {
 				createCmd << "email	TEXT PRIMARY KEY,";
 				createCmd << "domain TEXT DEFAULT '" << defaultPrefDomain << "',";
 				createCmd << "settingKey TEXT NOT NULL,";
-				createCmd << "settingValue TEXT DEFAULT '',";
+				createCmd << "settingValue TEXT DEFAULT ''";
 				createCmd << ")";
 				if(sqlite3_exec(__prefDB, createCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK){
 					pmm::Log << "Unable to create preferences table: " << errmsg << pmm::NL;
