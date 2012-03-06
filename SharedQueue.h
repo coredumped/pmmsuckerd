@@ -9,6 +9,7 @@
 #ifndef PMM_Sucker_SharedQueue_h
 #define PMM_Sucker_SharedQueue_h
 #include "Mutex.h"
+#include "MTLogger.h"
 #include <string>
 #include <vector>
 #include <queue>
@@ -41,6 +42,7 @@ namespace pmm {
 			m.lock();
 			try {
 				queueData.push(entry);
+				if(queueData.size() % 100) pmm::Log << "There is a queue with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;
 			} catch (...) {
 				m.unlock();
 				throw;
