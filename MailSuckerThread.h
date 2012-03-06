@@ -57,6 +57,7 @@ namespace pmm {
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
 		
+		virtual void initialize();
 		virtual void operator()();
 	};
 	

@@ -55,6 +55,8 @@ namespace pmm {
 		POP3SuckerThread();
 		POP3SuckerThread(size_t _maxMailFetchers);
 		virtual ~POP3SuckerThread();
+		
+		virtual void initialize();
 	};
 	
 	extern FetchedMailsCache fetchedMails;

@@ -82,6 +82,10 @@ namespace pmm {
 	MailSuckerThread::~MailSuckerThread(){
 		
 	}
+	
+	void MailSuckerThread::initialize(){
+
+	}
 
 	void MailSuckerThread::operator()(){
 		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
@@ -93,6 +97,7 @@ namespace pmm {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
 		}
 #endif
+		initialize();
 		while (true) {
 			time_t currTime = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
