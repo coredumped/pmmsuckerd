@@ -188,7 +188,8 @@ namespace pmm {
 	}
 	
 	POP3SuckerThread::POP3SuckerThread(size_t _maxMailFetchers){
-		
+		maxPOP3FetcherThreads = _maxMailFetchers;	
+		pop3Fetcher = NULL;
 	}
 	
 	POP3SuckerThread::~POP3SuckerThread(){
@@ -197,7 +198,6 @@ namespace pmm {
 
 	void POP3SuckerThread::initialize(){
 		pmm::Log << "Initializing pop3 fetchers..." << pmm::NL;
-		if (pop3Fetcher == NULL) {
 			pop3Log << "Instantiating pop3 message fetching threads for the first time..." << pmm::NL;
 			pop3Fetcher = new POP3FetcherThread[maxPOP3FetcherThreads];
 			for (size_t i = 0; i < maxPOP3FetcherThreads; i++) {
@@ -207,7 +207,6 @@ namespace pmm {
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 			}
-		}		
 	}
 	
 	void POP3SuckerThread::closeConnection(const MailAccountInfo &m){
