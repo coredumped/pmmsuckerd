@@ -38,7 +38,8 @@ namespace pmm {
 			 mout.unlock();*/
 			pthread_attr_setstacksize(&attr, stackSize);
 		}
-		gt.threadid = (long)&theThread;
+		pthread_t *ptr = &theThread;
+		gt.threadid = (long) *ptr;
 		int retval = pthread_create(&theThread, &attr, (void * (*)(void *))runThreadInBackground, (void *)&gt);
 		if (retval == EAGAIN) {
 			throw ThreadExecutionException("There are not enough resources to start a new thread");
