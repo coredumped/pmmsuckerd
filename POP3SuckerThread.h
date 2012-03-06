@@ -34,7 +34,7 @@ namespace pmm {
 		class POP3FetcherThread : public GenericThread {
 		public:
 			SharedQueue<NotificationPayload> *notificationQueue;
-			SharedQueue<MailAccountInfo> *fetchQueue;
+			//SharedQueue<MailAccountInfo> *fetchQueue;
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
 			SharedVector<std::string> *quotaUpdateVector;
 			POP3FetcherThread();
@@ -45,7 +45,6 @@ namespace pmm {
 		size_t maxPOP3FetcherThreads;
 		POP3FetcherThread *pop3Fetcher;
 		std::map<std::string, POP3Control> pop3Control;
-		SharedQueue<MailAccountInfo> fetchQueue;
 	protected:
 		void closeConnection(const MailAccountInfo &m); //Override me
 		void openConnection(const MailAccountInfo &m); //Override me

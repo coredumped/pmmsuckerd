@@ -39,8 +39,10 @@
 namespace pmm {
 	MTLogger pop3Log;
 	
+	SharedQueue<MailAccountInfo> mainFetchQueue;
+	
 	POP3SuckerThread::POP3FetcherThread::POP3FetcherThread(){
-		fetchQueue = NULL;
+		//fetchQueue = NULL;
 		notificationQueue = NULL;
 		quotaUpdateVector = NULL;
 		pmmStorageQueue = NULL;
@@ -51,9 +53,9 @@ namespace pmm {
 	}
 	
 	void POP3SuckerThread::POP3FetcherThread::operator()(){
-		if (fetchQueue == NULL) {
+		/*if (fetchQueue == NULL) {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL fetchQueue.");
-		}
+		}*/
 		if (notificationQueue == NULL) {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL notificationQueue.");
 		}
@@ -63,10 +65,9 @@ namespace pmm {
 		if (quotaUpdateVector == NULL) {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL quotaUpdateVector.");
 		}
-
 		while (true) {
 			MailAccountInfo m;
-			while (fetchQueue->extractEntry(m)) {
+			while (mainFetchQueue.extractEntry(m)) {
 				//Fetch messages for account here!!!
 				mailpop3 *pop3 = mailpop3_new(0, 0);
 				int result;
@@ -95,6 +96,9 @@ namespace pmm {
 							for (int i = 0; i < carray_count(msgList); i++) {
 								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 								if (info->msg_uidl == NULL) continue;
+								if (!m.isEnabled) {
+									break;
+								}
 								if (!fetchedMails.entryExists(m.email(), info->msg_uidl)) {
 									//Perform real message retrieval
 									char *msgBuffer;
@@ -201,7 +205,7 @@ namespace pmm {
 			pop3Log << "Instantiating pop3 message fetching threads for the first time..." << pmm::NL;
 			pop3Fetcher = new POP3FetcherThread[maxPOP3FetcherThreads];
 			for (size_t i = 0; i < maxPOP3FetcherThreads; i++) {
-				pop3Fetcher[i].fetchQueue = &fetchQueue;
+				//pop3Fetcher[i].fetchQueue = &mainFetchQueue;
 				pop3Fetcher[i].notificationQueue = notificationQueue;
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
@@ -218,7 +222,7 @@ namespace pmm {
 			pop3Log << "Instantiating pop3 message fetching threads for the first time..." << pmm::NL;
 			pop3Fetcher = new POP3FetcherThread[maxPOP3FetcherThreads];
 			for (size_t i = 0; i < maxPOP3FetcherThreads; i++) {
-				pop3Fetcher[i].fetchQueue = &fetchQueue;
+				//pop3Fetcher[i].fetchQueue = &mainFetchQueue;
 				pop3Fetcher[i].notificationQueue = notificationQueue;
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
@@ -263,7 +267,7 @@ namespace pmm {
 		pop3Log << "Retrieving new emails for: " << m.email() << "..." << pmm::NL;
 #endif
 		//Implement asynchronous retrieval code, tipically from a thread
-		fetchQueue.add(m);
+		mainFetchQueue.add(m);
 	}
 
 }
