@@ -112,6 +112,9 @@ namespace pmm {
 										time(&theTime);
 										struct tm tmTime;
 										gmtime_r(&theTime, &tmTime);
+#ifdef DEBUG
+										pmm::Log << "Message is " << (timegm(&tmTime) - theMessage.dateOfArrival) << " seconds old" << pmm::NL;
+#endif
 										if (timegm(&tmTime) - theMessage.dateOfArrival > DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 										}
