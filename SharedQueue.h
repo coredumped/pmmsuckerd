@@ -42,7 +42,7 @@ namespace pmm {
 			m.lock();
 			try {
 				queueData.push(entry);
-				if(queueData.size() % 100) pmm::Log << "There is a queue with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;
+				if(queueData.size() % 100 == 0) pmm::Log << "There is a queue with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;
 			} catch (...) {
 				m.unlock();
 				throw;
@@ -67,7 +67,7 @@ namespace pmm {
 			bool got_entry = false;;
 			m.lock();
 			try{
-				if (queueData.size() != 0) {
+				if (!queueData.empty()) {
 					val = queueData.front();
 					queueData.pop();
 					got_entry = true;
