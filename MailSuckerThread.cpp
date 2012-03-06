@@ -100,7 +100,7 @@ namespace pmm {
 		initialize();
 		while (true) {
 			time_t currTime = time(0);
-			if(currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
+			if(emailAccounts.size() == 0 && currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				QuotaIncreasePetition p;
 				if(quotaIncreaseQueue->extractEntry(p)){
