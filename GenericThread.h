@@ -16,6 +16,7 @@ namespace pmm {
 	private:
 	protected:
 	public:
+		long threadid;
 		/** Tells wheter the thread is still running */
 		pmm::AtomicFlag isRunning;
 		GenericThread();

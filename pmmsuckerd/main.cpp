@@ -512,10 +512,13 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 	pmm::MailAccountInfo m;
 	if(session.retrieveEmailAddressInfo(m, emailAccount)){
 		size_t idx = *assignationIndex;
+		std::stringstream lg;
+		lg << "Adding " << emailAccount << " to " << m.mailboxType() << " monitoring on thread: " << std::hex << (long)mailSuckerThreads[idx].threadid;
+		pmm::Log << lg.str() << pmm::NL;
 		mailSuckerThreads[idx++].emailAccounts.push_back(m);
 		if(idx >= nElems) idx = 0;
 		*assignationIndex = idx;
-		pmm::Log << "Adding " << emailAccount << " to " << m.mailboxType() << " monitoring." << pmm::NL;
+		
 		std::stringstream msg;
 		msg << "Monitoring of " + emailAccount + " has been enabled :-)";
 		std::vector<std::string> myDevTokens = m.devTokens();
