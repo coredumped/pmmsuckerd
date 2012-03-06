@@ -100,6 +100,7 @@ namespace pmm {
 		initialize();
 		while (true) {
 			time_t currTime = time(0);
+			if(currTime % 60 == 0) pmm::Log << "There are no pop3 accounts to monitor" << pmm::NL;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				QuotaIncreasePetition p;
 				if(quotaIncreaseQueue->extractEntry(p)){
@@ -146,7 +147,17 @@ namespace pmm {
 							mailboxControl[emailAccounts[i].email()].lastCheck = time(0);
 						}
 					}
+#ifdef DEBUG
+					else {
+						if(currTime % 60 == 0) pmm::Log << emailAccounts[i].email() << " is not enabled, ignoring..." << pmm::NL;
+					}
+#endif
 				}
+#ifdef DEBUG
+				else {
+					if(currTime % 60 == 0) pmm::Log << emailAccounts[i].email() << " has no registered devtokens, ignoring..." << pmm::NL;
+				}
+#endif
 			}
 			usleep(iterationWaitMicroSeconds);
 		}

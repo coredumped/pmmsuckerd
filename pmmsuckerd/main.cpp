@@ -513,7 +513,6 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 	if(session.retrieveEmailAddressInfo(m, emailAccount)){
 		size_t idx = *assignationIndex;
 		mailSuckerThreads[idx++].emailAccounts.push_back(m);
-		pmm::QuotaDB::set(m.email(), m.quota);
 		if(idx >= nElems) idx = 0;
 		*assignationIndex = idx;
 		pmm::Log << "Adding " << emailAccount << " to " << m.mailboxType() << " monitoring." << pmm::NL;
@@ -525,6 +524,7 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 			np.isSystemNotification = true;
 			mailSuckerThreads[0].notificationQueue->add(np);
 		}
+		pmm::QuotaDB::set(m.email(), m.quota);
 	}
 #ifdef DEBUG
 	else {
