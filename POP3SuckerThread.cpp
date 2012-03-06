@@ -21,7 +21,7 @@
 #endif
 
 #ifndef DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL
-#define DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL 43200
+#define DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL 500
 #endif
 
 #ifndef DEFAULT_POP3_MINIMUM_CHECK_INTERVAL
@@ -108,7 +108,11 @@ namespace pmm {
 									else {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
 										mailpop3_retr_free(msgBuffer);
-										if (abs(time(NULL) - theMessage.dateOfArrival) > DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL) {
+										time_t theTime;
+										time(&theTime);
+										struct tm tmTime;
+										gmtime_r(&theTime, &tmTime);
+										if (timegm(&tmTime) - theMessage.dateOfArrival > DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 										}
 										else {

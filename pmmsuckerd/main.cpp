@@ -37,12 +37,22 @@
 #ifndef DEFAULT_MAX_MESSAGE_UPLOADER_THREADS
 #define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 4
 #endif
+
 #ifndef DEFAULT_SSL_CERTIFICATE_PATH
 #define DEFAULT_SSL_CERTIFICATE_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
 #endif
-#ifndef DEFAULT_SS_PRIVATE_KEY_PATH
-#define DEFAULT_SS_PRIVATE_KEY_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
+#ifndef DEFAULT_SSL_PRIVATE_KEY_PATH
+#define DEFAULT_SSL_PRIVATE_KEY_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
 #endif
+
+#ifndef DEFAULT_DEVEL_SSL_CERTIFICATE_PATH
+#define DEFAULT_DEVEL_SSL_CERTIFICATE_PATH "pmm_devel.pem"
+#endif
+#ifndef DEFAULT_DEVEL_SSL_PRIVATE_KEY_PATH
+#define DEFAULT_DEVEL_SSL_PRIVATE_KEY_PATH "pmm_devel.pem"
+#endif
+
+
 #ifndef DEFAULT_LOGFILE
 #define DEFAULT_LOGFILE "pmmsuckerd.log"
 #endif
@@ -69,6 +79,7 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 
 int main (int argc, const char * argv[])
 {
+	bool enableDevelAPNS = false;
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
 	std::string logFilePath = DEFAULT_LOGFILE;
 	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
@@ -77,7 +88,10 @@ int main (int argc, const char * argv[])
 	size_t maxMessageUploaderThreads = DEFAULT_MAX_MESSAGE_UPLOADER_THREADS;
 	size_t threadStackSize = DEFAULT_THREAD_STACK_SIZE;
 	std::string sslCertificatePath = DEFAULT_SSL_CERTIFICATE_PATH;
-	std::string sslPrivateKeyPath = DEFAULT_SS_PRIVATE_KEY_PATH;
+	std::string sslPrivateKeyPath = DEFAULT_SSL_PRIVATE_KEY_PATH;
+	std::string sslDevelCertificatePath = DEFAULT_DEVEL_SSL_CERTIFICATE_PATH;
+	std::string sslDevelPrivateKeyPath = DEFAULT_DEVEL_SSL_PRIVATE_KEY_PATH;
+
 	int commandPollingInterval = DEFAULT_COMMAND_POLLING_INTERVAL;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	pmm::SharedVector<std::string> quotaUpdateVector;
@@ -136,6 +150,9 @@ int main (int argc, const char * argv[])
 			std::stringstream input(argv[++i]);
 			input >> commandPollingInterval;			
 		}
+		else if(arg.compare("--devel-apns") == 0){
+			enableDevelAPNS = true;
+		}
 	}
 	pmm::Log.open(logFilePath);
 	pmm::CacheLog.open("mailcache.log");
@@ -190,6 +207,10 @@ int main (int argc, const char * argv[])
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
+	pmm::APNSNotificationThread *develNotifThreads;
+	if(enableDevelAPNS){
+		develNotifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
+	}
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
 		//2. Start thread
