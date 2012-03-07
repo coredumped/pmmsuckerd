@@ -147,11 +147,15 @@ namespace pmm {
 		while (devTokenRelinquishQueue->extractEntry(item)) {
 			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
-				if (item.email.compare(emailAccounts[i].email()) == 0) {
-					pmm::Log << item.email << " will no longer receive notifications on device " << item.devToken << pmm::NL;
-					emailAccounts[i].deviceTokenRemove(item.devToken);
-					found = true;
-					usleep(500); //Give another MailSuckerThread a chance to find this guy
+				//Verify that this account has that devToken
+				for (size_t j = 0; j < emailAccounts[i].devTokens().size(); j++) {
+					if (item.devToken.compare(emailAccounts[i].devTokens()[j]) == 0) {
+						pmm::Log << item.email << " will no longer receive notifications on device " << item.devToken << pmm::NL;
+						emailAccounts[i].deviceTokenRemove(item.devToken);
+						found = true;
+						usleep(500); //Give another MailSuckerThread a chance to find this guy
+						break;
+					}
 				}
 			}
 			if (!found) devTokenRelinquishQueue->add(item);
