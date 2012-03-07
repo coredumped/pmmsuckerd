@@ -114,6 +114,7 @@ namespace pmm {
 					emailAccounts.erase(i);
 					found = true;
 					fetchedMails.removeAllEntriesOfEmail(m);
+#warning TODO: Remove all preferences for this account
 					break;
 				}
 			}
@@ -175,7 +176,9 @@ namespace pmm {
 		initialize();
 		while (true) {
 			//Process account addition and removals if there is any
+			registerDeviceTokens();
 			processAccountAdd();
+			relinquishDeviceTokens();
 			processAccountRemove();
 			time_t currTime = time(0);
 			if(emailAccounts.size() == 0 && currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
