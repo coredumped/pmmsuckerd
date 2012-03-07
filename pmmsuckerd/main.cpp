@@ -153,6 +153,12 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--ssl-private-key") == 0 && (i + 1) < argc){
 			sslPrivateKeyPath = argv[++i];
 		}
+		else if(arg.compare("--devel-ssl-certificate") == 0 && (i + 1) < argc){
+			sslDevelCertificatePath = argv[++i];
+		}
+		else if(arg.compare("--devel-ssl-private-key") == 0 && (i + 1) < argc){
+			sslDevelPrivateKeyPath = argv[++i];
+		}
 		else if(arg.compare("--log") == 0 && (i + 1) < argc){
 			logFilePath = argv[++i];
 		}
