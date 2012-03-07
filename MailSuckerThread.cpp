@@ -131,9 +131,10 @@ namespace pmm {
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				if (item.email.compare(emailAccounts[i].email()) == 0) {
 					pmm::Log << "Adding device " << item.devToken << " as recipient for messages of: " << item.email << pmm::NL;
-					emailAccounts[i].deviceTokenAdd(item.devToken);
+					emailAccounts.atUnlocked(i).deviceTokenAdd(item.devToken);
 					found = true;
 					usleep(500); //Give another MailSuckerThread a chance to find this guy
+					break;
 				}
 			}
 			if (!found) devTokenAddQueue->add(item);
@@ -151,7 +152,7 @@ namespace pmm {
 				for (size_t j = 0; j < emailAccounts[i].devTokens().size(); j++) {
 					if (item.devToken.compare(emailAccounts[i].devTokens()[j]) == 0) {
 						pmm::Log << item.email << " will no longer receive notifications on device " << item.devToken << pmm::NL;
-						emailAccounts[i].deviceTokenRemove(item.devToken);
+						emailAccounts.atUnlocked(i).deviceTokenRemove(item.devToken);
 						found = true;
 						usleep(500); //Give another MailSuckerThread a chance to find this guy
 						break;
