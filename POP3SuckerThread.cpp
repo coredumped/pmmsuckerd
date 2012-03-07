@@ -37,7 +37,7 @@
 #endif
 
 #ifndef DEFAULT_MAX_MSG_RETRIEVE
-#define DEFAULT_MAX_MSG_RETRIEVE 20
+#define DEFAULT_MAX_MSG_RETRIEVE 200
 #endif
 
 namespace pmm {
@@ -69,6 +69,7 @@ namespace pmm {
 		if (quotaUpdateVector == NULL) {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL quotaUpdateVector.");
 		}
+		time(&startedOn);
 		while (true) {
 			MailAccountInfo m;
 			while (mainFetchQueue.extractEntry(m)) {
@@ -115,14 +116,13 @@ namespace pmm {
 									else {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
 										mailpop3_retr_free(msgBuffer);
-										time_t theTime;
-										time(&theTime);
+										time_t startedOn;
 										struct tm tmTime;
-										gmtime_r(&theTime, &tmTime);
+										gmtime_r(&startedOn, &tmTime);
 #ifdef DEBUG
-										pmm::Log << "Message is " << (timegm(&tmTime) - theMessage.dateOfArrival) << " seconds old" << pmm::NL;
+										pmm::Log << "Message is " << (theMessage.dateOfArrival - timegm(&tmTime)) << " seconds old" << pmm::NL;
 #endif
-										if (timegm(&tmTime) - theMessage.dateOfArrival > DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL) {
+										if (theMessage.dateOfArrival >= timegm(&tmTime)) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}

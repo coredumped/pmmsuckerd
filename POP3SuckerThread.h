@@ -33,6 +33,7 @@ namespace pmm {
 		
 		class POP3FetcherThread : public GenericThread {
 		public:
+			time_t startedOn;
 			SharedQueue<NotificationPayload> *notificationQueue;
 			SharedQueue<NotificationPayload> *develNotificationQueue;
 			//SharedQueue<MailAccountInfo> *fetchQueue;
