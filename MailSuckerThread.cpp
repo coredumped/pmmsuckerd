@@ -121,6 +121,42 @@ namespace pmm {
 			usleep(500);
 		}
 	}
+	
+	void MailSuckerThread::registerDeviceTokens(){
+		DevtokenQueueItem item;
+		time_t t1 = time(0);
+		while (devTokenAddQueue->extractEntry(item)) {
+			bool found = false;
+			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				if (item.email.compare(emailAccounts[i].email()) == 0) {
+					pmm::Log << "Adding device " << item.devToken << " as recipient for messages of: " << item.email << pmm::NL;
+					emailAccounts[i].deviceTokenAdd(item.devToken);
+					found = true;
+					usleep(500); //Give another MailSuckerThread a chance to find this guy
+				}
+			}
+			if (!found) devTokenAddQueue->add(item);
+			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
+		}
+	}
+	
+	void MailSuckerThread::relinquishDeviceTokens(){
+		DevtokenQueueItem item;
+		time_t t1 = time(0);
+		while (devTokenAddQueue->extractEntry(item)) {
+			bool found = false;
+			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				if (item.email.compare(emailAccounts[i].email()) == 0) {
+					pmm::Log << item.email << " will no longer receive notifications on device " << item.devToken << pmm::NL;
+					emailAccounts[i].deviceTokenRemove(item.devToken);
+					found = true;
+					usleep(500); //Give another MailSuckerThread a chance to find this guy
+				}
+			}
+			if (!found) devTokenAddQueue->add(item);
+			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
+		}		
+	}
 
 	void MailSuckerThread::operator()(){
 		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
@@ -129,6 +165,8 @@ namespace pmm {
 		if (quotaIncreaseQueue == NULL) throw GenericException("Can't continue like this, the quotaIncreaseQueue is null!!!");
 		if (addAccountQueue == NULL) throw GenericException("Can't continue like this, the addAccountQueue is null!!!");
 		if (rmAccountQueue == NULL) throw GenericException("Can't continue like this, the rmAccountQueue is null!!!");
+		if (devTokenAddQueue == NULL) throw GenericException("Can't continue like this, the devTokenAddQueue is null!!!");
+		if (devTokenRelinquishQueue == NULL) throw GenericException("Can't continue like this, the devTokenRelinquishQueue is null!!!");
 #ifdef DEBUG
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;

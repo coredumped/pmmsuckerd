@@ -24,6 +24,11 @@ namespace pmm {
 	
 	extern const int minimumMailCheckInterval;
 	
+	struct DevtokenQueueItem {
+		std::string email;
+		std::string devToken;
+	};
+	
 	class MailboxControl {
 	public:
 		std::string email;
@@ -50,6 +55,9 @@ namespace pmm {
 		virtual void checkEmail(const MailAccountInfo &m); //Override me
 		virtual void processAccountAdd();
 		virtual void processAccountRemove();
+		//Device token addition and removal
+		virtual void registerDeviceTokens();
+		virtual void relinquishDeviceTokens();
 	public:
 		SharedVector<MailAccountInfo> emailAccounts;
 		SharedQueue<NotificationPayload> *notificationQueue;
@@ -58,6 +66,9 @@ namespace pmm {
 		SharedQueue<QuotaIncreasePetition> *quotaIncreaseQueue;
 		pmm::SharedQueue<pmm::MailAccountInfo> *addAccountQueue;
 		pmm::SharedQueue<std::string> *rmAccountQueue;
+		
+		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenAddQueue;
+		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenRelinquishQueue;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();

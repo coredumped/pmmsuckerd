@@ -108,6 +108,9 @@ int main (int argc, const char * argv[])
 	pmm::SharedQueue<pmm::MailAccountInfo> addPOP3AccountQueue;
 	pmm::SharedQueue<std::string> rmPOP3AccountQueue;
 	
+	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue;
+	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue;
+	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
 	SSL_library_init();
@@ -265,6 +268,8 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
 		imapSuckingThreads[i].addAccountQueue = &addIMAPAccountQueue;
 		imapSuckingThreads[i].rmAccountQueue = &rmIMAPAccountQueue;
+		imapSuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
+		imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
@@ -282,6 +287,8 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
 		pop3SuckingThreads[i].addAccountQueue = &addPOP3AccountQueue;
 		pop3SuckingThreads[i].rmAccountQueue = &rmPOP3AccountQueue;
+		pop3SuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
+		pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
@@ -380,14 +387,26 @@ int main (int argc, const char * argv[])
 							}
 						}
 						else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
-							for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
+							/*for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
 								relinquishDevTokenNotification(imapSuckingThreads, maxIMAPSuckerThreads, relIter->second);
 								relinquishDevTokenNotification(pop3SuckingThreads, maxPOP3SuckerThreads, relIter->second);
+							}*/
+							for (std::map<std::string, std::string>::iterator reliter = parameters.begin(); reliter != parameters.end(); reliter++) {
+								pmm::DevtokenQueueItem item;
+								item.email = reliter->first;
+								item.devToken = reliter->second;
+								devTokenRelinquishQueue.add(item);
 							}
 						}
 						else if (command.compare(pmm::Commands::refreshDeviceTokenList) == 0){
-							updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-							updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+							//updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
+							//updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+							for (std::map<std::string, std::string>::iterator reliter = parameters.begin(); reliter != parameters.end(); reliter++) {
+								pmm::DevtokenQueueItem item;
+								item.email = reliter->first;
+								item.devToken = reliter->second;
+								devTokenAddQueue.add(item);
+							}
 						}
 						else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){
 							if (parameters.find("mailboxType") != parameters.end()) {
