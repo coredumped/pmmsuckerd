@@ -283,7 +283,11 @@ namespace pmm {
 							pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
 #endif
 							imapFetch.badgeCounter++;
-							fetch_msg(imap, uid, myNotificationQueue, imapFetch);
+							if (imapFetch.mailAccountInfo.devel) {
+								pmm::imapLog << "Using development notification queue..." << pmm::NL;
+								fetch_msg(imap, uid, develNotificationQueue, imapFetch);
+							}
+							else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
 							uidSet.push_back(uid);
 						}
 						//Remove old entries if the current time is a multiple of 60 seconds
@@ -345,6 +349,7 @@ namespace pmm {
 		for (size_t i = 0; i < maxMailFetchers; i++) {
 			if (mailFetchers[i].isRunning == false) {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
+				mailFetchers[i].develNotificationQueue = develNotificationQueue;
 				mailFetchers[i].fetchQueue = &imapFetchQueue;
 				mailFetchers[i].quotaUpdateVector = quotaUpdateVector;
 				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
@@ -374,7 +379,10 @@ namespace pmm {
 				std::vector<std::string> myDevTokens = m.devTokens();
 				for (size_t i = 0; m.devTokens().size(); i++) {
 					NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
-					notificationQueue->add(msg);
+					if (m.devel) {
+						develNotificationQueue->add(msg);
+					}
+					else notificationQueue->add(msg);
 				}
 				serverConnectAttempts[m.serverAddress()] = 0;
 #warning Add method for relinquishing email account monitoring
@@ -398,7 +406,10 @@ namespace pmm {
 					std::vector<std::string> myDevTokens = m.devTokens();
 					for (size_t i = 0; m.devTokens().size(); i++) {
 						NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
-						notificationQueue->add(msg);
+						if (m.devel) {
+							develNotificationQueue->add(msg);
+						}
+						else notificationQueue->add(msg);
 					}
 					serverConnectAttempts[m.serverAddress()] = 0;
 #warning Add method for relinquishing email account monitoring

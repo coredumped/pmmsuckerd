@@ -34,6 +34,7 @@ namespace pmm {
 		class POP3FetcherThread : public GenericThread {
 		public:
 			SharedQueue<NotificationPayload> *notificationQueue;
+			SharedQueue<NotificationPayload> *develNotificationQueue;
 			//SharedQueue<MailAccountInfo> *fetchQueue;
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
 			SharedVector<std::string> *quotaUpdateVector;

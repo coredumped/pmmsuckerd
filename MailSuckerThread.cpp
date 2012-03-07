@@ -97,7 +97,10 @@ namespace pmm {
 			for (size_t i = 0; i < myDevTokens.size(); i++) {
 				pmm::NotificationPayload np(myDevTokens[i], msg.str());
 				np.isSystemNotification = true;
-				notificationQueue->add(np);
+				if (m.devel) {
+					develNotificationQueue->add(np);
+				}
+				else notificationQueue->add(np);
 			}
 			usleep(10000);
 		}
@@ -202,7 +205,10 @@ namespace pmm {
 						for (size_t npi = 0; npi < myDevTokens.size(); npi++) {
 							NotificationPayload np(myDevTokens[npi], incNotif.str());
 							np.isSystemNotification = true;
-							notificationQueue->add(np);
+							if (emailAccounts[i].devel) {
+								develNotificationQueue->add(np);
+							}
+							else notificationQueue->add(np);
 						}
 						emailAccounts.endCriticalSection();
 					}

@@ -137,7 +137,11 @@ namespace pmm {
 												nMsg << theMessage.from << "\n" << theMessage.subject;
 												NotificationPayload np(myDevTokens[i], nMsg.str(), i + 1, alertTone);
 												np.origMailMessage = theMessage;
-												notificationQueue->add(np);
+												if (m.devel) {
+													pmm::Log << "Using development notification queue for this message." << pmm::NL;
+													develNotificationQueue->add(np);
+												}
+												else notificationQueue->add(np);
 												if(i == 0){
 													fetchedMails.addEntry(m.email(), info->msg_uidl);
 													if(!QuotaDB::decrease(m.email())){
@@ -146,7 +150,11 @@ namespace pmm {
 														msg << "You have ran out of quota on " << m.email() << ", you may purchase more to keep receiving notifications.";
 														pmm::NotificationPayload npi(myDevTokens[i], msg.str());
 														npi.isSystemNotification = true;
-														notificationQueue->add(npi);
+														if (m.devel) {
+															pmm::Log << "Using development notification queue for this message." << pmm::NL;
+															develNotificationQueue->add(npi);
+														}
+														else notificationQueue->add(npi);
 													}
 													quotaUpdateVector->push_back(m.email());
 													pmmStorageQueue->add(np);
@@ -213,6 +221,7 @@ namespace pmm {
 				pop3Fetcher[i].notificationQueue = notificationQueue;
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
+				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 				ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 			}
 	}
@@ -230,6 +239,7 @@ namespace pmm {
 				pop3Fetcher[i].notificationQueue = notificationQueue;
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
+				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 				ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 			}
 		}

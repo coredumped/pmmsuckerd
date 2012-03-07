@@ -270,6 +270,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].rmAccountQueue = &rmIMAPAccountQueue;
 		imapSuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
 		imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
+		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
@@ -289,6 +290,7 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].rmAccountQueue = &rmPOP3AccountQueue;
 		pop3SuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
 		pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
+		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
