@@ -144,7 +144,7 @@ namespace pmm {
 	void MailSuckerThread::relinquishDeviceTokens(){
 		DevtokenQueueItem item;
 		time_t t1 = time(0);
-		while (devTokenAddQueue->extractEntry(item)) {
+		while (devTokenRemoveQueue->extractEntry(item)) {
 			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				if (item.email.compare(emailAccounts[i].email()) == 0) {
@@ -154,7 +154,7 @@ namespace pmm {
 					usleep(500); //Give another MailSuckerThread a chance to find this guy
 				}
 			}
-			if (!found) devTokenAddQueue->add(item);
+			if (!found) devTokenRemoveQueue->add(item);
 			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
 		}		
 	}
