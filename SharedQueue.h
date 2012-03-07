@@ -63,6 +63,17 @@ namespace pmm {
 			return T(val);			
 		}
 		
+		void peek(T &val){
+			m.lock();
+			try {
+				val = queueData.front();
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
+			m.unlock();
+		}
+		
 		bool extractEntry(T &val){
 			bool got_entry = false;;
 			m.lock();

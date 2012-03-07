@@ -58,7 +58,7 @@ namespace pmm {
 		virtual void initialize();
 	};
 	
-	extern FetchedMailsCache fetchedMails;
+
 	extern MTLogger pop3Log;
 }
 

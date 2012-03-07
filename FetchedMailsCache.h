@@ -43,6 +43,8 @@ namespace pmm {
 		void expireOldEntries();
 		void removeMultipleEntries(const std::string &email, const std::vector<uint32_t> &uidList);
 		void removeEntriesNotInSet(const std::string &email, const std::vector<uint32_t> &uidSet);
+		
+		void removeAllEntriesOfEmail(const std::string &email);
 	};
 	
 	extern MTLogger CacheLog;

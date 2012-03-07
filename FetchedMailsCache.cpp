@@ -292,6 +292,24 @@ namespace pmm {
 		}
 		closeDatabase(conn);		
 	}
+	
+	void FetchedMailsCache::removeAllEntriesOfEmail(const std::string &email){
+		sqlite3 *conn = openDatabase();
+		char *errmsg_s;
+		std::stringstream sqlCmd;
+		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE email='" << email << "'";
+		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+		if (errCode != SQLITE_OK) {
+			closeDatabase(conn);
+			std::stringstream errmsg;
+			errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+			CacheLog << errmsg.str() << pmm::NL;
+#endif
+			throw GenericException(errmsg.str());
+		}
+		closeDatabase(conn);
+	}
 
 	void FetchedMailsCache::verifyTables(){
 		sqlite3 *conn = openDatabase();

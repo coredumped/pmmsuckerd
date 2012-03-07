@@ -14,6 +14,7 @@
 #include "MailAccountInfo.h"
 #include "SharedQueue.h"
 #include "NotificationPayload.h"
+#include "FetchedMailsCache.h"
 #include "MTLogger.h"
 #include "DataTypes.h"
 #include <string>
@@ -47,12 +48,16 @@ namespace pmm {
 		virtual void closeConnection(const MailAccountInfo &m); //Override me
 		virtual void openConnection(const MailAccountInfo &m); //Override me
 		virtual void checkEmail(const MailAccountInfo &m); //Override me
+		virtual void processAccountAdd();
+		virtual void processAccountRemove();
 	public:
 		SharedVector<MailAccountInfo> emailAccounts;
 		SharedQueue<NotificationPayload> *notificationQueue;
 		SharedQueue<NotificationPayload> *pmmStorageQueue;
 		SharedVector<std::string> *quotaUpdateVector;
 		SharedQueue<QuotaIncreasePetition> *quotaIncreaseQueue;
+		pmm::SharedQueue<pmm::MailAccountInfo> *addAccountQueue;
+		pmm::SharedQueue<std::string> *rmAccountQueue;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
@@ -62,6 +67,7 @@ namespace pmm {
 	};
 	
 	bool etpanOperationFailed(int r);
+	extern FetchedMailsCache fetchedMails;
 }
 
 

@@ -86,12 +86,49 @@ namespace pmm {
 	void MailSuckerThread::initialize(){
 
 	}
+	
+	void MailSuckerThread::processAccountAdd(){
+		MailAccountInfo m;
+		while (addAccountQueue->extractEntry(m)) {
+			emailAccounts.push_back(m);
+			std::stringstream msg;
+			msg << "Monitoring of " + m.email() + " has been enabled :-)";
+			std::vector<std::string> myDevTokens = m.devTokens();
+			for (size_t i = 0; i < myDevTokens.size(); i++) {
+				pmm::NotificationPayload np(myDevTokens[i], msg.str());
+				np.isSystemNotification = true;
+				notificationQueue->add(np);
+			}
+			usleep(10000);
+		}
+	}
+	
+	void MailSuckerThread::processAccountRemove(){
+		if (rmAccountQueue->size() > 0) {
+			//Find element
+			std::string m;
+			rmAccountQueue->extractEntry(m);
+			bool found = false;
+			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				if (m.compare(emailAccounts[i].email()) == 0) {
+					emailAccounts.erase(i);
+					found = true;
+					fetchedMails.removeAllEntriesOfEmail(m);
+					break;
+				}
+			}
+			if(!found) rmAccountQueue->add(m);
+			usleep(500);
+		}
+	}
 
 	void MailSuckerThread::operator()(){
 		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
 		if (quotaUpdateVector == NULL) throw GenericException("quotaUpdateQueue is still NULL, it must point to a valid notification queue.");
 		if (pmmStorageQueue == NULL) throw GenericException("Can't continue like this, the pmmStorageQueue is null!!!");
 		if (quotaIncreaseQueue == NULL) throw GenericException("Can't continue like this, the quotaIncreaseQueue is null!!!");
+		if (addAccountQueue == NULL) throw GenericException("Can't continue like this, the addAccountQueue is null!!!");
+		if (rmAccountQueue == NULL) throw GenericException("Can't continue like this, the rmAccountQueue is null!!!");
 #ifdef DEBUG
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
@@ -99,6 +136,9 @@ namespace pmm {
 #endif
 		initialize();
 		while (true) {
+			//Process account addition and removals if there is any
+			processAccountAdd();
+			processAccountRemove();
 			time_t currTime = time(0);
 			if(emailAccounts.size() == 0 && currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
