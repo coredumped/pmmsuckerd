@@ -436,6 +436,9 @@ namespace pmm {
 			else {
 				m.isEnabled = true;
 			}
+			int v = o.get<jsonxx::Object>(i).get<jsonxx::number>("quota");
+			if (v == 0) m.devel = false;
+			else m.devel = true;
 			emailAddresses.push_back(m);			
 		}
 	}

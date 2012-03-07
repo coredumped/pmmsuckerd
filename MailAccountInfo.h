@@ -42,6 +42,7 @@ namespace pmm {
 		bool useSSL() const;
 		AtomicFlag isEnabled;
 		int quota;
+		bool devel;
 		
 		void updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 				
 					   const std::vector<std::string> &devTokens__, bool useSSL__);

@@ -96,6 +96,8 @@ int main (int argc, const char * argv[])
 
 	int commandPollingInterval = DEFAULT_COMMAND_POLLING_INTERVAL;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
+	pmm::SharedQueue<pmm::NotificationPayload> develNotificationQueue;
+	
 	pmm::SharedVector<std::string> quotaUpdateVector;
 	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
 	pmm::SharedQueue<pmm::QuotaIncreasePetition> quotaIncreaseQueue;
@@ -212,13 +214,12 @@ int main (int argc, const char * argv[])
 	}
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
+	pmm::APNSNotificationThread develNotifThread;	
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
-	pmm::APNSNotificationThread *develNotifThreads;
-	if(enableDevelAPNS){
-		develNotifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
-	}
+	
+	
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
 		//2. Start thread
@@ -228,6 +229,13 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(notifThreads[i], threadStackSize);
 		sleep(1);
 	}
+	pmm::Log << "Starting development notification thread..." << pmm::NL;
+	develNotifThread.notificationQueue = &develNotificationQueue;
+	develNotifThread.setCertPath(sslDevelCertificatePath);
+	develNotifThread.setKeyPath(sslDevelPrivateKeyPath);
+	pmm::ThreadDispatcher::start(develNotifThread, threadStackSize);
+	sleep(1);
+	
 	for (size_t i = 0; i < maxMessageUploaderThreads; i++) {
 		msgUploaderThreads[i].session = &session;
 		msgUploaderThreads[i].pmmStorageQueue = &pmmStorageQueue;

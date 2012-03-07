@@ -36,6 +36,10 @@
 #define MAX_CHECK_INTERVAL 120
 #endif
 
+#ifndef DEFAULT_MAX_MSG_RETRIEVE
+#define DEFAULT_MAX_MSG_RETRIEVE 20
+#endif
+
 namespace pmm {
 	MTLogger pop3Log;
 	
@@ -93,12 +97,11 @@ namespace pmm {
 							else pop3Log << "Unable to retrieve messages for: " << m.email() << ": etpan code=" << result << pmm::NL;						
 						}
 						else {
-							for (int i = 0; i < carray_count(msgList); i++) {
+							int max_retrieve = carray_count(msgList);
+							if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE:
+							for (int i = 0; i < max_retrieve; i++) {
 								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 								if (info->msg_uidl == NULL) continue;
-								if (!m.isEnabled) {
-									break;
-								}
 								if (!fetchedMails.entryExists(m.email(), info->msg_uidl)) {
 									//Perform real message retrieval
 									char *msgBuffer;
@@ -121,6 +124,7 @@ namespace pmm {
 #endif
 										if (timegm(&tmTime) - theMessage.dateOfArrival > DEFAULT_POP3_OLDEST_MESSAGE_INTERVAL) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
+											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}
 										else {
 											theMessage.to = m.email();
