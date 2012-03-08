@@ -191,6 +191,7 @@ namespace pmm {
 		imap = NULL;
 		startedOn = time(NULL);
 		maxIDLEConnectionTime = DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME;
+		supportsIdle = true;
 	}
 	
 	IMAPSuckerThread::IMAPControl::~IMAPControl(){
@@ -335,10 +336,12 @@ namespace pmm {
 	
 	void IMAPSuckerThread::closeConnection(const MailAccountInfo &m){
 		if (mailboxControl[m.email()].isOpened) {
-			struct mailimap *imap = imapControl[m.email()].imap;
-			mailimap_close(imap);
-			mailimap_free(imapControl[m.email()].imap);
-			imapControl[m.email()].imap = NULL;
+			if (imapControl[m.email()].supportsIdle) {
+				struct mailimap *imap = imapControl[m.email()].imap;
+				mailimap_close(imap);
+				mailimap_free(imapControl[m.email()].imap);
+				imapControl[m.email()].imap = NULL;
+			}
 		}
 		mailboxControl[m.email()].isOpened = false;
 	}
@@ -436,12 +439,15 @@ namespace pmm {
 				}				
 				if(!mailimap_has_idle(imapControl[m.email()].imap)){
 					imapLog << "FATAL: " << m.email() << " is not hosted in an IMAP IDLE environment." << pmm::NL;
-					mailboxControl[m.email()].isOpened = false;
-					mailboxControl[m.email()].lastCheck = time(0) + 86400;
+					mailboxControl[m.email()].isOpened = true;
+					mailboxControl[m.email()].openedOn = time(0x00);
+					imapControl[m.email()].startedOn = time(NULL);
 					mailimap_logout(imapControl[m.email()].imap);
 					mailimap_close(imapControl[m.email()].imap);
+					imapControl[m.email()].supportsIdle = false;
 					return;
 				}
+				imapControl[m.email()].supportsIdle = true;
 				result = mailimap_idle(imapControl[m.email()].imap);
 				if(etpanOperationFailed(result)){
 					throw GenericException("Unable to start IDLE!!!");
@@ -461,6 +467,12 @@ namespace pmm {
 	void IMAPSuckerThread::checkEmail(const MailAccountInfo &m){
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
+			if (!imapControl[m.email()].supportsIdle) {
+				if(time(0) - mailboxControl[m.email()].lastCheck > 2){
+					fetchMails(m);
+				}
+				return;
+			}
 			mailimap *imap = imapControl[m.email()].imap;
 			if (imapControl[m.email()].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
 				//Think about closing and re-opening this connection!!!

@@ -36,6 +36,7 @@ namespace pmm {
 		public:
 			struct mailimap *imap;
 			bool idling;
+			bool supportsIdle;
 			int failedLoginAttemptsCount;
 			time_t startedOn;
 			int maxIDLEConnectionTime;
