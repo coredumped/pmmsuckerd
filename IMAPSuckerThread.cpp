@@ -400,19 +400,23 @@ namespace pmm {
 				serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
 				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
-					std::stringstream errmsg;
+					if (mailboxControl[m.email()].lastCheck % 43200 == 0) {
+						std::stringstream errmsg;
 #warning TODO: Find a better way to notify the user that we are unable to login into their mail account
-					errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
-					std::vector<std::string> myDevTokens = m.devTokens();
-					for (size_t i = 0; myDevTokens.size(); i++) {
-						NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
-						if (m.devel) {
-							develNotificationQueue->add(msg);
+						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
+						std::vector<std::string> myDevTokens = m.devTokens();
+						for (size_t i = 0; myDevTokens.size(); i++) {
+							NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
+							if (m.devel) {
+								develNotificationQueue->add(msg);
+							}
+							else notificationQueue->add(msg);
 						}
-						else notificationQueue->add(msg);
 					}
-					serverConnectAttempts[m.serverAddress()] = 0;
+
 #warning Add method for relinquishing email account monitoring
+					mailboxControl[m.email()].lastCheck = time(0);
+					mailboxControl[m.email()].isOpened = false;
 				}
 				mailimap_free(imapControl[m.email()].imap);
 				imapControl[m.email()].imap = NULL;
@@ -420,16 +424,23 @@ namespace pmm {
 			}
 			else {
 				//Start IMAP IDLE processing...
+				serverConnectAttempts[m.serverAddress()] = 0;
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << m.email() << pmm::NL;
 #endif
 				//mailstream_debug = 1;
 				result = mailimap_select(imapControl[m.email()].imap, "INBOX");
 				if(etpanOperationFailed(result)){
+					pmm::Log << "FATAL: Unable to select INBOX folder in account " << m.email() << pmm::NL;
 					throw GenericException("Unable to select INBOX folder");
 				}				
 				if(!mailimap_has_idle(imapControl[m.email()].imap)){
-					throw GenericException("Can't POLL non IDLE mailboxes.");
+					imapLog << "FATAL: " << m.email() << " is not hosted in an IMAP IDLE environment." << pmm::NL;
+					mailboxControl[m.email()].isOpened = false;
+					mailboxControl[m.email()].lastCheck = time(0) + 86400;
+					mailimap_logout(imapControl[m.email()].imap);
+					mailimap_close(imapControl[m.email()].imap);
+					return;
 				}
 				result = mailimap_idle(imapControl[m.email()].imap);
 				if(etpanOperationFailed(result)){
