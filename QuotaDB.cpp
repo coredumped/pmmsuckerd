@@ -136,7 +136,7 @@ namespace pmm {
 		//sqlite3_close(dbConn);				
 	}
 	
-	void removeAccount(const std::string &emailAccount) {
+	void QuotaDB::removeAccount(const std::string &emailAccount) {
 		sqlite3 *dbConn = _connect2QuotaDB();
 		if (!_initialized) init(dbConn);
 		std::stringstream sqlCmd, errmsg;
