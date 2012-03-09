@@ -118,6 +118,7 @@ namespace pmm {
 					found = true;
 					fetchedMails.removeAllEntriesOfEmail(m);
 #warning TODO: Remove all preferences for this account
+					QuotaDB::removeAccount(m);
 					break;
 				}
 			}

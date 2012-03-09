@@ -136,6 +136,20 @@ namespace pmm {
 		//sqlite3_close(dbConn);				
 	}
 	
+	void removeAccount(const std::string &emailAccount) {
+		sqlite3 *dbConn = _connect2QuotaDB();
+		if (!_initialized) init(dbConn);
+		std::stringstream sqlCmd, errmsg;
+		char *errmsg_s;
+		sqlCmd << "DELETE FROM " << quota_table << " WHERE email='" << emailAccount << "'";
+		int errcode = sqlite3_exec(dbConn, sqlCmd.str().c_str(), 0, 0, &errmsg_s);
+		if(errcode != SQLITE_OK){
+			errmsg << "Unable to remove quota info: " << errmsg_s << ". Insert command was: " << sqlCmd.str();
+			pmm::Log << errmsg.str() << pmm::NL;
+			throw GenericException(errmsg.str());			
+		}			
+	}
+	
 	void QuotaDB::clearData(){
 		sqlite3 *dbConn = _connect2QuotaDB();
 		if (!_initialized) init(dbConn);

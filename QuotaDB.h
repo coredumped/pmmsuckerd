@@ -23,6 +23,8 @@ namespace pmm {
 		static int remaning(const std::string &emailAccount);
 		static bool have(const std::string &emailAccount);
 		static void clearData();
+		
+		static void removeAccount(const std::string &emailAccount);
 	};
 }
 
