@@ -280,12 +280,12 @@ namespace pmm {
 						for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
 							uint32_t uid;
 							uid = *((uint32_t *)clist_content(cur));
-#ifdef DEBUG
+#ifdef DEBUG_IMAP
 							pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
 #endif
 							imapFetch.badgeCounter++;
 							if (imapFetch.mailAccountInfo.devel) {
-								pmm::imapLog << "Using development notification queue..." << pmm::NL;
+								//pmm::imapLog << "Using development notification queue..." << pmm::NL;
 								fetch_msg(imap, uid, develNotificationQueue, imapFetch);
 							}
 							else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
