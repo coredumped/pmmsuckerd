@@ -273,6 +273,11 @@ namespace pmm {
 			url_encode(value);
 			if (encodedPost.str().size() == 0) encodedPost << param << "=" << value;
 			else encodedPost << "&" << param << "=" << value;
+#ifdef DEBUG
+			if (getenv("DEBUG_MSG") != NULL || param.compare("subject") == 0) {
+				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
+			}
+#endif
 		}
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
 #ifdef DEBUG
@@ -290,7 +295,7 @@ namespace pmm {
 		preparePostRequest(www, postData, &serverOutput);
 		//Let's url encode the param map
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
-		curl_easy_setopt(www, CURLOPT_ENCODING, "UTF-8");
+		curl_easy_setopt(www, CURLOPT_ENCODING, "utf-8");
 		CURLcode ret = curl_easy_perform(www);
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
@@ -524,7 +529,7 @@ namespace pmm {
 		}			
 		return tCount;
 	}
-	
+		
 	void SuckerSession::uploadNotificationMessage(const NotificationPayload &np){
 		performAutoRegister();
 		std::map<std::string, std::string> params;
