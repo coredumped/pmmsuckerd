@@ -40,7 +40,7 @@ namespace pmm {
 				urlEncodedString << "%";
 				urlEncodedString.width(2);
 				urlEncodedString.fill('0');
-				urlEncodedString << std::hex << (int)theString[i];
+				urlEncodedString << std::hex << std::uppercase << (int)(theString[i] & 0x000000ff);
 				urlEncodedString.width(_w);
 				replaceHappened = true;
 			}
