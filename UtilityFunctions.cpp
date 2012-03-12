@@ -38,9 +38,9 @@ namespace pmm {
 			if (isURLEncodable(theString[i])) {
 				size_t _w = urlEncodedString.width();
 				urlEncodedString << "%";
-				urlEncodedString.width(2);
+				urlEncodedString.width(4);
 				urlEncodedString.fill('0');
-				urlEncodedString << std::hex << std::uppercase << (int)(theString[i] & 0x000000ff);
+				urlEncodedString << std::hex << std::uppercase << (int)(theString[i] & 0x0000ffff);
 				urlEncodedString.width(_w);
 				replaceHappened = true;
 			}
