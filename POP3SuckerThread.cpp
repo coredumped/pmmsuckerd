@@ -120,9 +120,9 @@ namespace pmm {
 										struct tm tmTime;
 										gmtime_r(&startedOn, &tmTime);
 #ifdef DEBUG
-										pmm::Log << "Message is " << (theMessage.dateOfArrival - timegm(&tmTime)) << " seconds old" << pmm::NL;
+										pmm::Log << "Message is " << (time(0) - theMessage.serverDate) << " seconds old" << pmm::NL;
 #endif
-										if (theMessage.dateOfArrival >= timegm(&tmTime)) {
+										if (time(0) - theMessage.serverDate >= 86400) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}

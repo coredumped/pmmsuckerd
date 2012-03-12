@@ -21,6 +21,7 @@ namespace pmm {
 		time_t dateOfArrival;
 		int tzone;
 		std::string msgUid;
+		time_t serverDate;
 		MailMessage();
 		MailMessage(const std::string &_from, const std::string &_subject);
 		MailMessage(const MailMessage &m);

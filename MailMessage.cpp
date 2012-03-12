@@ -171,15 +171,11 @@ namespace pmm {
 					tDate.tm_min = origDate->dt_min;
 					tDate.tm_sec = origDate->dt_sec;
 					tDate.tm_gmtoff = origDate->dt_zone;
-					//m.dateOfArrival = timegm(&tDate);
-					//m.tzone = origDate->dt_zone;
+					m.serverDate = mktime(&tDate);
 					m.dateOfArrival = now;
 					m.tzone = 0;
-
-					m.dateOfArrival = 
 #ifdef DEBUG
-					time_t _crTime = time(0);
-					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " currTstamp=" << _crTime << " diff=" << (m.dateOfArrival - _crTime) << pmm::NL;
+					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " remote time="<< m.serverDate << " currTstamp=" << now << " diff=" << (m.dateOfArrival - remoteTime) << pmm::NL;
 #endif
 					gotTime = true;
 					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
