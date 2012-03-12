@@ -175,7 +175,7 @@ namespace pmm {
 					m.dateOfArrival = now;
 					m.tzone = 0;
 #ifdef DEBUG
-					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " remote time="<< m.serverDate << " currTstamp=" << now << " diff=" << (m.dateOfArrival - remoteTime) << pmm::NL;
+					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " remote time="<< m.serverDate << " currTstamp=" << now << " diff=" << (m.dateOfArrival - m.serverDate) << pmm::NL;
 #endif
 					gotTime = true;
 					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
