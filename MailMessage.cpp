@@ -96,9 +96,10 @@ namespace pmm {
 		int retCode = mailmime_parse(rawMessage.c_str(), rawMessage.size(), &indx, &result);
 		fields = result->mm_data.mm_message.mm_fields;
 #endif
+		time_t now = time(0);
 		m.from = "";
 		m.subject = "";
-		m.dateOfArrival = time(0);
+		m.dateOfArrival = now;
 		m.tzone = 0;
 		bool gotTime = false;
 		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
@@ -169,10 +170,13 @@ namespace pmm {
 					tDate.tm_hour = origDate->dt_hour;
 					tDate.tm_min = origDate->dt_min;
 					tDate.tm_sec = origDate->dt_sec;
-					//tDate.tm_gmtoff = origDate->dt_zone;
-					tDate.tm_gmtoff = 0;
-					m.dateOfArrival = timegm(&tDate);
-					m.tzone = origDate->dt_zone;
+					tDate.tm_gmtoff = origDate->dt_zone;
+					//m.dateOfArrival = timegm(&tDate);
+					//m.tzone = origDate->dt_zone;
+					m.dateOfArrival = now;
+					m.tzone = 0;
+
+					m.dateOfArrival = 
 #ifdef DEBUG
 					time_t _crTime = time(0);
 					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " currTstamp=" << _crTime << " diff=" << (m.dateOfArrival - _crTime) << pmm::NL;
