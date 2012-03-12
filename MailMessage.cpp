@@ -72,6 +72,7 @@ namespace pmm {
 	MailMessage::MailMessage(const std::string &_from, const std::string &_subject){
 		from = _from;
 		subject = _subject;
+		tzone = 0;
 	}
 	
 	MailMessage::MailMessage(const MailMessage &m){
@@ -80,6 +81,7 @@ namespace pmm {
 		to = m.to;
 		dateOfArrival = m.dateOfArrival;
 		msgUid = m.msgUid;
+		tzone = m.tzone;
 	}
 	
 	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){
@@ -97,6 +99,7 @@ namespace pmm {
 		m.from = "";
 		m.subject = "";
 		m.dateOfArrival = time(0);
+		m.tzone = 0;
 		bool gotTime = false;
 		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
 			struct mailimf_field *field = (struct mailimf_field *)clist_content(iter);
@@ -166,8 +169,10 @@ namespace pmm {
 					tDate.tm_hour = origDate->dt_hour;
 					tDate.tm_min = origDate->dt_min;
 					tDate.tm_sec = origDate->dt_sec;
-					tDate.tm_gmtoff = origDate->dt_zone;
+					//tDate.tm_gmtoff = origDate->dt_zone;
+					tDate.tm_gmtoff = 0;
 					m.dateOfArrival = timegm(&tDate);
+					m.tzone = origDate->dt_zone;
 #ifdef DEBUG
 					time_t _crTime = time(0);
 					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " currTstamp=" << _crTime << " diff=" << (m.dateOfArrival - _crTime) << pmm::NL;
