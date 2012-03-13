@@ -265,6 +265,7 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_WRITEDATA, buffer);
 		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
 		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		//curl_easy_setopt(www, CURLOPT_ENCODING, "utf-8");
 		std::stringstream encodedPost;
 		std::map<std::string, std::string>::iterator keypair;
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
@@ -299,7 +300,6 @@ namespace pmm {
 		preparePostRequest(www, postData, &serverOutput);
 		//Let's url encode the param map
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
-		//curl_easy_setopt(www, CURLOPT_ENCODING, "utf-8");
 		CURLcode ret = curl_easy_perform(www);
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
