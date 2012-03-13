@@ -269,10 +269,14 @@ namespace pmm {
 		std::map<std::string, std::string>::iterator keypair;
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
-			url_encode(param);
-			url_encode(value);
-			if (encodedPost.str().size() == 0) encodedPost << param << "=" << value;
-			else encodedPost << "&" << param << "=" << value;
+			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
+			char *v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
+			//url_encode(param);
+			//url_encode(value);
+			if (encodedPost.str().size() == 0) encodedPost << p << "=" << v;
+			else encodedPost << "&" << p << "=" << v;
+			curl_free(p);
+			curl_free(v);
 #ifdef DEBUG
 			if (getenv("DEBUG_MSG") != NULL || param.compare("subject") == 0) {
 				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
