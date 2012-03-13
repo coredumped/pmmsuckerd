@@ -28,6 +28,7 @@
 #include <iostream>
 #include <sstream>
 #include <curl/curl.h>
+#include <iconv.h>
 #include "PMMSuckerSession.h"
 #include "ServerResponse.h"
 #include "jsonxx.h"
@@ -268,10 +269,21 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_ENCODING, "utf-8");
 		std::stringstream encodedPost;
 		std::map<std::string, std::string>::iterator keypair;
+		iconv_t cnv = iconv_open("UTF-8", "");
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
+			char *v, *theVal = (char *)value.c_str();
+			char *utf8Output = new char[value.size() * 3];
+			size_t inbytesLft, outbytesLeft;
+			if (iconv(cnv, &theVal, &inbytesLft, &utf8Output, &outbytesLeft) == -1) {
+				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
+				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
+			}
+			else {
+				v = curl_easy_escape(www, utf8Output, outbytesLeft);
+			}
+			delete [] utf8Output;
 			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
-			char *v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			//url_encode(param);
 			//url_encode(value);
 			if (encodedPost.str().size() == 0) encodedPost << p << "=" << v;
@@ -284,6 +296,7 @@ namespace pmm {
 			}
 #endif
 		}
+		iconv_close(cnv);
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
 #ifdef DEBUG
 		pmm::Log << "DEBUG: Sending post data: " << encodedPost.str().c_str() << pmm::NL;
