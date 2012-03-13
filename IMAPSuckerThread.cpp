@@ -278,6 +278,10 @@ namespace pmm {
 						imapFetch.badgeCounter = 0;
 						std::vector<uint32_t> uidSet;
 						for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
+							if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
+								pmm::Log << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
+								break;
+							}
 							uint32_t uid;
 							uid = *((uint32_t *)clist_content(cur));
 #ifdef DEBUG_IMAP
