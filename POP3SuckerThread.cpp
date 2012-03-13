@@ -99,7 +99,7 @@ namespace pmm {
 						}
 						else {
 							int max_retrieve = carray_count(msgList);
-							if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
+							//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 							for (int i = 0; i < max_retrieve; i++) {
 								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 								if (info->msg_uidl == NULL) continue;
