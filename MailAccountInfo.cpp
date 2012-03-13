@@ -13,6 +13,7 @@ namespace pmm {
 	
 	MailAccountInfo::MailAccountInfo(){
 		devel = false;
+		startedOn = time(0);
 	}
 	
 	MailAccountInfo::MailAccountInfo(const std::string &email__, const std::string &mailboxType__, const std::string &username__, 
@@ -27,6 +28,7 @@ namespace pmm {
 		devTokens_ = devTokens__;
 		useSSL_ = useSSL__;
 		devel = false;
+		startedOn = time(0);
 	}
 	
 	MailAccountInfo::MailAccountInfo(const MailAccountInfo &m){
@@ -41,6 +43,7 @@ namespace pmm {
 		quota = m.quota;
 		isEnabled = m.isEnabled;
 		devel = m.devel;
+		startedOn = m.startedOn;
 	}
 	
 	const std::string &MailAccountInfo::email() const {

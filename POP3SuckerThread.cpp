@@ -120,13 +120,10 @@ namespace pmm {
 									else {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
 										mailpop3_retr_free(msgBuffer);
-										time_t startedOn;
-										struct tm tmTime;
-										gmtime_r(&startedOn, &tmTime);
 #ifdef DEBUG
-										pmm::Log << "Message is " << (time(0) - theMessage.serverDate) << " seconds old" << pmm::NL;
+										pmm::Log << "Message is " << (time(0) - m.startedOn) << " seconds old" << pmm::NL;
 #endif
-										if (time(0) - theMessage.serverDate >= 86400) {
+										if (time(0) >= m.startedOn) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}
@@ -160,8 +157,10 @@ namespace pmm {
 														}
 														else notificationQueue->add(npi);
 													}
-													quotaUpdateVector->push_back(m.email());
-													pmmStorageQueue->add(np);
+													else {
+														quotaUpdateVector->push_back(m.email());
+														pmmStorageQueue->add(np);
+													}
 												}
 											}
 										}
