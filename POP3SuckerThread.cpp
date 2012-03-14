@@ -123,7 +123,7 @@ namespace pmm {
 #ifdef DEBUG
 										pmm::Log << "Message is " << (time(0) - m.startedOn) << " seconds old" << pmm::NL;
 #endif
-										if (time(0) >= m.startedOn) {
+										if ((time(0) - 120) >= m.startedOn) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}
