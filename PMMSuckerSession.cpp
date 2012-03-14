@@ -282,7 +282,7 @@ namespace pmm {
 				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			}
 			else {
-				v = curl_easy_escape(www, utf8Output, outbytesLeft);
+				v = curl_easy_escape(www, utf8Output, (utf8tmp - utf8Output));
 			}
 			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
 			//url_encode(param);
