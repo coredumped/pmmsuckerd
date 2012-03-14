@@ -275,8 +275,9 @@ namespace pmm {
 			char *v, *theVal = (char *)value.c_str();
 			char *utf8Output = (char *)malloc(value.size() * 3 * sizeof(char));
 			utf8Output[0] = 0;
+			char *utf8tmp = utf8Output;
 			size_t inbytesLft = value.size(), outbytesLeft = value.size() * 3;
-			if (iconv(cnv, &theVal, &inbytesLft, &utf8Output, &outbytesLeft) == -1) {
+			if (iconv(cnv, &theVal, &inbytesLft, &utf8tmp, &outbytesLeft) == -1) {
 				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
 				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			}
