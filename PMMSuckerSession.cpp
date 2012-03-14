@@ -273,9 +273,10 @@ namespace pmm {
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
 			char *v, *theVal = (char *)value.c_str();
-			char utf8Output[value.size() * 3];
+			char *utf8Output = (char *)malloc(value.size() * 3 * sizeof(char));
+			utf8Output[0] = 0;
 			size_t inbytesLft = value.size(), outbytesLeft = value.size() * 3;
-			if (iconv(cnv, &theVal, &inbytesLft, (char **)&utf8Output, &outbytesLeft) == -1) {
+			if (iconv(cnv, &theVal, &inbytesLft, &utf8Output, &outbytesLeft) == -1) {
 				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
 				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			}
@@ -289,6 +290,7 @@ namespace pmm {
 			else encodedPost << "&" << p << "=" << v;
 			curl_free(p);
 			curl_free(v);
+			free(utf8Output);
 #ifdef DEBUG
 			if (getenv("DEBUG_MSG") != NULL || param.compare("subject") == 0) {
 				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
