@@ -273,16 +273,15 @@ namespace pmm {
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
 			char *v, *theVal = (char *)value.c_str();
-			char *utf8Output = new char(value.size() * 3);
+			char utf8Output[value.size() * 3];
 			size_t inbytesLft = value.size(), outbytesLeft = value.size() * 3;
-			if (iconv(cnv, &theVal, &inbytesLft, &utf8Output, &outbytesLeft) == -1) {
+			if (iconv(cnv, &theVal, &inbytesLft, (char **)&utf8Output, &outbytesLeft) == -1) {
 				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
 				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			}
 			else {
 				v = curl_easy_escape(www, utf8Output, outbytesLeft);
 			}
-			delete  utf8Output;
 			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
 			//url_encode(param);
 			//url_encode(value);
