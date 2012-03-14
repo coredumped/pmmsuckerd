@@ -122,12 +122,12 @@ namespace pmm {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
 										mailpop3_retr_free(msgBuffer);
 										if (startTimeMap.find(m.email()) == startTimeMap.end()) {
-											startTimeMap[m.email()] = now - 43200;
+											startTimeMap[m.email()] = now;
 										}
 #ifdef DEBUG
 										pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[m.email()]) << " seconds old" << pmm::NL;
 #endif
-										if (theMessage.serverDate >= startTimeMap[m.email()]) {
+										if (theMessage.serverDate + 43200 < startTimeMap[m.email()]) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}
