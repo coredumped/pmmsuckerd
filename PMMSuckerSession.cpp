@@ -274,7 +274,7 @@ namespace pmm {
 			std::string param = keypair->first, value = keypair->second;
 			char *v, *theVal = (char *)value.c_str();
 			char *utf8Output = new char(value.size() * 3);
-			size_t inbytesLft, outbytesLeft;
+			size_t inbytesLft = value.size(), outbytesLeft = 0;
 			if (iconv(cnv, &theVal, &inbytesLft, &utf8Output, &outbytesLeft) == -1) {
 				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
 				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
