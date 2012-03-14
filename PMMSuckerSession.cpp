@@ -272,26 +272,12 @@ namespace pmm {
 		//iconv_t cnv = iconv_open("UTF-8", "");
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
-			//char *v, *theVal = (char *)value.c_str();
-			//char *utf8Output = (char *)malloc(value.size() * 3 * sizeof(char));
-			//utf8Output[0] = 0;
-			//char *utf8tmp = utf8Output;
-			//size_t inbytesLft = value.size(), outbytesLeft = value.size() * 3;
-			/*if (iconv(cnv, &theVal, &inbytesLft, &utf8tmp, &outbytesLeft) == -1) {
-				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
-				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
-			}
-			else {
-				v = curl_easy_escape(www, utf8Output, (utf8tmp - utf8Output));
-			}*/
 			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
-			//url_encode(param);
-			url_encode(value);
+			char *v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			if (encodedPost.str().size() == 0) encodedPost << p << "=" << value;
 			else encodedPost << "&" << p << "=" << value;
 			curl_free(p);
-			//curl_free(v);
-			//free(utf8Output);
+			curl_free(v);
 #ifdef DEBUG
 			if (getenv("DEBUG_MSG") != NULL || param.compare("subject") == 0) {
 				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
