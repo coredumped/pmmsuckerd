@@ -269,36 +269,36 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_ENCODING, "utf-8");
 		std::stringstream encodedPost;
 		std::map<std::string, std::string>::iterator keypair;
-		iconv_t cnv = iconv_open("UTF-8", "");
+		//iconv_t cnv = iconv_open("UTF-8", "");
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
-			char *v, *theVal = (char *)value.c_str();
-			char *utf8Output = (char *)malloc(value.size() * 3 * sizeof(char));
-			utf8Output[0] = 0;
-			char *utf8tmp = utf8Output;
-			size_t inbytesLft = value.size(), outbytesLeft = value.size() * 3;
-			if (iconv(cnv, &theVal, &inbytesLft, &utf8tmp, &outbytesLeft) == -1) {
+			//char *v, *theVal = (char *)value.c_str();
+			//char *utf8Output = (char *)malloc(value.size() * 3 * sizeof(char));
+			//utf8Output[0] = 0;
+			//char *utf8tmp = utf8Output;
+			//size_t inbytesLft = value.size(), outbytesLeft = value.size() * 3;
+			/*if (iconv(cnv, &theVal, &inbytesLft, &utf8tmp, &outbytesLeft) == -1) {
 				pmm::Log << "Unable to convert " << value << " to UTF-8, conversion stopped at " << (int)(value.size() - inbytesLft) << pmm::NL;
 				v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
 			}
 			else {
 				v = curl_easy_escape(www, utf8Output, (utf8tmp - utf8Output));
-			}
+			}*/
 			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
 			//url_encode(param);
-			//url_encode(value);
-			if (encodedPost.str().size() == 0) encodedPost << p << "=" << v;
-			else encodedPost << "&" << p << "=" << v;
+			url_encode(value);
+			if (encodedPost.str().size() == 0) encodedPost << p << "=" << value;
+			else encodedPost << "&" << p << "=" << value;
 			curl_free(p);
-			curl_free(v);
-			free(utf8Output);
+			//curl_free(v);
+			//free(utf8Output);
 #ifdef DEBUG
 			if (getenv("DEBUG_MSG") != NULL || param.compare("subject") == 0) {
 				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
 			}
 #endif
 		}
-		iconv_close(cnv);
+		//iconv_close(cnv);
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
 #ifdef DEBUG
 		pmm::Log << "DEBUG: Sending post data: " << encodedPost.str().c_str() << pmm::NL;

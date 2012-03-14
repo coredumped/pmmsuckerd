@@ -33,16 +33,19 @@ namespace pmm {
 	void url_encode(std::string &theString){
 		std::stringstream urlEncodedString;
 		bool replaceHappened = false;
-
 		for (size_t i = 0; i < theString.size(); i++) {
 			if (isURLEncodable(theString[i])) {
 				size_t _w = urlEncodedString.width();
-				urlEncodedString << "%";
-				/*if(theString[i] >= 0x7f) urlEncodedString.width(4);
-				else*/ 
+				int normval = (int)(theString[i] & 0x000000ff);
 				urlEncodedString.width(2);
 				urlEncodedString.fill('0');
-				urlEncodedString << std::hex << std::uppercase << (int)(theString[i] & 0x000000ff);
+				if(normval >= 0x7f){
+					int pfx = (normval >> 6) + 0x000000c0;
+					urlEncodedString << "%" << std::hex << std::uppercase << pfx;
+					normval = normval & 0x000007f + 0x000080;
+				}
+				urlEncodedString << "%";
+				urlEncodedString << std::hex << std::uppercase << normval;
 				urlEncodedString.width(_w);
 				replaceHappened = true;
 			}
