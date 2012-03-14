@@ -101,6 +101,7 @@ namespace pmm {
 							int max_retrieve = carray_count(msgList);
 							//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 							for (int i = 0; i < max_retrieve; i++) {
+								time_t now = time(0);
 								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 								if (info->msg_uidl == NULL) continue;
 								if (!QuotaDB::have(m.email())) {
@@ -120,10 +121,13 @@ namespace pmm {
 									else {
 										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
 										mailpop3_retr_free(msgBuffer);
+										if (startTimeMap.find(m.email()) == startTimeMap.end()) {
+											startTimeMap[m.email()] = now - 43200;
+										}
 #ifdef DEBUG
-										pmm::Log << "Message is " << (time(0) - m.startedOn) << " seconds old" << pmm::NL;
+										pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[m.email()]) << " seconds old" << pmm::NL;
 #endif
-										if ((time(0) - 120) >= m.startedOn) {
+										if (theMessage.serverDate >= startTimeMap[m.email()]) {
 											fetchedMails.addEntry(m.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}
