@@ -279,7 +279,7 @@ namespace pmm {
 			curl_free(p);
 			curl_free(v);
 #ifdef DEBUG
-			if (getenv("DEBUG_MSG") != NULL || param.compare("subject") == 0) {
+			if (getenv("DEBUG_MSG") != NULL && param.compare("subject") == 0) {
 				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
 			}
 #endif
