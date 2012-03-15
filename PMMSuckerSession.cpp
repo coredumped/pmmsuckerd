@@ -273,9 +273,10 @@ namespace pmm {
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
 			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
-			char *v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
-			if (encodedPost.str().size() == 0) encodedPost << p << "=" << value;
-			else encodedPost << "&" << p << "=" << value;
+			char *v;
+			v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
+			if (encodedPost.str().size() == 0) encodedPost << p << "=" << v;
+			else encodedPost << "&" << p << "=" << v;
 			curl_free(p);
 			curl_free(v);
 #ifdef DEBUG
