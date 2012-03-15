@@ -35,6 +35,8 @@ namespace pmm {
 		std::string &deviceToken();
 		bool isSystemNotification;
 		void useSilentSound();
+		
+		int attempts;
 	};
 }
 

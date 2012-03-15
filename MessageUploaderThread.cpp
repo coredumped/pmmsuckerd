@@ -10,10 +10,15 @@
 #include "MTLogger.h"
 #include <iostream>
 
+#ifndef MAX_DEFAULT_UPLOAD_ATTEMPTS
+#define MAX_DEFAULT_UPLOAD_ATTEMPTS 5
+#endif
+
 namespace pmm {
 	MessageUploaderThread::MessageUploaderThread(){
 		pmmStorageQueue = NULL;
 		session = NULL;
+		maxUploadAttempts = MAX_DEFAULT_UPLOAD_ATTEMPTS;
 	}
 	
 	MessageUploaderThread::~MessageUploaderThread(){
@@ -31,11 +36,17 @@ namespace pmm {
 #ifdef DEBUG
 					pmm::Log << "Uploading message to: " << np.origMailMessage.to << pmm::NL;
 #endif
+					np.attempts++;
 					session->uploadNotificationMessage(np);
 				} catch (pmm::HTTPException &htex1) {
 					pmm::Log << "Can't upload message due to: " << htex1.errorMessage() << ", will retry in the next cycle." << pmm::NL;
 					sleep(1);
-					pmmStorageQueue->add(np);
+					if (np.attempts <= maxUploadAttempts) {
+						pmmStorageQueue->add(np);
+					}
+					else {
+						pmm::Log << "PANIC: Tried to upload message " << np.message() << " " << np.attempts << " times without success, not further attempts will be made" << pmm::NL;
+					}
 				}
 			}
 			usleep(250000);

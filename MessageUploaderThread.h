@@ -23,6 +23,7 @@ namespace pmm {
 		MessageUploaderThread();
 		virtual ~MessageUploaderThread();
 		void operator()();
+		int maxUploadAttempts;
 	};
 }
 
