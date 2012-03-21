@@ -559,7 +559,7 @@ namespace pmm {
 		}
 	}
 	
-	bool SuckerSession::fnxHashPendingTasks(){
+	bool SuckerSession::fnxHasPendingTasks(){
 		bool retval = false;
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
 		static const char *sURL = "http://fnxsoftware.com/pmm/pmmgottask.php?pmmsucker=";
@@ -575,6 +575,7 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
 		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+		curl_easy_setopt(www, CURLOPT_TIMEOUT, 10);
 #ifdef DEBUG
 		pmm::Log << "DEBUG: Requesting pending tasks to fn(x): " << theURL.str() << pmm::NL;
 #endif
@@ -590,13 +591,13 @@ namespace pmm {
 #endif
 		}
 		else {
-#ifdef DEBUG
-			pmm::Log << "DEBUG: Unable to perform request to " << theURL.str() << ": " << errorBuffer << pmm::NL;
-#endif
 			int http_errcode; 
 			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
-			curl_easy_cleanup(www);
-			throw HTTPException(http_errcode, errorBuffer);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Unable to perform request to " << theURL.str() << ": HTTP Status=" << http_errcode << ": " << errorBuffer << pmm::NL;
+#endif
+			//curl_easy_cleanup(www);
+			//throw HTTPException(http_errcode, errorBuffer);
 		}
 		curl_easy_cleanup(www);
 		return retval;

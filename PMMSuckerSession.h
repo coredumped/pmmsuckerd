@@ -79,7 +79,7 @@ namespace pmm {
 		void uploadNotificationMessage(const NotificationPayload &np);
 		
 		//Checks if a new task has been registered in fnxsoftware.com
-		bool fnxHashPendingTasks();
+		bool fnxHasPendingTasks();
 	};
 	
 	namespace Commands {

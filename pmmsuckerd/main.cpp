@@ -345,7 +345,7 @@ int main (int argc, const char * argv[])
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
 				bool doCmdCheck = false;
-				if(doCmdCheck == false && session.fnxHashPendingTasks()){
+				if(doCmdCheck == false && session.fnxHasPendingTasks()){
 					doCmdCheck = true;
 				}
 				if(doCmdCheck){
