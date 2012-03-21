@@ -338,13 +338,14 @@ int main (int argc, const char * argv[])
 			//pmm::FetchedMailsCache fCache;
 			//fCache.expireOldEntries();
 		}
+		bool doCmdCheck = false;
+		if (tic % 900 == 0) { //At least go to app engine every 15 minutes
+			doCmdCheck = true;
+		}
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
 				bool doCmdCheck = false;
-				if(session.fnxHashPendingTasks()){
-					doCmdCheck = true;
-				}
-				if (tic % 900 == 0) { //At least go to app engine every 15 minutes
+				if(doCmdCheck == false && session.fnxHashPendingTasks()){
 					doCmdCheck = true;
 				}
 				if(doCmdCheck){
