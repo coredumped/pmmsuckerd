@@ -49,7 +49,8 @@ namespace pmm {
 				continue;
 			}
 			* p_msg_size = item->att_data.att_static->att_data.att_body_section->sec_length;
-			MailMessage::parse(tm, item->att_data.att_static->att_data.att_body_section->sec_body_part);
+			//MailMessage::parse(tm, item->att_data.att_static->att_data.att_body_section->sec_body_part);
+			MailMessage::parse(tm, item->att_data.att_static->att_data.att_body_section->sec_body_part, item->att_data.att_static->att_data.att_body_section->sec_length);
 			return item->att_data.att_static->att_data.att_body_section->sec_body_part;
 		}
 		return NULL;
