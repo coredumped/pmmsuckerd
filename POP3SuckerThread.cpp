@@ -119,7 +119,7 @@ namespace pmm {
 										pop3Log << "Unable to download message " << info->msg_uidl << " from " << m.email() << ": etpan code=" << result << pmm::NL;
 									}
 									else {
-										MailMessage::parse(theMessage, std::string(msgBuffer, msgSize));
+										MailMessage::parse(theMessage, msgBuffer, msgSize);
 										mailpop3_retr_free(msgBuffer);
 										if (startTimeMap.find(m.email()) == startTimeMap.end()) {
 											startTimeMap[m.email()] = now;
