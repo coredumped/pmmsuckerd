@@ -84,7 +84,11 @@ namespace pmm {
 		tzone = m.tzone;
 	}
 	
-	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){
+	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){ 
+		MailMessage::parse(m, rawMessage.c_str(), rawMessage.size());
+	}
+	
+	void MailMessage::parse(MailMessage &m, const char *msgBuffer, size_t msgSize){
 		size_t indx = 0;
 		struct mailimf_fields *fields;
 #ifdef USE_IMF
@@ -93,7 +97,7 @@ namespace pmm {
 		fields = result->msg_fields->fld_list;
 #else
 		struct mailmime *result;
-		int retCode = mailmime_parse(rawMessage.c_str(), rawMessage.size(), &indx, &result);
+		int retCode = mailmime_parse(msgBuffer, msgSize, &indx, &result);
 		fields = result->mm_data.mm_message.mm_fields;
 #endif
 		time_t now = time(0);
@@ -148,7 +152,8 @@ namespace pmm {
 						if ((s2pos = m.subject.find_first_of("?", s1pos + 2)) != m.subject.npos) {
 							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
 #warning Find out what are we going to do with Languages that use encodings different than utf-8
-							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newSubject);
+							//mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newSubject);
+							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
 							m.subject = newSubject;
 							free(newSubject);
 						}
@@ -186,10 +191,10 @@ namespace pmm {
 			}
 		}
 		if (m.subject.size() == 0 || m.subject.compare("Fw:") == 0 || m.subject.compare("Re:") == 0 || m.subject.compare("FW:") == 0 || m.subject.compare("RE") == 0 || m.subject.compare("Rv:") == 0 || m.subject.compare("RV:") == 0) {
-#ifdef DEBUG
+/*#ifdef DEBUG
 			pmm::Log << "DEBUG: Computing subject from: " << pmm::NL;
 			pmm::Log << rawMessage << pmm::NL;
-#endif
+#endif*/
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
 			std::string theBody = msgBody.str();

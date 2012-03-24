@@ -25,6 +25,7 @@
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		82805982145FB18200E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
 		82805983145FB1B400E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
+		828697CC150FF37D003E7675 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
 		8290FB96142F47D30080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
 		8290FB99142F508B0080BB85 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
 		8290FB9A142F51930080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
@@ -106,6 +107,7 @@
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		8280597F145FB0E600E7B614 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
 		82805981145FB18100E7B614 /* DataTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataTypes.cpp; sourceTree = "<group>"; };
+		828697CB150FF37D003E7675 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		8290FB93142F47770080BB85 /* MailAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailAccountInfo.h; sourceTree = "<group>"; };
 		8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MailAccountInfo.cpp; sourceTree = "<group>"; };
 		8290FB97142F502D0080BB85 /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mutex.h; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				828697CC150FF37D003E7675 /* libiconv.dylib in Frameworks */,
 				823BD0481444AECD001ED14E /* libcrypto.a in Frameworks */,
 				823BD0491444AECD001ED14E /* libssl.a in Frameworks */,
 				82571EB2144363D20047347E /* libetpan.framework in Frameworks */,
@@ -208,6 +211,7 @@
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				828697CB150FF37D003E7675 /* libiconv.dylib */,
 				823BD0461444AECD001ED14E /* libcrypto.a */,
 				823BD0471444AECD001ED14E /* libssl.a */,
 				82571EA914413E0F0047347E /* libsqlite3.dylib */,
