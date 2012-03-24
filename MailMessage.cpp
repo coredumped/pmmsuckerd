@@ -128,7 +128,7 @@ namespace pmm {
 						size_t s2pos;
 						if ((s2pos = m.from.find_first_of("?", s1pos + 2)) != m.from.npos) {
 							std::string sourceEncoding = m.from.substr(s1pos + 2, s2pos - s1pos - 2);
-							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, sourceEncoding.c_str(), &newFrom);
+							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, "UTF-8", &newFrom);
 							m.from = newFrom;
 							free(newFrom);
 						}
@@ -156,6 +156,7 @@ namespace pmm {
 							//mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newSubject);
 							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
 							if(newSubject != 0){
+								pmm::Log << "Unable to decode subject from subject field!!!" << pmm::NL;
 								m.subject = newSubject;
 								free(newSubject);
 							}
