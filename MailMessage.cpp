@@ -35,6 +35,7 @@ namespace pmm {
 				}
 					break;
 				default:
+					//Consider an encoding conversion here!!!!
 					outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
 					break;
 			}
@@ -154,8 +155,10 @@ namespace pmm {
 #warning Find out what are we going to do with Languages that use encodings different than utf-8
 							//mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newSubject);
 							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
-							m.subject = newSubject;
-							free(newSubject);
+							if(newSubject != 0){
+								m.subject = newSubject;
+								free(newSubject);
+							}
 						}
 					}
 #ifdef DEBUG
