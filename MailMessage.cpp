@@ -152,7 +152,6 @@ namespace pmm {
 						size_t s2pos;
 						if ((s2pos = m.subject.find_first_of("?", s1pos + 2)) != m.subject.npos) {
 							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
-#warning Find out what are we going to do with Languages that use encodings different than utf-8
 							//mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newSubject);
 							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
 							if(newSubject != 0){

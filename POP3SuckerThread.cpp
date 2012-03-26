@@ -173,7 +173,7 @@ namespace pmm {
 							}
 						}
 					}
-					mailpop3_quit(pop3);
+					//mailpop3_quit(pop3);
 				}
 				mailpop3_free(pop3);
 			}
