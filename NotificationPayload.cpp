@@ -40,15 +40,15 @@ namespace pmm {
 				newString.append("\\'");
 			}
 			else if (((unsigned char)theMsg[i]) >= 0x7f) {
-				/*newString.append("\\u");
+				newString.append("\\u");
 				std::stringstream hconv;
 				hconv.fill('0');
 				hconv.width(4);
 				
 				hconv << std::right << std::hex << (int)((unsigned char)theMsg[i]);
-				newString.append(hconv.str());*/
+				newString.append(hconv.str());
 				
-				newString.append("\\u");
+				/*newString.append("\\u");
 				std::stringstream hconv;
 				size_t j = i;
 				while(((unsigned char)theMsg[j]) >= 0x7f && j < theMsg.size()) {
@@ -65,7 +65,7 @@ namespace pmm {
 					newString.append("0");
 				}
 				newString.append(hconv.str());
-				if(j > 1) i += j - 1;
+				if(j > 1) i += j - 1;*/
 			}
 			else {
 				char tbuf[2] = { theMsg[i], 0x00};
