@@ -55,9 +55,9 @@ namespace pmm {
 				size_t j = i;
 				while(((unsigned char)theMsg[j]) >= 0x7f && j < theMsg.size()) {
 					hconv << std::right << std::hex << (int)((unsigned char)theMsg[j]);
-					newString.append(hconv.str());
 					j++;
 				}
+				newString.append(hconv.str());
 				if(j > 1) i += j - 1;
 			}
 			else {
