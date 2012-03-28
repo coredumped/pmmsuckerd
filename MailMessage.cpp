@@ -67,13 +67,15 @@ namespace pmm {
 
 	
 	MailMessage::MailMessage(){
-		
+		serverDate = 0;
+		tzone = 0;
 	}
 	
 	MailMessage::MailMessage(const std::string &_from, const std::string &_subject){
 		from = _from;
 		subject = _subject;
 		tzone = 0;
+		serverDate = 0;
 	}
 	
 	MailMessage::MailMessage(const MailMessage &m){
@@ -83,6 +85,7 @@ namespace pmm {
 		dateOfArrival = m.dateOfArrival;
 		msgUid = m.msgUid;
 		tzone = m.tzone;
+		serverDate = m.serverDate;
 	}
 	
 	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){ 
@@ -147,17 +150,21 @@ namespace pmm {
 					if ((s1pos = m.subject.find("=?")) != m.subject.npos) {
 						//Encoded with RFC 2047, let's decode this damn thing!!!
 						size_t indx2 = 0;
-						char *newSubject;
+						char *newSubject = 0;
 						//Find source encoding
 						size_t s2pos;
 						if ((s2pos = m.subject.find_first_of("?", s1pos + 2)) != m.subject.npos) {
 							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
-							//mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, sourceEncoding.c_str(), &newSubject);
-							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
-							if(newSubject != 0){
-								pmm::Log << "Unable to decode subject from subject field!!!" << pmm::NL;
-								m.subject = newSubject;
-								free(newSubject);
+							if(sourceEncoding.size() == 0){
+								pmm::Log << "Unable to compute source encoding from " << m.subject << pmm::NL;
+							}
+							else {
+								mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
+								if(newSubject != 0){
+									pmm::Log << "Unable to decode subject from subject field!!!" << pmm::NL;
+									m.subject = newSubject;
+									free(newSubject);
+								}
 							}
 						}
 					}
