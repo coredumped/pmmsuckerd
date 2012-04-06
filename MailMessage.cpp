@@ -102,7 +102,7 @@ namespace pmm {
 #else
 		struct mailmime *result;
 		int retCode = mailmime_parse(msgBuffer, msgSize, &indx, &result);
-		if(retCode == MAILIMF_NO_ERROR){
+		if(retCode != MAILIMF_NO_ERROR){
 			pmm::Log << "Unable to properly parse message";
 			if(msgBuffer == 0 || msgSize == 0){
 				pmm::Log << " because the given e-mail message is either NULL or empty!!!";
