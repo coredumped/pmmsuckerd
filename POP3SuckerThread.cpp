@@ -103,6 +103,8 @@ namespace pmm {
 							for (int i = 0; i < max_retrieve; i++) {
 								time_t now = time(0);
 								struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
+								if (info == NULL) continue;
+								//Verify for null here!!!
 								if (info->msg_uidl == NULL) continue;
 								if (!QuotaDB::have(m.email())) {
 									pmm::Log << m.email() << " has ran out of quota in the middle of a POP3 mailbox poll!!!" << pmm::NL;
@@ -119,7 +121,12 @@ namespace pmm {
 										pop3Log << "Unable to download message " << info->msg_uidl << " from " << m.email() << ": etpan code=" << result << pmm::NL;
 									}
 									else {
-										MailMessage::parse(theMessage, msgBuffer, msgSize);
+										if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
+											pmm::Log << "Unable to parse e-mail message !!!" << pmm::NL;
+#warning Find a soemthing better to do when a message can't be properly parsed!!!!
+											mailpop3_retr_free(msgBuffer);
+											continue;
+										}
 										mailpop3_retr_free(msgBuffer);
 										if (startTimeMap.find(m.email()) == startTimeMap.end()) {
 											startTimeMap[m.email()] = now;

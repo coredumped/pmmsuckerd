@@ -88,11 +88,11 @@ namespace pmm {
 		serverDate = m.serverDate;
 	}
 	
-	void MailMessage::parse(MailMessage &m, const std::string &rawMessage){ 
-		MailMessage::parse(m, rawMessage.c_str(), rawMessage.size());
+	bool MailMessage::parse(MailMessage &m, const std::string &rawMessage){ 
+		return MailMessage::parse(m, rawMessage.c_str(), rawMessage.size());
 	}
 	
-	void MailMessage::parse(MailMessage &m, const char *msgBuffer, size_t msgSize){
+	bool MailMessage::parse(MailMessage &m, const char *msgBuffer, size_t msgSize){
 		size_t indx = 0;
 		struct mailimf_fields *fields;
 #ifdef USE_IMF
@@ -102,6 +102,17 @@ namespace pmm {
 #else
 		struct mailmime *result;
 		int retCode = mailmime_parse(msgBuffer, msgSize, &indx, &result);
+		if(retCode == MAILIMF_NO_ERROR){
+			pmm::Log << "Unable to properly parse message";
+			if(msgBuffer == 0 || msgSize == 0){
+				pmm::Log << " because the given e-mail message is either NULL or empty!!!";
+			}
+			else {
+				pmm::Log << ": " << msgBuffer;
+			}
+			pmm::Log << pmm::NL;
+			return false;
+		}
 		fields = result->mm_data.mm_message.mm_fields;
 #endif
 		time_t now = time(0);
@@ -229,5 +240,6 @@ namespace pmm {
 #else
 		mailmime_free(result);
 #endif
+		return true;
 	}
 }

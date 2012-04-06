@@ -196,13 +196,15 @@ namespace pmm {
 				if(quotaIncreaseQueue->extractEntry(p)){
 					//Verify if we should upgrade quotas on an account
 					if (emailAccounts[i].email().compare(p.emailAddress) == 0) {
-						QuotaDB::set(emailAccounts[i].email(), p.quotaValue);
+						QuotaDB::set(p.emailAddress, p.quotaValue);
 						emailAccounts.beginCriticalSection();
 						emailAccounts.atUnlocked(i).quota = p.quotaValue;
 						emailAccounts.atUnlocked(i).isEnabled = true;
+						emailAccounts.endCriticalSection();
+						pmm::Log << "Notifying quota increase of " << p.quotaValue << " to " << p.emailAddress << pmm::NL;
 						std::stringstream incNotif;
-						incNotif << "We have incremented your notification quota on " << emailAccounts.atUnlocked(i).email() << " by " << p.quotaValue << ".\nThanks for showing us some love!";
-						std::vector<std::string> myDevTokens = emailAccounts.atUnlocked(i).devTokens();
+						incNotif << "We have incremented your notification quota on " << p.emailAddress << " by " << p.quotaValue << ".\nThanks for showing us some love!";
+						std::vector<std::string> myDevTokens = emailAccounts[i].devTokens();
 						for (size_t npi = 0; npi < myDevTokens.size(); npi++) {
 							NotificationPayload np(myDevTokens[npi], incNotif.str());
 							np.isSystemNotification = true;
@@ -211,7 +213,7 @@ namespace pmm {
 							}
 							else notificationQueue->add(np);
 						}
-						emailAccounts.endCriticalSection();
+						
 					}
 					else quotaIncreaseQueue->add(p);
 				}

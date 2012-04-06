@@ -25,8 +25,8 @@ namespace pmm {
 		MailMessage();
 		MailMessage(const std::string &_from, const std::string &_subject);
 		MailMessage(const MailMessage &m);
-		static void parse(MailMessage &m, const std::string &rawMessage);
-		static void parse(MailMessage &m, const char *msgBuffer, size_t msgSize);
+		static bool parse(MailMessage &m, const std::string &rawMessage);
+		static bool parse(MailMessage &m, const char *msgBuffer, size_t msgSize);
 	};
 }
 
