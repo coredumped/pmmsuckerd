@@ -43,29 +43,18 @@ namespace pmm {
 				newString.append("\\u");
 				std::stringstream hconv;
 				hconv.fill('0');
+				hconv.width(2);
+				while ((unsigned char)theMsg[i] >= 0x7f) {
+					hconv << std::right << std::hex << (int)((unsigned char)theMsg[i]);
+					i++;
+				}
+				i--;
+				/*
+				hconv.fill('0');
 				hconv.width(4);
-				
 				hconv << std::right << std::hex << (int)((unsigned char)theMsg[i]);
+				 */
 				newString.append(hconv.str());
-				
-				/*newString.append("\\u");
-				std::stringstream hconv;
-				size_t j = i;
-				while(((unsigned char)theMsg[j]) >= 0x7f && j < theMsg.size()) {
-					hconv << std::right << std::hex << (int)((unsigned char)theMsg[j]);
-					j++;
-				}
-				if (hconv.str().size() == 2) {
-					newString.append("00");
-				}
-				else if (hconv.str().size() == 1){
-					newString.append("000");
-				}
-				else if (hconv.str().size() > 4 && hconv.str().size() % 2 != 0) {
-					newString.append("0");
-				}
-				newString.append(hconv.str());
-				if(j > 1) i += j - 1;*/
 			}
 			else {
 				char tbuf[2] = { theMsg[i], 0x00};
