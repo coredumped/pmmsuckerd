@@ -570,7 +570,7 @@ namespace pmm {
 		_return.clear();
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
-		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMessage;
+		params["opType"] = pmm::OperationTypes::pmmSuckerRetrieveSilentModeInfo;
 		params["suckerID"] = this->myID;
 		std::stringstream allEmails;
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
