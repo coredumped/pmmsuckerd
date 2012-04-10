@@ -82,7 +82,7 @@ namespace pmm {
 		bool ret = false;
 		if(silentDB == NULL) initialize();
 		std::stringstream sqlCmd, errmsg;
-		char *errmsg_s = NULL, *sztail = NULL;
+		char *sztail = NULL;
 		sqlite3_stmt *statement;
 		sqlCmd << "SELECT startHour,startMinute,endHour,endMinute FROM  " << silentModeTable << " WHERE email='" << email << "'";
 		int errCode = sqlite3_prepare_v2(silentDB, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);

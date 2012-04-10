@@ -80,6 +80,10 @@ namespace pmm {
 		
 		//Checks if a new task has been registered in fnxsoftware.com
 		bool fnxHasPendingTasks();
+		
+		//Retrieves silent mode information or the given accounts
+		bool silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::vector<std::string> &emailAccounts);
+		bool silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::string &emailAccounts);
 	};
 	
 	namespace Commands {

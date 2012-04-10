@@ -78,6 +78,7 @@ namespace pmm {
 		static const char *pmmSuckerQuotaUpdate = "zpmmSuckerQuotaUpdate";
 		static const char *pmmSuckerCommandRetrieve = "pmmSuckerCommandRetrieve";
 		static const char *pmmSuckerUploadMessage = "pmmSuckerUploadMessage";
+		static const char *pmmSuckerRetrieveSilentModeInfo = "pmmSuckerRetrieveSilentModeInfo";
 	};
 	
 	namespace Commands {
@@ -559,6 +560,47 @@ namespace pmm {
 		}
 	}
 	
+	bool SuckerSession::silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::string &emailAccounts){
+		std::vector<std::string> all;
+		all.push_back(emailAccounts);
+		return silentModeInfoGet(_return, all);
+	}
+	
+	bool SuckerSession::silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::vector<std::string> &emailAccounts){
+		_return.clear();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMessage;
+		params["suckerID"] = this->myID;
+		std::stringstream allEmails;
+		for (size_t i = 0; i < emailAccounts.size(); i++) {
+			if(i == 0) allEmails << emailAccounts[i];
+			else allEmails << "," << emailAccounts[i];
+		}
+		params["emailAccounts"] = allEmails.str();
+		std::string output;
+		executePost(params, output);
+		//Analyze server output
+		std::stringstream of(output);
+		while (!of.eof()) {
+			std::string item_s;
+			std::getline(of, item_s);
+			nltrim(item_s);
+			if (item_s.size() > 1) {
+				std::vector<std::string> item;
+				pmm::splitString(item, item_s, ",");
+				std::map<std::string, int> data;
+				data["startHour"] = atoi(item[1].c_str());
+				data["startMinute"] = atoi(item[1].c_str());
+				data["endHour"] = atoi(item[1].c_str());
+				data["endMinute"] = atoi(item[1].c_str());
+				_return[item[0]] = data;
+			}
+		}
+		return (_return.size() > 0)?true:false;
+	}
+
+	
 	bool SuckerSession::fnxHasPendingTasks(){
 		bool retval = false;
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
@@ -602,5 +644,6 @@ namespace pmm {
 		curl_easy_cleanup(www);
 		return retval;
 	}
+
 }
 

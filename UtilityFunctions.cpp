@@ -117,4 +117,19 @@ namespace pmm {
 		sqlite3_finalize(statement);
 		return gotTable;
 	}
+	
+	void splitString(std::vector<std::string> &_return, const std::string &theString, const std::string &delim){
+		int idx = 0;
+		while (true) {
+			size_t newPos = theString.find(delim, idx);
+			if (newPos != theString.npos) {
+				std::string sub = theString.substr(idx, newPos - idx);
+				idx = newPos;
+			}
+			else {
+				_return.push_back(theString.substr(idx));
+				break;
+			}
+		}
+	}
 }

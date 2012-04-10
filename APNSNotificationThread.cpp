@@ -299,7 +299,6 @@ namespace pmm {
 				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
 #endif
 				//Verify here if we should notify the event or not
-#warning TODO: Remeber to add the notification filtering code here
 				try {
 					time_t theTime;
 					time(&theTime);

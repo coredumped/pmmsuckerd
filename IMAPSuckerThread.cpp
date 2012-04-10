@@ -115,7 +115,6 @@ namespace pmm {
 		set = mailimap_set_new_single(uid);
 		fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
 		section = mailimap_section_new(NULL);
-#warning TODO: Find a way to only retrieve the most meaningful header fields
 		/*clist *hdrsList = clist_new();
 		clist_append(hdrsList, (void *)"FROM");
 		clist_append(hdrsList, (void *)"SUBJECT");
@@ -126,7 +125,6 @@ namespace pmm {
 		
 		r = mailimap_uid_fetch(imap, set, fetch_type, &fetch_result);
 		if(etpanOperationFailed(r)){
-#warning Enqueue mail fetch for later
 			IMAPFetchControl ifc = imapFetch;
 			ifc.madeAttempts++;
 			ifc.nextAttempt = time(NULL) + fetchRetryInterval;
@@ -232,7 +230,6 @@ namespace pmm {
 					result = mailimap_socket_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
 				}
 				if (etpanOperationFailed(result)) {
-#warning TODO enqueue mail fetching for later
 					imapFetch.madeAttempts++;
 					imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
 					fetchQueue->add(imapFetch);

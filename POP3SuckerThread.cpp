@@ -123,7 +123,7 @@ namespace pmm {
 									else {
 										if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
 											pmm::Log << "Unable to parse e-mail message !!!" << pmm::NL;
-#warning Find a soemthing better to do when a message can't be properly parsed!!!!
+#warning Find a something better to do when a message can't be properly parsed!!!!
 											mailpop3_retr_free(msgBuffer);
 											continue;
 										}
