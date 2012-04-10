@@ -78,6 +78,8 @@ void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, si
 void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &params);
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
+void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts);
+
 
 int main (int argc, const char * argv[])
 {
@@ -221,6 +223,7 @@ int main (int argc, const char * argv[])
 	for (size_t i = 0; i < emailAccounts.size(); i++) {
 		pmm::QuotaDB::set(emailAccounts[i].email(), emailAccounts[i].quota);
 	}
+	retrieveAndSaveSilentModeSettings(emailAccounts);
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
 	pmm::APNSNotificationThread develNotifThread;	
@@ -669,7 +672,24 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 	}	
 }
 
-
+void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts){
+	std::vector<std::string> allAccounts;
+	for (size_t i = 0; i < emailAccounts.size(); i++) {
+		allAccounts.push_back(emailAccounts[i].email());
+	}
+	//Now we retrieve account information...
+	std::map<std::string, std::map<std::string, int> > info;
+	if(globalSession->silentModeInfoGet(info, allAccounts)){
+		for (size_t i = 0; i < allAccounts.size(); i++) {
+			std::cout << allAccounts[i] << ": ";
+			std::cout << info[allAccounts[i]]["startHour"] << ":";
+			std::cout << info[allAccounts[i]]["startMinute"] << " -> ";
+			std::cout << info[allAccounts[i]]["endHour"] << ":";
+			std::cout << info[allAccounts[i]]["endMinute"] << std::endl;
+			//Save data here
+		}
+	}
+}
 
 
 

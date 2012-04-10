@@ -591,9 +591,9 @@ namespace pmm {
 				pmm::splitString(item, item_s, ",");
 				std::map<std::string, int> data;
 				data["startHour"] = atoi(item[1].c_str());
-				data["startMinute"] = atoi(item[1].c_str());
-				data["endHour"] = atoi(item[1].c_str());
-				data["endMinute"] = atoi(item[1].c_str());
+				data["startMinute"] = atoi(item[2].c_str());
+				data["endHour"] = atoi(item[3].c_str());
+				data["endMinute"] = atoi(item[4].c_str());
 				_return[item[0]] = data;
 			}
 		}
