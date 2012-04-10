@@ -223,7 +223,7 @@ int main (int argc, const char * argv[])
 	for (size_t i = 0; i < emailAccounts.size(); i++) {
 		pmm::QuotaDB::set(emailAccounts[i].email(), emailAccounts[i].quota);
 	}
-	retrieveAndSaveSilentModeSettings(emailAccounts);
+	//retrieveAndSaveSilentModeSettings(emailAccounts);
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
 	pmm::APNSNotificationThread develNotifThread;	
