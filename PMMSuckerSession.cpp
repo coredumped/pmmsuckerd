@@ -588,7 +588,7 @@ namespace pmm {
 			nltrim(item_s);
 			if (item_s.size() > 1) {
 				std::vector<std::string> item;
-				pmm::splitString(item, item_s, ",");
+				pmm::splitString(item, item_s, "|");
 				std::map<std::string, int> data;
 				data["startHour"] = atoi(item[1].c_str());
 				data["startMinute"] = atoi(item[2].c_str());
