@@ -124,6 +124,7 @@ namespace pmm {
 			size_t newPos = theString.find(delim, idx);
 			if (newPos != theString.npos) {
 				std::string sub = theString.substr(idx, newPos - idx);
+				_return.push_back(sub);
 				idx = newPos + 1;
 			}
 			else {
