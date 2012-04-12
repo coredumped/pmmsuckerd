@@ -680,13 +680,21 @@ void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &
 	//Now we retrieve account information...
 	std::map<std::string, std::map<std::string, int> > info;
 	if(globalSession->silentModeInfoGet(info, allAccounts)){
-		for (size_t i = 0; i < allAccounts.size(); i++) {
-			std::cout << allAccounts[i] << ": ";
-			std::cout << info[allAccounts[i]]["startHour"] << ":";
-			std::cout << info[allAccounts[i]]["startMinute"] << " -> ";
-			std::cout << info[allAccounts[i]]["endHour"] << ":";
-			std::cout << info[allAccounts[i]]["endMinute"] << std::endl;
+		pmm::Log << "Saving silent mode info..." << pmm::NL;
+		for (std::map<std::string, std::map<std::string, int> >::iterator iter = info.begin(); iter != info.end(); iter++) {
+			std::string theAccount = iter->first;
+			pmm::Log << theAccount << ": ";
+			pmm::Log << info[theAccount]["startHour"] << ":";
+			pmm::Log << info[theAccount]["startMinute"] << " -> ";
+			pmm::Log << info[theAccount]["endHour"] << ":";
+			pmm::Log << info[theAccount]["endMinute"] << pmm::NL;
 			//Save data here
+			pmm::SilentMode::set(theAccount, 
+								 info[theAccount]["startHour"], 
+								 info[theAccount]["startMinute"], 
+								 info[theAccount]["endHour"], 
+								 info[theAccount]["endMinute"]
+								 );
 		}
 	}
 }
