@@ -98,6 +98,7 @@ namespace pmm {
 		void setCertPassword(const std::string &certPwd);
 		~APNSNotificationThread();
 		void operator()();
+		void useForProduction();
 	};
 	
 }

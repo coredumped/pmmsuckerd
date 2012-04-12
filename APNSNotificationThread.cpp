@@ -227,6 +227,12 @@ namespace pmm {
 		SSL_free(apnsConnection);    
 	}
 	
+	void APNSNotificationThread::useForProduction(){
+		_useSandbox = false;
+		maxBurstPauseInterval = 1;
+		maxNotificationsPerBurst = 64;
+		pmm::APNSLog << "Setting this notification thread as a production notifier" << pmm::NL;
+	}
 	
 	APNSNotificationThread::APNSNotificationThread(){
 		sslInitComplete = false;

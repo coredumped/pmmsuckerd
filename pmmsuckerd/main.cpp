@@ -235,6 +235,7 @@ int main (int argc, const char * argv[])
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
 		//2. Start thread
+		notifThreads[i].useForProduction();
 		notifThreads[i].notificationQueue = &notificationQueue;
 		notifThreads[i].setCertPath(sslCertificatePath);
 		notifThreads[i].setKeyPath(sslPrivateKeyPath);
