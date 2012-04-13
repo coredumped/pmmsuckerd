@@ -352,6 +352,8 @@ int main (int argc, const char * argv[])
 				if(doCmdCheck == false && session.fnxHasPendingTasks()){
 					doCmdCheck = true;
 				}
+				int nNotif = notificationQueue.size();
+				if(nNotif > 0) pmm::Log << "Notification queue has " << nNotif << " pending elements" << pmm::NL;
 				if(doCmdCheck){
 					std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
 					int nTasks = session.getPendingTasks(tasksToRun);
