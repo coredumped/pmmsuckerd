@@ -40,7 +40,7 @@
 namespace pmm {
 	MTLogger APNSLog;
 
-	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength)
+	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength, bool useSandbox)
 	{
 		bool rtn = true;
 		if (sslPtr && deviceTokenBinary && payloadBuff && payloadLength)
@@ -93,6 +93,7 @@ namespace pmm {
 			if (SSL_pending(sslPtr) > 0) {
 				char apnsRetCode[6] = {0, 0, 0, 0, 0, 0};
 				do{
+					APNSLog << "There is additional data to read!!!" << pmm::NL;
 					sslRetCode = SSL_read(sslPtr, (void *)apnsRetCode, 6);
 				}while (sslRetCode == SSL_ERROR_WANT_READ || sslRetCode == SSL_ERROR_WANT_WRITE);
 				if (sslRetCode <= 0) {
