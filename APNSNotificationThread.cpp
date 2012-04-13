@@ -313,6 +313,7 @@ namespace pmm {
 					if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){
 						payload.useSilentSound();
 					}
+					if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
 					notifyTo(payload.deviceToken(), payload);
 				} 
 				catch (SSLException &sse1){
