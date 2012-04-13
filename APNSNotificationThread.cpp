@@ -314,6 +314,7 @@ namespace pmm {
 						payload.useSilentSound();
 					}
 					if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
+					else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
 					notifyTo(payload.deviceToken(), payload);
 				} 
 				catch (SSLException &sse1){
