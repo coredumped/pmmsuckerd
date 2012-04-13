@@ -363,7 +363,7 @@ namespace pmm {
 			devToken2Binary(devToken, binaryDevToken);
 			devTokenCache[devToken] = binaryDevToken;
 		}
-		sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size());
+		sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size(), _useSandbox);
 	}
 	
 	SSLException::SSLException(){ 
