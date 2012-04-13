@@ -320,6 +320,7 @@ namespace pmm {
 				} 
 				catch (SSLException &sse1){
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
+						APNSLog << "CRITICAL: SSLException caught!!! errorCode=" << sse1.errorCode() << " msg=" << sse1.message() << pmm::NL;
 						//Connection close, force reconnect
 						_socket = -1;
 						disconnectFromAPNS();
@@ -329,10 +330,11 @@ namespace pmm {
 					}
 					else{
 						if(errno == 32){
+							APNSLog << "CRITICAL: SSLException caught!!! errorCode=" << sse1.errorCode() << " msg=" << sse1.message() << pmm::NL;
 							APNSLog << "CRITICAL: Got a broken pipe, forcing reconnection..." << pmm::NL;
 							notificationQueue->add(payload);
-							_socket = -1;
 							disconnectFromAPNS();
+							_socket = -1;
 							sleep(waitTimeBeforeReconnectToAPNS);
 							connect2APNS();
 						}
