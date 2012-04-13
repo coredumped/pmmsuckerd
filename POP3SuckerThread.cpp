@@ -70,6 +70,7 @@ namespace pmm {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL quotaUpdateVector.");
 		}
 		time(&startedOn);
+		mainFetchQueue.name = "POP3MainFetchQueue";
 		while (true) {
 			MailAccountInfo m;
 			while (mainFetchQueue.extractEntry(m)) {

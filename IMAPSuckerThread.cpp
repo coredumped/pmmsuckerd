@@ -207,6 +207,7 @@ namespace pmm {
 		pmm::imapLog << "DEBUG: IMAP MailFetcher warming up..." << pmm::NL;
 		sleep(1);
 		pmm::imapLog << "DEBUG: IMAP MailFetcher started!!!" << pmm::NL;
+		fetchQueue->name = "IMAPFetchQueue";
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {

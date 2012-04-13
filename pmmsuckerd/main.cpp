@@ -97,21 +97,21 @@ int main (int argc, const char * argv[])
 	std::string sslDevelPrivateKeyPath = DEFAULT_DEVEL_SSL_PRIVATE_KEY_PATH;
 
 	int commandPollingInterval = DEFAULT_COMMAND_POLLING_INTERVAL;
-	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
-	pmm::SharedQueue<pmm::NotificationPayload> develNotificationQueue;
+	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue("NotificationQueue");
+	pmm::SharedQueue<pmm::NotificationPayload> develNotificationQueue("DevelNotificationQueue");
 	
 	pmm::SharedVector<std::string> quotaUpdateVector;
-	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue;
-	pmm::SharedQueue<pmm::QuotaIncreasePetition> quotaIncreaseQueue;
-	pmm::SharedQueue<pmm::PreferenceQueueItem> preferenceSetQueue;
+	pmm::SharedQueue<pmm::NotificationPayload> pmmStorageQueue("StorageQueue");
+	pmm::SharedQueue<pmm::QuotaIncreasePetition> quotaIncreaseQueue("QuotaIncreaseQueue");
+	pmm::SharedQueue<pmm::PreferenceQueueItem> preferenceSetQueue("PreferencesMgmntQueue");
 	
-	pmm::SharedQueue<pmm::MailAccountInfo> addIMAPAccountQueue;
-	pmm::SharedQueue<std::string> rmIMAPAccountQueue;
-	pmm::SharedQueue<pmm::MailAccountInfo> addPOP3AccountQueue;
-	pmm::SharedQueue<std::string> rmPOP3AccountQueue;
+	pmm::SharedQueue<pmm::MailAccountInfo> addIMAPAccountQueue("AddIMAPAccountQueue");
+	pmm::SharedQueue<std::string> rmIMAPAccountQueue("RemoveIMAPAccountQueue");
+	pmm::SharedQueue<pmm::MailAccountInfo> addPOP3AccountQueue("AddPOP3AccountQueue");
+	pmm::SharedQueue<std::string> rmPOP3AccountQueue("RemovePOP3AccountQueue");
 	
-	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue;
-	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue;
+	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue("DeviceTokenAddQueue");
+	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
 	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;

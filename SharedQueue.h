@@ -24,7 +24,9 @@ namespace pmm {
 		std::queue<T>queueData;
 	protected:
 	public:
+		std::string name;
 		SharedQueue(){ }
+		SharedQueue(const std::string &nName){ name = nName; }
 		virtual ~SharedQueue(){ }
 		
 		/*void add(T &entry){
@@ -42,7 +44,7 @@ namespace pmm {
 			m.lock();
 			try {
 				queueData.push(entry);
-				if(queueData.size() % 100 == 0) pmm::Log << "There is a queue with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;
+				if(queueData.size() % 100 == 0) pmm::Log << "There is a queue (" << name << ") with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;
 			} catch (...) {
 				m.unlock();
 				throw;
