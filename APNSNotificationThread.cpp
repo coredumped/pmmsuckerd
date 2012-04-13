@@ -231,7 +231,7 @@ namespace pmm {
 	void APNSNotificationThread::useForProduction(){
 		_useSandbox = false;
 		maxBurstPauseInterval = 1;
-		maxNotificationsPerBurst = 64;
+		//maxNotificationsPerBurst = 64;
 		pmm::APNSLog << "Setting this notification thread as a production notifier" << pmm::NL;
 	}
 	
@@ -329,9 +329,12 @@ namespace pmm {
 					}
 					else{
 						if(errno == 32){
-							APNSLog << "CRITICAL: Got a broken pipe, forcing reconnection timer..." << pmm::NL;
-							start = 0;
+							APNSLog << "CRITICAL: Got a broken pipe, forcing reconnection..." << pmm::NL;
 							notificationQueue->add(payload);
+							_socket = -1;
+							disconnectFromAPNS();
+							sleep(waitTimeBeforeReconnectToAPNS);
+							connect2APNS();
 						}
 						else {
 							APNSLog << "Got SSL error with code=" << sse1.errorCode() << " errno=" << errno << " aborting!!!" << pmm::NL;
