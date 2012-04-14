@@ -284,14 +284,16 @@ namespace pmm {
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		time_t start = time(NULL);
 		while (true) {
-			time_t currTime = time(NULL);
-			if(currTime - start > maxConnectionInterval){
-				APNSLog << "Max connection time (" << (currTime - start) << " > " << maxConnectionInterval << ") reached, reconnecting..." << pmm::NL;
-				disconnectFromAPNS();
-				initSSL();
-				connect2APNS();
-				APNSLog << "Re-connected succesfully!!!" << pmm::NL;
-				start = time(NULL);
+			if(_useSandbox){
+				time_t currTime = time(NULL);
+				if(currTime - start > maxConnectionInterval){
+					APNSLog << "Max connection time (" << (currTime - start) << " > " << maxConnectionInterval << ") reached, reconnecting..." << pmm::NL;
+					disconnectFromAPNS();
+					initSSL();
+					connect2APNS();
+					APNSLog << "Re-connected succesfully!!!" << pmm::NL;
+					start = time(NULL);
+				}
 			}
 #ifdef DEBUG
 			if(++i % 2400 == 0){
