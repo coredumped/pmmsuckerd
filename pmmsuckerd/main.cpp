@@ -481,6 +481,10 @@ void printHelpInfo() {
 void emergencyUnregister(){
 	std::cerr << "Triggering emergency unregister, some unhandled exception ocurred :-(" << std::endl;
 	globalSession->unregisterFromPMM();
+	//Save exit time...
+	std::ofstream of("apns-logout-time.log", std::ios_base::trunc);
+	of << time(0);
+	of.close();
 	abort();
 }
 

@@ -99,6 +99,8 @@ namespace pmm {
 		~APNSNotificationThread();
 		void operator()();
 		void useForProduction();
+		
+		void triggerSimultanousReconnect();
 	};
 	
 }

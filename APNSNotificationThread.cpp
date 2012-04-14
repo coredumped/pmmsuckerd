@@ -34,8 +34,12 @@
 #ifndef DEFAULT_MAX_CONNECTION_INTERVAL
 #define DEFAULT_MAX_CONNECTION_INTERVAL 7200
 #endif
+#ifndef DEFAULT_NOTIFICATION_WARMUP_TIME
+#define DEFAULT_NOTIFICATION_WARMUP_TIME 300
+#endif
 #include <pthread.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 namespace pmm {
 	MTLogger APNSLog;
@@ -265,6 +269,23 @@ namespace pmm {
 		_certPassword = certPwd;
 	}
 	
+	
+	static Mutex reconnectMutex;
+	static time_t reconnectTime = 0;
+	static bool shouldReconnect(){
+		bool ret = false;
+		reconnectMutex.lock();
+		if(time(0) - reconnectTime < 60) ret = true;
+		reconnectMutex.unlock();
+		return ret;
+	}
+	
+	void APNSNotificationThread::triggerSimultanousReconnect(){
+		reconnectMutex.lock();
+		reconnectTime = time(0);
+		reconnectMutex.unlock();
+	}
+	
 	void APNSNotificationThread::operator()(){
 #ifdef DEBUG
 		size_t i = 0;  
@@ -278,6 +299,23 @@ namespace pmm {
 		sigaddset(&bSignal, SIGPIPE);
 		if(pthread_sigmask(SIG_BLOCK, &bSignal, NULL) != 0){
 			APNSLog << "WARNING: Unable to block SIGPIPE, if a persistent APNS connection is cut unexpectedly we might crash!!!" << pmm::NL;
+		}
+		//Verify if connect delay is needed
+		{
+			struct stat st;
+			if(stat("apns-logout-time.log", &st) == 0){
+				int rightNow = time(0);
+				int lastRun = time(0);
+				//Read file, find las execution value and wait for 5 minutes....
+				std::ifstream inf("apns-logout-time.log");
+				inf >> lastRun;
+				inf.close();
+				int deltaT = rightNow - lastRun;
+				if (deltaT < 300) {
+					APNSLog << "Warming up thread..." << pmm::NL;
+					sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
+				}
+			}
 		}
 		initSSL();
 		connect2APNS();
@@ -304,12 +342,24 @@ namespace pmm {
 			NotificationPayload payload;
 			int notifyCount = 0;
 			std::string lastDevToken;
+			if (shouldReconnect()) {
+				disconnectFromAPNS();
+				_socket = -1;
+				sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
+				connect2APNS();
+			}
 			while (notificationQueue->extractEntry(payload)) {
 #ifdef DEBUG
 				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
 #endif
 				//Verify here if we should notify the event or not
 				try {
+					if (shouldReconnect()) {
+						disconnectFromAPNS();
+						_socket = -1;
+						sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
+						connect2APNS();
+					}
 					time_t theTime;
 					time(&theTime);
 					struct tm tmTime;
@@ -342,7 +392,8 @@ namespace pmm {
 							notificationQueue->add(payload);
 							disconnectFromAPNS();
 							_socket = -1;
-							sleep(10 * 60);
+							triggerSimultanousReconnect();
+							sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
 							connect2APNS();
 						}
 						else {
