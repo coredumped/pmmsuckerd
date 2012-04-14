@@ -43,6 +43,17 @@
 
 namespace pmm {
 	MTLogger APNSLog;
+	Mutex uuidGenM;
+	
+	static uint32_t _uuidCnt = 0;
+	static uint32_t msgUUIDGenerate(){
+		uint32_t newUUID = 0;
+		uuidGenM.lock();
+		_uuidCnt++;
+		newUUID = _uuidCnt;
+		uuidGenM.unlock();
+		return newUUID;
+	}
 
 	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength, bool useSandbox)
 	{
@@ -54,7 +65,7 @@ namespace pmm {
 			char binaryMessageBuff[bufSize];
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
-			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = 1234;
+			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = msgUUIDGenerate();
 			uint32_t networkOrderExpiryEpochUTC = htonl(time(NULL)+86400); // expire message if not delivered in 1 day
 			uint16_t networkOrderTokenLength = htons(DEVICE_BINARY_SIZE);
 			uint16_t networkOrderPayloadLength = htons(payloadLength);
