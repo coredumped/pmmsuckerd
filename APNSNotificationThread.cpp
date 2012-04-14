@@ -182,6 +182,11 @@ namespace pmm {
 		int enable_nosigpipe = 1;
 		setsockopt(_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)enable_nosigpipe, (socklen_t)sizeof(int));
 #endif
+		struct linger lopt;
+		lopt.l_onoff = 1;
+		lopt.l_linger = 1;
+		setsockopt(_socket, SOL_SOCKET, SO_LINGER, (void *)&lopt, sizeof(lopt));
+
 		if(_host_info)
 		{
 			struct in_addr *address = (struct in_addr*)_host_info->h_addr_list[0];
