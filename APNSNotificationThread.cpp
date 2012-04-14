@@ -275,7 +275,10 @@ namespace pmm {
 	static bool shouldReconnect(){
 		bool ret = false;
 		reconnectMutex.lock();
-		if(time(0) - reconnectTime < 60) ret = true;
+		if(time(0) - reconnectTime < 60){ 
+			ret = true;
+			pmm::APNSLog << "A broken PIPE event was detected, waiting for APNS reconnect..." << pmm::NL;
+		}
 		reconnectMutex.unlock();
 		return ret;
 	}
