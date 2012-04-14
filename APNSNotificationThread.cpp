@@ -301,6 +301,7 @@ namespace pmm {
 			//Verify if there are any ending notifications in the notification queue
 			NotificationPayload payload;
 			int notifyCount = 0;
+			std::string lastDevToken;
 			while (notificationQueue->extractEntry(payload)) {
 #ifdef DEBUG
 				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
@@ -316,7 +317,11 @@ namespace pmm {
 					}
 					if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
 					else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
+					if (lastDevToken.compare(payload.deviceToken()) == 0) {
+						sleep(1);
+					}
 					notifyTo(payload.deviceToken(), payload);
+					lastDevToken = payload.deviceToken();
 				} 
 				catch (SSLException &sse1){
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
@@ -335,7 +340,7 @@ namespace pmm {
 							notificationQueue->add(payload);
 							disconnectFromAPNS();
 							_socket = -1;
-							sleep(waitTimeBeforeReconnectToAPNS);
+							sleep(10 * 60);
 							connect2APNS();
 						}
 						else {
