@@ -267,6 +267,7 @@ namespace pmm {
 		maxNotificationsPerBurst = DEFAULT_MAX_NOTIFICATIONS_PER_BURST;
 		maxBurstPauseInterval = DEFAULT_BURST_PAUSE_INTERVAL;
 		maxConnectionInterval = DEFAULT_MAX_CONNECTION_INTERVAL;
+		warmingUP = false;
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
@@ -331,8 +332,10 @@ namespace pmm {
 				inf.close();
 				int deltaT = rightNow - lastRun;
 				if (deltaT < 300) {
+					warmingUP = true;
 					APNSLog << "Warming up thread..." << pmm::NL;
 					sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
+					warmingUP = false;
 				}
 			}
 		}
@@ -376,7 +379,9 @@ namespace pmm {
 					if (shouldReconnect()) {
 						disconnectFromAPNS();
 						_socket = -1;
+						warmingUP = true;
 						sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
+						warmingUP = false;
 						connect2APNS();
 					}
 					time_t theTime;

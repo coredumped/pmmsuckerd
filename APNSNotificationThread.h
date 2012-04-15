@@ -91,6 +91,7 @@ namespace pmm {
 		void initSSL();
 		void notifyTo(const std::string &devToken, NotificationPayload &msg);
 	public:
+		AtomicFlag warmingUP;
 		SharedQueue<NotificationPayload> *notificationQueue;
 		APNSNotificationThread();
 		void setKeyPath(const std::string &keyPath);
