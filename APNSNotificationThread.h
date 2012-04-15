@@ -86,6 +86,11 @@ namespace pmm {
 		int maxNotificationsPerBurst;
 		int maxBurstPauseInterval;
 		int maxConnectionInterval;
+		
+		std::string _keyPath;
+		std::string _certPath;
+		std::string _certPassword;
+
 	protected:
 		bool sslInitComplete;
 		void initSSL();

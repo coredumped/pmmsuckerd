@@ -63,8 +63,10 @@
 #define DEFAULT_COMMAND_POLLING_INTERVAL 30
 #endif
 
+#ifdef SEND_PUSH_KEEPALIVES
 #ifndef DEFAULT_KEEPALIVE_DEVTOKEN
 #define DEFAULT_KEEPALIVE_DEVTOKEN "4ab904318d30a0ecee730b369ea6b4acb9ab67c10023e5b497c25e035e353af5"
+#endif
 #endif
 
 void printHelpInfo();
@@ -358,12 +360,14 @@ int main (int argc, const char * argv[])
 				}
 				int nNotif = notificationQueue.size();
 				if(nNotif > 0) pmm::Log << "Notification queue has " << nNotif << " pending elements" << pmm::NL;
+#ifdef SEND_PUSH_KEEPALIVES
 				if (tic % 120 == 0) {
 					//Send keepalive message
 					pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, "PMM is alive", 1, "sln.caf");
 					np.isSystemNotification = true;
 					notificationQueue.add(np);
 				}
+#endif
 				if(doCmdCheck){
 					std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
 					int nTasks = session.getPendingTasks(tasksToRun);
@@ -602,7 +606,12 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mail
 		*assignationIndex = idx;
 		
 		std::stringstream msg;
-		msg << "Monitoring of " + emailAccount + " has been enabled :-)";
+		if(emailAccount.find("hotmail") == emailAccount.npos){
+			msg << "Monitoring of " + emailAccount + " has been enabled :-)";
+		}
+		else {
+			msg << "Monitoring of " + emailAccount + " has been enabled :-)\n\nNotice: polling of hotmail is not realtime.";
+		}
 		std::vector<std::string> myDevTokens = m.devTokens();
 		for (size_t i = 0; i < myDevTokens.size(); i++) {
 			pmm::NotificationPayload np(myDevTokens[i], msg.str());

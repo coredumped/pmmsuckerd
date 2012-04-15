@@ -35,7 +35,7 @@
 #define DEFAULT_MAX_CONNECTION_INTERVAL 7200
 #endif
 #ifndef DEFAULT_NOTIFICATION_WARMUP_TIME
-#define DEFAULT_NOTIFICATION_WARMUP_TIME 300
+#define DEFAULT_NOTIFICATION_WARMUP_TIME 30
 #endif
 #include <pthread.h>
 #include <signal.h>
@@ -129,11 +129,7 @@ namespace pmm {
 		}
 		return rtn;
 	}
-	
-	static std::string _keyPath;
-	static std::string _certPath;
-	static std::string _certPassword;
-	
+		
 	void APNSNotificationThread::initSSL(){
 		if(!sslInitComplete){
 			sslCTX = SSL_CTX_new(SSLv3_method());
@@ -292,7 +288,7 @@ namespace pmm {
 	static bool shouldReconnect(){
 		bool ret = false;
 		reconnectMutex.lock();
-		if(time(0) - reconnectTime < 60){ 
+		if(time(0) - reconnectTime < 5){ 
 			ret = true;
 			pmm::APNSLog << "A broken PIPE event was detected, waiting for APNS reconnect..." << pmm::NL;
 		}
