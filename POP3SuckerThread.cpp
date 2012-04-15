@@ -193,7 +193,7 @@ namespace pmm {
 	POP3SuckerThread::POP3Control::POP3Control(){
 		pop3 = NULL;
 		startedOn = time(NULL);
-		lastCheck = time(NULL);
+		lastCheck = startedOn;
 		msgCount = 0;
 		mailboxSize = 0;
 		minimumCheckInterval = DEFAULT_POP3_MINIMUM_CHECK_INTERVAL;
@@ -213,9 +213,10 @@ namespace pmm {
 		startedOn = pc.startedOn;
 	}
 	
-	POP3SuckerThread::POP3SuckerThread(){
+	POP3SuckerThread::POP3SuckerThread() {
 		maxPOP3FetcherThreads = DEFAULT_MAX_POP3_FETCHER_THREADS;	
 		pop3Fetcher = NULL;
+		threadStartTime = time(0) - 900;
 	}
 	
 	POP3SuckerThread::POP3SuckerThread(size_t _maxMailFetchers){

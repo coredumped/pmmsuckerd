@@ -77,6 +77,7 @@ namespace pmm {
 		maxServerReconnects = DEFAULT_MAX_SERVER_CONNECT_FAILURES;
 		quotaUpdateVector = NULL;
 		quotaIncreaseQueue = NULL;
+		threadStartTime = time(0) - 900;
 	}
 	
 	MailSuckerThread::~MailSuckerThread(){

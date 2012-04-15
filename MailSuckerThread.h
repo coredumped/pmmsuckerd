@@ -42,9 +42,8 @@ namespace pmm {
 	};
 	
 	class MailSuckerThread : public GenericThread {
-	private:
 	protected:		
-		Mutex mutex;
+		time_t threadStartTime;
 		std::map<std::string, MailboxControl> mailboxControl;
 		std::map<std::string, int> serverConnectAttempts;
 		int iterationWaitMicroSeconds;

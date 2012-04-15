@@ -53,6 +53,7 @@ namespace pmm {
 			int fetchRetryInterval;
 			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);
 		public:
+			time_t threadStartTime;
 			SharedQueue<IMAPFetchControl> *fetchQueue;
 			SharedQueue<NotificationPayload> *myNotificationQueue;
 			SharedQueue<NotificationPayload> *develNotificationQueue;

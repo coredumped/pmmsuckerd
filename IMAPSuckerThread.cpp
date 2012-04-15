@@ -136,34 +136,40 @@ namespace pmm {
 			std::stringstream msgUid_s;
 			msgUid_s << (int)uid;
 			theMessage.msgUid = msgUid_s.str();
+			//Parse e-mail, retrieve FROM and SUBJECT
 			msg_content = get_msg_content(fetch_result, &msg_len, theMessage);
 			if (msg_content == NULL) {
 				//fprintf(stderr, "no content\n");
 				mailimap_fetch_list_free(fetch_result);
 				return;
 			}
-			//Parse e-mail, retrieve FROM and SUBJECT
-			std::vector<std::string> myDevTokens = imapFetch.mailAccountInfo.devTokens();
-			for (size_t i = 0; i < myDevTokens.size(); i++) {
-				//Apply all processing rules before notifying
-				std::string alertTone;
-				std::stringstream nMsg;
-				nMsg << theMessage.from << "\n" << theMessage.subject;
-				
-				PreferenceEngine::defaultAlertTone(alertTone, imapFetch.mailAccountInfo.email()); //Here we retrieve the user alert tone
-				
-				NotificationPayload np(myDevTokens[i], nMsg.str(), imapFetch.badgeCounter, alertTone);
-				np.origMailMessage = theMessage;
-				notificationQueue->add(np);
-				if(i == 0){
-					fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
-					if (!QuotaDB::decrease(imapFetch.mailAccountInfo.email())) {
-						imapLog << "ATTENTION: Account " << imapFetch.mailAccountInfo.email() << " has ran out of quota!!!" << pmm::NL;
-					}
-					quotaUpdateVector->push_back(imapFetch.mailAccountInfo.email());
-					pmmStorageQueue->add(np);
-				}
+			fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
+			//Verify if theMessage is not too old, if it is then just discard it!!!
+			if (theMessage.serverDate < threadStartTime) {
+				imapLog << "Message is too old, not notifying it!!!" << pmm::NL;				
 			}
+			else {
+				std::vector<std::string> myDevTokens = imapFetch.mailAccountInfo.devTokens();
+				for (size_t i = 0; i < myDevTokens.size(); i++) {
+					//Apply all processing rules before notifying
+					std::string alertTone;
+					std::stringstream nMsg;
+					nMsg << theMessage.from << "\n" << theMessage.subject;
+					
+					PreferenceEngine::defaultAlertTone(alertTone, imapFetch.mailAccountInfo.email()); //Here we retrieve the user alert tone
+					
+					NotificationPayload np(myDevTokens[i], nMsg.str(), imapFetch.badgeCounter, alertTone);
+					np.origMailMessage = theMessage;
+					notificationQueue->add(np);
+					if(i == 0){
+						if (!QuotaDB::decrease(imapFetch.mailAccountInfo.email())) {
+							imapLog << "ATTENTION: Account " << imapFetch.mailAccountInfo.email() << " has ran out of quota!!!" << pmm::NL;
+						}
+						quotaUpdateVector->push_back(imapFetch.mailAccountInfo.email());
+						pmmStorageQueue->add(np);
+					}
+				}
+			}			
 			mailimap_fetch_list_free(fetch_result);
 		}
 		mailimap_fetch_att_free(fetch_att);
@@ -327,6 +333,7 @@ namespace pmm {
 		maxMailFetchers = DEFAULT_MAX_MAIL_FETCHERS;
 		mailFetchers = new MailFetcher[maxMailFetchers];
 		//IMAPSuckerThread::fetchedMails.expireOldEntries();
+		threadStartTime = time(0) - 900;
 	}
 	IMAPSuckerThread::IMAPSuckerThread(size_t _maxMailFetchers){
 		maxMailFetchers = _maxMailFetchers;
@@ -359,6 +366,7 @@ namespace pmm {
 				mailFetchers[i].fetchQueue = &imapFetchQueue;
 				mailFetchers[i].quotaUpdateVector = quotaUpdateVector;
 				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
+				mailFetchers[i].threadStartTime = threadStartTime;
 				pmm::ThreadDispatcher::start(mailFetchers[i], 8 * 1024 * 1024);
 				first_connection = true;
 			}

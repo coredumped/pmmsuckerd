@@ -394,6 +394,10 @@ int main (int argc, const char * argv[])
 							std::stringstream input(parameters["quota"]);
 							input >> p.quotaValue;
 							quotaIncreaseQueue.add(p);
+							/*std::stringstream lnx;
+							lnx << "User " << p.emailAddress << " has increased her quota to: " << p.quotaValue;
+							pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, lnx.str(), 1, "sln.caf");
+							notificationQueue.add(np);*/
 						}
 						else if (command.compare(pmm::Commands::newMailAccountRegistered) == 0){
 							if (parameters["mailboxType"].compare("IMAP") == 0) {
@@ -619,6 +623,9 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::SharedQueue<pmm::MailA
 	if(session.retrieveEmailAddressInfo(m, emailAccount)){
 		addQueue->add(m);
 		pmm::QuotaDB::set(m.email(), m.quota);
+		//std::stringstream lnx;
+		//lnx << "User " << m.username() << " has added a new e-mail account: " << m.email();
+		//pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, lnx.str(), 1, "sln.caf");		
 	}
 #ifdef DEBUG
 	else {
