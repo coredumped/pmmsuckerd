@@ -390,14 +390,14 @@ namespace pmm {
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
 #endif
-				std::vector<std::string> myDevTokens = m.devTokens();
+				/*std::vector<std::string> myDevTokens = m.devTokens();
 				for (size_t i = 0; m.devTokens().size(); i++) {
 					NotificationPayload msg(myDevTokens[i], errmsg.str());
 					if (m.devel) {
 						develNotificationQueue->add(msg);
 					}
 					else notificationQueue->add(msg);
-				}
+				}*/
 				serverConnectAttempts[m.serverAddress()] = 0;
 #warning Add method for relinquishing email account monitoring
 			}
