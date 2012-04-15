@@ -63,6 +63,10 @@
 #define DEFAULT_COMMAND_POLLING_INTERVAL 30
 #endif
 
+#ifndef DEFAULT_KEEPALIVE_DEVTOKEN
+#define DEFAULT_KEEPALIVE_DEVTOKEN "4ab904318d30a0ecee730b369ea6b4acb9ab67c10023e5b497c25e035e353af5"
+#endif
+
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
 void emergencyUnregister();
@@ -354,6 +358,12 @@ int main (int argc, const char * argv[])
 				}
 				int nNotif = notificationQueue.size();
 				if(nNotif > 0) pmm::Log << "Notification queue has " << nNotif << " pending elements" << pmm::NL;
+				if (tic % 120 == 0) {
+					//Send keepalive message
+					pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, "PMM is alive", 1, "sln.caf");
+					np.isSystemNotification = true;
+					notificationQueue.add(np);
+				}
 				if(doCmdCheck){
 					std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
 					int nTasks = session.getPendingTasks(tasksToRun);
