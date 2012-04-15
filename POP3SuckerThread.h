@@ -40,6 +40,7 @@ namespace pmm {
 			//SharedQueue<MailAccountInfo> *fetchQueue;
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
 			SharedVector<std::string> *quotaUpdateVector;
+			std::map<std::string, int> serverConnectAttempts;
 			POP3FetcherThread();
 			~POP3FetcherThread();
 			void operator()();

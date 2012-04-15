@@ -89,7 +89,21 @@ namespace pmm {
 				else {
 					result = mailpop3_login(pop3, m.username().c_str(), m.password().c_str());
 					if(etpanOperationFailed(result)){
-						pop3Log << "Unable to retrieve messages for: " << m.email() << " can't login to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
+						if(serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
+						serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
+						if (serverConnectAttempts[m.serverAddress()] == 100) {
+							//Notify the user that we might not be able to monitor this account
+							std::vector<std::string> allTokens = m.devTokens();
+							std::string msgX = "From: Push Me Mail Service\nCan't login to your mailbox, have you changed your password?";
+							for (size_t i = 0; i < allTokens.size(); i++) {
+								NotificationPayload np(allTokens[i], msgX);
+								np.isSystemNotification = true;
+								notificationQueue->add(np);
+							}
+						}
+						else {
+							pop3Log << "Unable to retrieve messages for: " << m.email() << " can't login to server " << m.serverAddress() << ", I will retry later." << pmm::NL;
+						}
 					}
 					else {
 						carray *msgList;
@@ -293,7 +307,7 @@ namespace pmm {
 	}
 	
 	void POP3SuckerThread::fetchMails(const MailAccountInfo &m){
-#ifdef DEBUG
+#ifdef DEBUG_POP3_RETRIEVAL
 		pop3Log << "Retrieving new emails for: " << m.email() << "..." << pmm::NL;
 #endif
 		//Implement asynchronous retrieval code, tipically from a thread
