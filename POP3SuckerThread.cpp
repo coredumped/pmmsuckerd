@@ -265,7 +265,7 @@ namespace pmm {
 #ifdef DEBUG
 		pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif		
-		if(m.email().find("hotmail.com") != m.email().npos){
+		if(m.email().find("@hotmail.") != m.email().npos){
 			pop3Control[m.email()].minimumCheckInterval = DEFAULT_HOTMAIL_CHECK_INTERVAL;
 		}
 	}

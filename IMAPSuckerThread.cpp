@@ -399,6 +399,7 @@ namespace pmm {
 					else notificationQueue->add(msg);
 				}*/
 				serverConnectAttempts[m.serverAddress()] = 0;
+				mailboxControl[m.email()].lastCheck = time(0) + 300;
 #warning Add method for relinquishing email account monitoring
 			}
 			mailboxControl[m.email()].isOpened = false;
