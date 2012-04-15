@@ -310,7 +310,7 @@ int main (int argc, const char * argv[])
 			sleep(1);
 			continue;
 		}
-		if (tic % 10 == 0) {
+		if (tic % 30 == 0) {
 			//Process quota updates if any
 			if (quotaUpdateVector.size() > 0) {
 				quotaUpdateVector.beginCriticalSection();

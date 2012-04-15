@@ -49,7 +49,7 @@ namespace pmm {
 					}
 				}
 			}
-			usleep(250000);
+			sleep(2);
 		}
 	}
 }
