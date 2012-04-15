@@ -386,13 +386,13 @@ namespace pmm {
 				//Max reconnect exceeded, notify user
 #warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
 				std::stringstream errmsg;
-				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped";
+				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, we will retry later.";
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
 #endif
 				std::vector<std::string> myDevTokens = m.devTokens();
 				for (size_t i = 0; m.devTokens().size(); i++) {
-					NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
+					NotificationPayload msg(myDevTokens[i], errmsg.str());
 					if (m.devel) {
 						develNotificationQueue->add(msg);
 					}

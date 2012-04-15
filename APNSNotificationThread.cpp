@@ -394,7 +394,7 @@ namespace pmm {
 					if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
 					else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
 					if (lastDevToken.compare(payload.deviceToken()) == 0) {
-						sleep(1);
+						sleep(2);
 					}
 					notifyTo(payload.deviceToken(), payload);
 					lastDevToken = payload.deviceToken();
