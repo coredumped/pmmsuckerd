@@ -421,11 +421,11 @@ namespace pmm {
 						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
 						std::vector<std::string> myDevTokens = m.devTokens();
 						for (size_t i = 0; myDevTokens.size(); i++) {
-							NotificationPayload msg(NotificationPayload(myDevTokens[i], errmsg.str()));
+							NotificationPayload np(myDevTokens[i], errmsg.str());
 							if (m.devel) {
-								develNotificationQueue->add(msg);
+								develNotificationQueue->add(np);
 							}
-							else notificationQueue->add(msg);
+							else notificationQueue->add(np);
 						}
 					}
 
