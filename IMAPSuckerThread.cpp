@@ -345,20 +345,22 @@ namespace pmm {
 	}
 	
 	void IMAPSuckerThread::closeConnection(const MailAccountInfo &m){
-		if (mailboxControl[m.email()].isOpened) {
-			if (imapControl[m.email()].supportsIdle) {
-				struct mailimap *imap = imapControl[m.email()].imap;
+		std::string theEmail = m.email();
+		if (mailboxControl[theEmail].isOpened) {
+			if (imapControl[theEmail].supportsIdle) {
+				struct mailimap *imap = imapControl[theEmail].imap;
 				mailimap_close(imap);
-				mailimap_free(imapControl[m.email()].imap);
-				imapControl[m.email()].imap = NULL;
+				mailimap_free(imapControl[theEmail].imap);
+				imapControl[theEmail].imap = NULL;
 			}
 		}
-		mailboxControl[m.email()].isOpened = false;
+		mailboxControl[theEmail].isOpened = false;
 	}
 	
 	void IMAPSuckerThread::openConnection(const MailAccountInfo &m){
 		int result;
 		bool first_connection = false;
+		std::string theEmail = m.email();
 		for (size_t i = 0; i < maxMailFetchers; i++) {
 			if (mailFetchers[i].isRunning == false) {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
@@ -371,14 +373,14 @@ namespace pmm {
 				first_connection = true;
 			}
 		}
-		if(imapControl[m.email()].imap == NULL) imapControl[m.email()].imap = mailimap_new(0, NULL);
+		if(imapControl[theEmail].imap == NULL) imapControl[theEmail].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
 		if(first_connection) fetchMails(m);		
 		if (m.useSSL()) {
-			result = mailimap_ssl_connect(imapControl[m.email()].imap, m.serverAddress().c_str(), m.serverPort());
+			result = mailimap_ssl_connect(imapControl[theEmail].imap, m.serverAddress().c_str(), m.serverPort());
 		}
 		else {
-			result = mailimap_socket_connect(imapControl[m.email()].imap, m.serverAddress().c_str(), m.serverPort());
+			result = mailimap_socket_connect(imapControl[theEmail].imap, m.serverAddress().c_str(), m.serverPort());
 		}
 		if (etpanOperationFailed(result)) {
 			serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
@@ -386,7 +388,7 @@ namespace pmm {
 				//Max reconnect exceeded, notify user
 #warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
 				std::stringstream errmsg;
-				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, we will retry later.";
+				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, we will retry later.";
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
 #endif
@@ -399,26 +401,26 @@ namespace pmm {
 					else notificationQueue->add(msg);
 				}*/
 				serverConnectAttempts[m.serverAddress()] = 0;
-				mailboxControl[m.email()].lastCheck = time(0) + 300;
+				mailboxControl[theEmail].lastCheck = time(0) + 300;
 #warning Add method for relinquishing email account monitoring
 			}
-			mailboxControl[m.email()].isOpened = false;
-			mailimap_free(imapControl[m.email()].imap);
-			imapControl[m.email()].imap = NULL;
+			mailboxControl[theEmail].isOpened = false;
+			mailimap_free(imapControl[theEmail].imap);
+			imapControl[theEmail].imap = NULL;
 #warning TODO: delay reconnections			
 		}
 		else {
-			mailboxControl[m.email()].openedOn = time(NULL);
+			mailboxControl[theEmail].openedOn = time(NULL);
 			//Proceed to login stage
-			result = mailimap_login(imapControl[m.email()].imap, m.username().c_str(), m.password().c_str());
+			result = mailimap_login(imapControl[theEmail].imap, m.username().c_str(), m.password().c_str());
 			if(etpanOperationFailed(result)){
 				serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
 				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
-					if (mailboxControl[m.email()].lastCheck % 43200 == 0) {
+					if (mailboxControl[theEmail].lastCheck % 43200 == 0) {
 						std::stringstream errmsg;
 #warning TODO: Find a better way to notify the user that we are unable to login into their mail account
-						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << m.email() << " has been stopped, please reset your authentication information.";
+						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, please reset your authentication information.";
 						std::vector<std::string> myDevTokens = m.devTokens();
 						for (size_t i = 0; myDevTokens.size(); i++) {
 							NotificationPayload np(myDevTokens[i], errmsg.str());
@@ -430,47 +432,57 @@ namespace pmm {
 					}
 
 #warning Add method for relinquishing email account monitoring
-					mailboxControl[m.email()].lastCheck = time(0);
-					mailboxControl[m.email()].isOpened = false;
+					mailboxControl[theEmail].lastCheck = time(0);
+					mailboxControl[theEmail].isOpened = false;
 				}
-				mailimap_free(imapControl[m.email()].imap);
-				imapControl[m.email()].imap = NULL;
-				mailboxControl[m.email()].isOpened = false;
+				mailimap_free(imapControl[theEmail].imap);
+				imapControl[theEmail].imap = NULL;
+				mailboxControl[theEmail].isOpened = false;
 			}
 			else {
 				//Start IMAP IDLE processing...
 				serverConnectAttempts[m.serverAddress()] = 0;
 #ifdef DEBUG
-				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << m.email() << pmm::NL;
+				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << theEmail << pmm::NL;
 #endif
 				//mailstream_debug = 1;
-				result = mailimap_select(imapControl[m.email()].imap, "INBOX");
+				result = mailimap_select(imapControl[theEmail].imap, "INBOX");
 				if(etpanOperationFailed(result)){
-					pmm::Log << "FATAL: Unable to select INBOX folder in account " << m.email() << pmm::NL;
+					pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << pmm::NL;
 					throw GenericException("Unable to select INBOX folder");
-				}				
-				if(!mailimap_has_idle(imapControl[m.email()].imap)){
-					imapLog << "FATAL: " << m.email() << " is not hosted in an IMAP IDLE environment." << pmm::NL;
-					mailboxControl[m.email()].isOpened = true;
-					mailboxControl[m.email()].openedOn = time(0x00);
-					imapControl[m.email()].startedOn = time(NULL);
-					mailimap_logout(imapControl[m.email()].imap);
-					mailimap_close(imapControl[m.email()].imap);
-					imapControl[m.email()].supportsIdle = false;
+				}			
+				int idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
+				//////////////////////////////////////////////////////////////////////////
+				//
+				//Remove once we find out what fuck is going on with the Gmail IDLE stuff
+				//
+				//
+				if(theEmail.find("@gmail.com") != theEmail.npos) idleEnabled = 0;
+				//
+				//
+				//////////////////////////////////////////////////////////////////////////
+				if(!idleEnabled){
+					imapLog << "WARNING: " << theEmail << " is not hosted in an IMAP IDLE environment." << pmm::NL;
+					mailboxControl[theEmail].isOpened = true;
+					mailboxControl[theEmail].openedOn = time(0x00);
+					imapControl[theEmail].startedOn = time(NULL);
+					mailimap_logout(imapControl[theEmail].imap);
+					mailimap_close(imapControl[theEmail].imap);
+					imapControl[theEmail].supportsIdle = false;
 					return;
 				}
-				imapControl[m.email()].supportsIdle = true;
-				result = mailimap_idle(imapControl[m.email()].imap);
+				imapControl[theEmail].supportsIdle = true;
+				result = mailimap_idle(imapControl[theEmail].imap);
 				if(etpanOperationFailed(result)){
 					throw GenericException("Unable to start IDLE!!!");
 				}
 				//Report successfull login
-				mailboxControl[m.email()].isOpened = true;
-				mailboxControl[m.email()].openedOn = time(0x00);
-				imapControl[m.email()].startedOn = time(NULL);
+				mailboxControl[theEmail].isOpened = true;
+				mailboxControl[theEmail].openedOn = time(0x00);
+				imapControl[theEmail].startedOn = time(NULL);
 				//sleep(1);
 #ifdef DEBUG
-				pmm::imapLog << m.email() << " is being succesfully monitored!!!" << pmm::NL;
+				pmm::imapLog << theEmail << " is being succesfully monitored!!!" << pmm::NL;
 #endif
 			}
 		}
@@ -479,23 +491,23 @@ namespace pmm {
 	void IMAPSuckerThread::checkEmail(const MailAccountInfo &m){
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
-			if (!imapControl[m.email()].supportsIdle) {
-				if(time(0) - mailboxControl[m.email()].lastCheck > 2){
+			if (!imapControl[theEmail].supportsIdle) {
+				if(time(0) - mailboxControl[theEmail].lastCheck > 2){
 					fetchMails(m);
 				}
 				return;
 			}
-			mailimap *imap = imapControl[m.email()].imap;
-			if (imapControl[m.email()].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
+			mailimap *imap = imapControl[theEmail].imap;
+			if (imapControl[theEmail].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
 				//Think about closing and re-opening this connection!!!
 #ifdef DEBUG
-				pmm::imapLog << "Max connection time account for " << m.email() << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
+				pmm::imapLog << "Max connection time account for " << theEmail << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
 #endif
 				//mailimap_idle_done(imap);
 				//mailimap_logout(imap);
 				mailimap_close(imap);
 				mailimap_free(imap);
-				imapControl[m.email()].imap = NULL;
+				imapControl[theEmail].imap = NULL;
 				mailboxControl[theEmail].isOpened = false;
 				return;
 			}
@@ -520,8 +532,8 @@ namespace pmm {
 						imap->imap_stream = NULL;
 					}
 					mailimap_free(imap);
-					imapControl[m.email()].imap = NULL;
-					imapControl[m.email()].failedLoginAttemptsCount = 0;
+					imapControl[theEmail].imap = NULL;
+					imapControl[theEmail].failedLoginAttemptsCount = 0;
 					mailboxControl[theEmail].isOpened = false;
 					return;
 				}
@@ -547,7 +559,7 @@ namespace pmm {
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
 				if(etpanOperationFailed(result)){
-					pmm::imapLog << "Unable to send DONE to IMAP after IDLE for: " << m.email() << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
+					pmm::imapLog << "Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
 					mailimap_idle_done(imap);
 					mailimap_logout(imap);
 					mailimap_close(imap);
