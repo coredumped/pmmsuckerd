@@ -71,6 +71,12 @@ namespace pmm {
 		}
 		binaryDevToken.assign(buf, 32);
 	}
+	
+	void binary2DevToken(std::string &devToken, uint32_t binaryToken){
+		std::stringstream buf;
+		buf << std::hex << binaryToken;
+		devToken = buf.str();
+	}
 
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts){
 		for (size_t i = 0; i < mailAccounts.size(); i++) {

@@ -90,8 +90,9 @@ namespace pmm {
 					result = mailpop3_login(pop3, m.username().c_str(), m.password().c_str());
 					if(etpanOperationFailed(result)){
 						if(serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
-						serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
-						if (serverConnectAttempts[m.serverAddress()] == 100) {
+						int theVal = serverConnectAttempts[m.serverAddress()] + 1;
+						serverConnectAttempts[m.serverAddress()] = theVal;
+						if (theVal == 100) {
 							//Notify the user that we might not be able to monitor this account
 							std::vector<std::string> allTokens = m.devTokens();
 							std::string msgX = "From: Push Me Mail Service\nCan't login to your mailbox, have you changed your password?";
@@ -108,7 +109,7 @@ namespace pmm {
 					else {
 						carray *msgList;
 						result = mailpop3_list(pop3, &msgList);
-						if(etpanOperationFailed(result)){
+						if(result != MAILPOP3_NO_ERROR){
 							if (pop3->pop3_response != NULL) pop3Log << "Unable to retrieve messages for: " << m.email() << ": etpan code=" << result << " response: " << pop3->pop3_response << pmm::NL;
 							else pop3Log << "Unable to retrieve messages for: " << m.email() << ": etpan code=" << result << pmm::NL;						
 						}

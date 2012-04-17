@@ -142,6 +142,11 @@ namespace pmm {
 			m.unlock();
 		}
 
+		void copyTo(std::vector<T> &newVector){
+			m.lock();
+			newVector = dataVec;
+			m.unlock();
+		}
 	};
 }
 
