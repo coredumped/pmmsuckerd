@@ -93,7 +93,7 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts);
-
+void broadcastMessageToAll(std::map<std::string, std::string> &params);
 
 int main (int argc, const char * argv[])
 {
@@ -494,6 +494,10 @@ int main (int argc, const char * argv[])
 								pmm::Log << "Refreshing user(" << prefItem.emailAccount << ") " << prefItem.settingKey << "=" << prefItem.settingValue << pmm::NL;
 							}
 						}
+						else if (command.compare(pmm::Commands::broadcastMessage) == 0){
+							pmm::Log << "Prepare to broadcast message: " << parameters["message"] << " to " << parameters["count"] << " devices, hang on tight!!!" << pmm::NL;
+							broadcastMessageToAll(parameters);
+						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 						}
@@ -772,6 +776,15 @@ void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &
 	}
 }
 
+void broadcastMessageToAll(std::map<std::string, std::string> &params){
+	int count = atoi(params["count"].c_str());
+	for (int i = 0; i < count; i++) {
+		std::stringstream key;
+		key << "i" << i;
+		std::string token = params[key.str()];
+		pmm::Log << " * Sending via broadcast (" << token << "): " << params["message"] << pmm::NL;
+	}
+}
 
 
 

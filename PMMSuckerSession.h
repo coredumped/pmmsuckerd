@@ -98,6 +98,7 @@ namespace pmm {
 		extern const char *silentModeSet;
 		extern const char *silentModeClear;
 		extern const char *refreshUserPreference;
+		extern const char *broadcastMessage;
 	}
 }
 
