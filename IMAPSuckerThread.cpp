@@ -19,7 +19,7 @@
 #include "QuotaDB.h"
 
 #ifndef DEFAULT_MAX_MAIL_FETCHERS
-#define DEFAULT_MAX_MAIL_FETCHERS 2
+#define DEFAULT_MAX_MAIL_FETCHERS 3
 #endif
 #ifndef DEFAULT_FETCH_RETRY_INTERVAL
 #define DEFAULT_FETCH_RETRY_INTERVAL 60
@@ -180,6 +180,7 @@ namespace pmm {
 		madeAttempts = 0;
 		nextAttempt = 0;
 		badgeCounter = 0;
+		supportsIdle = false;
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(const IMAPFetchControl &ifc){
@@ -187,6 +188,7 @@ namespace pmm {
 		nextAttempt = ifc.nextAttempt;
 		madeAttempts = ifc.madeAttempts;
 		badgeCounter += ifc.badgeCounter;
+		supportsIdle = ifc.supportsIdle;
 	}
 	
 	
@@ -204,6 +206,7 @@ namespace pmm {
 	}
 	
 	IMAPSuckerThread::MailFetcher::MailFetcher(){
+		allowsPeriodicPolling = false;
 		availableMessages = 0;
 		pmmStorageQueue = NULL;
 	}
@@ -217,7 +220,11 @@ namespace pmm {
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
-				//try {
+				if (!allowsPeriodicPolling && imapFetch.supportsIdle == false) {
+					fetchQueue->add(imapFetch);
+					if(fetchQueue->size() == 0) usleep(250);
+					continue;
+				}
 				if (imapFetch.madeAttempts > 0 && time(0) < imapFetch.nextAttempt) {
 					if (fetchQueue->size() == 0) {
 						usleep(10);
@@ -368,6 +375,9 @@ namespace pmm {
 				mailFetchers[i].quotaUpdateVector = quotaUpdateVector;
 				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
 				mailFetchers[i].threadStartTime = threadStartTime;
+				if (i % 2 == 0) {
+					mailFetchers[i].allowsPeriodicPolling = true;
+				}
 				pmm::ThreadDispatcher::start(mailFetchers[i], 8 * 1024 * 1024);
 			}
 		}
@@ -568,6 +578,7 @@ namespace pmm {
 		//Find and schedule a fetching thread
 		IMAPFetchControl ifc;
 		ifc.mailAccountInfo = m;
+		ifc.supportsIdle = imapControl[m.email()].supportsIdle;
 		imapFetchQueue.add(ifc);
 	}
 }

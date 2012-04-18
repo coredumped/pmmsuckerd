@@ -27,6 +27,7 @@ namespace pmm {
 			time_t nextAttempt;
 			int madeAttempts;
 			int badgeCounter;
+			bool supportsIdle;
 			IMAPFetchControl();
 			IMAPFetchControl(const IMAPFetchControl &ifc);
 		};
@@ -53,6 +54,7 @@ namespace pmm {
 			int fetchRetryInterval;
 			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);
 		public:
+			bool allowsPeriodicPolling;
 			time_t threadStartTime;
 			SharedQueue<IMAPFetchControl> *fetchQueue;
 			SharedQueue<NotificationPayload> *myNotificationQueue;
