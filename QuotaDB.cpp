@@ -189,6 +189,7 @@ namespace pmm {
 	bool QuotaDB::notifyQuotaChanged(std::map<std::string, int> &changedAccounts){
 		qM.lock();
 		changedAccounts = _latestChanges;
+		_latestChanges.clear();
 		qM.unlock();
 		return (changedAccounts.size() == 0)?false:true;
 	}
