@@ -35,6 +35,7 @@
 namespace pmm {
 	MTLogger imapLog;
 	FetchedMailsCache fetchedMails;
+	SharedQueue<IMAPSuckerThread::IMAPFetchControl> imapFetchQueue;
 	
 	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size, MailMessage &tm)
 	{
@@ -180,7 +181,7 @@ namespace pmm {
 		madeAttempts = 0;
 		nextAttempt = 0;
 		badgeCounter = 0;
-		supportsIdle = false;
+		supportsIdle = true;
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(const IMAPFetchControl &ifc){
@@ -220,7 +221,8 @@ namespace pmm {
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
-				if (!allowsPeriodicPolling && imapFetch.supportsIdle == false) {
+				if (allowsPeriodicPolling == false && imapFetch.supportsIdle == false) {
+					imapLog << "This thread does not allow non-IDLE accounts, returning fetch request to the queue..." << pmm::NL;
 					fetchQueue->add(imapFetch);
 					if(fetchQueue->size() == 0) usleep(250);
 					continue;
