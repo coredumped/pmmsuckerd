@@ -247,7 +247,7 @@ namespace pmm {
 			}
 			itM.unlock();
 			disconnectFromAPNS();
-			sleep(3600);
+			sleep(600);
 		}
 	}
 	

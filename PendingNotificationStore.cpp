@@ -59,6 +59,7 @@ namespace pmm {
 			if (sqlite3_exec(db, insCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
 				pmm::Log << "Unable to add notification payload to persistent queue(" << insCmd.str() << "): " << errmsg << pmm::NL;
 			}
+			pmm::Log << " * Saving notification for device: " << payload.deviceToken() << pmm::NL;
 		}
 		sqlite3_close(db);
 	}
@@ -75,6 +76,7 @@ namespace pmm {
 				const char *msg = (const char *)sqlite3_column_text(statement, 1);
 				const char *snd = (const char *)sqlite3_column_text(statement, 2);
 				int badge = sqlite3_column_int(statement, 3);
+				pmm::Log << " * Loading notification for device: " << tok << pmm::NL;
 				NotificationPayload payload(tok, msg, badge, snd);
 				nQueue->add(payload);
 			}
