@@ -12,6 +12,7 @@
 #include <strings.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <cstdlib>
 #include "UtilityFunctions.h"
 #include "Mutex.h"
 #include "GenericException.h"
