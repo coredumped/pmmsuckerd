@@ -123,7 +123,7 @@ namespace pmm {
 		bool gotTime = false;
 		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
 			struct mailimf_field *field = (struct mailimf_field *)clist_content(iter);
-			pmm::Log << field->fld_type << pmm::NL;
+			//pmm::Log << "Field type: " << field->fld_type << pmm::NL;
 			switch (field->fld_type) {
 				case MAILIMF_FIELD_FROM:
 				{
@@ -179,7 +179,7 @@ namespace pmm {
 							}
 						}
 					}
-#ifdef DEBUG
+#ifdef DEBUG_SUBJECT_DATA
 					pmm::Log << "DEBUG: Subject=\"" << m.subject << "\"" << pmm::NL;
 #endif
 					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
@@ -200,7 +200,7 @@ namespace pmm {
 					m.serverDate = mktime(&tDate);
 					m.dateOfArrival = now;
 					m.tzone = 0;
-#ifdef DEBUG
+#ifdef DEBUG_MSG_TIME_FIELD
 					pmm::Log << "DEBUG: Computed dateOfArrival=" << m.dateOfArrival << " remote time="<< m.serverDate << " currTstamp=" << now << " diff=" << (m.dateOfArrival - m.serverDate) << pmm::NL;
 #endif
 					gotTime = true;
