@@ -287,7 +287,7 @@ int main (int argc, const char * argv[])
 			imapAssignationIndex = 0;
 		}
 	}
-	
+	globalNotificationQueue = &notificationQueue;
 	//Install SEGFAULT signal handler
 	signal(SIGSEGV, signalHandler);
 	

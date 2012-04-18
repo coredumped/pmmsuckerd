@@ -221,12 +221,12 @@ namespace pmm {
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
-				if (allowsPeriodicPolling == false && imapFetch.supportsIdle == false) {
+				/*if (allowsPeriodicPolling == false && imapFetch.supportsIdle == false) {
 					imapLog << "This thread does not allow non-IDLE accounts, returning fetch request to the queue..." << pmm::NL;
 					fetchQueue->add(imapFetch);
 					if(fetchQueue->size() == 0) usleep(250);
 					continue;
-				}
+				}*/
 				if (imapFetch.madeAttempts > 0 && time(0) < imapFetch.nextAttempt) {
 					if (fetchQueue->size() == 0) {
 						usleep(10);
