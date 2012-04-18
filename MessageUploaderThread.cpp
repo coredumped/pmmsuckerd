@@ -33,7 +33,7 @@ namespace pmm {
 			NotificationPayload np;
 			while (pmmStorageQueue->extractEntry(np)) {
 				try {
-#ifdef DEBUG
+#ifdef DEBUG_MSG_UPLOAD
 					pmm::Log << "Uploading message to: " << np.origMailMessage.to << pmm::NL;
 #endif
 					np.attempts++;

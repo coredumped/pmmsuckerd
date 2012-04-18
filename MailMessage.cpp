@@ -211,7 +211,10 @@ namespace pmm {
 					break;
 			}
 		}
-		if (m.subject.size() == 0 || m.subject.compare("Fw:") == 0 || m.subject.compare("Re:") == 0 || m.subject.compare("FW:") == 0 || m.subject.compare("RE") == 0 || m.subject.compare("Rv:") == 0 || m.subject.compare("RV:") == 0) {
+		if (m.subject.size() <= 5 || m.subject.compare("Fw:") == 0 || m.subject.compare("Re:") == 0 || 
+			m.subject.compare("FW:") == 0 || m.subject.compare("RE") == 0 || m.subject.compare("Rv:") == 0 ||
+			m.subject.compare("RV:") == 0 || m.subject.compare("RE: ") || m.subject.compare("Re: ") || 
+			m.subject.compare("RE: ...") == 0) {
 /*#ifdef DEBUG
 			pmm::Log << "DEBUG: Computing subject from: " << pmm::NL;
 			pmm::Log << rawMessage << pmm::NL;
@@ -219,11 +222,14 @@ namespace pmm {
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
 			std::string theBody = msgBody.str();
+			while (theBody[0] == '\r' || theBody[0] == '\n') {
+				theBody = theBody.substr(1);
+			}
 			if(theBody.size() > 0 && theBody.size() < 256){
-				m.subject.assign(theBody.c_str(), theBody.size());
+				m.subject.append(theBody.c_str(), theBody.size());
 			}
 			else {
-				m.subject.assign(theBody.c_str(), 256);
+				m.subject.append(theBody.c_str(), 256);
 			}
 			while (m.subject[0] == '\r' || m.subject[0] == '\n') {
 				m.subject = m.subject.substr(1);
