@@ -104,10 +104,10 @@ namespace pmm {
 		}	
 		//Retrieve remaing quota
 		quotaval = _remainingQuotaGet(emailAccount, dbConn);
+		if(quotaval < 0) return false;
 		qM.lock();
 		_latestChanges[emailAccount] = quotaval;
 		qM.unlock();
-		if(quotaval <= 0) return false;
 		return true;
 	}
 	
@@ -188,7 +188,8 @@ namespace pmm {
 	
 	bool QuotaDB::notifyQuotaChanged(std::map<std::string, int> &changedAccounts){
 		qM.lock();
-		changedAccounts = _latestChanges;
+		changedAccounts.clear();
+		if(_latestChanges.size() > 0) changedAccounts = _latestChanges;
 		_latestChanges.clear();
 		qM.unlock();
 		return (changedAccounts.size() == 0)?false:true;
