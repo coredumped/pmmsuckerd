@@ -28,7 +28,7 @@
 #define DEFAULT_MAX_IMAP_CONNECTION_TIME 1200
 #endif
 #ifndef DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME
-#define DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME 300
+#define DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME 1200
 #endif
 
 
@@ -359,7 +359,6 @@ namespace pmm {
 	
 	void IMAPSuckerThread::openConnection(const MailAccountInfo &m){
 		int result;
-		bool first_connection = false;
 		std::string theEmail = m.email();
 		for (size_t i = 0; i < maxMailFetchers; i++) {
 			if (mailFetchers[i].isRunning == false) {
@@ -370,12 +369,10 @@ namespace pmm {
 				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
 				mailFetchers[i].threadStartTime = threadStartTime;
 				pmm::ThreadDispatcher::start(mailFetchers[i], 8 * 1024 * 1024);
-				first_connection = true;
 			}
 		}
 		if(imapControl[theEmail].imap == NULL) imapControl[theEmail].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
-		if(first_connection) fetchMails(m);		
 		if (m.useSSL()) {
 			result = mailimap_ssl_connect(imapControl[theEmail].imap, m.serverAddress().c_str(), m.serverPort());
 		}
@@ -441,6 +438,7 @@ namespace pmm {
 			}
 			else {
 				//Start IMAP IDLE processing...
+				
 				serverConnectAttempts[m.serverAddress()] = 0;
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << theEmail << pmm::NL;
@@ -452,15 +450,6 @@ namespace pmm {
 					throw GenericException("Unable to select INBOX folder");
 				}			
 				int idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
-				//////////////////////////////////////////////////////////////////////////
-				//
-				//Remove once we find out what fuck is going on with the Gmail IDLE stuff
-				//
-				//
-				if(theEmail.find("@gmail.com") != theEmail.npos) idleEnabled = 0;
-				//
-				//
-				//////////////////////////////////////////////////////////////////////////
 				if(!idleEnabled){
 					imapLog << "WARNING: " << theEmail << " is not hosted in an IMAP IDLE environment." << pmm::NL;
 					mailboxControl[theEmail].isOpened = true;
@@ -471,6 +460,8 @@ namespace pmm {
 					imapControl[theEmail].supportsIdle = false;
 					return;
 				}
+				//Manually check mailbox in case any unnotified e-mail arrived before a call to IDLE
+				fetchMails(m);
 				imapControl[theEmail].supportsIdle = true;
 				result = mailimap_idle(imapControl[theEmail].imap);
 				if(etpanOperationFailed(result)){
