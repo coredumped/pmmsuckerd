@@ -11,6 +11,9 @@
 #include <string>
 #include <vector>
 #include <sqlite3.h>
+#ifdef __linux__
+#include <stdint.h>
+#endif
 #include "MailAccountInfo.h"
 
 namespace pmm {
