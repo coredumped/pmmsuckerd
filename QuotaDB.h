@@ -8,7 +8,8 @@
 
 #ifndef PMM_Sucker_QuotaDB_h
 #define PMM_Sucker_QuotaDB_h
-#include<string>
+#include <string>
+#include <map>
 #include <sqlite3.h>
 #include "DataTypes.h"
 
@@ -25,6 +26,8 @@ namespace pmm {
 		static void clearData();
 		
 		static void removeAccount(const std::string &emailAccount);
+		
+		static bool notifyQuotaChanged(std::map<std::string, int> &changedAccounts);
 	};
 }
 

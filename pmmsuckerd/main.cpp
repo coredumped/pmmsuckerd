@@ -346,7 +346,17 @@ int main (int argc, const char * argv[])
 		}
 		if (tic % 30 == 0) {
 			//Process quota updates if any
-			if (quotaUpdateVector.size() > 0) {
+			if (pmm::QuotaDB::notifyQuotaChanged(quotas)) {
+				try {
+					if(session.reportQuotas(quotas)){
+						quotas.clear();
+					}
+				} 
+				catch (pmm::HTTPException &htex0) {
+					pmm::Log << "Unable to update upstream quotas due to: " << htex0.errorMessage() << ", I will retry in the next cycle" << pmm::NL;
+				}
+			}
+			/*if (quotaUpdateVector.size() > 0) {
 				quotaUpdateVector.beginCriticalSection();
 				for (size_t i = 0; i < quotaUpdateVector.unlockedSize(); i++) {
 					if (quotas.find(quotaUpdateVector.atUnlocked(i)) == quotas.end()) {
@@ -368,7 +378,7 @@ int main (int argc, const char * argv[])
 					pmm::Log << "Unable to update upstream quotas due to: " << htex0.errorMessage() << ", I will retry in the next cycle" << pmm::NL;
 				}
 				//In case we failed to report any quotas the service will re-report them again
-			}
+			}*/
 		}
 		if(tic % 86400 == 0){
 			//Cleanup the fetch mail cache database

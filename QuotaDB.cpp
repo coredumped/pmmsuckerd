@@ -13,6 +13,7 @@
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
 #include "GenericException.h"
+#include "Mutex.h"
 
 #ifndef DEFAULT_QUOTA_DB_TABLE
 #define DEFAULT_QUOTA_DB_TABLE "quotainfo"
@@ -27,6 +28,8 @@ namespace pmm {
 	static const char *quota_table = DEFAULT_QUOTA_DB_TABLE;
 	static const char *quota_datafile = DEFAULT_QUOTA_DB_DATAFILE;
 	static sqlite3 *_uniqueConn = NULL;
+	
+	static Mutex qM;
 	
 	static sqlite3 *_connect2QuotaDB(){
 		sqlite3 *dbConn = NULL;
@@ -84,6 +87,7 @@ namespace pmm {
 		_initialized = true;
 	}
 	
+	static std::map<std::string, int> _latestChanges;
 	
 	bool QuotaDB::decrease(const std::string &emailAccount){
 		int quotaval = 0;
@@ -100,7 +104,9 @@ namespace pmm {
 		}	
 		//Retrieve remaing quota
 		quotaval = _remainingQuotaGet(emailAccount, dbConn);
-		//sqlite3_close(dbConn);		
+		qM.lock();
+		_latestChanges[emailAccount] = quotaval;
+		qM.unlock();
 		if(quotaval <= 0) return false;
 		return true;
 	}
@@ -178,5 +184,12 @@ namespace pmm {
 			return true;
 		}
 		return false;
+	}
+	
+	bool QuotaDB::notifyQuotaChanged(std::map<std::string, int> &changedAccounts){
+		qM.lock();
+		changedAccounts = _latestChanges;
+		qM.unlock();
+		return (changedAccounts.size() == 0)?false:true;
 	}
 }
