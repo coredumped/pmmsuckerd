@@ -325,6 +325,7 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
+	globalNotificationQueue = &notificationQueue;
 	
 	//7. Dispatch the APN feedback interrogator thread
 	pmm::ThreadDispatcher::start(feedbackThread, threadStackSize);
