@@ -107,6 +107,8 @@ namespace pmm {
 		void useForProduction();
 		
 		void triggerSimultanousReconnect();
+		
+		AtomicFlag stopExecution;
 	};
 	
 }

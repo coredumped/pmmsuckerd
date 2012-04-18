@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		820BBDF9153E7187005A1C5A /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
+		820BBDFA153E7242005A1C5A /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
 		821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
@@ -92,6 +94,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		820BBDF6153E7164005A1C5A /* PendingNotificationStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PendingNotificationStore.h; sourceTree = "<group>"; };
+		820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PendingNotificationStore.cpp; sourceTree = "<group>"; };
 		821675BB14283DA800F8FF70 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8217B24214B5DCEA00E45AA0 /* QuotaDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuotaDB.h; sourceTree = "<group>"; };
@@ -350,6 +354,8 @@
 				82B6109314F2A2FC00975C32 /* UserPreferences.cpp */,
 				82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */,
 				82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */,
+				820BBDF6153E7164005A1C5A /* PendingNotificationStore.h */,
+				820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -464,6 +470,7 @@
 				8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */,
 				82B6109414F2A2FC00975C32 /* UserPreferences.cpp in Sources */,
 				82B081DC153AD30200F78A4D /* APNSFeedbackThread.cpp in Sources */,
+				820BBDF9153E7187005A1C5A /* PendingNotificationStore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +478,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				820BBDFA153E7242005A1C5A /* PendingNotificationStore.cpp in Sources */,
 				82B081DD153AD33100F78A4D /* APNSFeedbackThread.cpp in Sources */,
 				82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */,
 				8217B24614B5E01100E45AA0 /* QuotaDB.cpp in Sources */,

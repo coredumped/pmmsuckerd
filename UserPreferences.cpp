@@ -94,7 +94,6 @@ namespace pmm {
 	
 	void PreferenceEngine::userPreferenceGet(std::map<std::string, std::string> &preferenceMap, const std::string &emailAccount, const std::string &domain){
 		db = connect2PrefDB();
-		db = connect2PrefDB();
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
 		char *szTail;
@@ -102,7 +101,7 @@ namespace pmm {
 		if(sqlite3_prepare_v2(db, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&szTail) == SQLITE_OK){
 			while (sqlite3_step(statement) == SQLITE_ROW) {
 				const char *key = (const char *)sqlite3_column_text(statement, 0);
-				const char *value = (const char *)sqlite3_column_text(statement, 0);
+				const char *value = (const char *)sqlite3_column_text(statement, 1);
 				preferenceMap[key] = value;
 			}
 			sqlite3_finalize(statement);

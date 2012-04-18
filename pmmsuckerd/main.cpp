@@ -11,6 +11,7 @@
 #include <openssl/ssl.h>
 #include <stdlib.h>
 #include <fstream>
+#include <signal.h>
 #include "ServerResponse.h"
 #include "PMMSuckerSession.h"
 #include "APNSNotificationThread.h"
@@ -26,6 +27,7 @@
 #include "QuotaDB.h"
 #include "UserPreferences.h"
 #include "APNSFeedbackThread.h"
+#include "PendingNotificationStore.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 4
 #endif
@@ -72,7 +74,12 @@
 
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
+pmm::APNSNotificationThread *globalNotifThreads;
+pmm::SharedQueue<pmm::NotificationPayload> *globalNotificationQueue;
+size_t globalMaxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
+
 void emergencyUnregister();
+void signalHandler(int s);
 
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts);
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo);
@@ -235,6 +242,8 @@ int main (int argc, const char * argv[])
 	retrieveAndSaveSilentModeSettings(emailAccounts);
 	//4. Start APNS notification threads, validate remote devTokens
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
+	globalNotifThreads = notifThreads;
+	globalMaxNotificationThreads = maxNotificationThreads;
 	pmm::APNSNotificationThread develNotifThread;	
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
@@ -243,7 +252,7 @@ int main (int argc, const char * argv[])
 	pmm::APNSFeedbackThread feedbackThread;
 	feedbackThread.setKeyPath(sslPrivateKeyPath);
 	feedbackThread.setCertPath(sslCertificatePath);
-	pmm::ThreadDispatcher::start(feedbackThread, threadStackSize);
+	feedbackThread.useForProduction();
 	
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
@@ -278,6 +287,11 @@ int main (int argc, const char * argv[])
 			imapAssignationIndex = 0;
 		}
 	}
+	
+	//Install SEGFAULT signal handler
+	signal(SIGSEGV, signalHandler);
+	
+	
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
@@ -311,10 +325,17 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
-	//7. After registration time ends, close every connection, return to Step 1
+	
+	//7. Dispatch the APN feedback interrogator thread
+	pmm::ThreadDispatcher::start(feedbackThread, threadStackSize);
+	
+	//8. After registration time ends, close every connection, return to Step 1
 	int tic = 1;
 	std::map<std::string, int> quotas;
 	bool keepRunning = true;
+	
+	//9. Dispatch pending notifications not sent due to a unexpected crash or unhandled exception
+	pmm::PendingNotificationStore::loadPayloads(&notificationQueue);
 	while (keepRunning) {
 		try {
 			session.performAutoRegister();
@@ -504,12 +525,24 @@ void printHelpInfo() {
 }
 
 void emergencyUnregister(){
+	std::cerr << "Some weird exception just happened, need to save some application state..." << std::endl;
+	for (size_t i = 0; i < globalMaxNotificationThreads; i++) {
+		globalNotifThreads[i].stopExecution = true;
+	}
+	//Save current notification information for future retrieval...
+	std::cerr << "Saving pending notifications for future dispatch..." << std::endl;
+	pmm::PendingNotificationStore::savePayloads(globalNotificationQueue);
 	std::cerr << "Triggering emergency unregister, some unhandled exception ocurred :-(" << std::endl;
 	globalSession->unregisterFromPMM();
 	//Save exit time...
 	std::ofstream of("apns-logout-time.log", std::ios_base::trunc);
 	of << time(0);
 	of.close();
+	abort();
+}
+
+void signalHandler(int s){
+	if(s == SIGSEGV) emergencyUnregister();
 	abort();
 }
 

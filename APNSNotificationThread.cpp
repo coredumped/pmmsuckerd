@@ -303,6 +303,7 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::operator()(){
+		stopExecution = false;
 #ifdef DEBUG
 		size_t i = 0;  
 #endif
@@ -367,6 +368,11 @@ namespace pmm {
 				connect2APNS();
 			}
 			while (notificationQueue->extractEntry(payload)) {
+				if(stopExecution == true){
+					APNSLog << "Explicit thread termination asked :-(" << pmm::NL;
+					notificationQueue->add(payload);
+					sleep(120);
+				}
 #ifdef DEBUG
 				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
 #endif

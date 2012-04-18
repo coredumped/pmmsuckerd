@@ -156,4 +156,8 @@ namespace pmm {
 		_soundName = DEFAULT_SILENT_SOUND;
 		build();
 	}
+	
+	int NotificationPayload::badge(){
+		return _badgeNumber;
+	}
 }
