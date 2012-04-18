@@ -14,7 +14,7 @@
 #define DEFAULT_PENDING_NOTIFICATION_DATAFILE "pending_queue.db"
 #endif
 #ifndef DEFAULT_PENDING_NOTIFICATION_TABLE
-#define DEFAULT_PENDING_NOTIFICATION_TABLE "pending_queue.db"
+#define DEFAULT_PENDING_NOTIFICATION_TABLE "pending_queue"
 #endif
 
 namespace pmm {
