@@ -17,6 +17,7 @@ namespace pmm {
 
 	void url_encode(std::string &theString);
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken);
+	void binary2DevToken(std::string &devToken, uint32_t binaryToken);
 	
 	void splitEmailAccounts(std::vector<MailAccountInfo> &mailAccounts, std::vector<MailAccountInfo> &imapAccounts, std::vector<MailAccountInfo> &pop3Accounts);
 	

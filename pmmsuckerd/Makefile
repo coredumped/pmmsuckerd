@@ -21,13 +21,13 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
 		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o \
-		QuotaDB.o UserPreferences.o
+		QuotaDB.o UserPreferences.o APNSFeedbackThread.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
 				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
 				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o QuotaDB.o \
-				UserPreferences.o $(LIBS)
+				UserPreferences.o APNSFeedbackThread.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -100,6 +100,10 @@ QuotaDB.o: ../QuotaDB.cpp ../QuotaDB.h
 
 UserPreferences.o: ../UserPreferences.cpp ../UserPreferences.h
 	$(GCC) $(CFLAGS) -c -o UserPreferences.o ../UserPreferences.cpp
+
+APNSFeedbackThread.o: ../APNSFeedbackThread.cpp ../APNSFeedbackThread.h ../GenericThread.h ../SharedVector.h ../APNSNotificationThread.h
+	$(GCC) $(CFLAGS) -c -o APNSFeedbackThread.o ../APNSFeedbackThread.cpp
+
 
 clean:
 	rm -f *.o pmmsuckerd

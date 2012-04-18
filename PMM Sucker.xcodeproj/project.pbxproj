@@ -34,6 +34,8 @@
 		8293E232142CCD1100F62897 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
 		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
 		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
+		82B081DC153AD30200F78A4D /* APNSFeedbackThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */; };
+		82B081DD153AD33100F78A4D /* APNSFeedbackThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */; };
 		82B6109414F2A2FC00975C32 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
 		82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
 		82BD8EBD148BBB4B008DDEA1 /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
@@ -115,6 +117,8 @@
 		8293E22F142CCD0000F62897 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.cc"; sourceTree = "<group>"; };
 		8293E230142CCD0000F62897 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.h"; sourceTree = "<group>"; };
 		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
+		82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNSFeedbackThread.h; sourceTree = "<group>"; };
+		82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = APNSFeedbackThread.cpp; sourceTree = "<group>"; };
 		82B6109114F2A28200975C32 /* UserPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserPreferences.h; sourceTree = "<group>"; };
 		82B6109314F2A2FC00975C32 /* UserPreferences.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserPreferences.cpp; sourceTree = "<group>"; };
 		82BD8EBA148BBAAA008DDEA1 /* SilentMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SilentMode.h; sourceTree = "<group>"; };
@@ -308,11 +312,11 @@
 				8290FB97142F502D0080BB85 /* Mutex.h */,
 				8290FB98142F508B0080BB85 /* Mutex.cpp */,
 				82ED5B071431761400444844 /* APNSNotificationThread.h */,
+				82ED5B111431882700444844 /* APNSNotificationThread.cpp */,
 				82ED5B09143176B300444844 /* GenericThread.h */,
 				82ED5B0A14317FD000444844 /* GenericThread.cpp */,
 				82ED5B0D1431870800444844 /* ThreadDispatcher.h */,
 				82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */,
-				82ED5B111431882700444844 /* APNSNotificationThread.cpp */,
 				82ED5B16143437BD00444844 /* SharedQueue.h */,
 				82ED5B171435123100444844 /* SharedQueue.cpp */,
 				82ED5B1A143537A300444844 /* NotificationPayload.h */,
@@ -325,6 +329,8 @@
 				82ED5B2B1437ECDA00444844 /* MailSuckerThread.cpp */,
 				82ED5B2E1437EF4E00444844 /* IMAPSuckerThread.h */,
 				82ED5B2F1437F01A00444844 /* IMAPSuckerThread.cpp */,
+				82FA4DAF1469C4D800A21B11 /* POP3SuckerThread.h */,
+				82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */,
 				82ED5B311437F19900444844 /* SharedVector.h */,
 				82571EAC1442AC220047347E /* FetchedMailsCache.h */,
 				82571EAE1442B1730047347E /* FetchedMailsCache.cpp */,
@@ -336,14 +342,14 @@
 				82F857C1144D4DA5000B43B8 /* MessageUploaderThread.cpp */,
 				8280597F145FB0E600E7B614 /* DataTypes.h */,
 				82805981145FB18100E7B614 /* DataTypes.cpp */,
-				82FA4DAF1469C4D800A21B11 /* POP3SuckerThread.h */,
-				82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */,
 				82BD8EBA148BBAAA008DDEA1 /* SilentMode.h */,
 				82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */,
 				8217B24214B5DCEA00E45AA0 /* QuotaDB.h */,
 				8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */,
 				82B6109114F2A28200975C32 /* UserPreferences.h */,
 				82B6109314F2A2FC00975C32 /* UserPreferences.cpp */,
+				82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */,
+				82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -457,6 +463,7 @@
 				82BD8EBD148BBB4B008DDEA1 /* SilentMode.cpp in Sources */,
 				8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */,
 				82B6109414F2A2FC00975C32 /* UserPreferences.cpp in Sources */,
+				82B081DC153AD30200F78A4D /* APNSFeedbackThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -464,6 +471,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82B081DD153AD33100F78A4D /* APNSFeedbackThread.cpp in Sources */,
 				82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */,
 				8217B24614B5E01100E45AA0 /* QuotaDB.cpp in Sources */,
 				82BD8EBE148BBB87008DDEA1 /* SilentMode.cpp in Sources */,

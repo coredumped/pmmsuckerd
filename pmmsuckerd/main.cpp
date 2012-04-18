@@ -25,6 +25,7 @@
 #include "SilentMode.h"
 #include "QuotaDB.h"
 #include "UserPreferences.h"
+#include "APNSFeedbackThread.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 4
 #endif
@@ -186,6 +187,8 @@ int main (int argc, const char * argv[])
 	pmm::CacheLog.setTag("FetchedMailsCache");
 	pmm::APNSLog.open("apns.log");
 	pmm::APNSLog.setTag("APNSNotificationThread");
+	pmm::fdbckLog.open("apn-feedback.log");
+	pmm::fdbckLog.setTag("APNSFeedbackThread");
 	pmm::imapLog.open("imap-fetch.log");
 	pmm::imapLog.setTag("IMAPSuckerThread");
 	pmm::pop3Log.open("pop3-fetch.log");
@@ -237,6 +240,10 @@ int main (int argc, const char * argv[])
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
 	
+	pmm::APNSFeedbackThread feedbackThread;
+	feedbackThread.setKeyPath(sslPrivateKeyPath);
+	feedbackThread.setCertPath(sslCertificatePath);
+	pmm::ThreadDispatcher::start(feedbackThread, threadStackSize);
 	
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...

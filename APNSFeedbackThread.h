@@ -8,10 +8,11 @@
 
 #ifndef PMM_Sucker_APNSFeedbackThread_h
 #define PMM_Sucker_APNSFeedbackThread_h
-#include"GenericThread.h"
-#include"APNSNotificationThread.h"
+#include "GenericThread.h"
+#include "APNSNotificationThread.h"
 #include "SharedVector.h"
-#include<set>
+#include "MTLogger.h"
+#include <set>
 
 namespace pmm {
 	class APNSFeedbackThread : public GenericThread {
@@ -34,7 +35,6 @@ namespace pmm {
 	protected:
 		bool sslInitComplete;
 		void initSSL();
-		void notifyTo(const std::string &devToken, NotificationPayload &msg);
 	public:
 		APNSFeedbackThread();
 		void setKeyPath(const std::string &keyPath);

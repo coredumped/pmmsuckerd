@@ -190,9 +190,6 @@ namespace pmm {
 	std::set<std::string> __invalidTokens;
 	
 	void APNSFeedbackThread::operator()(){
-#ifdef DEBUG
-		size_t i = 0;  
-#endif
 		pmm::Log << "Starting APNSFeedbackThread..." << pmm::NL;
 #ifdef DEBUG
 		fdbckLog << "Masking SIGPIPE..." << pmm::NL;
@@ -205,14 +202,8 @@ namespace pmm {
 		}
 		pmm::Log << "APNSFeedbackThread main loop started!!!" << pmm::NL;
 		while (true) {
-#ifdef DEBUG
-			if(++i % 2400 == 0){
-				fdbckLog << "DEBUG: keepalive still tickling!!!" << pmm::NL;
-			}
-#endif
 			//Verify if there are any ending notifications in the notification queue
-			NotificationPayload payload;
-			std::string lastDevToken;
+			fdbckLog << "Retrieving device tokens..." << pmm::NL;
 			initSSL();
 			connect2APNS();
 			itM.lock();
@@ -235,12 +226,13 @@ namespace pmm {
 							memcpy(&tleno, binaryPtr, sizeof(uint16_t));
 							binaryPtr += sizeof(uint16_t);
 							memcpy(&tokno, binaryPtr, sizeof(uint32_t));
-							time_t timestamp = ntohl(timeno);
-							uint16_t tlen = ntohs(tleno);
-							uint32_t tokenN = ntohl(tokno);
+							//time_t timestamp = ntohl(timeno);
+							//uint16_t tlen = ntohs(tleno);
+							
 							//Take tokenN and parse it back to a string
-							
-							
+							std::string sToken;
+							binary2DevToken(sToken, tokno);
+							fdbckLog << "  * Device " << sToken << " no longer has the app installed." << pmm::NL;
 							break;
 						}
 						else {
