@@ -90,7 +90,7 @@ namespace pmm {
 			POP3FetchItem pf;
 			while (mainFetchQueue.extractEntry(pf)) {
 				if (time(0) - pf.timestamp > 600) {
-					pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old!!!" << pmm::NL;
+					pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs" << pmm::NL;
 					continue;
 				}
 				//m = pf.mailAccountInfo;
