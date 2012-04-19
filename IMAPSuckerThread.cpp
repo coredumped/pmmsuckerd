@@ -198,6 +198,13 @@ namespace pmm {
 		return false;
 	}
 	
+	bool IMAPSuckerThread::IMAPFetchControl::operator<(const IMAPFetchControl &i) const {
+		if (i.mailAccountInfo.email().size() < i.mailAccountInfo.email().size()) {
+			true;
+		}
+		return false;
+	}
+	
 	
 	IMAPSuckerThread::IMAPControl::IMAPControl(){
 		failedLoginAttemptsCount = 0;

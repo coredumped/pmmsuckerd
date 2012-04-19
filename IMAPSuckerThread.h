@@ -12,6 +12,7 @@
 #include "SharedQueue.h"
 #include "FetchedMailsCache.h"
 #include "UserPreferences.h"
+#include "ExclusiveSharedQueue.h"
 #include <map>
 #include "libetpan/libetpan.h"
 
@@ -30,6 +31,7 @@ namespace pmm {
 			IMAPFetchControl();
 			IMAPFetchControl(const IMAPFetchControl &ifc);
 			bool operator==(const IMAPFetchControl &i) const;
+			bool operator<(const IMAPFetchControl &i) const;
 		};
 	private:
 		class IMAPControl {
@@ -55,7 +57,7 @@ namespace pmm {
 			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);
 		public:
 			time_t threadStartTime;
-			SharedQueue<IMAPFetchControl> *fetchQueue;
+			ExclusiveSharedQueue<IMAPFetchControl> *fetchQueue;
 			SharedQueue<NotificationPayload> *myNotificationQueue;
 			SharedQueue<NotificationPayload> *develNotificationQueue;
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
@@ -63,7 +65,7 @@ namespace pmm {
 			MailFetcher();
 			void operator()();
 		};
-		SharedQueue<IMAPFetchControl> imapFetchQueue;
+		ExclusiveSharedQueue<IMAPFetchControl> imapFetchQueue;
 		std::map<std::string, IMAPControl> imapControl;
 		MailFetcher *mailFetchers;
 		size_t maxMailFetchers;

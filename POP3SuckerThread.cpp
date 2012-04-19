@@ -43,7 +43,7 @@
 namespace pmm {
 	MTLogger pop3Log;
 	
-	SharedQueue<POP3SuckerThread::POP3FetchItem> mainFetchQueue;
+	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> mainFetchQueue;
 	
 	POP3SuckerThread::POP3FetchItem::POP3FetchItem(){
 		timestamp = time(0);
@@ -61,6 +61,13 @@ namespace pmm {
 	
 	bool POP3SuckerThread::POP3FetchItem::operator==(const POP3FetchItem &p) const {
 		if (mailAccountInfo == p.mailAccountInfo) {
+			return true;
+		}
+		return false;
+	}
+	
+	bool POP3SuckerThread::POP3FetchItem::operator<(const POP3FetchItem &p) const {
+		if (mailAccountInfo.email().size() < p.mailAccountInfo.email().size()) {
 			return true;
 		}
 		return false;

@@ -26,6 +26,7 @@ namespace pmm {
 			POP3FetchItem(const POP3FetchItem &p);
 			POP3FetchItem(const MailAccountInfo &m);
 			bool operator==(const POP3FetchItem &p) const;
+			bool operator<(const POP3FetchItem &p) const;
 		};
 	private:
 		class POP3Control {
