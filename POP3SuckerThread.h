@@ -16,6 +16,15 @@
 
 namespace pmm {
 	class POP3SuckerThread : public MailSuckerThread {
+	public:
+		class POP3FetchItem {
+		public:
+			MailAccountInfo mailAccountInfo;
+			time_t timestamp;
+			POP3FetchItem();
+			POP3FetchItem(const POP3FetchItem &p);
+			POP3FetchItem(const MailAccountInfo &m);
+		};
 	private:
 		class POP3Control {
 		public:
@@ -37,7 +46,6 @@ namespace pmm {
 			std::map<std::string, time_t> startTimeMap;
 			SharedQueue<NotificationPayload> *notificationQueue;
 			SharedQueue<NotificationPayload> *develNotificationQueue;
-			//SharedQueue<MailAccountInfo> *fetchQueue;
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
 			SharedVector<std::string> *quotaUpdateVector;
 			std::map<std::string, int> serverConnectAttempts;
