@@ -449,7 +449,11 @@ namespace pmm {
 					pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << pmm::NL;
 					throw GenericException("Unable to select INBOX folder");
 				}			
-				int idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
+				int idleEnabled;
+				if (theEmail.compare("jinny27@nate.com")) {
+					idleEnabled = 0;
+				}
+				else idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
 				if(!idleEnabled){
 					imapLog << "WARNING: " << theEmail << " is not hosted in an IMAP IDLE environment." << pmm::NL;
 					mailboxControl[theEmail].isOpened = true;
