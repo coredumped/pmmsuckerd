@@ -78,6 +78,17 @@ namespace pmm {
 			m.unlock();
 		}
 		
+		void copyTo(const std::vector<T> &v){
+			m.lock();
+			try {
+				v = dataVec;
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
+			m.unlock();
+		}
+		
 		T operator[](size_t i){
 			return at(i);
 		}
@@ -114,6 +125,17 @@ namespace pmm {
 			m.unlock();
 		}
 		
+		void clear(){
+			m.lock();
+			try {
+				dataVec.clear();
+			} catch (...) {
+				m.unlock();
+				throw ;
+			}
+			m.unlock();			
+		}
+		
 		void beginCriticalSection(){
 			m.lock();
 		}
@@ -146,6 +168,10 @@ namespace pmm {
 			m.lock();
 			newVector = dataVec;
 			m.unlock();
+		}
+		
+		void unlockedCopyTo(std::vector<T> &newVector){
+			newVector = dataVec;
 		}
 	};
 }
