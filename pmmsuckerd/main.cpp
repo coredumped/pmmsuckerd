@@ -570,10 +570,12 @@ void emergencyUnregister(){
 	std::ofstream of("apns-logout-time.log", std::ios_base::trunc);
 	of << time(0);
 	of.close();
+	std::set_terminate(abort);
 	abort();
 }
 
 void signalHandler(int s){
+	signal(SIGSEGV, SIG_DFL);
 	if(s == SIGSEGV) emergencyUnregister();
 	abort();
 }
