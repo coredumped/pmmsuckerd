@@ -213,8 +213,8 @@ namespace pmm {
 			//Read remote data here
 			int bytes2read = 0;
 			fdbckLog << "Trying to read data from feedback service..." << pmm::NL;
-			//while ((bytes2read = SSL_pending(apnsConnection)) > 0) {
-			//	if (bytes2read >= APNS_ITEM_BYTE_SIZE) {
+			while ((bytes2read = SSL_pending(apnsConnection)) > 0) {
+				if (bytes2read >= APNS_ITEM_BYTE_SIZE) {
 					while (true) {
 						char binaryTuple[APNS_ITEM_BYTE_SIZE];
 						int rRet = SSL_read(apnsConnection, binaryTuple, APNS_ITEM_BYTE_SIZE);
@@ -246,9 +246,8 @@ namespace pmm {
 							}
 						}
 					}
-					//	}
-					//}
-
+				}
+			}
 			disconnectFromAPNS();
 			sleep(600);
 		}
