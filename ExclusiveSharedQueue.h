@@ -23,8 +23,7 @@ namespace pmm {
 	class ExclusiveSharedQueue {
 	private:
 		Mutex m;
-		std::queue<T>queueData;
-		std::set<T> controlSet;
+		std::vector<T>queueData;
 	protected:
 	public:
 		std::string name;
@@ -35,9 +34,16 @@ namespace pmm {
 		void add(const T &entry){
 			m.lock();
 			try {
-				if (controlSet.find(entry) == controlSet.end()) {
-					queueData.push(entry);
-					if(queueData.size() % 100 == 0) pmm::Log << "There is a queue (" << name << ") with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;
+				bool found = false;
+				for (size_t i = 0; i < queueData.size(); i++) {
+					if (queueData[i] == entry) {
+						found = true;
+						break;
+					}
+				}
+				if(!found){
+					queueData.push_back(entry);
+					if(queueData.size() % 500 == 0) pmm::Log << "There is a queue (" << name << ") with " << (int)queueData.size() << " pending elements, this is completely abnormal!!!" << pmm::NL;					
 				}
 			} catch (...) {
 				m.unlock();
@@ -52,8 +58,7 @@ namespace pmm {
 			try{
 				if (!queueData.empty()) {
 					val = queueData.front();
-					queueData.pop();
-					controlSet.erase(val);
+					queueData.erase(queueData.begin());
 					got_entry = true;
 				}
 			}
