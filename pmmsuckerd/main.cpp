@@ -580,7 +580,7 @@ void signalHandler(int s){
 
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts){
 	//Disable email accounts that require it
-	for (size_t k = 0; k < nElems; k++) {
+	/*for (size_t k = 0; k < nElems; k++) {
 		mailSuckerThreads[k].emailAccounts.beginCriticalSection();
 		for (std::map<std::string, std::string>::iterator iter2 = accounts.begin(); iter2 != accounts.end(); iter2++) {
 			for (size_t l = 0; l < mailSuckerThreads[k].emailAccounts.unlockedSize(); l++) {
@@ -602,7 +602,7 @@ void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, 
 			}
 		}	
 		mailSuckerThreads[k].emailAccounts.endCriticalSection();
-	}
+	}*/
 }
 
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo){
