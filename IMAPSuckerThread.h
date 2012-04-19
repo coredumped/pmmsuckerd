@@ -24,6 +24,7 @@ namespace pmm {
 		class IMAPFetchControl {
 		public:
 			MailAccountInfo mailAccountInfo;
+			time_t issuedDate;
 			time_t nextAttempt;
 			int madeAttempts;
 			int badgeCounter;

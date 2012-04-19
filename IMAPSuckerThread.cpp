@@ -217,8 +217,9 @@ namespace pmm {
 		while (true) {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
-				//try {
-				if (imapFetch.madeAttempts > 0 && time(0) < imapFetch.nextAttempt) {
+				time_t rightNow = time(0);
+				if (rightNow - imapFetch.issuedDate > 180) continue; //This is a really old element in the queue, let's just skip it
+				if (imapFetch.madeAttempts > 0 && rightNow < imapFetch.nextAttempt) {
 					if (fetchQueue->size() == 0) {
 						usleep(10);
 					}
@@ -238,7 +239,7 @@ namespace pmm {
 				}
 				if (etpanOperationFailed(result)) {
 					imapFetch.madeAttempts++;
-					imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+					imapFetch.nextAttempt = rightNow + fetchRetryInterval;
 					fetchQueue->add(imapFetch);
 #ifdef DEBUG
 					if (imap->imap_response == 0) {
@@ -257,7 +258,7 @@ namespace pmm {
 						pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
 #endif				
 						imapFetch.madeAttempts++;
-						imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+						imapFetch.nextAttempt = rightNow + fetchRetryInterval;
 						fetchQueue->add(imapFetch);
 					}
 					else {
@@ -301,7 +302,7 @@ namespace pmm {
 							uidSet.push_back(uid);
 						}
 						//Remove old entries if the current time is a multiple of 60 seconds
-						if (time(NULL) % 60 == 0) {
+						if (rightNow % 60 == 0) {
 #ifdef DEBUG
 							pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
 #endif
@@ -318,7 +319,7 @@ namespace pmm {
 				 }*/
 				mailimap_free(imap);
 			}
-			sleep(1);
+			usleep(1000);
 		}
 	}
 	
@@ -572,6 +573,7 @@ namespace pmm {
 		//Find and schedule a fetching thread
 		IMAPFetchControl ifc;
 		ifc.mailAccountInfo = m;
+		ifc.issuedDate = time(0);
 		imapFetchQueue.add(ifc);
 	}
 }
