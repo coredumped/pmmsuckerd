@@ -225,6 +225,7 @@ namespace pmm {
 			while (theBody[0] == '\r' || theBody[0] == '\n') {
 				theBody = theBody.substr(1);
 			}
+			if(m.subject.size() > 0) m.subject.append("\n");
 			if(theBody.size() > 0 && theBody.size() < 256){
 				m.subject.append(theBody.c_str(), theBody.size());
 			}

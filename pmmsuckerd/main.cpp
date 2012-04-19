@@ -93,7 +93,7 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 //void updateMailAccountQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo, pmm::SharedQueue<pmm::NotificationPayload> *notificationQueue);
 
 void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts);
-void broadcastMessageToAll(std::map<std::string, std::string> &params);
+void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::SharedQueue<pmm::NotificationPayload> &notificationQueue, pmm::SharedQueue<pmm::NotificationPayload> &pmmStorageQueue);
 
 int main (int argc, const char * argv[])
 {
@@ -804,13 +804,16 @@ void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &
 	}
 }
 
-void broadcastMessageToAll(std::map<std::string, std::string> &params){
+void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::SharedQueue<pmm::NotificationPayload> &notificationQueue, pmm::SharedQueue<pmm::NotificationPayload> &pmmStorageQueue){
 	int count = atoi(params["count"].c_str());
 	for (int i = 0; i < count; i++) {
 		std::stringstream key;
 		key << "i" << i;
 		std::string token = params[key.str()];
 		pmm::Log << " * Sending via broadcast (" << token << "): " << params["message"] << pmm::NL;
+		pmm::NotificationPayload np(token, params["message"], 911);
+		notificationQueue.add(np);
+		pmmStorageQueue.add(np);
 	}
 }
 
