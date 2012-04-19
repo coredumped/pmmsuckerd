@@ -73,31 +73,39 @@ namespace pmm {
 	}
 	
 	void FetchedMailsCache::addEntry(const std::string &email, const std::string &uid){
-		sqlite3 *conn = openDatabase();
-		char *errmsg_s;
-		std::stringstream sqlCmd;
-		sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL);
-		sqlCmd << ",'" << email << "',";
-		sqlCmd << "'" << uid << "' )";
-		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
-		if (errCode != SQLITE_OK) {
-			if (errCode == SQLITE_CONSTRAINT) {
-				CacheLog << "Duplicate entry in database: " << email << "(" << uid << ") resetting database..." << pmm::NL;
-				closeDatabase(conn);
-				dbConn = 0;
-			}
-			else{
-				closeDatabase(conn);
-				std::stringstream errmsg;
-				errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+		bool retry = false;
+		while (retry) {
+			sqlite3 *conn = openDatabase();
+			char *errmsg_s;
+			std::stringstream sqlCmd;
+			sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL);
+			sqlCmd << ",'" << email << "',";
+			sqlCmd << "'" << uid << "' )";
+			int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+			if (errCode != SQLITE_OK) {
+				if (errCode == SQLITE_CONSTRAINT) {
+					CacheLog << "Duplicate entry in database: " << email << "(" << uid << ") resetting database..." << pmm::NL;
+					closeDatabase(conn);
+					dbConn = 0;
+				}
+				else if(errCode == SQLITE_BUSY){
+					usleep(1000);
+					retry = true;
+				}
+				else{
+					closeDatabase(conn);
+					std::stringstream errmsg;
+					errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
 #ifdef DEBUG
-				CacheLog << errmsg.str() << pmm::NL;
+					CacheLog << errmsg.str() << pmm::NL;
 #endif
-				throw GenericException(errmsg.str());
+					throw GenericException(errmsg.str());
+				}
 			}
+			closeDatabase(conn);
 		}
-		closeDatabase(conn);
 	}
+	
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		bool ret = false;
 		sqlite3 *conn = openDatabase();
