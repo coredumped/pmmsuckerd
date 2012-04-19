@@ -363,7 +363,7 @@ int main (int argc, const char * argv[])
 				//Report quota changes to pmm service.
 				try{
 					if(session.reportQuotas(quotas)){
-						updateAccountQuotas(imapSuckingThreads, maxIMAPSuckerThreads, quotas);
+						//updateAccountQuotas(imapSuckingThreads, maxIMAPSuckerThreads, quotas);
 						//updateAccountQuotas(pop3SuckingThreads, maxPOP3SuckerThreads, quotas);
 						quotas.clear();
 					}
