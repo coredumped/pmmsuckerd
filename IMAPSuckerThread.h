@@ -63,7 +63,7 @@ namespace pmm {
 			MailFetcher();
 			void operator()();
 		};
-		
+		SharedQueue<IMAPFetchControl> imapFetchQueue;
 		std::map<std::string, IMAPControl> imapControl;
 		MailFetcher *mailFetchers;
 		size_t maxMailFetchers;

@@ -35,7 +35,6 @@
 namespace pmm {
 	MTLogger imapLog;
 	FetchedMailsCache fetchedMails;
-	SharedQueue<IMAPSuckerThread::IMAPFetchControl> imapFetchQueue;
 	
 	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size, MailMessage &tm)
 	{
