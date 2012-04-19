@@ -524,7 +524,7 @@ int main (int argc, const char * argv[])
 						}
 						else if (command.compare(pmm::Commands::broadcastMessage) == 0){
 							pmm::Log << "Prepare to broadcast message: " << parameters["message"] << " to " << parameters["count"] << " devices, hang on tight!!!" << pmm::NL;
-							broadcastMessageToAll(parameters);
+							broadcastMessageToAll(parameters, notificationQueue, pmmStorageQueue);
 						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
