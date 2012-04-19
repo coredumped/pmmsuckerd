@@ -359,6 +359,7 @@ namespace pmm {
 		maxMailFetchers = _maxMailFetchers;
 		mailFetchers = new MailFetcher[maxMailFetchers];
 		//IMAPSuckerThread::fetchedMails.expireOldEntries();
+		threadStartTime = time(0) - 900;
 	}
 	IMAPSuckerThread::~IMAPSuckerThread(){
 		delete [] mailFetchers;
@@ -470,7 +471,7 @@ namespace pmm {
 					throw GenericException("Unable to select INBOX folder");
 				}			
 				int idleEnabled;
-				if (theEmail.compare("jinny27@nate.com")) {
+				if (theEmail.compare("jinny27@nate.com") == 0) {
 					idleEnabled = 0;
 				}
 				else idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
