@@ -153,6 +153,7 @@ namespace pmm {
 			throw GenericException("Can't close socket client APNS socket");
 		}    
 		SSL_free(apnsConnection);    
+		fdbckLog << "Disconnected from APNS feedback" << pmm::NL;
 	}
 	
 	void APNSFeedbackThread::useForProduction(){
@@ -208,12 +209,14 @@ namespace pmm {
 			connect2APNS();
 			itM.lock();
 			__invalidTokens.clear();
+			itM.unlock();
 			//Read remote data here
 			int bytes2read = 0;
+			fdbckLog << "Trying to read data from feedback service..." << pmm::NL;
 			while ((bytes2read = SSL_pending(apnsConnection)) > 0) {
 				if (bytes2read >= APNS_ITEM_BYTE_SIZE) {
-					char binaryTuple[APNS_ITEM_BYTE_SIZE];
 					while (true) {
+						char binaryTuple[APNS_ITEM_BYTE_SIZE];
 						int rRet = SSL_read(apnsConnection, binaryTuple, APNS_ITEM_BYTE_SIZE);
 						if(rRet > 0){
 							//Here we parse;
@@ -245,7 +248,7 @@ namespace pmm {
 					}
 				}
 			}
-			itM.unlock();
+
 			disconnectFromAPNS();
 			sleep(600);
 		}
