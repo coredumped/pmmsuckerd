@@ -12,6 +12,7 @@
 #include "FetchedMailsCache.h"
 #include "UserPreferences.h"
 #include "libetpan/libetpan.h"
+#include "ExclusiveSharedQueue.h"
 #include <map>
 
 namespace pmm {
@@ -24,6 +25,7 @@ namespace pmm {
 			POP3FetchItem();
 			POP3FetchItem(const POP3FetchItem &p);
 			POP3FetchItem(const MailAccountInfo &m);
+			bool operator==(const POP3FetchItem &p) const;
 		};
 	private:
 		class POP3Control {

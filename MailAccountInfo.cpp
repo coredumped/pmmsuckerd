@@ -111,4 +111,10 @@ namespace pmm {
 		}
 	}
 
+	bool MailAccountInfo::operator==(const MailAccountInfo &m) const {
+		if (email_.compare(m.email_) == 0 && serverAddress_.compare(m.serverAddress_) == 0) {
+			return true;
+		}
+		return false;
+	}
 }

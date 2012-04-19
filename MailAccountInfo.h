@@ -49,6 +49,8 @@ namespace pmm {
 
 		void deviceTokenAdd(const std::string &newDevToken);
 		void deviceTokenRemove(const std::string &oldDevToken);
+		
+		bool operator==(const MailAccountInfo &m) const;
 	};
 }
 

@@ -19,8 +19,7 @@ namespace pmm {
 	
 	
 	class IMAPSuckerThread : public MailSuckerThread {
-	private:
-
+	public:
 		class IMAPFetchControl {
 		public:
 			MailAccountInfo mailAccountInfo;
@@ -30,8 +29,9 @@ namespace pmm {
 			int badgeCounter;
 			IMAPFetchControl();
 			IMAPFetchControl(const IMAPFetchControl &ifc);
+			bool operator==(const IMAPFetchControl &i) const;
 		};
-
+	private:
 		class IMAPControl {
 		protected:
 		public:
@@ -65,7 +65,6 @@ namespace pmm {
 		};
 		
 		std::map<std::string, IMAPControl> imapControl;
-		SharedQueue<IMAPFetchControl> imapFetchQueue;
 		MailFetcher *mailFetchers;
 		size_t maxMailFetchers;
 	protected:

@@ -59,6 +59,13 @@ namespace pmm {
 		timestamp = time(0);
 	}
 	
+	bool POP3SuckerThread::POP3FetchItem::operator==(const POP3FetchItem &p) const {
+		if (mailAccountInfo == p.mailAccountInfo) {
+			return true;
+		}
+		return false;
+	}
+	
 	POP3SuckerThread::POP3FetcherThread::POP3FetcherThread(){
 		//fetchQueue = NULL;
 		notificationQueue = NULL;
