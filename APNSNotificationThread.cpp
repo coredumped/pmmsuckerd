@@ -35,7 +35,7 @@
 #define DEFAULT_MAX_CONNECTION_INTERVAL 7200
 #endif
 #ifndef DEFAULT_NOTIFICATION_WARMUP_TIME
-#define DEFAULT_NOTIFICATION_WARMUP_TIME 30
+#define DEFAULT_NOTIFICATION_WARMUP_TIME 1
 #endif
 #include <pthread.h>
 #include <signal.h>
@@ -247,7 +247,7 @@ namespace pmm {
 	void APNSNotificationThread::useForProduction(){
 		_useSandbox = false;
 		maxBurstPauseInterval = 1;
-		//maxNotificationsPerBurst = 64;
+		maxNotificationsPerBurst = 2048;
 		pmm::APNSLog << "Setting this notification thread as a production notifier" << pmm::NL;
 	}
 	

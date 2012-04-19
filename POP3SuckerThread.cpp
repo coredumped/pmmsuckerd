@@ -154,6 +154,7 @@ namespace pmm {
 						}
 						else {
 							int max_retrieve = carray_count(msgList);
+							if(max_retrieve > 1000) pop3Log << "WARNING: " << pf.mailAccountInfo.email() << " is a very large mailbox, it has " << max_retrieve << " messages, scanning it will take a while!!!" << pmm::NL;
 							//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 							for (int i = 0; i < max_retrieve; i++) {
 								time_t now = time(0);
