@@ -257,6 +257,7 @@ namespace pmm {
 		maxPOP3FetcherThreads = DEFAULT_MAX_POP3_FETCHER_THREADS;	
 		pop3Fetcher = NULL;
 		threadStartTime = time(0) - 900;
+		iterationWaitMicroSeconds = 1000000;
 	}
 	
 	POP3SuckerThread::POP3SuckerThread(size_t _maxMailFetchers){
