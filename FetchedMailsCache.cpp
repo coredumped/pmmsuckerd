@@ -74,7 +74,7 @@ namespace pmm {
 	
 	void FetchedMailsCache::addEntry(const std::string &email, const std::string &uid){
 		bool retry = false;
-		while (retry) {
+		//while (retry) {
 			sqlite3 *conn = openDatabase();
 			char *errmsg_s;
 			std::stringstream sqlCmd;
@@ -88,10 +88,10 @@ namespace pmm {
 					closeDatabase(conn);
 					dbConn = 0;
 				}
-				else if(errCode == SQLITE_BUSY){
+				/*else if(errCode == SQLITE_BUSY){
 					usleep(1000);
 					retry = true;
-				}
+				}*/
 				else{
 					closeDatabase(conn);
 					std::stringstream errmsg;
@@ -103,7 +103,7 @@ namespace pmm {
 				}
 			}
 			closeDatabase(conn);
-		}
+		//}
 	}
 	
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
