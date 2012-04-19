@@ -130,8 +130,13 @@ namespace pmm {
 						carray *msgList;
 						result = mailpop3_list(pop3, &msgList);
 						if(result != MAILPOP3_NO_ERROR){
-							if (pop3->pop3_response != NULL) pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << ": etpan code=" << result << " response: " << pop3->pop3_response << pmm::NL;
-							else pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;						
+							if (result == MAILPOP3_ERROR_CANT_LIST) {
+								pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << ": the server has denied mailbox listings" << pmm::NL;
+							}
+							else {
+								if (pop3->pop3_response != NULL) pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << ": etpan code=" << result << " response: " << pop3->pop3_response << pmm::NL;
+								else pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;
+							}
 						}
 						else {
 							int max_retrieve = carray_count(msgList);
