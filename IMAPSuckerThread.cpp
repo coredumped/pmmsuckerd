@@ -180,6 +180,7 @@ namespace pmm {
 		madeAttempts = 0;
 		nextAttempt = 0;
 		badgeCounter = 0;
+		issuedDate = time(0);
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(const IMAPFetchControl &ifc){
@@ -187,6 +188,7 @@ namespace pmm {
 		nextAttempt = ifc.nextAttempt;
 		madeAttempts = ifc.madeAttempts;
 		badgeCounter += ifc.badgeCounter;
+		issuedDate = ifc.issuedDate;
 	}
 	
 	
