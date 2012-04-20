@@ -172,9 +172,11 @@ namespace pmm {
 							else {
 								mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
 								if(newSubject != 0){
-									pmm::Log << "Unable to decode subject from subject field!!!" << pmm::NL;
 									m.subject = newSubject;
 									free(newSubject);
+								}
+								else {
+									pmm::Log << "Unable to decode subject from subject field: " << m.subject << pmm::NL;
 								}
 							}
 						}
