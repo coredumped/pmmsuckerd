@@ -99,6 +99,35 @@ namespace pmm {
 	
 	void NotificationPayload::build(){
 		std::stringstream jsonbuilder;
+		size_t l = msg.size();
+		std::string encodedMsg = msg;
+		bool addDots = false;
+		bool useSteps = false;
+		do{
+			if(addDots == true){
+				if(!useSteps){
+					l = MAXPAYLOAD_SIZE - jsonbuilder.str().size() - 3;
+					useSteps = true;
+				}
+				else {
+					l--;
+				}
+			}
+			jsonbuilder.str(std::string());
+			encodedMsg = msg.substr(0, l);
+			if(addDots) encodedMsg.append("...");
+			msg_encode(encodedMsg);
+			jsonbuilder << "{";
+			jsonbuilder << "\"aps\":";
+			jsonbuilder << "{";
+			jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
+			jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
+			jsonbuilder << "}";
+			jsonbuilder << "}";
+			addDots = true;
+		}while (jsonbuilder.str().size() > MAXPAYLOAD_SIZE);
+		/*std::stringstream jsonbuilder;
 		std::string encodedMsg = msg;
 		msg_encode(encodedMsg);
 		jsonbuilder << "{";
@@ -118,6 +147,7 @@ namespace pmm {
 			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 			jsonbuilder << "}";
 			jsonbuilder << "}";
+			
 			size_t maxMsgLength = jsonbuilder.str().size() - 3;
 			jsonbuilder.str(std::string());
 			jsonbuilder << "{";
@@ -128,7 +158,7 @@ namespace pmm {
 			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 			jsonbuilder << "}";
 			jsonbuilder << "}";			
-		}
+		}*/
 		jsonRepresentation = jsonbuilder.str();
 	}
 	
