@@ -106,7 +106,7 @@ namespace pmm {
 		do{
 			if(addDots == true){
 				if(!useSteps){
-					l = MAXPAYLOAD_SIZE - jsonbuilder.str().size() - 3;
+					l = l - (MAXPAYLOAD_SIZE - jsonbuilder.str().size()) - 3;
 					useSteps = true;
 				}
 				else {
