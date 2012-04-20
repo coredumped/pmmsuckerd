@@ -439,14 +439,14 @@ namespace pmm {
 						std::stringstream errmsg;
 #warning TODO: Find a better way to notify the user that we are unable to login into their mail account
 						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, please reset your authentication information.";
-						std::vector<std::string> myDevTokens = m.devTokens();
+/*						std::vector<std::string> myDevTokens = m.devTokens();
 						for (size_t i = 0; myDevTokens.size(); i++) {
 							NotificationPayload np(myDevTokens[i], errmsg.str());
 							if (m.devel) {
 								develNotificationQueue->add(np);
 							}
 							else notificationQueue->add(np);
-						}
+						}*/
 					}
 
 #warning Add method for relinquishing email account monitoring
