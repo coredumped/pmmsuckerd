@@ -36,6 +36,10 @@ namespace pmm {
 					break;
 				default:
 					//Consider an encoding conversion here!!!!
+					if(data->dt_encoded){
+						//Need do decode message here!!!
+						pmm::Log << "You need to decode a message which is \"" << data->dt_encoding << "\" encoded." << pmm::NL;
+					}
 					outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
 					break;
 			}
