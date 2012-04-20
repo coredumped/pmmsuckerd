@@ -34,6 +34,17 @@ namespace pmm {
 					}
 				}
 					break;
+				case MAILMIME_MECHANISM_QUOTED_PRINTABLE:
+				{
+					char *decodedMsg;
+					size_t indx = 0, decodedSize = 0;
+					int r = mailmime_quoted_printable_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize, 0);
+					if (r == MAILIMF_NO_ERROR) {
+						outputStream.write(decodedMsg, decodedSize);
+						mailmime_decoded_part_free(decodedMsg);
+					}
+				}
+					break;
 				default:
 					//Consider an encoding conversion here!!!!
 					if(data->dt_encoded){
