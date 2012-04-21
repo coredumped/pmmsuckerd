@@ -400,8 +400,11 @@ namespace pmm {
 						sleep(2);
 						APNSLog << "WARNING: Sent to another thread...";
 						notificationQueue->add(payload);
+						disconnectFromAPNS();
 						sleep(2);
 						APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
+						lastDevToken = "";
+						connect2APNS();
 						continue;
 					}
 					notifyTo(payload.deviceToken(), payload);

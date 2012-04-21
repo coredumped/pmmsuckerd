@@ -34,7 +34,7 @@ namespace pmm {
 					}
 				}
 					break;
-				case MAILMIME_MECHANISM_QUOTED_PRINTABLE:
+				/*case MAILMIME_MECHANISM_QUOTED_PRINTABLE:
 				{
 					char *decodedMsg;
 					size_t indx = 0, decodedSize = 0;
@@ -44,7 +44,7 @@ namespace pmm {
 						mailmime_decoded_part_free(decodedMsg);
 					}
 				}
-					break;
+					break;*/
 				default:
 					//Consider an encoding conversion here!!!!
 					if(data->dt_encoded){
