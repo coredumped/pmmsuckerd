@@ -47,7 +47,8 @@ namespace pmm {
 			if(!sslCTX){
 				//Fatal error, stop daemon, notify pmm service inmediately so it can release all e-mail
 				//accounts from this pmm sucker inmediatelly
-				std::cerr << "Unable to create SSL context" << std::endl;
+				std::cerr << "Unable to create SSL context: ";
+				ERR_print_errors_fp(stderr);
 				fdbckLog << "Can't create SSL context, aborting application!!!" << pmm::NL;
 				abort();
 			}
