@@ -174,29 +174,6 @@ namespace pmm {
 					m.subject = field->fld_data.fld_subject->sbj_value;
 					size_t s1pos; 
 					if ((s1pos = m.subject.find("=?")) != m.subject.npos) {
-						//Encoded with RFC 2047, let's decode this damn thing!!!
-						/*
-						size_t indx2 = 0;
-						char *newSubject = 0;
-						//Find source encoding
-						size_t s2pos;
-						if ((s2pos = m.subject.find_first_of("?", s1pos + 2)) != m.subject.npos) {
-							std::string sourceEncoding = m.subject.substr(s1pos + 2, s2pos - s1pos - 2);
-							if(sourceEncoding.size() == 0){
-								pmm::Log << "Unable to compute source encoding from " << m.subject << pmm::NL;
-							}
-							else {
-								mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
-								if(newSubject != 0){
-									m.subject = newSubject;
-									free(newSubject);
-								}
-								else {
-									pmm::Log << "Unable to decode subject from subject field: " << m.subject << pmm::NL;
-								}
-							}
-						}
-						 */
 						size_t indx2 = 0;
 						char *newSubject = 0;
 						mailmime_encoded_phrase_parse("UTF-8", m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
