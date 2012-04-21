@@ -274,7 +274,8 @@ namespace pmm {
 					if(etpanOperationFailed(result)){
 #warning TODO: Remember to report the user whenever we have too many login attempts
 #ifdef DEBUG
-						pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
+						if(imap->imap_response == 0) pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << result << pmm::NL;
+						else pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
 #endif				
 						imapFetch.madeAttempts++;
 						imapFetch.nextAttempt = rightNow + fetchRetryInterval;
