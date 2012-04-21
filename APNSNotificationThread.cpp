@@ -371,7 +371,7 @@ namespace pmm {
 				if(stopExecution == true){
 					APNSLog << "Explicit thread termination asked :-(" << pmm::NL;
 					notificationQueue->add(payload);
-					sleep(120);
+					sleep(1);
 				}
 #ifdef DEBUG
 				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
@@ -396,7 +396,13 @@ namespace pmm {
 					if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
 					else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
 					if (lastDevToken.compare(payload.deviceToken()) == 0) {
+						APNSLog << "WARNING: Got another notification for the same device in the same thread, lets try to have another thread notify it..." << pmm::NL;
 						sleep(2);
+						APNSLog << "WARNING: Sent to another thread...";
+						notificationQueue->add(payload);
+						sleep(2);
+						APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
+						continue;
 					}
 					notifyTo(payload.deviceToken(), payload);
 					lastDevToken = payload.deviceToken();
