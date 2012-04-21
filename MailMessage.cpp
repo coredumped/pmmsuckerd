@@ -218,7 +218,7 @@ namespace pmm {
 					break;
 			}
 		}
-		if (m.subject.size() <= 128) {
+		if (m.subject.size() <= 5) {
 /*#ifdef DEBUG
 			pmm::Log << "DEBUG: Computing subject from: " << pmm::NL;
 			pmm::Log << rawMessage << pmm::NL;
