@@ -340,6 +340,7 @@ namespace pmm {
 		connect2APNS();
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		time_t start = time(NULL);
+		std::string lastDevToken;
 		while (true) {
 			if(_useSandbox){
 				time_t currTime = time(NULL);
@@ -360,7 +361,6 @@ namespace pmm {
 			//Verify if there are any ending notifications in the notification queue
 			NotificationPayload payload;
 			int notifyCount = 0;
-			std::string lastDevToken;
 			if (shouldReconnect()) {
 				disconnectFromAPNS();
 				_socket = -1;
