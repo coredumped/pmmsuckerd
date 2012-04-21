@@ -11,7 +11,7 @@
 #include "ThreadDispatcher.h"
 
 #ifndef DEFAULT_CERTIFICATE_PATH
-#define DEFAULT_CERTIFICATE_PATH "/Users/coredumped/Dropbox/MacOSXProjects/pmm_production.pem"
+#define DEFAULT_CERTIFICATE_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
 #endif
 
 #ifndef DEFAULT_CERTIFICATE_KEY
