@@ -8,6 +8,7 @@
 
 #ifndef PMM_Sucker_PendingNotificationStore_h
 #define PMM_Sucker_PendingNotificationStore_h
+#include <inttypes.h>
 #include "SharedQueue.h"
 #include "NotificationPayload.h"
 
