@@ -114,7 +114,7 @@ namespace pmm {
 		return retval;
 	}
 
-	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength, bool useSandbox)
+	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength, bool useSandbox, const std::string &devTokenS)
 	{
 		bool rtn = true;
 		if (sslPtr && deviceTokenBinary && payloadBuff && payloadLength)
@@ -164,29 +164,7 @@ namespace pmm {
 			if (sslRetCode == 0) {
 				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification, can't write to socket for some reason!!!");
 			}
-			PendingNotificationStore::saveSentPayload(deviceTokenBinary, payloadBuff, whicheverOrderIWantToGetBackInAErrorResponse_ID);
-			/*
-				char apnsRetCode[6] = {0, 0, 0, 0, 0, 0};
-				do{
-					APNSLog << "There is additional data to read!!!" << pmm::NL;
-					sslRetCode = SSL_read(sslPtr, (void *)apnsRetCode, 6);
-				}while (sslRetCode == SSL_ERROR_WANT_READ);
-				if (sslRetCode > 0) {
-#ifdef DEBUG
-					APNSLog << "DEBUG: APNS Response: " << (int)apnsRetCode[0] << " " << (int)apnsRetCode[1] << " " << (int)apnsRetCode[2] << " " << (int)apnsRetCode[3] << " " << (int)apnsRetCode[4] << " " << (int)apnsRetCode[5] << pmm::NL; 
-#endif
-					if (apnsRetCode[1] != 0) {
-						std::stringstream errmsg;
-						errmsg << "Unable to post notification, error code=" << (int)apnsRetCode[1];
-						APNSLog << errmsg.str() << pmm::NL;
-						//throw GenericException(errmsg.str());
-					}
-
-				}
-			 */
-#ifdef DEBUG
-			APNSLog << "DEBUG: payload sent!!!" << pmm::NL;
-#endif
+			PendingNotificationStore::saveSentPayload(devTokenS, payloadBuff, whicheverOrderIWantToGetBackInAErrorResponse_ID);
 		}
 		return rtn;
 	}
@@ -418,7 +396,7 @@ namespace pmm {
 					start = time(NULL);
 				}
 			}
-#ifdef DEBUG
+#ifdef DEBUG_THREADS
 			if(++i % 2400 == 0){
 				APNSLog << "DEBUG: keepalive still tickling!!!" << pmm::NL;
 			}
@@ -528,7 +506,7 @@ namespace pmm {
 			devToken2Binary(devToken, binaryDevToken);
 			devTokenCache[devToken] = binaryDevToken;
 		}
-		sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size(), _useSandbox);
+		sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size(), _useSandbox, devToken);
 	}
 	
 	SSLException::SSLException(){ 
