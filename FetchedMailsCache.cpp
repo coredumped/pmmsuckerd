@@ -29,9 +29,9 @@ namespace pmm {
 		if (sqlite3_threadsafe() && dbConn != 0) {
 			return dbConn;
 		}
-#ifdef DEBUG
+/*#ifdef DEBUG
 		CacheLog << "DEBUG: Opening database" << pmm::NL;
-#endif
+#endif*/
 		int errCode = sqlite3_open(datafile.c_str(), &dbConn);
 		if (errCode != SQLITE_OK) {
 			throw GenericException(sqlite3_errmsg(dbConn));

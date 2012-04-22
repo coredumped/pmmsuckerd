@@ -19,6 +19,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #ifndef DEVICE_BINARY_SIZE
 #define DEVICE_BINARY_SIZE 32
 #endif
@@ -37,10 +38,13 @@
 #ifndef APNS_ITEM_BYTE_SIZE
 #define APNS_ITEM_BYTE_SIZE 38
 #endif
+#ifndef DEFAULT_FEEDBACK_CHECK_INTERVAL
+#define DEFAULT_FEEDBACK_CHECK_INTERVAL 3600
+#endif
 
 namespace pmm {
 	MTLogger fdbckLog;
-		
+	
 	void APNSFeedbackThread::initSSL(){
 		if(!sslInitComplete){
 			sslCTX = SSL_CTX_new(SSLv3_method());
@@ -136,6 +140,8 @@ namespace pmm {
 			throw SSLException(apnsConnection, err, "APNS SSL Connection");
 		}
 		fdbckLog << "DEBUG: Successfully connected to APNS service" << pmm::NL;
+		int flags = fcntl(_socket, F_GETFL);
+		fcntl(_socket, F_SETFL, flags | O_NONBLOCK);
 	}
 	
 	void APNSFeedbackThread::ifNotConnectedToAPNSThenConnect(){
@@ -170,6 +176,7 @@ namespace pmm {
 #else
 		_useSandbox = false;
 #endif
+		checkInterval = DEFAULT_FEEDBACK_CHECK_INTERVAL;
 	}
 	
 	APNSFeedbackThread::~APNSFeedbackThread(){
@@ -212,45 +219,49 @@ namespace pmm {
 			__invalidTokens.clear();
 			itM.unlock();
 			//Read remote data here
-			int bytes2read = 0;
 			fdbckLog << "Trying to read data from feedback service..." << pmm::NL;
-			while ((bytes2read = SSL_pending(apnsConnection)) > 0) {
-				if (bytes2read >= APNS_ITEM_BYTE_SIZE) {
-					while (true) {
-						char binaryTuple[APNS_ITEM_BYTE_SIZE];
-						int rRet = SSL_read(apnsConnection, binaryTuple, APNS_ITEM_BYTE_SIZE);
-						if(rRet > 0){
-							//Here we parse;
-							uint32_t timeno;
-							uint16_t tleno;
-							uint32_t tokno;
-							char *binaryPtr = binaryTuple;
-							memcpy(&timeno, binaryPtr, sizeof(uint32_t));
-							binaryPtr += sizeof(uint32_t);
-							memcpy(&tleno, binaryPtr, sizeof(uint16_t));
-							binaryPtr += sizeof(uint16_t);
-							memcpy(&tokno, binaryPtr, sizeof(uint32_t));
-							//time_t timestamp = ntohl(timeno);
-							//uint16_t tlen = ntohs(tleno);
-							
-							//Take tokenN and parse it back to a string
-							std::string sToken;
-							binary2DevToken(sToken, tokno);
-							fdbckLog << "  * Device " << sToken << " no longer has the app installed." << pmm::NL;
-							break;
+			int secsElapsed = 1;
+			while (true) {
+				char binaryTuple[APNS_ITEM_BYTE_SIZE];
+				int rRet = SSL_read(apnsConnection, binaryTuple, APNS_ITEM_BYTE_SIZE);
+				if(rRet > 0){
+					//Here we parse;
+					uint32_t timeno;
+					uint16_t tleno;
+					uint32_t tokno;
+					char *binaryPtr = binaryTuple;
+					memcpy(&timeno, binaryPtr, sizeof(uint32_t));
+					binaryPtr += sizeof(uint32_t);
+					memcpy(&tleno, binaryPtr, sizeof(uint16_t));
+					binaryPtr += sizeof(uint16_t);
+					memcpy(&tokno, binaryPtr, sizeof(uint32_t));
+					//time_t timestamp = ntohl(timeno);
+					//uint16_t tlen = ntohs(tleno);
+					
+					//Take tokenN and parse it back to a string
+					std::string sToken;
+					binary2DevToken(sToken, tokno);
+					fdbckLog << "  * Device " << sToken << " no longer has the app installed." << pmm::NL;
+				}
+				else {
+					int ssl_error_code = SSL_get_error(apnsConnection, rRet);
+					if(ssl_error_code != SSL_ERROR_WANT_READ){
+						if(ssl_error_code == SSL_ERROR_ZERO_RETURN){
+							fdbckLog << "No more data to read, the server just closed our connection." << pmm::NL;
 						}
 						else {
-							int ssl_error_code = SSL_get_error(apnsConnection, rRet);
-							if(ssl_error_code != SSL_ERROR_WANT_READ){
-								fdbckLog << "Unable to read data from feedback service: ssl_code=" << ssl_error_code << pmm::NL;
-								break;
-							}
+							fdbckLog << "Unable to read data from feedback service: ssl_code=" << ssl_error_code << pmm::NL;
+							ERR_print_errors_fp(stderr);
 						}
+						break;
 					}
 				}
+				sleep(1);
+				secsElapsed += 1;
+				if(secsElapsed > 120) break;
 			}
 			disconnectFromAPNS();
-			sleep(600);
+			sleep(60);
 		}
 	}
 	
@@ -269,5 +280,5 @@ namespace pmm {
 		itM.unlock();
 		return isValid;
 	}
-
+	
 }

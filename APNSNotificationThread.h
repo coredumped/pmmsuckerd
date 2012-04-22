@@ -95,6 +95,7 @@ namespace pmm {
 		bool sslInitComplete;
 		void initSSL();
 		void notifyTo(const std::string &devToken, NotificationPayload &msg);
+		bool gotErrorFromApple();
 	public:
 		AtomicFlag warmingUP;
 		SharedQueue<NotificationPayload> *notificationQueue;
@@ -111,5 +112,17 @@ namespace pmm {
 		AtomicFlag stopExecution;
 	};
 	
+	namespace PushErrorCodes {
+		extern uint32_t NoErrorsEncountered;
+		extern uint32_t ProcessingError;
+		extern uint32_t MissingDeviceToken;
+		extern uint32_t MissingTopic;
+		extern uint32_t MissingPayload;
+		extern uint32_t InvalidTokenSize;
+		extern uint32_t InvalidTopicSize;
+		extern uint32_t InvalidPayloadSize;
+		extern uint32_t InvalidToken;
+		extern uint32_t NoneUnknown;
+	}
 }
 #endif

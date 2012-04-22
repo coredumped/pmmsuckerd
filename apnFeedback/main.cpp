@@ -11,7 +11,7 @@
 #include "ThreadDispatcher.h"
 
 #ifndef DEFAULT_CERTIFICATE_PATH
-#define DEFAULT_CERTIFICATE_PATH "/Users/coredumped/Dropbox/iPhone and iPad Development Projects Documentation/PushMeMail/Push Me Mail Certs/development/pmm_devel.pem"
+#define DEFAULT_CERTIFICATE_PATH "/Users/coredumped/Dropbox/MacOSXProjects/pmm_production.pem"
 #endif
 
 #ifndef DEFAULT_CERTIFICATE_KEY
@@ -22,6 +22,14 @@ int main(int argc, const char * argv[])
 {
 	std::string certificate = DEFAULT_CERTIFICATE_PATH;
 	std::string privateKey = DEFAULT_CERTIFICATE_KEY;
+	for (int i = 1; i < argc; i++) {
+		certificate = argv[i];
+		privateKey = argv[i];
+	}
+	pmm::fdbckLog.open("/tmp/apn-feedback.log");
+	pmm::fdbckLog.setTag("APN Feedback");
+	SSL_library_init();
+	SSL_load_error_strings();
 	struct stat st;
 	if (stat(certificate.c_str(), &st) != 0) {
 		std::cout << "Unable to find SSL certificate." << std::endl;
@@ -31,6 +39,8 @@ int main(int argc, const char * argv[])
 	apnFeedback.useForProduction();
 	apnFeedback.setCertPath(certificate);
 	apnFeedback.setKeyPath(certificate);
+	apnFeedback.checkInterval = 60;
+	pmm::fdbckLog << "Starting thread..." << pmm::NL;
 	
 	pmm::ThreadDispatcher::start(apnFeedback);
 	while (true) {

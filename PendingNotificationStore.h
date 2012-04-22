@@ -16,6 +16,10 @@ namespace pmm {
 	public:
 		static void savePayloads(SharedQueue<NotificationPayload> *nQueue);
 		static void loadPayloads(SharedQueue<NotificationPayload> *nQueue);
+		
+		static void saveSentPayload(const std::string &devToken, const std::string &payload, uint32_t _id);
+		static void setSentPayloadErrorCode(uint32_t _id, int errorCode);
+		static void eraseOldPayloads();
 	};
 }
 

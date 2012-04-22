@@ -344,12 +344,16 @@ int main (int argc, const char * argv[])
 			pmm::Log << "CRITICAL: Unable to re-register, something's wrong with app engine: " << httex.errorMessage() << pmm::NL;
 			sleep(1);
 			continue;
+		} 
+		if (tic % 43200 == 0){
+			pmm::PendingNotificationStore::eraseOldPayloads();
 		}
 		if (tic % 30 == 0) {
 			//Process quota updates if any
 			std::vector<std::string> quotaVec;
 			quotaUpdateVector.copyTo(quotaVec);
 			if (quotaVec.size() > 0) {
+				pmm::Log << "Sending quota updates to app engine..." << pmm::NL;
 				quotaUpdateVector.beginCriticalSection();
 				quotaUpdateVector.unlockedCopyTo(quotaVec);
 				for (size_t i = 0; i < quotaVec.size(); i++) {
@@ -815,7 +819,7 @@ void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::Shar
 		pmm::Log << " * Sending via broadcast (" << token << "): " << params["message"] << pmm::NL;
 		pmm::NotificationPayload np(token, params["message"], 911);
 		notificationQueue.add(np);
-		pmmStorageQueue.add(np);
+		//pmmStorageQueue.add(np);
 	}
 }
 

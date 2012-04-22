@@ -16,6 +16,7 @@
 #include "Mutex.h"
 #include "UtilityFunctions.h"
 #include "SilentMode.h"
+#include "PendingNotificationStore.h"
 #ifndef DEVICE_BINARY_SIZE
 #define DEVICE_BINARY_SIZE 32
 #endif
@@ -40,19 +41,77 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <poll.h>
+#include <fcntl.h>
 
 namespace pmm {
 	MTLogger APNSLog;
 	Mutex uuidGenM;
 	
+	namespace PushErrorCodes {
+		uint32_t NoErrorsEncountered    = 0;
+		uint32_t ProcessingError        = 1;    
+		uint32_t MissingDeviceToken     = 2;
+		uint32_t MissingTopic           = 3;
+		uint32_t MissingPayload         = 4;
+		uint32_t InvalidTokenSize       = 5;
+		uint32_t InvalidTopicSize       = 6;
+		uint32_t InvalidPayloadSize     = 7;
+		uint32_t InvalidToken           = 8;
+		uint32_t NoneUnknown            = 255;
+		
+		static const char *errorString[] = {
+			"No errors encountered",
+			"Processing error",
+			"Missing device token",
+			"Missing topic",
+			"Missing payload",
+			"Invalid token size",
+			"Invalid topic size",
+			"Invalid payload size",
+			"Invalid token"	
+		};
+	}
+	
 	static uint32_t _uuidCnt = 0;
 	static uint32_t msgUUIDGenerate(){
 		uint32_t newUUID = 0;
 		uuidGenM.lock();
+		if(_uuidCnt == 0) _uuidCnt = time(0);
 		_uuidCnt++;
 		newUUID = _uuidCnt;
 		uuidGenM.unlock();
 		return newUUID;
+	}
+	
+	bool APNSNotificationThread::gotErrorFromApple(){
+		bool retval = false;
+		if (_socket != -1) {
+			int sslRetCode;
+			char apnsRetCode[6] = {0, 0, 0, 0, 0, 0};
+			do{
+				sslRetCode = SSL_read(apnsConnection, (void *)apnsRetCode, 6);
+			}while (sslRetCode == SSL_ERROR_WANT_READ);
+			if (sslRetCode > 0) {
+#ifdef APNS_DEBUG
+				APNSLog << "DEBUG: APNS Response: " << (int)apnsRetCode[0] << " " << (int)apnsRetCode[1] << " " << (int)apnsRetCode[2] << " " << (int)apnsRetCode[3] << " " << (int)apnsRetCode[4] << " " << (int)apnsRetCode[5] << pmm::NL; 
+#endif
+				if (apnsRetCode[1] != 0) {
+					uint32_t notifID;
+					memcpy(&notifID, apnsRetCode + 2, 4);
+					std::stringstream errmsg;
+					if(apnsRetCode[1] == 255) APNSLog << "PANIC: Unable to post notification (id=" << (int)notifID << "), error code=" << (int)apnsRetCode[1] << pmm::NL;
+					else APNSLog << "CRITICAL: Unable to post notification (id=" << (int)notifID << "), error code=" << (int)apnsRetCode[1] << ": " << PushErrorCodes::errorString[apnsRetCode[1]] << pmm::NL;
+					PendingNotificationStore::setSentPayloadErrorCode(notifID, apnsRetCode[1]);
+					retval = true;
+					//At this point we should disconnect!!!
+					disconnectFromAPNS();
+					_socket = -1;
+					connect2APNS();
+				}
+			}
+		}
+		return retval;
 	}
 
 	static bool sendPayload(SSL *sslPtr, const char *deviceTokenBinary, const char *payloadBuff, size_t payloadLength, bool useSandbox)
@@ -66,6 +125,7 @@ namespace pmm {
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
 			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = msgUUIDGenerate();
+			APNSLog << "Just created a paylod with ID=" << (int)whicheverOrderIWantToGetBackInAErrorResponse_ID << pmm::NL;
 			uint32_t networkOrderExpiryEpochUTC = htonl(time(NULL)+86400); // expire message if not delivered in 1 day
 			uint16_t networkOrderTokenLength = htons(DEVICE_BINARY_SIZE);
 			uint16_t networkOrderPayloadLength = htons(payloadLength);
@@ -100,29 +160,30 @@ namespace pmm {
 #ifdef DEBUG
 			APNSLog << "DEBUG: Sending " << (int)(binaryMessagePt - binaryMessageBuff) << " bytes payload..." << pmm::NL;
 #endif
-			if ((sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff))) <= 0){
-				//delete binaryMessageBuff;
-				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification :-(");
+			sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff));
+			if (sslRetCode == 0) {
+				throw SSLException(sslPtr, sslRetCode, "Unable to send push notification, can't write to socket for some reason!!!");
 			}
-			//delete binaryMessageBuff;
-			if (SSL_pending(sslPtr) > 0) {
+			PendingNotificationStore::saveSentPayload(deviceTokenBinary, payloadBuff, whicheverOrderIWantToGetBackInAErrorResponse_ID);
+			/*
 				char apnsRetCode[6] = {0, 0, 0, 0, 0, 0};
 				do{
 					APNSLog << "There is additional data to read!!!" << pmm::NL;
 					sslRetCode = SSL_read(sslPtr, (void *)apnsRetCode, 6);
-				}while (sslRetCode == SSL_ERROR_WANT_READ || sslRetCode == SSL_ERROR_WANT_WRITE);
-				if (sslRetCode <= 0) {
-					throw SSLException(sslPtr, sslRetCode, "Unable to read response code");
-				}
+				}while (sslRetCode == SSL_ERROR_WANT_READ);
+				if (sslRetCode > 0) {
 #ifdef DEBUG
-				APNSLog << "DEBUG: APNS Response: " << (int)apnsRetCode[0] << " " << (int)apnsRetCode[1] << " " << (int)apnsRetCode[2] << " " << (int)apnsRetCode[3] << " " << (int)apnsRetCode[4] << " " << (int)apnsRetCode[5] << pmm::NL; 
+					APNSLog << "DEBUG: APNS Response: " << (int)apnsRetCode[0] << " " << (int)apnsRetCode[1] << " " << (int)apnsRetCode[2] << " " << (int)apnsRetCode[3] << " " << (int)apnsRetCode[4] << " " << (int)apnsRetCode[5] << pmm::NL; 
 #endif
-				if (apnsRetCode[1] != 0) {
-					std::stringstream errmsg;
-					errmsg << "Unable to post notification, error code=" << (int)apnsRetCode[1];
-					throw GenericException(errmsg.str());
+					if (apnsRetCode[1] != 0) {
+						std::stringstream errmsg;
+						errmsg << "Unable to post notification, error code=" << (int)apnsRetCode[1];
+						APNSLog << errmsg.str() << pmm::NL;
+						//throw GenericException(errmsg.str());
+					}
+
 				}
-			}
+			 */
 #ifdef DEBUG
 			APNSLog << "DEBUG: payload sent!!!" << pmm::NL;
 #endif
@@ -167,6 +228,7 @@ namespace pmm {
 			if(!SSL_CTX_check_private_key(sslCTX)){
 				throw SSLException(NULL, 0, "Given private key is not valid, it does not match");
 			}
+			SSL_CTX_set_mode(sslCTX, SSL_MODE_AUTO_RETRY);
 		}
 	}
 	
@@ -209,7 +271,6 @@ namespace pmm {
 		{
 			throw GenericException("Can't connect to remote APNS server: client connection failed.");
 		}    
-		
 		apnsConnection = SSL_new(sslCTX);
 		if(!apnsConnection)
 		{
@@ -224,6 +285,10 @@ namespace pmm {
 			throw SSLException(apnsConnection, err, "APNS SSL Connection");
 		}
 		APNSLog << "DEBUG: Successfully connected to APNS service" << pmm::NL;
+
+		//Migrate the socket to blocking mode, magic is here!!!
+		int flags = fcntl(_socket, F_GETFL);
+		fcntl(_socket, F_SETFL, flags | O_NONBLOCK);
 	}
 	
 	void APNSNotificationThread::ifNotConnectedToAPNSThenConnect(){
@@ -301,7 +366,7 @@ namespace pmm {
 		reconnectTime = time(0);
 		reconnectMutex.unlock();
 	}
-	
+		
 	void APNSNotificationThread::operator()(){
 		stopExecution = false;
 #ifdef DEBUG
@@ -361,6 +426,7 @@ namespace pmm {
 			//Verify if there are any ending notifications in the notification queue
 			NotificationPayload payload;
 			int notifyCount = 0;
+			APNSNotificationThread::gotErrorFromApple();
 			if (shouldReconnect()) {
 				disconnectFromAPNS();
 				_socket = -1;
@@ -378,6 +444,7 @@ namespace pmm {
 #endif
 				//Verify here if we should notify the event or not
 				try {
+					APNSNotificationThread::gotErrorFromApple();
 					if (shouldReconnect()) {
 						disconnectFromAPNS();
 						_socket = -1;
@@ -414,8 +481,8 @@ namespace pmm {
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {
 						APNSLog << "CRITICAL: SSLException caught!!! errorCode=" << sse1.errorCode() << " msg=" << sse1.message() << pmm::NL;
 						//Connection close, force reconnect
-						_socket = -1;
 						disconnectFromAPNS();
+						_socket = -1;
 						sleep(waitTimeBeforeReconnectToAPNS);
 						connect2APNS();
 						notificationQueue->add(payload);
