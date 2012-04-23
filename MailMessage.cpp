@@ -17,8 +17,17 @@
 #include "UtilityFunctions.h"
 
 namespace pmm {
+	namespace MIMEParameter {
+		static const char *charset = "charset";
+	}
+	namespace MIMEContentSubtype {
+		static const char *plain = "plain";
+	}
+	namespace TextEncoding {
+		static const char *utf8 = "UTF-8";
+	}
 	
-	static void getMIMEData(struct mailmime_data * data, std::stringstream &outputStream)
+	static void getMIMEData(struct mailmime_data * data, std::stringstream &outputStream, const std::string &charset)
 	{
 		if (data->dt_type == MAILMIME_DATA_TEXT) {
 			switch (data->dt_encoding) {
@@ -34,17 +43,24 @@ namespace pmm {
 					}
 				}
 					break;
-				/*case MAILMIME_MECHANISM_QUOTED_PRINTABLE:
+				case MAILMIME_MECHANISM_QUOTED_PRINTABLE:
 				{
 					char *decodedMsg;
 					size_t indx = 0, decodedSize = 0;
 					int r = mailmime_quoted_printable_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize, 0);
 					if (r == MAILIMF_NO_ERROR) {
-						outputStream.write(decodedMsg, decodedSize);
+						size_t indx2 = 0;
+						char *newText = 0;
+						mailmime_encoded_phrase_parse(charset.c_str(), decodedMsg, decodedSize, &indx2, TextEncoding::utf8, &newText);
+						if(newText != 0){
+							outputStream << newText;
+							free(newText);
+						}
+						else outputStream.write(decodedMsg, decodedSize);
 						mailmime_decoded_part_free(decodedMsg);
 					}
 				}
-					break;*/
+					break;
 				default:
 					//Consider an encoding conversion here!!!!
 					if(data->dt_encoded){
@@ -62,7 +78,21 @@ namespace pmm {
 		clistiter * cur;		
 		switch (mime->mm_type) {
 			case MAILMIME_SINGLE:
-				getMIMEData(mime->mm_data.mm_single, outputStream);
+			{
+				if (strcasecmp(mime->mm_content_type->ct_subtype, MIMEContentSubtype::plain) == 0) {
+					//Now we guess the charset
+					clist *params = mime->mm_content_type->ct_parameters;
+					std::string charset = TextEncoding::utf8;
+					for (clistiter *param = clist_begin(params); param != NULL; param = clist_next(param)) {
+						struct mailmime_parameter *theParam = (struct mailmime_parameter *)clist_content(param);
+						//std::cout << theParam->pa_name << "=" << theParam->pa_value << std::endl;
+						if (strcasecmp(theParam->pa_name, MIMEParameter::charset) == 0) {
+							charset = theParam->pa_value;
+						}
+					}
+					getMIMEData(mime->mm_data.mm_single, outputStream, charset);
+				}
+			}
 				break;
 			case MAILMIME_MULTIPLE:
 				for(cur = clist_begin(mime->mm_data.mm_multipart.mm_mp_list) ; cur != NULL ; cur = clist_next(cur)) {
@@ -110,11 +140,6 @@ namespace pmm {
 	bool MailMessage::parse(MailMessage &m, const char *msgBuffer, size_t msgSize){
 		size_t indx = 0;
 		struct mailimf_fields *fields;
-#ifdef USE_IMF
-		struct mailimf_message *result;
-		mailimf_message_parse(rawMessage.c_str(), rawMessage.size(), &indx, &result);
-		fields = result->msg_fields->fld_list;
-#else
 		struct mailmime *result;
 		int retCode = mailmime_parse(msgBuffer, msgSize, &indx, &result);
 		if(retCode != MAILIMF_NO_ERROR){
@@ -129,7 +154,6 @@ namespace pmm {
 			return false;
 		}
 		fields = result->mm_data.mm_message.mm_fields;
-#endif
 		time_t now = time(0);
 		m.from = "";
 		m.subject = "";
@@ -157,13 +181,12 @@ namespace pmm {
 						size_t s2pos;
 						if ((s2pos = m.from.find_first_of("?", s1pos + 2)) != m.from.npos) {
 							std::string sourceEncoding = m.from.substr(s1pos + 2, s2pos - s1pos - 2);
-							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, "UTF-8", &newFrom);
+							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, TextEncoding::utf8, &newFrom);
 							m.from = newFrom;
 							free(newFrom);
 						}
 					}
-
-#ifdef DEBUG
+#ifdef DEBUG_FROM_FIELD
 					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
 #endif
 					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
@@ -176,7 +199,7 @@ namespace pmm {
 					if ((s1pos = m.subject.find("=?")) != m.subject.npos) {
 						size_t indx2 = 0;
 						char *newSubject = 0;
-						mailmime_encoded_phrase_parse("UTF-8", m.subject.c_str(), m.subject.size(), &indx2, "UTF-8", &newSubject);
+						mailmime_encoded_phrase_parse(TextEncoding::utf8, m.subject.c_str(), m.subject.size(), &indx2, TextEncoding::utf8, &newSubject);
 						if(newSubject != 0){
 							m.subject = newSubject;
 							free(newSubject);
@@ -218,11 +241,10 @@ namespace pmm {
 					break;
 			}
 		}
-		if (m.subject.size() <= 5) {
-/*#ifdef DEBUG
-			pmm::Log << "DEBUG: Computing subject from: " << pmm::NL;
-			pmm::Log << rawMessage << pmm::NL;
-#endif*/
+		if (m.subject.size() <= 128) {
+			//Try to retrieve the message encoding first...
+			
+			
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
 			std::string theBody = msgBody.str();

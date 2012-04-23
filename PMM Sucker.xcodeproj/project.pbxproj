@@ -9,6 +9,54 @@
 /* Begin PBXBuildFile section */
 		820BBDF9153E7187005A1C5A /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
 		820BBDFA153E7242005A1C5A /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
+		820BBE1315423FAB005A1C5A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBE1215423FAB005A1C5A /* main.cpp */; };
+		820BBE1515423FAB005A1C5A /* apnFeedback.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 820BBE1415423FAB005A1C5A /* apnFeedback.1 */; };
+		820BBE1915424022005A1C5A /* APNSNotificationThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B111431882700444844 /* APNSNotificationThread.cpp */; };
+		820BBE1A15424022005A1C5A /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
+		820BBE1B15424022005A1C5A /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
+		820BBE1C15424022005A1C5A /* SharedQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B171435123100444844 /* SharedQueue.cpp */; };
+		820BBE1D15424022005A1C5A /* NotificationPayload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1B1435380A00444844 /* NotificationPayload.cpp */; };
+		820BBE1E15424022005A1C5A /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		820BBE1F15424022005A1C5A /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		820BBE2015424022005A1C5A /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		820BBE2115424022005A1C5A /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
+		820BBE2215424022005A1C5A /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
+		820BBE2315424022005A1C5A /* APNSFeedbackThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */; };
+		820BBE26154240B2005A1C5A /* libetpan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 820BBE25154240B1005A1C5A /* libetpan.a */; };
+		820BBE2715424116005A1C5A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
+		820BBE291542413E005A1C5A /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		820BBE2A15424152005A1C5A /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
+		820BBE2B15424166005A1C5A /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
+		820BBE2C15424172005A1C5A /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		820BBE2D1542418D005A1C5A /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		820BBE2F1542451D005A1C5A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0471444AECD001ED14E /* libssl.a */; };
+		820BBE3015424531005A1C5A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		820BBE31154246EB005A1C5A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
+		820BBE3B1542F466005A1C5A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBE3A1542F466005A1C5A /* main.cpp */; };
+		820BBE3D1542F466005A1C5A /* apnNotificator.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 820BBE3C1542F466005A1C5A /* apnNotificator.1 */; };
+		820BBE411542F575005A1C5A /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
+		820BBE421542F5A4005A1C5A /* APNSNotificationThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B111431882700444844 /* APNSNotificationThread.cpp */; };
+		820BBE431542F5A4005A1C5A /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		820BBE441542F5A4005A1C5A /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		820BBE451542F5A4005A1C5A /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
+		820BBE461542F5A4005A1C5A /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
+		820BBE471542F5A4005A1C5A /* SharedQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B171435123100444844 /* SharedQueue.cpp */; };
+		820BBE481542F5A4005A1C5A /* NotificationPayload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1B1435380A00444844 /* NotificationPayload.cpp */; };
+		820BBE491542F5A4005A1C5A /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		820BBE4A1542F5A4005A1C5A /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		820BBE4B1542F5A4005A1C5A /* MailSuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2B1437ECDA00444844 /* MailSuckerThread.cpp */; };
+		820BBE4C1542F5A4005A1C5A /* IMAPSuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2F1437F01A00444844 /* IMAPSuckerThread.cpp */; };
+		820BBE4D1542F5A4005A1C5A /* POP3SuckerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82FA4DB11469C7B300A21B11 /* POP3SuckerThread.cpp */; };
+		820BBE4E1542F5A4005A1C5A /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
+		820BBE4F15433565005A1C5A /* libetpan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 820BBE25154240B1005A1C5A /* libetpan.a */; };
+		820BBE501543357D005A1C5A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
+		820BBE511543357D005A1C5A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0471444AECD001ED14E /* libssl.a */; };
+		820BBE5215433593005A1C5A /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		820BBE53154335A5005A1C5A /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		820BBE54154335B5005A1C5A /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
+		820BBE55154335BF005A1C5A /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
+		820BBE56154335D0005A1C5A /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
+		820BBE5715433DED005A1C5A /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
 		821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
@@ -28,6 +76,27 @@
 		82805982145FB18200E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
 		82805983145FB1B400E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
 		828697CC150FF37D003E7675 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
+		828879A51543837F00DEF837 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
+		828879A71543839E00DEF837 /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
+		828879A8154383A500DEF837 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
+		828879A9154383DA00DEF837 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		828879AA154383E400DEF837 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
+		828879AB154383FA00DEF837 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
+		828879AC1543845F00DEF837 /* MessageUploaderThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857C1144D4DA5000B43B8 /* MessageUploaderThread.cpp */; };
+		828879AD1543845F00DEF837 /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
+		828879AE154384E800DEF837 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
+		828879AF15438EEB00DEF837 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		828879B215438F8200DEF837 /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
+		828879BB1544607300DEF837 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828879BA1544607300DEF837 /* main.cpp */; };
+		828879BD1544607300DEF837 /* msgParser.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 828879BC1544607300DEF837 /* msgParser.1 */; };
+		828879C11544637B00DEF837 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		828879C21544637B00DEF837 /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
+		828879C3154463B000DEF837 /* libetpan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 820BBE25154240B1005A1C5A /* libetpan.a */; };
+		828879C4154463B000DEF837 /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
+		828879C5154463B800DEF837 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
+		828879C61544642A00DEF837 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
+		828879C71544642A00DEF837 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0471444AECD001ED14E /* libssl.a */; };
+		828879C81544648000DEF837 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
 		8290FB96142F47D30080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
 		8290FB99142F508B0080BB85 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
 		8290FB9A142F51930080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
@@ -81,6 +150,36 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		820BBE0D15423FAB005A1C5A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				820BBE1515423FAB005A1C5A /* apnFeedback.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		820BBE351542F466005A1C5A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				820BBE3D1542F466005A1C5A /* apnNotificator.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		828879B51544607300DEF837 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				828879BD1544607300DEF837 /* msgParser.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		82F86B531425A810006ACFEB /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -96,6 +195,14 @@
 /* Begin PBXFileReference section */
 		820BBDF6153E7164005A1C5A /* PendingNotificationStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PendingNotificationStore.h; sourceTree = "<group>"; };
 		820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PendingNotificationStore.cpp; sourceTree = "<group>"; };
+		820BBDFB15408CF3005A1C5A /* ExclusiveSharedQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExclusiveSharedQueue.h; sourceTree = "<group>"; };
+		820BBE0F15423FAB005A1C5A /* apnFeedback */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = apnFeedback; sourceTree = BUILT_PRODUCTS_DIR; };
+		820BBE1215423FAB005A1C5A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		820BBE1415423FAB005A1C5A /* apnFeedback.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = apnFeedback.1; sourceTree = "<group>"; };
+		820BBE25154240B1005A1C5A /* libetpan.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libetpan.a; path = ../DerivedData/PushMeMail/Build/Products/Debug/libetpan.a; sourceTree = "<group>"; };
+		820BBE371542F466005A1C5A /* apnNotificator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = apnNotificator; sourceTree = BUILT_PRODUCTS_DIR; };
+		820BBE3A1542F466005A1C5A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		820BBE3C1542F466005A1C5A /* apnNotificator.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = apnNotificator.1; sourceTree = "<group>"; };
 		821675BB14283DA800F8FF70 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8217B24214B5DCEA00E45AA0 /* QuotaDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuotaDB.h; sourceTree = "<group>"; };
@@ -114,6 +221,10 @@
 		8280597F145FB0E600E7B614 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
 		82805981145FB18100E7B614 /* DataTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataTypes.cpp; sourceTree = "<group>"; };
 		828697CB150FF37D003E7675 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
+		828879B015438F5D00DEF837 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		828879B71544607300DEF837 /* msgParser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = msgParser; sourceTree = BUILT_PRODUCTS_DIR; };
+		828879BA1544607300DEF837 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		828879BC1544607300DEF837 /* msgParser.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = msgParser.1; sourceTree = "<group>"; };
 		8290FB93142F47770080BB85 /* MailAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailAccountInfo.h; sourceTree = "<group>"; };
 		8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MailAccountInfo.cpp; sourceTree = "<group>"; };
 		8290FB97142F502D0080BB85 /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mutex.h; sourceTree = "<group>"; };
@@ -180,6 +291,48 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		820BBE0C15423FAB005A1C5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				820BBE3015424531005A1C5A /* Security.framework in Frameworks */,
+				820BBE31154246EB005A1C5A /* CoreFoundation.framework in Frameworks */,
+				820BBE2F1542451D005A1C5A /* libssl.a in Frameworks */,
+				820BBE2715424116005A1C5A /* libcrypto.a in Frameworks */,
+				820BBE2C15424172005A1C5A /* libsqlite3.dylib in Frameworks */,
+				820BBE2B15424166005A1C5A /* libiconv.dylib in Frameworks */,
+				820BBE26154240B2005A1C5A /* libetpan.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		820BBE341542F466005A1C5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				820BBE501543357D005A1C5A /* libcrypto.a in Frameworks */,
+				820BBE511543357D005A1C5A /* libssl.a in Frameworks */,
+				828879B215438F8200DEF837 /* libetpan.framework in Frameworks */,
+				828879AB154383FA00DEF837 /* CoreFoundation.framework in Frameworks */,
+				828879AA154383E400DEF837 /* libcurl.dylib in Frameworks */,
+				828879A9154383DA00DEF837 /* Security.framework in Frameworks */,
+				828879A51543837F00DEF837 /* libiconv.dylib in Frameworks */,
+				820BBE53154335A5005A1C5A /* libsqlite3.dylib in Frameworks */,
+				820BBE4F15433565005A1C5A /* libetpan.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		828879B41544607300DEF837 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				828879C61544642A00DEF837 /* libcrypto.a in Frameworks */,
+				828879C71544642A00DEF837 /* libssl.a in Frameworks */,
+				828879C5154463B800DEF837 /* libiconv.dylib in Frameworks */,
+				828879C3154463B000DEF837 /* libetpan.a in Frameworks */,
+				828879C4154463B000DEF837 /* libetpan.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		82F86B281425A457006ACFEB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -207,6 +360,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		820BBE1115423FAB005A1C5A /* apnFeedback */ = {
+			isa = PBXGroup;
+			children = (
+				820BBE1215423FAB005A1C5A /* main.cpp */,
+				820BBE1415423FAB005A1C5A /* apnFeedback.1 */,
+			);
+			path = apnFeedback;
+			sourceTree = "<group>";
+		};
+		820BBE321542DEAC005A1C5A /* APNS Interaction */ = {
+			isa = PBXGroup;
+			children = (
+				82ED5B071431761400444844 /* APNSNotificationThread.h */,
+				82ED5B111431882700444844 /* APNSNotificationThread.cpp */,
+				82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */,
+				82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */,
+			);
+			name = "APNS Interaction";
+			sourceTree = "<group>";
+		};
+		820BBE391542F466005A1C5A /* apnNotificator */ = {
+			isa = PBXGroup;
+			children = (
+				820BBE3A1542F466005A1C5A /* main.cpp */,
+				820BBE3C1542F466005A1C5A /* apnNotificator.1 */,
+			);
+			path = apnNotificator;
+			sourceTree = "<group>";
+		};
 		82708493142ADF5E00D05386 /* jsonxx */ = {
 			isa = PBXGroup;
 			children = (
@@ -216,9 +398,20 @@
 			name = jsonxx;
 			sourceTree = "<group>";
 		};
+		828879B91544607300DEF837 /* msgParser */ = {
+			isa = PBXGroup;
+			children = (
+				828879BA1544607300DEF837 /* main.cpp */,
+				828879BC1544607300DEF837 /* msgParser.1 */,
+			);
+			path = msgParser;
+			sourceTree = "<group>";
+		};
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				828879B015438F5D00DEF837 /* CoreServices.framework */,
+				820BBE25154240B1005A1C5A /* libetpan.a */,
 				828697CB150FF37D003E7675 /* libiconv.dylib */,
 				823BD0461444AECD001ED14E /* libcrypto.a */,
 				823BD0471444AECD001ED14E /* libssl.a */,
@@ -235,6 +428,9 @@
 				82F86B4C1425A54F006ACFEB /* PushMeMailIcon.png */,
 				82F86B351425A458006ACFEB /* PMM Sucker */,
 				82F86B571425A810006ACFEB /* pmmsuckerd */,
+				820BBE1115423FAB005A1C5A /* apnFeedback */,
+				820BBE391542F466005A1C5A /* apnNotificator */,
+				828879B91544607300DEF837 /* msgParser */,
 				82F86B2E1425A457006ACFEB /* Frameworks */,
 				82F86B2C1425A457006ACFEB /* Products */,
 			);
@@ -245,6 +441,9 @@
 			children = (
 				82F86B2B1425A457006ACFEB /* PMM Sucker.app */,
 				82F86B551425A810006ACFEB /* pmmsuckerd */,
+				820BBE0F15423FAB005A1C5A /* apnFeedback */,
+				820BBE371542F466005A1C5A /* apnNotificator */,
+				828879B71544607300DEF837 /* msgParser */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -305,6 +504,7 @@
 		82F86B611425B500006ACFEB /* SuckingEngine */ = {
 			isa = PBXGroup;
 			children = (
+				820BBE321542DEAC005A1C5A /* APNS Interaction */,
 				82F86B621425B54B006ACFEB /* PMMSuckerSession.h */,
 				82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */,
 				82708498142AE23900D05386 /* ServerResponse.h */,
@@ -315,8 +515,6 @@
 				8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */,
 				8290FB97142F502D0080BB85 /* Mutex.h */,
 				8290FB98142F508B0080BB85 /* Mutex.cpp */,
-				82ED5B071431761400444844 /* APNSNotificationThread.h */,
-				82ED5B111431882700444844 /* APNSNotificationThread.cpp */,
 				82ED5B09143176B300444844 /* GenericThread.h */,
 				82ED5B0A14317FD000444844 /* GenericThread.cpp */,
 				82ED5B0D1431870800444844 /* ThreadDispatcher.h */,
@@ -352,10 +550,9 @@
 				8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */,
 				82B6109114F2A28200975C32 /* UserPreferences.h */,
 				82B6109314F2A2FC00975C32 /* UserPreferences.cpp */,
-				82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */,
-				82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */,
 				820BBDF6153E7164005A1C5A /* PendingNotificationStore.h */,
 				820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */,
+				820BBDFB15408CF3005A1C5A /* ExclusiveSharedQueue.h */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -363,6 +560,57 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		820BBE0E15423FAB005A1C5A /* apnFeedback */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 820BBE1615423FAB005A1C5A /* Build configuration list for PBXNativeTarget "apnFeedback" */;
+			buildPhases = (
+				820BBE0B15423FAB005A1C5A /* Sources */,
+				820BBE0C15423FAB005A1C5A /* Frameworks */,
+				820BBE0D15423FAB005A1C5A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = apnFeedback;
+			productName = apnFeedback;
+			productReference = 820BBE0F15423FAB005A1C5A /* apnFeedback */;
+			productType = "com.apple.product-type.tool";
+		};
+		820BBE361542F466005A1C5A /* apnNotificator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 820BBE3E1542F466005A1C5A /* Build configuration list for PBXNativeTarget "apnNotificator" */;
+			buildPhases = (
+				820BBE331542F466005A1C5A /* Sources */,
+				820BBE341542F466005A1C5A /* Frameworks */,
+				820BBE351542F466005A1C5A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = apnNotificator;
+			productName = apnNotificator;
+			productReference = 820BBE371542F466005A1C5A /* apnNotificator */;
+			productType = "com.apple.product-type.tool";
+		};
+		828879B61544607300DEF837 /* msgParser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */;
+			buildPhases = (
+				828879B31544607300DEF837 /* Sources */,
+				828879B41544607300DEF837 /* Frameworks */,
+				828879B51544607300DEF837 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = msgParser;
+			productName = msgParser;
+			productReference = 828879B71544607300DEF837 /* msgParser */;
+			productType = "com.apple.product-type.tool";
+		};
 		82F86B2A1425A457006ACFEB /* PMM Sucker */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 82F86B491425A458006ACFEB /* Build configuration list for PBXNativeTarget "PMM Sucker" */;
@@ -419,6 +667,9 @@
 			targets = (
 				82F86B2A1425A457006ACFEB /* PMM Sucker */,
 				82F86B541425A810006ACFEB /* pmmsuckerd */,
+				820BBE0E15423FAB005A1C5A /* apnFeedback */,
+				820BBE361542F466005A1C5A /* apnNotificator */,
+				828879B61544607300DEF837 /* msgParser */,
 			);
 		};
 /* End PBXProject section */
@@ -439,6 +690,72 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		820BBE0B15423FAB005A1C5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				820BBE2D1542418D005A1C5A /* MailAccountInfo.cpp in Sources */,
+				820BBE2A15424152005A1C5A /* MailMessage.cpp in Sources */,
+				820BBE291542413E005A1C5A /* Mutex.cpp in Sources */,
+				820BBE1915424022005A1C5A /* APNSNotificationThread.cpp in Sources */,
+				820BBE1A15424022005A1C5A /* GenericThread.cpp in Sources */,
+				820BBE1B15424022005A1C5A /* ThreadDispatcher.cpp in Sources */,
+				820BBE1C15424022005A1C5A /* SharedQueue.cpp in Sources */,
+				820BBE1D15424022005A1C5A /* NotificationPayload.cpp in Sources */,
+				820BBE1E15424022005A1C5A /* UtilityFunctions.cpp in Sources */,
+				820BBE1F15424022005A1C5A /* GenericException.cpp in Sources */,
+				820BBE2015424022005A1C5A /* MTLogger.cpp in Sources */,
+				820BBE2115424022005A1C5A /* DataTypes.cpp in Sources */,
+				820BBE2215424022005A1C5A /* SilentMode.cpp in Sources */,
+				820BBE2315424022005A1C5A /* APNSFeedbackThread.cpp in Sources */,
+				820BBE1315423FAB005A1C5A /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		820BBE331542F466005A1C5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				828879AF15438EEB00DEF837 /* JSONParseException.cpp in Sources */,
+				828879AE154384E800DEF837 /* DataTypes.cpp in Sources */,
+				828879AC1543845F00DEF837 /* MessageUploaderThread.cpp in Sources */,
+				828879AD1543845F00DEF837 /* PendingNotificationStore.cpp in Sources */,
+				828879A8154383A500DEF837 /* ServerResponse.cpp in Sources */,
+				828879A71543839E00DEF837 /* PMMSuckerSession.cpp in Sources */,
+				820BBE5715433DED005A1C5A /* UserPreferences.cpp in Sources */,
+				820BBE56154335D0005A1C5A /* QuotaDB.cpp in Sources */,
+				820BBE55154335BF005A1C5A /* SilentMode.cpp in Sources */,
+				820BBE54154335B5005A1C5A /* MailMessage.cpp in Sources */,
+				820BBE5215433593005A1C5A /* MTLogger.cpp in Sources */,
+				820BBE421542F5A4005A1C5A /* APNSNotificationThread.cpp in Sources */,
+				820BBE431542F5A4005A1C5A /* MailAccountInfo.cpp in Sources */,
+				820BBE441542F5A4005A1C5A /* Mutex.cpp in Sources */,
+				820BBE451542F5A4005A1C5A /* GenericThread.cpp in Sources */,
+				820BBE461542F5A4005A1C5A /* ThreadDispatcher.cpp in Sources */,
+				820BBE471542F5A4005A1C5A /* SharedQueue.cpp in Sources */,
+				820BBE481542F5A4005A1C5A /* NotificationPayload.cpp in Sources */,
+				820BBE491542F5A4005A1C5A /* UtilityFunctions.cpp in Sources */,
+				820BBE4A1542F5A4005A1C5A /* GenericException.cpp in Sources */,
+				820BBE4B1542F5A4005A1C5A /* MailSuckerThread.cpp in Sources */,
+				820BBE4C1542F5A4005A1C5A /* IMAPSuckerThread.cpp in Sources */,
+				820BBE4D1542F5A4005A1C5A /* POP3SuckerThread.cpp in Sources */,
+				820BBE4E1542F5A4005A1C5A /* FetchedMailsCache.cpp in Sources */,
+				820BBE411542F575005A1C5A /* jsonxx.cc in Sources */,
+				820BBE3B1542F466005A1C5A /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		828879B31544607300DEF837 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				828879C81544648000DEF837 /* Mutex.cpp in Sources */,
+				828879C11544637B00DEF837 /* MTLogger.cpp in Sources */,
+				828879C21544637B00DEF837 /* MailMessage.cpp in Sources */,
+				828879BB1544607300DEF837 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		82F86B271425A457006ACFEB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -538,6 +855,126 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		820BBE1715423FAB005A1C5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Debug;
+		};
+		820BBE1815423FAB005A1C5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = YES;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Release;
+		};
+		820BBE3F1542F466005A1C5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Debug;
+		};
+		820BBE401542F466005A1C5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Release;
+		};
+		828879BF1544607300DEF837 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"DEBUG_MESSAGE_PARSING=1",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Debug;
+		};
+		828879C01544607300DEF837 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG_MESSAGE_PARSING=1";
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Release;
+		};
 		82F86B471425A458006ACFEB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -545,6 +982,10 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -573,6 +1014,10 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -653,6 +1098,32 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		820BBE1615423FAB005A1C5A /* Build configuration list for PBXNativeTarget "apnFeedback" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				820BBE1715423FAB005A1C5A /* Debug */,
+				820BBE1815423FAB005A1C5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		820BBE3E1542F466005A1C5A /* Build configuration list for PBXNativeTarget "apnNotificator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				820BBE3F1542F466005A1C5A /* Debug */,
+				820BBE401542F466005A1C5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				828879BF1544607300DEF837 /* Debug */,
+				828879C01544607300DEF837 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		82F86B251425A457006ACFEB /* Build configuration list for PBXProject "PMM Sucker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

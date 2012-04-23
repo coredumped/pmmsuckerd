@@ -197,13 +197,16 @@ namespace pmm {
 #endif
 #warning TODO: Verify that the certificate has not expired, if it has send a very loud panic alert
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
+				ERR_print_errors_fp(stderr);
 				throw SSLException(NULL, 0, "Unable to load certificate file");
 			}
 			SSL_CTX_set_default_passwd_cb(sslCTX, (pem_password_cb *)_certPassword.c_str());
 			if (SSL_CTX_use_PrivateKey_file(sslCTX, _keyPath.c_str(), SSL_FILETYPE_PEM) <= 0) {
+				ERR_print_errors_fp(stderr);
 				throw SSLException(NULL, 0, "Can't use given keyfile");
 			}
 			if(!SSL_CTX_check_private_key(sslCTX)){
+				ERR_print_errors_fp(stderr);
 				throw SSLException(NULL, 0, "Given private key is not valid, it does not match");
 			}
 			SSL_CTX_set_mode(sslCTX, SSL_MODE_AUTO_RETRY);
@@ -347,7 +350,7 @@ namespace pmm {
 		
 	void APNSNotificationThread::operator()(){
 		stopExecution = false;
-#ifdef DEBUG
+#ifdef DEBUG_THREADS
 		size_t i = 0;  
 #endif
 		pmm::Log << "Starting APNSNotificationThread..." << pmm::NL;
