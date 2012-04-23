@@ -28,7 +28,7 @@ namespace pmm {
 		~NotificationPayload();
 		MailMessage origMailMessage;
 		
-		const std::string &toJSON() const;
+		const std::string &toJSON();
 		std::string &soundName();
 		const std::string &soundName() const;
 		std::string &message();

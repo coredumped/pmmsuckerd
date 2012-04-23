@@ -157,7 +157,7 @@ namespace pmm {
 		jsonRepresentation = jsonbuilder.str();
 	}
 	
-	const std::string &NotificationPayload::toJSON() const {
+	const std::string &NotificationPayload::toJSON() {
 		build();
 		return jsonRepresentation;
 	}
