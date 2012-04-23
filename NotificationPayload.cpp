@@ -56,9 +56,9 @@ namespace pmm {
 				newString.append(tbuf);
 			}
 		}
-		if (newString.size() > theMsg.size()) {
+		//if (newString.size() > theMsg.size()) {
 			theMsg = newString;
-		}
+		//}
 	}
 
 	NotificationPayload::NotificationPayload(){
