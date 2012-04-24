@@ -112,6 +112,7 @@ namespace pmm {
 			encodedMsg = msg.substr(0, l);
 			if(addDots) encodedMsg.append("...");
 			msg_encode(encodedMsg);
+			if(encodedMsg.size() > 1 && encodedMsg[encodedMsg.size() - 1] == '\\') encodedMsg[encodedMsg.size() - 1] = ' ';
 			jsonbuilder << "{";
 			jsonbuilder << "\"aps\":";
 			jsonbuilder << "{";
