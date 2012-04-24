@@ -182,18 +182,6 @@ namespace pmm {
 							m.from = newFrom;
 							free(newFrom);
 						}
-						/*
-						size_t indx2 = 0;
-						char *newFrom;
-						//Find source encoding
-						size_t s2pos;
-						if ((s2pos = m.from.find_first_of("?", s1pos + 2)) != m.from.npos) {
-							std::string sourceEncoding = m.from.substr(s1pos + 2, s2pos - s1pos - 2);
-							mailmime_encoded_phrase_parse(sourceEncoding.c_str(), m.from.c_str(), m.from.size(), &indx2, TextEncoding::utf8, &newFrom);
-							m.from = newFrom;
-							free(newFrom);
-						}
-						 */
 					}
 #ifdef DEBUG_FROM_FIELD
 					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
@@ -257,15 +245,17 @@ namespace pmm {
 			while (theBody[0] == '\r' || theBody[0] == '\n') {
 				theBody = theBody.substr(1);
 			}
-			if(m.subject.size() > 0) m.subject.append("\n");
-			if(theBody.size() > 0 && theBody.size() < 256){
-				m.subject.append(theBody.c_str(), theBody.size());
-			}
-			else {
-				m.subject.append(theBody.c_str(), 256);
-			}
-			while (m.subject[0] == '\r' || m.subject[0] == '\n') {
-				m.subject = m.subject.substr(1);
+			if (theBody.size() > 0) {
+				if(m.subject.size() > 0) m.subject.append("\n");
+				if(theBody.size() < 256){
+					m.subject.append(theBody.c_str(), theBody.size());
+				}
+				else {
+					m.subject.append(theBody.c_str(), 256);
+				}
+				while (m.subject[0] == '\r' || m.subject[0] == '\n') {
+					m.subject = m.subject.substr(1);
+				}
 			}
 		}
 		mailmime_free(result);
