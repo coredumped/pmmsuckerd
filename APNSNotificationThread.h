@@ -14,6 +14,7 @@
 #include "GenericException.h"
 #include <string>
 #include <map>
+#include <set>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -91,6 +92,7 @@ namespace pmm {
 		std::string _certPath;
 		std::string _certPassword;
 
+		
 	protected:
 		bool sslInitComplete;
 		void initSSL();
@@ -98,7 +100,10 @@ namespace pmm {
 		bool gotErrorFromApple();
 	public:
 		AtomicFlag warmingUP;
+		std::set<std::string> invalidTokenSet;
 		SharedQueue<NotificationPayload> *notificationQueue;
+		SharedQueue<std::string> *invalidTokens;
+		AtomicVar<std::string> newInvalidDevToken;
 		APNSNotificationThread();
 		void setKeyPath(const std::string &keyPath);
 		void setCertPath(const std::string &certPath);

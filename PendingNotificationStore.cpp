@@ -115,6 +115,27 @@ namespace pmm {
 		}		
 	}
 	
+	bool PendingNotificationStore::getDeviceTokenFromMessage(std::string &devToken, uint32_t _id){
+		bool ret = false;
+		if(sDB == NULL) sDB = connect2NotifDB();
+		std::stringstream sqlCmd;
+		sqlite3_stmt *statement;
+		char *szTail;
+		sqlCmd << "SELECT devtoken FROM " << sentTable << " where id=" << _id;
+		if(sqlite3_prepare_v2(sDB, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&szTail) == SQLITE_OK){
+			if (sqlite3_step(statement) == SQLITE_ROW) {
+				devToken = (const char *)sqlite3_column_text(statement, 0);
+				ret = true;
+			}
+			sqlite3_finalize(statement);
+		}
+		else {
+			const char *errmsg = sqlite3_errmsg(sDB);
+			pmm::Log << "Unable to retrieve device token from notification with id=" << (int)_id << " (" << sqlCmd.str() << ") due to: " << errmsg << pmm::NL;
+		}
+		return ret;
+	}
+	
 	void PendingNotificationStore::loadPayloads(SharedQueue<NotificationPayload> *nQueue){
 		if(sDB == NULL) sDB = connect2NotifDB();
 		std::stringstream sqlCmd;

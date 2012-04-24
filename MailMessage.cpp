@@ -242,9 +242,6 @@ namespace pmm {
 			}
 		}
 		if (m.subject.size() <= 128) {
-			//Try to retrieve the message encoding first...
-			
-			
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
 			std::string theBody = msgBody.str();
@@ -261,18 +258,8 @@ namespace pmm {
 			while (m.subject[0] == '\r' || m.subject[0] == '\n') {
 				m.subject = m.subject.substr(1);
 			}
-			/*if (m.subject.size() > 0) {
-				size_t thePos;
-				if ((thePos = m.subject.find("\r\n")) != m.subject.npos) {
-					m.subject = m.subject.substr(0, thePos);
-				}
-			}*/
 		}
-#ifdef USE_IMF
-		mailimf_message_free(result);
-#else
 		mailmime_free(result);
-#endif
 		return true;
 	}
 }

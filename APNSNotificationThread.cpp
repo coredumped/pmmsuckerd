@@ -105,9 +105,11 @@ namespace pmm {
 					PendingNotificationStore::setSentPayloadErrorCode(notifID, apnsRetCode[1]);
 					retval = true;
 					//At this point we should disconnect!!!
-					disconnectFromAPNS();
-					_socket = -1;
-					connect2APNS();
+					if (apnsRetCode[0] == PushErrorCodes::InvalidToken) {
+						//Retrieve failed device token from database...
+						std::string invalidToken;
+						if(PendingNotificationStore::getDeviceTokenFromMessage(invalidToken, notifID)) invalidTokens->add(invalidToken);
+					}
 				}
 			}
 		}
@@ -434,29 +436,41 @@ namespace pmm {
 						warmingUP = false;
 						connect2APNS();
 					}
-					time_t theTime;
-					time(&theTime);
-					struct tm tmTime;
-					gmtime_r(&theTime, &tmTime);		
-					if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){
-						payload.useSilentSound();
+					std::string newInvalidToken = newInvalidDevToken;
+					if (newInvalidToken.size() > 0) {
+						invalidTokenSet.insert(newInvalidToken);
+						newInvalidDevToken = "";
 					}
-					if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
-					else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
-					if (lastDevToken.compare(payload.deviceToken()) == 0) {
-						APNSLog << "WARNING: Got another notification for the same device in the same thread, lets try to have another thread notify it..." << pmm::NL;
-						sleep(2);
-						APNSLog << "WARNING: Sent to another thread...";
-						notificationQueue->add(payload);
-						disconnectFromAPNS();
-						sleep(2);
-						APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
-						lastDevToken = "";
-						connect2APNS();
-						continue;
+					if (invalidTokenSet.find(payload.deviceToken()) != invalidTokenSet.end()) {
+						APNSLog << "CRITICAL: Refusing to post notification to device " << payload.deviceToken() << " this is an invalid device token." << pmm::NL;
+#warning Warn the user somehow that her device is holding an invalid device token
+						triggerSimultanousReconnect();
 					}
-					notifyTo(payload.deviceToken(), payload);
-					lastDevToken = payload.deviceToken();
+					else {
+						time_t theTime;
+						time(&theTime);
+						struct tm tmTime;
+						gmtime_r(&theTime, &tmTime);		
+						if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){
+							payload.useSilentSound();
+						}
+						if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
+						else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
+						if (lastDevToken.compare(payload.deviceToken()) == 0) {
+							APNSLog << "WARNING: Got another notification for the same device in the same thread, lets try to have another thread notify it..." << pmm::NL;
+							sleep(2);
+							APNSLog << "WARNING: Sent to another thread...";
+							notificationQueue->add(payload);
+							disconnectFromAPNS();
+							sleep(2);
+							APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
+							lastDevToken = "";
+							connect2APNS();
+							continue;
+						}
+						notifyTo(payload.deviceToken(), payload);
+						lastDevToken = payload.deviceToken();
+					}
 				} 
 				catch (SSLException &sse1){
 					if (sse1.errorCode() == SSL_ERROR_ZERO_RETURN) {

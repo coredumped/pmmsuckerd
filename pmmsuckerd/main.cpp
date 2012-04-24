@@ -71,6 +71,9 @@
 #define DEFAULT_KEEPALIVE_DEVTOKEN "4ab904318d30a0ecee730b369ea6b4acb9ab67c10023e5b497c25e035e353af5"
 #endif
 #endif
+#ifndef DEFAULT_INVALID_TOKEN_FILE
+#define DEFAULT_INVALID_TOKEN_FILE "invalid-devices.dat"
+#endif
 
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
@@ -109,6 +112,7 @@ int main (int argc, const char * argv[])
 	std::string sslPrivateKeyPath = DEFAULT_SSL_PRIVATE_KEY_PATH;
 	std::string sslDevelCertificatePath = DEFAULT_DEVEL_SSL_CERTIFICATE_PATH;
 	std::string sslDevelPrivateKeyPath = DEFAULT_DEVEL_SSL_PRIVATE_KEY_PATH;
+	std::string invalidTokensFile = DEFAULT_INVALID_TOKEN_FILE;
 
 	int commandPollingInterval = DEFAULT_COMMAND_POLLING_INTERVAL;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue("NotificationQueue");
@@ -126,6 +130,8 @@ int main (int argc, const char * argv[])
 	
 	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue("DeviceTokenAddQueue");
 	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
+	pmm::SharedQueue<std::string> invalidTokenQ;
+	pmm::SharedQueue<std::string> develInvalidTokenQ;
 	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
@@ -254,6 +260,21 @@ int main (int argc, const char * argv[])
 	feedbackThread.setCertPath(sslCertificatePath);
 	feedbackThread.useForProduction();
 	
+	//Load invalid device tokens into each notification thread
+	{
+		std::ifstream tfile(invalidTokensFile.c_str());
+		if (tfile.good()) {
+			while (!tfile.eof()) {
+				std::string tokenItem;
+				std::getline(tfile, tokenItem);
+				pmm::Log << " * Adding " << tokenItem << " to invalid token cache on each notification thread." << pmm::NL;
+				for (size_t idx = 0; idx < maxNotificationThreads; idx++) {
+					notifThreads[idx].invalidTokenSet.insert(tokenItem);
+				}
+			}
+			tfile.close();
+		}
+	}
 	for (size_t i = 0; i < maxNotificationThreads; i++) {
 		//1. Initializa notification thread...
 		//2. Start thread
@@ -261,6 +282,7 @@ int main (int argc, const char * argv[])
 		notifThreads[i].notificationQueue = &notificationQueue;
 		notifThreads[i].setCertPath(sslCertificatePath);
 		notifThreads[i].setKeyPath(sslPrivateKeyPath);
+		notifThreads[i].invalidTokens = &invalidTokenQ;
 		pmm::ThreadDispatcher::start(notifThreads[i], threadStackSize);
 		sleep(1);
 	}
@@ -268,6 +290,7 @@ int main (int argc, const char * argv[])
 	develNotifThread.notificationQueue = &develNotificationQueue;
 	develNotifThread.setCertPath(sslDevelCertificatePath);
 	develNotifThread.setKeyPath(sslDevelPrivateKeyPath);
+	develNotifThread.invalidTokens = &develInvalidTokenQ;
 	pmm::ThreadDispatcher::start(develNotifThread, threadStackSize);
 	sleep(1);
 	
@@ -345,6 +368,20 @@ int main (int argc, const char * argv[])
 			sleep(1);
 			continue;
 		} 
+		std::string lastInvalidToken;
+		while (invalidTokenQ.extractEntry(lastInvalidToken)) {
+			pmm::Log << "CRITICAL: " << lastInvalidToken << " is an invalid token, no more messages will be sent to it!!" << pmm::NL;
+			//First update each notification thread internal cache
+			for (size_t idx = 0; idx < maxNotificationThreads; idx++) {
+				notifThreads[idx].newInvalidDevToken = lastInvalidToken;
+			}
+			//Save token to local file
+			std::ofstream tfile(invalidTokensFile.c_str(), std::ios_base::app);
+			tfile << lastInvalidToken << "\n";
+			tfile.close();
+			//Here we update appengine and tell it we have one new invalid device token
+#warning TODO: Send invalid tokens to app engine
+		}
 		if (tic % 43200 == 0){
 			pmm::PendingNotificationStore::eraseOldPayloads();
 		}
