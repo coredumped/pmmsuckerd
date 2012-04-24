@@ -177,6 +177,14 @@ namespace pmm {
 						//Encoded with RFC 2047, let's decode this damn thing!!!
 						size_t indx2 = 0;
 						char *newFrom;
+						int r = mailmime_encoded_phrase_parse(TextEncoding::utf8, m.from.c_str(), m.from.size(), &indx2, TextEncoding::utf8, &newFrom);
+						if(r == MAILIMF_NO_ERROR){
+							m.from = newFrom;
+							free(newFrom);
+						}
+						/*
+						size_t indx2 = 0;
+						char *newFrom;
 						//Find source encoding
 						size_t s2pos;
 						if ((s2pos = m.from.find_first_of("?", s1pos + 2)) != m.from.npos) {
@@ -185,6 +193,7 @@ namespace pmm {
 							m.from = newFrom;
 							free(newFrom);
 						}
+						 */
 					}
 #ifdef DEBUG_FROM_FIELD
 					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
