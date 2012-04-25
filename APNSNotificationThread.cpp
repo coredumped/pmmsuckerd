@@ -30,7 +30,7 @@
 #define DEFAULT_MAX_NOTIFICATIONS_PER_BURST 32
 #endif
 #ifndef DEFAULT_BURST_PAUSE_INTERVAL
-#define DEFAULT_BURST_PAUSE_INTERVAL 10
+#define DEFAULT_BURST_PAUSE_INTERVAL 1
 #endif
 #ifndef DEFAULT_MAX_CONNECTION_INTERVAL
 #define DEFAULT_MAX_CONNECTION_INTERVAL 7200
@@ -459,7 +459,7 @@ namespace pmm {
 						if (lastDevToken.compare(payload.deviceToken()) == 0) {
 							APNSLog << "WARNING: Got another notification for the same device in the same thread, lets try to have another thread notify it..." << pmm::NL;
 							sleep(1);
-							APNSLog << "WARNING: Sent to another thread...";
+							APNSLog << "WARNING: Sent to another thread..." << pmm::NL;
 							notificationQueue->add(payload);
 							disconnectFromAPNS();
 							sleep(1);
