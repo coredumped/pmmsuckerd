@@ -458,11 +458,11 @@ namespace pmm {
 						else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
 						if (lastDevToken.compare(payload.deviceToken()) == 0) {
 							APNSLog << "WARNING: Got another notification for the same device in the same thread, lets try to have another thread notify it..." << pmm::NL;
-							sleep(2);
+							sleep(1);
 							APNSLog << "WARNING: Sent to another thread...";
 							notificationQueue->add(payload);
 							disconnectFromAPNS();
-							sleep(2);
+							sleep(1);
 							APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
 							lastDevToken = "";
 							connect2APNS();
