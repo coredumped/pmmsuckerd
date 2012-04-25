@@ -281,7 +281,7 @@ namespace pmm {
 			else encodedPost << "&" << p << "=" << v;
 			curl_free(p);
 			curl_free(v);
-#ifdef DEBUG
+#ifdef DEBUG_MSG_UPLOAD
 			if (getenv("DEBUG_MSG") != NULL && param.compare("subject") == 0) {
 				pmm::Log << "Uploading msg with subject: " << value << pmm::NL;
 			}
