@@ -389,6 +389,7 @@ namespace pmm {
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		time_t start = time(NULL);
 		std::string lastDevToken;
+		std::map<std::string, time_t> lastTimeSentMap;
 		while (true) {
 			if(_useSandbox){
 				time_t currTime = time(NULL);
@@ -423,9 +424,16 @@ namespace pmm {
 					sleep(1);
 				}
 #ifdef DEBUG
-				APNSLog << "DEBUG: There are " << (int)notificationQueue->size() << " elements in the notification queue." << pmm::NL;
+				int nSize = notificationQueue->size();
+				if((nSize + 1) % 10 == 0) APNSLog << "DEBUG: There are " << nSize << " elements in the notification queue." << pmm::NL;
 #endif
 				//Verify here if we should notify the event or not
+				time_t rightNow;
+				rightNow = time(0);
+				std::string currentDeviceToken = payload.deviceToken();
+				if (lastTimeSentMap.find(currentDeviceToken) == lastTimeSentMap.end()) {
+					lastTimeSentMap[currentDeviceToken] = rightNow;
+				}
 				try {
 					APNSNotificationThread::gotErrorFromApple();
 					if (shouldReconnect()) {
@@ -447,29 +455,32 @@ namespace pmm {
 						triggerSimultanousReconnect();
 					}
 					else {
-						time_t theTime;
-						time(&theTime);
+						//time_t theTime;
+						//time(&theTime);
 						struct tm tmTime;
-						gmtime_r(&theTime, &tmTime);		
+						gmtime_r(&rightNow, &tmTime);		
 						if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){
 							payload.useSilentSound();
 						}
 						if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
 						else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
 						if (lastDevToken.compare(payload.deviceToken()) == 0) {
-							APNSLog << "WARNING: Got another notification for the same device in the same thread, lets try to have another thread notify it..." << pmm::NL;
-							sleep(1);
-							APNSLog << "WARNING: Sent to another thread..." << pmm::NL;
-							notificationQueue->add(payload);
-							disconnectFromAPNS();
-							sleep(1);
-							APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
-							lastDevToken = "";
-							connect2APNS();
-							continue;
+							if (rightNow - lastTimeSentMap[currentDeviceToken] < 2) {
+								APNSLog << "WARNING: Got another notification for the same device in the same thread too soon, lets try to have another thread notify it..." << pmm::NL;
+								sleep(1);
+								APNSLog << "WARNING: Sent to another thread..." << pmm::NL;
+								notificationQueue->add(payload);
+								disconnectFromAPNS();
+								sleep(1);
+								APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
+								lastDevToken = "";
+								connect2APNS();
+								continue;
+							}
 						}
-						notifyTo(payload.deviceToken(), payload);
-						lastDevToken = payload.deviceToken();
+						notifyTo(currentDeviceToken, payload);
+						lastDevToken = currentDeviceToken;
+						lastTimeSentMap[currentDeviceToken] = rightNow;
 					}
 				} 
 				catch (SSLException &sse1){

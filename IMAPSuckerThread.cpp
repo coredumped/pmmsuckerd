@@ -200,7 +200,7 @@ namespace pmm {
 	
 	bool IMAPSuckerThread::IMAPFetchControl::operator<(const IMAPFetchControl &i) const {
 		if (i.mailAccountInfo.email().size() < i.mailAccountInfo.email().size()) {
-			true;
+			return true;
 		}
 		return false;
 	}
@@ -296,7 +296,6 @@ namespace pmm {
 						struct mailimap_search_key *sKey = mailimap_search_key_new(MAILIMAP_SEARCH_KEY_UNSEEN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 						result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
 						if (etpanOperationFailed(result)) {
-							throw GenericException("Can't find unseen messages, IMAP SEARCH failed miserably");
 							if (imap->imap_response == 0) {
 								imapLog << "CRITICAL: Can't find unseen messages, IMAP SEARCH failed miserably" << pmm::NL;
 							}
@@ -586,6 +585,7 @@ namespace pmm {
 				else {
 					result = mailimap_idle(imap);
 					if(etpanOperationFailed(result)) throw GenericException("Unable to restart IDLE after DONE.");
+					fetchMails(m);
 				}
 			}
 		}
