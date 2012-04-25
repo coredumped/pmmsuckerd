@@ -325,14 +325,13 @@ namespace pmm {
 								else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
 								uidSet.push_back(uid);
 							}
-
-						}
-						//Remove old entries if the current time is a multiple of 60 seconds
-						if (rightNow % 600 == 0) {
+							//Remove old entries if the current time is a multiple of 60 seconds
+							if (rightNow % 600 == 0) {
 #ifdef DEBUG
-							pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
+								pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
 #endif
-							fetchedMails.removeEntriesNotInSet(imapFetch.mailAccountInfo.email(), uidSet);
+								fetchedMails.removeEntriesNotInSet(imapFetch.mailAccountInfo.email(), uidSet);
+							}
 						}
 						mailimap_search_result_free(unseenMails);	
 						mailimap_logout(imap);
