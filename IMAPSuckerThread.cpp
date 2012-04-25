@@ -297,32 +297,38 @@ namespace pmm {
 						result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
 						if (etpanOperationFailed(result)) {
 							throw GenericException("Can't find unseen messages, IMAP SEARCH failed miserably");
+							if (imap->imap_response == 0) {
+								imapLog << "CRITICAL: Can't find unseen messages, IMAP SEARCH failed miserably" << pmm::NL;
+							}
 						}
+						else {
 #ifdef DEBUG
-						pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
+							if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
 #endif
-						imapFetch.badgeCounter = 0;
-						std::vector<uint32_t> uidSet;
-						for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
-							if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
-								pmm::Log << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
-								break;
-							}
-							uint32_t uid;
-							uid = *((uint32_t *)clist_content(cur));
+							imapFetch.badgeCounter = 0;
+							std::vector<uint32_t> uidSet;
+							for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
+								if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
+									pmm::Log << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
+									break;
+								}
+								uint32_t uid;
+								uid = *((uint32_t *)clist_content(cur));
 #ifdef DEBUG_IMAP
-							pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
+								pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
 #endif
-							imapFetch.badgeCounter++;
-							if (imapFetch.mailAccountInfo.devel) {
-								//pmm::imapLog << "Using development notification queue..." << pmm::NL;
-								fetch_msg(imap, uid, develNotificationQueue, imapFetch);
+								imapFetch.badgeCounter++;
+								if (imapFetch.mailAccountInfo.devel) {
+									//pmm::imapLog << "Using development notification queue..." << pmm::NL;
+									fetch_msg(imap, uid, develNotificationQueue, imapFetch);
+								}
+								else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
+								uidSet.push_back(uid);
 							}
-							else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
-							uidSet.push_back(uid);
+
 						}
 						//Remove old entries if the current time is a multiple of 60 seconds
-						if (rightNow % 60 == 0) {
+						if (rightNow % 600 == 0) {
 #ifdef DEBUG
 							pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
 #endif
@@ -333,10 +339,6 @@ namespace pmm {
 					}
 					mailimap_close(imap);
 				}
-				/*} catch (...) {
-				 fetchQueue->add(imapFetch);
-				 throw ;
-				 }*/
 				mailimap_free(imap);
 			}
 			usleep(1000);

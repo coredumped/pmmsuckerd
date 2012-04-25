@@ -71,7 +71,7 @@ namespace pmm {
 		if (outputStream.is_open()) {
 			outputStream.close();
 		}
-		outputStream.open(path.c_str());
+		outputStream.open(path.c_str(), std::ios_base::app);
 	}
 	
 	void MTLogger::setTag(const std::string &_tag){
