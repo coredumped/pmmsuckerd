@@ -26,30 +26,10 @@ namespace pmm {
 		sqlite3 *dbConn;
 		void verifyTables();
 		void verifyTables(sqlite3 *conn, const std::string &email);
-		
-		Mutex fM;
-		Mutex migrM;
-		class UniqueDBDescriptor {
-		protected:
-			int maxOpenTime;
-		public:
-			sqlite3 *conn;
-			time_t openedOn;
-			UniqueDBDescriptor();
-			UniqueDBDescriptor(const UniqueDBDescriptor &u);
-			void closeConn();
-			void autoRefresh();
-		};
-		
-		std::map<std::string, UniqueDBDescriptor> uConnMap;
 	protected:
 		sqlite3 *openDatabase();
 		sqlite3 *openDatabase(const std::string &email);
 		void closeDatabase(sqlite3 *db);
-		
-		sqlite3 *getUConnection(const std::string &email);
-		void setUConnection(const std::string &email, sqlite3 *conn);
-		void autoRefreshUConn(const std::string &email);
 	public:
 		FetchedMailsCache();
 		FetchedMailsCache(const std::string &_datafile);
