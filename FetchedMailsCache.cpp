@@ -135,7 +135,7 @@ namespace pmm {
 		if (sqlite3_threadsafe() && dbConn != 0) {
 			return dbConn;
 		}
-		int errCode = sqlite3_open(datafile.c_str(), &dbConn);
+		int errCode = sqlite3_open_v2(datafile.c_str(), &dbConn, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, NULL);
 		if (errCode != SQLITE_OK) {
 			throw GenericException(sqlite3_errmsg(dbConn));
 		}
@@ -184,6 +184,7 @@ namespace pmm {
 				}
 				bool logged = false;
 				char *errmsg_s = 0;
+				time_t t1 = time(0);
 				while (sqlite3_step(statement) == SQLITE_ROW) {
 					if (!logged) {
 						logged = true;
@@ -206,6 +207,7 @@ namespace pmm {
 					}
 					
 				}
+				CacheLog << "Migration of " << email << " took " << (int)(time(0) - t1) << " seconds" << pmm::NL;
 				sqlite3_finalize(statement);
 				//Erase old entries
 				sqlCmd.str(std::string());
