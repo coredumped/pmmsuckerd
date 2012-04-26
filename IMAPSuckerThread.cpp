@@ -34,7 +34,7 @@
 
 namespace pmm {
 	MTLogger imapLog;
-	FetchedMailsCache fetchedMails;
+	
 	
 	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size, MailMessage &tm)
 	{
@@ -99,7 +99,7 @@ namespace pmm {
 	
 	void IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch)
 	{
-		if (fetchedMails.entryExists(imapFetch.mailAccountInfo.email(), uid)) {
+		if (fetchedMails.entryExists2(imapFetch.mailAccountInfo.email(), uid)) {
 			//Do not fetch or even notify previously fetched e-mails
 			return;
 		}
@@ -143,7 +143,7 @@ namespace pmm {
 				mailimap_fetch_list_free(fetch_result);
 				return;
 			}
-			fetchedMails.addEntry(imapFetch.mailAccountInfo.email(), uid);
+			fetchedMails.addEntry2(imapFetch.mailAccountInfo.email(), uid);
 			//Verify if theMessage is not too old, if it is then just discard it!!!
 			if (theMessage.serverDate < threadStartTime) {
 				imapLog << "Message is too old, not notifying it!!!" << pmm::NL;				
@@ -329,7 +329,7 @@ namespace pmm {
 #ifdef DEBUG
 								pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
 #endif
-								fetchedMails.removeEntriesNotInSet(imapFetch.mailAccountInfo.email(), uidSet);
+								fetchedMails.removeEntriesNotInSet2(imapFetch.mailAccountInfo.email(), uidSet);
 							}
 						}
 						mailimap_search_result_free(unseenMails);	

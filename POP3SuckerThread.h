@@ -44,6 +44,8 @@ namespace pmm {
 		};
 		
 		class POP3FetcherThread : public GenericThread {
+		private:
+			FetchedMailsCache fetchedMails;
 		public:
 			time_t startedOn;
 			std::map<std::string, time_t> startTimeMap;

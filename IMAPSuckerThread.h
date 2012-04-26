@@ -52,6 +52,7 @@ namespace pmm {
 		private:
 			int dispatched;
 			//MailAccountInfo mInfo;
+			FetchedMailsCache fetchedMails;
 			int availableMessages;
 			int fetchRetryInterval;
 			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);

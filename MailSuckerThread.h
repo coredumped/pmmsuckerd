@@ -58,6 +58,7 @@ namespace pmm {
 		virtual void registerDeviceTokens();
 		virtual void relinquishDeviceTokens();
 	public:
+		FetchedMailsCache fetchedMails;
 		SharedVector<MailAccountInfo> emailAccounts;
 		SharedQueue<NotificationPayload> *notificationQueue;
 		SharedQueue<NotificationPayload> *develNotificationQueue;
@@ -78,7 +79,6 @@ namespace pmm {
 	};
 	
 	bool etpanOperationFailed(int r);
-	extern FetchedMailsCache fetchedMails;
 }
 
 

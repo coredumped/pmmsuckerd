@@ -159,7 +159,7 @@ namespace pmm {
 			memcpy(binaryMessagePt, payloadBuff, payloadLength);
 			binaryMessagePt += payloadLength;
 			int sslRetCode;
-#ifdef DEBUG
+#ifdef DEBUG_PAYLOAD_SIZE
 			APNSLog << "DEBUG: Sending " << (int)(binaryMessagePt - binaryMessageBuff) << " bytes payload..." << pmm::NL;
 #endif
 			sslRetCode = SSL_write(sslPtr, binaryMessageBuff, (int)(binaryMessagePt - binaryMessageBuff));
@@ -526,8 +526,10 @@ namespace pmm {
 	void APNSNotificationThread::notifyTo(const std::string &devToken, NotificationPayload &msg){
 		//Add some code here for god sake!!!
 		std::string jsonMsg = msg.toJSON();
-#ifdef DEBUG
+#ifdef DEBUG_FULL_MESSAGE
 		APNSLog << "DEBUG: Sending notification " << jsonMsg << pmm::NL;
+#else
+		APNSLog << "DEBUG: Sending message to device " << devToken << pmm::NL;
 #endif
 		if (devTokenCache.find(devToken) == devTokenCache.end()) {
 			std::string binaryDevToken;

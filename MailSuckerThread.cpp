@@ -27,7 +27,7 @@
 #endif
 
 #ifndef DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL
-#define DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL 3
+#define DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL 2
 #endif
 
 namespace pmm {
@@ -117,7 +117,7 @@ namespace pmm {
 				if (m.compare(emailAccounts[i].email()) == 0) {
 					emailAccounts.erase(i);
 					found = true;
-					fetchedMails.removeAllEntriesOfEmail(m);
+					fetchedMails.removeAllEntriesOfEmail2(m);
 #warning TODO: Remove all preferences for this account
 					QuotaDB::removeAccount(m);
 					break;
@@ -193,6 +193,7 @@ namespace pmm {
 			time_t currTime = time(0);
 			if(emailAccounts.size() == 0 && currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				time_t rightNow = time(0);
 				QuotaIncreasePetition p;
 				if(quotaIncreaseQueue->extractEntry(p)){
 					//Verify if we should upgrade quotas on an account
@@ -238,20 +239,20 @@ namespace pmm {
 						//Maximum time the mailbox connection can be opened, if reched then we close the connection and force a new one.
 						if (maxOpenTime > 0 && currTime - mailboxControl[emailAccounts[i].email()].openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
 						if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
-						if (mCtrl.lastCheck + minimumMailCheckInterval < time(0)) {
+						if (rightNow - mCtrl.lastCheck >= minimumMailCheckInterval) {
 							checkEmail(emailAccounts[i]);
-							mailboxControl[emailAccounts[i].email()].lastCheck = time(0);
+							mailboxControl[emailAccounts[i].email()].lastCheck = rightNow;
 						}
 					}
 #ifdef DEBUG
 					else {
-						if(currTime % 60 == 0) pmm::Log << emailAccounts[i].email() << " is not enabled, ignoring..." << pmm::NL;
+						if(currTime % 600 == 0) pmm::Log << emailAccounts[i].email() << " is not enabled, ignoring..." << pmm::NL;
 					}
 #endif
 				}
 #ifdef DEBUG
 				else {
-					if(currTime % 60 == 0) pmm::Log << emailAccounts[i].email() << " has no registered devtokens, ignoring..." << pmm::NL;
+					if(currTime % 600 == 0) pmm::Log << emailAccounts[i].email() << " has no registered devtokens, ignoring..." << pmm::NL;
 				}
 #endif
 			}

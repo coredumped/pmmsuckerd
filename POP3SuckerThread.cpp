@@ -25,7 +25,7 @@
 #endif
 
 #ifndef DEFAULT_POP3_MINIMUM_CHECK_INTERVAL
-#define DEFAULT_POP3_MINIMUM_CHECK_INTERVAL 5
+#define DEFAULT_POP3_MINIMUM_CHECK_INTERVAL 3
 #endif
 
 #ifndef DEFAULT_HOTMAIL_CHECK_INTERVAL
@@ -166,7 +166,7 @@ namespace pmm {
 									pmm::Log << pf.mailAccountInfo.email() << " has ran out of quota in the middle of a POP3 mailbox poll!!!" << pmm::NL;
 									break;
 								}
-								if (!fetchedMails.entryExists(pf.mailAccountInfo.email(), info->msg_uidl)) {
+								if (!fetchedMails.entryExists2(pf.mailAccountInfo.email(), info->msg_uidl)) {
 									//Perform real message retrieval
 									char *msgBuffer;
 									size_t msgSize;
@@ -185,13 +185,13 @@ namespace pmm {
 										}
 										mailpop3_retr_free(msgBuffer);
 										if (startTimeMap.find(pf.mailAccountInfo.email()) == startTimeMap.end()) {
-											startTimeMap[pf.mailAccountInfo.email()] = now;
+											startTimeMap[pf.mailAccountInfo.email()] = now - 300;
 										}
 #ifdef DEBUG
 										pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
 #endif
 										if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
-											fetchedMails.addEntry(pf.mailAccountInfo.email(), info->msg_uidl);
+											fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 											pmm::Log << "Message not notified because it is too old" << pmm::NL;
 										}
 										else {
@@ -211,7 +211,7 @@ namespace pmm {
 												}
 												else notificationQueue->add(np);
 												if(i == 0){
-													fetchedMails.addEntry(pf.mailAccountInfo.email(), info->msg_uidl);
+													fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 													if(!QuotaDB::decrease(pf.mailAccountInfo.email())){
 														pop3Log << "ATTENTION: Account " << pf.mailAccountInfo.email() << " has ran out of quota!" << pmm::NL;
 														std::stringstream msg;
