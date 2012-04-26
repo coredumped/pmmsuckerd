@@ -25,7 +25,7 @@
 #endif
 
 #ifndef DEFAULT_DBCONN_MAX_OPEN_TIME
-#define DEFAULT_DBCONN_MAX_OPEN_TIME 600
+#define DEFAULT_DBCONN_MAX_OPEN_TIME 60
 #endif
 
 
@@ -40,6 +40,7 @@ namespace pmm {
 	public:
 		sqlite3 *conn;
 		time_t openedOn;
+		
 		UniqueDBDescriptor(){
 			conn = NULL;
 			openedOn = time(0);
@@ -51,7 +52,10 @@ namespace pmm {
 			maxOpenTime = u.maxOpenTime;
 		}
 		void closeConn(){
-			if(conn != NULL) sqlite3_close(conn);
+			if(conn != NULL){
+				sqlite3_close(conn);
+				conn = NULL;
+			}
 		}
 		void autoRefresh(){
 			if(time(0) - openedOn >= maxOpenTime){
