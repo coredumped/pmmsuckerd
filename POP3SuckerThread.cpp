@@ -187,12 +187,12 @@ namespace pmm {
 										if (startTimeMap.find(pf.mailAccountInfo.email()) == startTimeMap.end()) {
 											startTimeMap[pf.mailAccountInfo.email()] = now - 300;
 										}
-#ifdef DEBUG
+#ifdef DEBUG_TIME_ELDERNESS
 										pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
 #endif
 										if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
 											fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-											pmm::Log << "Message not notified because it is too old" << pmm::NL;
+											pmm::Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
 										}
 										else {
 											theMessage.to = pf.mailAccountInfo.email();
