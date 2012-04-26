@@ -32,35 +32,28 @@
 namespace pmm {
 	MTLogger CacheLog;
 	static const char *fetchedMailsTable = DEFAULT_FETCHED_MAILS_TABLE_NAME;
-	static Mutex fM;
+
+	FetchedMailsCache::UniqueDBDescriptor::UniqueDBDescriptor(){
+		conn = NULL;
+		openedOn = time(0);
+		maxOpenTime = DEFAULT_DBCONN_MAX_OPEN_TIME;
+	}
 	
-	class UniqueDBDescriptor {
-	protected:
-		int maxOpenTime;
-	public:
-		sqlite3 *conn;
-		time_t openedOn;
-		UniqueDBDescriptor(){
-			conn = NULL;
-			openedOn = time(0);
-			maxOpenTime = DEFAULT_DBCONN_MAX_OPEN_TIME;
-		}
-		UniqueDBDescriptor(const UniqueDBDescriptor &u){
-			conn = u.conn;
-			openedOn = u.openedOn;
-			maxOpenTime = u.maxOpenTime;
-		}
-		void closeConn(){
-			if(conn != NULL) sqlite3_close(conn);
-		}
-		void autoRefresh(){
-			if(time(0) - openedOn >= maxOpenTime){
-				closeConn();
-			}
-		}
-	};
+	FetchedMailsCache::UniqueDBDescriptor::UniqueDBDescriptor(const UniqueDBDescriptor &u){
+		conn = u.conn;
+		openedOn = u.openedOn;
+		maxOpenTime = u.maxOpenTime;
+	}
 	
-	static std::map<std::string, UniqueDBDescriptor> uConnMap;
+	void FetchedMailsCache::UniqueDBDescriptor::closeConn(){
+		if(conn != NULL) sqlite3_close(conn);
+	}
+	
+	void FetchedMailsCache::UniqueDBDescriptor::autoRefresh(){
+		if(time(0) - openedOn >= maxOpenTime){
+			closeConn();
+		}
+	}
 	
 	static void createDirIfNotExists(const std::string &theDir){
 		struct stat st;
@@ -103,7 +96,7 @@ namespace pmm {
 		return false;
 	}
 	
-	static sqlite3 *getUConnection(const std::string &email){
+	sqlite3 *FetchedMailsCache::getUConnection(const std::string &email){
 		sqlite3 *theConn = NULL;
 		fM.lock();
 		try {
@@ -118,14 +111,14 @@ namespace pmm {
 		return theConn;
 	}
 	
-	static void setUConnection(const std::string &email, sqlite3 *conn){
+	void FetchedMailsCache::setUConnection(const std::string &email, sqlite3 *conn){
 		fM.lock();
 		uConnMap[email].conn = conn;
 		uConnMap[email].openedOn = time(0);
 		fM.unlock();
 	}
 	
-	static void autoRefreshUConn(const std::string &email){
+	void FetchedMailsCache::autoRefreshUConn(const std::string &email){
 		fM.lock();
 		uConnMap[email].autoRefresh();
 		fM.unlock();
@@ -141,8 +134,6 @@ namespace pmm {
 		}
 		return dbConn;
 	}
-	
-	static Mutex migrM;
 	
 	sqlite3 *FetchedMailsCache::openDatabase(const std::string &email){
 		sqlite3 *theConn;
@@ -262,11 +253,7 @@ namespace pmm {
 	}
 	
 	void FetchedMailsCache::addEntry(const std::string &email, const std::string &uid){
-#ifdef ENABLE_MULTIPLE_TABLES
-		sqlite3 *conn = openDatabase(email);
-#else
 		sqlite3 *conn = openDatabase();
-#endif
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "INSERT INTO " << fetchedMailsTable << " (timestamp,email,uniqueid) VALUES (" << time(NULL);
@@ -289,11 +276,7 @@ namespace pmm {
 				throw GenericException(errmsg.str());
 			}
 		}
-#ifdef ENABLE_MULTIPLE_TABLES
-		autoRefreshUConn(email);
-#else
 		closeDatabase(conn);
-#endif
 	}
 #endif
 	
@@ -313,8 +296,11 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);
+		//autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 	}
+	
 	void FetchedMailsCache::addEntry2(const std::string &email, uint32_t &uid){
 		sqlite3 *conn = openDatabase(email);
 		char *errmsg_s;
@@ -331,8 +317,11 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);		
+		//autoRefreshUConn(email);		
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 	}
+	
 #ifdef OLD_CACHE_INTERFACE
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		bool ret = false;
@@ -449,7 +438,9 @@ namespace pmm {
 			throw GenericException(errmsg.str());			
 		}
 		sqlite3_finalize(statement);
-		autoRefreshUConn(email);
+		//autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 		return ret;
 	}
 	
@@ -465,7 +456,7 @@ namespace pmm {
 		if (errCode != SQLITE_OK) {
 			std::stringstream errmsg;
 			errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
-			closeDatabase(conn);
+			sqlite3_close(conn);
 			setUConnection(email, 0);
 #ifdef DEBUG
 			CacheLog << errmsg.str() << pmm::NL;
@@ -489,7 +480,8 @@ namespace pmm {
 			throw GenericException(errmsg.str());			
 		}
 		sqlite3_finalize(statement);
-		autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 		return ret;
 	}	
 	
@@ -595,7 +587,8 @@ namespace pmm {
 			throw GenericException(errmsg.str());			
 		}
 		sqlite3_finalize(statement);
-		autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 		return ret;		
 	}
 	
@@ -636,7 +629,8 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 	}
 	
 #ifdef OLD_CACHE_INTERFACE
@@ -663,6 +657,7 @@ namespace pmm {
 		}
 		closeDatabase(conn);
 	}
+	
 	void FetchedMailsCache::removeEntriesNotInSet(const std::string &email, const std::vector<uint32_t> &uidSet){
 		if(uidSet.size() == 0) return;
 		sqlite3 *conn = openDatabase();
@@ -727,8 +722,10 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 	}
+	
 	void FetchedMailsCache::removeEntriesNotInSet2(const std::string &email, const std::vector<uint32_t> &uidSet){
 		if(uidSet.size() == 0) return;
 		sqlite3 *conn = openDatabase(email);
@@ -750,7 +747,8 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 	}
 	
 	void FetchedMailsCache::removeAllEntriesOfEmail2(const std::string &email){
@@ -768,7 +766,8 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);
+		sqlite3_close(conn);
+		setUConnection(email, 0);
 	}
 
 	
