@@ -477,39 +477,46 @@ namespace pmm {
 				//mailstream_debug = 1;
 				result = mailimap_select(imapControl[theEmail].imap, "INBOX");
 				if(etpanOperationFailed(result)){
-					pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << pmm::NL;
-					throw GenericException("Unable to select INBOX folder");
-				}			
-				int idleEnabled;
-				if (theEmail.compare("jinny27@nate.com") == 0) {
-					idleEnabled = 0;
-				}
-				else idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
-				if(!idleEnabled){
-					imapLog << "WARNING: " << theEmail << " is not hosted in an IMAP IDLE environment." << pmm::NL;
+					if (imapControl[theEmail].imap->imap_response == 0) {
+						pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << pmm::NL;
+					}
+					else {
+						pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << ": " << imapControl[theEmail].imap->imap_response <<  pmm::NL;
+					}
+					//throw GenericException("Unable to select INBOX folder");
+				}	
+				else {
+					int idleEnabled;
+					if (theEmail.compare("jinny27@nate.com") == 0) {
+						idleEnabled = 0;
+					}
+					else idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
+					if(!idleEnabled){
+						imapLog << "WARNING: " << theEmail << " is not hosted in an IMAP IDLE environment." << pmm::NL;
+						mailboxControl[theEmail].isOpened = true;
+						mailboxControl[theEmail].openedOn = time(0x00);
+						imapControl[theEmail].startedOn = time(NULL);
+						mailimap_logout(imapControl[theEmail].imap);
+						mailimap_close(imapControl[theEmail].imap);
+						imapControl[theEmail].supportsIdle = false;
+						return;
+					}
+					//Manually check mailbox in case any unnotified e-mail arrived before a call to IDLE
+					fetchMails(m);
+					imapControl[theEmail].supportsIdle = true;
+					result = mailimap_idle(imapControl[theEmail].imap);
+					if(etpanOperationFailed(result)){
+						throw GenericException("Unable to start IDLE!!!");
+					}
+					//Report successfull login
 					mailboxControl[theEmail].isOpened = true;
 					mailboxControl[theEmail].openedOn = time(0x00);
 					imapControl[theEmail].startedOn = time(NULL);
-					mailimap_logout(imapControl[theEmail].imap);
-					mailimap_close(imapControl[theEmail].imap);
-					imapControl[theEmail].supportsIdle = false;
-					return;
-				}
-				//Manually check mailbox in case any unnotified e-mail arrived before a call to IDLE
-				fetchMails(m);
-				imapControl[theEmail].supportsIdle = true;
-				result = mailimap_idle(imapControl[theEmail].imap);
-				if(etpanOperationFailed(result)){
-					throw GenericException("Unable to start IDLE!!!");
-				}
-				//Report successfull login
-				mailboxControl[theEmail].isOpened = true;
-				mailboxControl[theEmail].openedOn = time(0x00);
-				imapControl[theEmail].startedOn = time(NULL);
-				//sleep(1);
+					//sleep(1);
 #ifdef DEBUG
-				pmm::imapLog << theEmail << " is being succesfully monitored!!!" << pmm::NL;
+					pmm::imapLog << theEmail << " is being succesfully monitored!!!" << pmm::NL;
 #endif
+				}
 			}
 		}
 	}
