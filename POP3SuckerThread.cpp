@@ -84,6 +84,7 @@ namespace pmm {
 		quotaUpdateVector = NULL;
 		pmmStorageQueue = NULL;
 		isForHotmail = false;
+		mailstream_network_delay.tv_sec = 5;
 	}
 	
 	POP3SuckerThread::POP3FetcherThread::~POP3FetcherThread(){
