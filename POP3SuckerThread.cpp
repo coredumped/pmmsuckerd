@@ -255,10 +255,10 @@ namespace pmm {
 			if (isForHotmail) {
 				while (hotmailFetchQueue.extractEntry(pf)) {
 					time_t rightNow = time(0);
-					if (rightNow - pf.timestamp > 600) {
+					/*if (rightNow - pf.timestamp > 600) {
 						pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs, queue has" << (int)mainFetchQueue.size() << " elements" << pmm::NL;
 						continue;
-					}
+					}*/
 					//Fetch messages for account here!!!
 					fetchMessages(pf);
 				}
@@ -266,11 +266,11 @@ namespace pmm {
 			else {
 				//Fetch regular pop3 accounts here
 				while (mainFetchQueue.extractEntry(pf)) {
-					time_t rightNow = time(0);
+					/*time_t rightNow = time(0);
 					if (rightNow - pf.timestamp > 600) {
 						pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs, queue has" << (int)mainFetchQueue.size() << " elements" << pmm::NL;
 						continue;
-					}
+					}*/
 					//Fetch messages for account here!!!
 					fetchMessages(pf);
 				}
