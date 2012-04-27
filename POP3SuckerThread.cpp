@@ -142,6 +142,8 @@ namespace pmm {
 						pop3Log << "WARNING: " << pf.mailAccountInfo.email() << " is a very large mailbox, it has " << max_retrieve << " messages, scanning it will take a while!!!" << pmm::NL;
 						largeT1 = time(0);
 					}
+					if(isForHotmail) pop3Log << "HOTMAIL: Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
+					else pop3Log << "Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 					for (int i = 0; i < max_retrieve; i++) {
 						time_t now = time(0);
@@ -252,7 +254,8 @@ namespace pmm {
 			POP3FetchItem pf;
 			if (isForHotmail) {
 				while (hotmailFetchQueue.extractEntry(pf)) {
-					if (time(0) - pf.timestamp > 600) {
+					time_t rightNow = time(0);
+					if (rightNow - pf.timestamp > 600) {
 						pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs, queue has" << (int)mainFetchQueue.size() << " elements" << pmm::NL;
 						continue;
 					}
@@ -263,7 +266,8 @@ namespace pmm {
 			else {
 				//Fetch regular pop3 accounts here
 				while (mainFetchQueue.extractEntry(pf)) {
-					if (time(0) - pf.timestamp > 600) {
+					time_t rightNow = time(0);
+					if (rightNow - pf.timestamp > 600) {
 						pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs, queue has" << (int)mainFetchQueue.size() << " elements" << pmm::NL;
 						continue;
 					}
@@ -394,6 +398,7 @@ namespace pmm {
 		//Implement asynchronous retrieval code, tipically from a thread
 		std::string email = m.email();
 		if (email.find("@hotmail.") == email.npos || email.find("@live.") == email.npos) {
+			pop3Log << m.email() << " added to main fetch queue" << pmm::NL;
 			mainFetchQueue.add(m);
 		}
 		else {
