@@ -393,6 +393,8 @@ int main (int argc, const char * argv[])
 			for (int j = 0; j < maxNotificationThreads; j++) {
 				sent += notifThreads[j].cntMessageSent;
 				failed += notifThreads[j].cntMessageFailed;
+				notifThreads[j].cntMessageSent = 0;
+				notifThreads[j].cntMessageFailed = 0;
 			}
 			pmm::Log << "STAT: Notifications sent: " << (double)(sent / 300.0) << "/sec failed: " << (double)(failed / 300.0) << "/sec" << pmm::NL;
 		}

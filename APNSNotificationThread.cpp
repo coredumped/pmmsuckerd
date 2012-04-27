@@ -313,6 +313,8 @@ namespace pmm {
 		maxBurstPauseInterval = DEFAULT_BURST_PAUSE_INTERVAL;
 		maxConnectionInterval = DEFAULT_MAX_CONNECTION_INTERVAL;
 		warmingUP = false;
+		cntMessageFailed = 0;
+		cntMessageSent = 0;
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
