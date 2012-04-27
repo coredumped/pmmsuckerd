@@ -153,8 +153,12 @@ namespace pmm {
 							}
 						}
 						else {
+							time_t largeT1;
 							int max_retrieve = carray_count(msgList);
-							if(max_retrieve > 1000) pop3Log << "WARNING: " << pf.mailAccountInfo.email() << " is a very large mailbox, it has " << max_retrieve << " messages, scanning it will take a while!!!" << pmm::NL;
+							if(max_retrieve > 1000){
+								pop3Log << "WARNING: " << pf.mailAccountInfo.email() << " is a very large mailbox, it has " << max_retrieve << " messages, scanning it will take a while!!!" << pmm::NL;
+								largeT1 = time(0);
+							}
 							//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 							for (int i = 0; i < max_retrieve; i++) {
 								time_t now = time(0);
@@ -233,6 +237,9 @@ namespace pmm {
 										}
 									}
 								}
+							}
+							if(max_retrieve > 1000){
+								pop3Log << "WARNING: Scan of " << pf.mailAccountInfo.email() << " took: " << (int)(time(0) - largeT1) << " secs" << pmm::NL;
 							}
 						}
 					}
