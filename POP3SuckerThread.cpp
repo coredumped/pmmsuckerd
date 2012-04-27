@@ -331,11 +331,11 @@ namespace pmm {
 			pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 			pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 			pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
-			ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 		}
 		for (size_t j = 0; j < maxHotmailThreads; j++) {
 			pop3Fetcher[l - j - 1].isForHotmail = true;
 		}
+		for (size_t i = 0; i < l; i++) ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 	}
 	
 	void POP3SuckerThread::closeConnection(const MailAccountInfo &m){
@@ -352,11 +352,11 @@ namespace pmm {
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
-				ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {
 				pop3Fetcher[l - j - 1].isForHotmail = true;
 			}
+			for (size_t i = 0; i < l; i++) ThreadDispatcher::start(pop3Fetcher[i], 12 * 1024 * 1024);
 		}
 		mailboxControl[m.email()].isOpened = true;
 		mailboxControl[m.email()].openedOn = time(0x00);
@@ -398,7 +398,7 @@ namespace pmm {
 		//Implement asynchronous retrieval code, tipically from a thread
 		std::string email = m.email();
 		if (email.find("@hotmail.") == email.npos || email.find("@live.") == email.npos) {
-			pop3Log << m.email() << " added to main fetch queue" << pmm::NL;
+			//pop3Log << m.email() << " added to main fetch queue" << pmm::NL;
 			mainFetchQueue.add(m);
 		}
 		else {
