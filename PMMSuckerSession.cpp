@@ -308,7 +308,7 @@ namespace pmm {
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
 #ifdef DEBUG
-			if(output.size() > 0){
+			if(output.size() > 0 && postData["opType"].compare(pmm::OperationTypes::pmmSuckerRequestMailAccounts) != 0){
 				pmm::Log << "DEBUG: POST RESPONSE: " << output << pmm::NL;
 				pmm::Log.flush();
 			}
