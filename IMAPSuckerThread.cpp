@@ -363,13 +363,13 @@ namespace pmm {
 		maxMailFetchers = DEFAULT_MAX_MAIL_FETCHERS;
 		mailFetchers = new MailFetcher[maxMailFetchers];
 		//IMAPSuckerThread::fetchedMails.expireOldEntries();
-		threadStartTime = time(0) - 1200;
+		threadStartTime = time(0) - 43200;
 	}
 	IMAPSuckerThread::IMAPSuckerThread(size_t _maxMailFetchers){
 		maxMailFetchers = _maxMailFetchers;
 		mailFetchers = new MailFetcher[maxMailFetchers];
 		//IMAPSuckerThread::fetchedMails.expireOldEntries();
-		threadStartTime = time(0) - 1200;
+		threadStartTime = time(0) - 43200;
 	}
 	IMAPSuckerThread::~IMAPSuckerThread(){
 		delete [] mailFetchers;
