@@ -146,7 +146,7 @@ namespace pmm {
 			fetchedMails.addEntry2(imapFetch.mailAccountInfo.email(), uid);
 			//Verify if theMessage is not too old, if it is then just discard it!!!
 			if (theMessage.serverDate < threadStartTime) {
-				imapLog << "Message is too old, not notifying it!!!" << pmm::NL;				
+				imapLog << "Message for " << imapFetch.mailAccountInfo.email() << " is too old, not notifying it!!!" << pmm::NL;				
 			}
 			else {
 				std::vector<std::string> myDevTokens = imapFetch.mailAccountInfo.devTokens();
@@ -354,13 +354,13 @@ namespace pmm {
 		maxMailFetchers = DEFAULT_MAX_MAIL_FETCHERS;
 		mailFetchers = new MailFetcher[maxMailFetchers];
 		//IMAPSuckerThread::fetchedMails.expireOldEntries();
-		threadStartTime = time(0) - 900;
+		threadStartTime = time(0) - 1200;
 	}
 	IMAPSuckerThread::IMAPSuckerThread(size_t _maxMailFetchers){
 		maxMailFetchers = _maxMailFetchers;
 		mailFetchers = new MailFetcher[maxMailFetchers];
 		//IMAPSuckerThread::fetchedMails.expireOldEntries();
-		threadStartTime = time(0) - 900;
+		threadStartTime = time(0) - 1200;
 	}
 	IMAPSuckerThread::~IMAPSuckerThread(){
 		delete [] mailFetchers;

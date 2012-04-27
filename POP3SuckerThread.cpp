@@ -211,6 +211,7 @@ namespace pmm {
 												}
 												else notificationQueue->add(np);
 												if(i == 0){
+													quotaUpdateVector->push_back(pf.mailAccountInfo.email());
 													fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 													if(!QuotaDB::decrease(pf.mailAccountInfo.email())){
 														pop3Log << "ATTENTION: Account " << pf.mailAccountInfo.email() << " has ran out of quota!" << pmm::NL;
@@ -225,7 +226,6 @@ namespace pmm {
 														else notificationQueue->add(npi);
 													}
 													else {
-														quotaUpdateVector->push_back(pf.mailAccountInfo.email());
 														pmmStorageQueue->add(np);
 													}
 												}
