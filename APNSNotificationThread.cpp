@@ -110,6 +110,7 @@ namespace pmm {
 						std::string invalidToken;
 						if(PendingNotificationStore::getDeviceTokenFromMessage(invalidToken, notifID)) invalidTokens->add(invalidToken);
 					}
+					cntMessageFailed = cntMessageFailed + 1;
 				}
 			}
 		}
@@ -315,7 +316,7 @@ namespace pmm {
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
-		disconnectFromAPNS();
+		if(_socket != -1) disconnectFromAPNS();
 		SSL_CTX_free(sslCTX);
 	}
 	
@@ -479,6 +480,7 @@ namespace pmm {
 							}
 						}
 						notifyTo(currentDeviceToken, payload);
+						cntMessageSent = cntMessageSent + 1;
 						lastDevToken = currentDeviceToken;
 						lastTimeSentMap[currentDeviceToken] = rightNow;
 					}

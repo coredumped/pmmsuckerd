@@ -267,9 +267,11 @@ int main (int argc, const char * argv[])
 			while (!tfile.eof()) {
 				std::string tokenItem;
 				std::getline(tfile, tokenItem);
-				pmm::Log << " * Adding " << tokenItem << " to invalid token cache on each notification thread." << pmm::NL;
-				for (size_t idx = 0; idx < maxNotificationThreads; idx++) {
-					notifThreads[idx].invalidTokenSet.insert(tokenItem);
+				if(tokenItem.size() > 0){
+					pmm::Log << " * Adding " << tokenItem << " to invalid token cache on each notification thread." << pmm::NL;
+					for (size_t idx = 0; idx < maxNotificationThreads; idx++) {
+						notifThreads[idx].invalidTokenSet.insert(tokenItem);
+					}
 				}
 			}
 			tfile.close();
@@ -384,6 +386,15 @@ int main (int argc, const char * argv[])
 		}
 		if (tic % 43200 == 0){
 			pmm::PendingNotificationStore::eraseOldPayloads();
+		}
+		if (tic % 300 == 0){
+			//Save stats to log
+			int sent = 0, failed = 0;
+			for (int j = 0; j < maxNotificationThreads; j++) {
+				sent += notifThreads[j].cntMessageSent;
+				failed += notifThreads[j].cntMessageFailed;
+			}
+			pmm::Log << "STAT: Notifications sent: " << (double)(sent / 300.0) << "/sec failed: " << (double)(failed / 300.0) << "/sec" << pmm::NL;
 		}
 		if (tic % 30 == 0) {
 			//Process quota updates if any

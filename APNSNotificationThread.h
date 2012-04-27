@@ -115,6 +115,9 @@ namespace pmm {
 		void triggerSimultanousReconnect();
 		
 		AtomicFlag stopExecution;
+		//Stat counters
+		AtomicVar<int> cntMessageSent;
+		AtomicVar<int> cntMessageFailed;
 	};
 	
 	namespace PushErrorCodes {

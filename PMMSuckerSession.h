@@ -37,13 +37,18 @@ namespace pmm {
 	class SuckerSession {
 	private:
 		std::string pmmServiceURL;
+#ifndef CHEAT_SESSION_MANAGER
 		std::string myID;
+#endif
 		std::string apiKey;
 		time_t expirationTime;
 		Mutex timeM;
 	protected:
 
 	public:
+#ifdef CHEAT_SESSION_MANAGER
+		std::string myID;
+#endif
 		SuckerSession();
 		SuckerSession(const std::string &srvURL);
 
