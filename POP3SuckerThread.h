@@ -46,7 +46,10 @@ namespace pmm {
 		class POP3FetcherThread : public GenericThread {
 		private:
 			FetchedMailsCache fetchedMails;
+		protected:
+			void fetchMessages(POP3FetchItem &pf);
 		public:
+			bool isForHotmail;
 			time_t startedOn;
 			std::map<std::string, time_t> startTimeMap;
 			SharedQueue<NotificationPayload> *notificationQueue;
@@ -60,6 +63,7 @@ namespace pmm {
 		};
 		
 		size_t maxPOP3FetcherThreads;
+		size_t maxHotmailThreads;
 		POP3FetcherThread *pop3Fetcher;
 		std::map<std::string, POP3Control> pop3Control;
 	protected:
