@@ -172,35 +172,13 @@ namespace pmm {
 				sqlite3 *old_db = openDatabase();
 				std::stringstream sqlCmd;
 				sqlite3_stmt *statement;
-				
-				char *sztail;
-				sqlCmd << "SELECT uniqueid,timestamp FROM " << fetchedMailsTable << " WHERE email='" << email << "'";		
-				errCode = sqlite3_prepare_v2(old_db, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
-				if (errCode != SQLITE_OK) {
-					std::stringstream errmsg;
-					errmsg << "Unable to migrate data from old database: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(old_db);
-					closeDatabase(old_db);
-#ifdef DEBUG
-					CacheLog << errmsg.str() << pmm::NL;
-#endif
-					migrM.unlock();
-					throw GenericException(errmsg.str());
-				}
-				bool logged = false;
-				char *errmsg_s = 0;
-				while (sqlite3_step(statement) == SQLITE_ROW) {
-					if (!logged) {
-						logged = true;
-						CacheLog << "Migrating data (" << email << ") from old database..." << pmm::NL;
-					}
-					sqlCmd.str(std::string());
-					sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (uniqueid,timestamp) VALUES (";
-					sqlCmd << "'" << sqlite3_column_text(statement, 0) << "',";
-					sqlCmd << "'" << sqlite3_column_text(statement, 1) << "')";
-					errCode = sqlite3_exec(theConn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+				if(tableExists(old_db, fetchedMailsTable)){
+					char *sztail;
+					sqlCmd << "SELECT uniqueid,timestamp FROM " << fetchedMailsTable << " WHERE email='" << email << "'";		
+					errCode = sqlite3_prepare_v2(old_db, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 					if (errCode != SQLITE_OK) {
 						std::stringstream errmsg;
-						errmsg << "Unable to migrate data from old database: " << sqlCmd.str() << " due to: " << errmsg_s;
+						errmsg << "Unable to migrate data from old database: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(old_db);
 						closeDatabase(old_db);
 #ifdef DEBUG
 						CacheLog << errmsg.str() << pmm::NL;
@@ -208,24 +186,47 @@ namespace pmm {
 						migrM.unlock();
 						throw GenericException(errmsg.str());
 					}
-					
-				}
-				sqlite3_finalize(statement);
-				//Erase old entries
-				sqlCmd.str(std::string());
-				sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE email='" << email << "'";
-				errCode = sqlite3_exec(old_db, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
-				if (errCode != SQLITE_OK) {
-					std::stringstream errmsg;
-					errmsg << "Unable to remove old data from old database: " << sqlCmd.str() << " due to: " << errmsg_s;
-					closeDatabase(old_db);
+					bool logged = false;
+					char *errmsg_s = 0;
+					while (sqlite3_step(statement) == SQLITE_ROW) {
+						if (!logged) {
+							logged = true;
+							CacheLog << "Migrating data (" << email << ") from old database..." << pmm::NL;
+						}
+						sqlCmd.str(std::string());
+						sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (uniqueid,timestamp) VALUES (";
+						sqlCmd << "'" << sqlite3_column_text(statement, 0) << "',";
+						sqlCmd << "'" << sqlite3_column_text(statement, 1) << "')";
+						errCode = sqlite3_exec(theConn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+						if (errCode != SQLITE_OK) {
+							std::stringstream errmsg;
+							errmsg << "Unable to migrate data from old database: " << sqlCmd.str() << " due to: " << errmsg_s;
+							closeDatabase(old_db);
 #ifdef DEBUG
-					CacheLog << errmsg.str() << pmm::NL;
+							CacheLog << errmsg.str() << pmm::NL;
 #endif
-					migrM.unlock();
-					throw GenericException(errmsg.str());
-				}			
-				closeDatabase(old_db);
+							migrM.unlock();
+							throw GenericException(errmsg.str());
+						}
+						
+					}
+					sqlite3_finalize(statement);
+					//Erase old entries
+					sqlCmd.str(std::string());
+					sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE email='" << email << "'";
+					errCode = sqlite3_exec(old_db, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+					if (errCode != SQLITE_OK) {
+						std::stringstream errmsg;
+						errmsg << "Unable to remove old data from old database: " << sqlCmd.str() << " due to: " << errmsg_s;
+						closeDatabase(old_db);
+#ifdef DEBUG
+						CacheLog << errmsg.str() << pmm::NL;
+#endif
+						migrM.unlock();
+						throw GenericException(errmsg.str());
+					}			
+					closeDatabase(old_db);
+				}
 				migrM.unlock();
 			}
 		}
