@@ -26,6 +26,17 @@ namespace pmm {
 	static const char *sentTable = DEFAULT_PAYLOAD_SENT_TABLE;
 	sqlite3 *sDB = NULL;
 	
+	static void sqlQuote(std::string &_return, const std::string origSQL){
+		for (size_t i = 0; i < origSQL.size(); i++) {
+			if (origSQL[i] == '\'') {
+				_return.append("''");
+			}
+			else {
+				_return.append(1, origSQL[i]);
+			}
+		}
+	}
+	
 	static sqlite3 *connect2NotifDB(){
 		sqlite3 *qDB = NULL;
 		if(sqlite3_open(DEFAULT_PENDING_NOTIFICATION_DATAFILE, &qDB) != SQLITE_OK){
@@ -86,10 +97,12 @@ namespace pmm {
 	void PendingNotificationStore::saveSentPayload(const std::string &devToken, const std::string &payload, uint32_t _id){
 		if(sDB == NULL) sDB = connect2NotifDB();
 		std::stringstream insCmd;
+		std::string quotedPayload;
 		char *errmsg;
+		sqlQuote(quotedPayload, payload);
 		insCmd << "INSERT INTO " << sentTable << " (id, devtoken, message, tstamp) VALUES (";
 		insCmd << _id << ", '" << devToken << "', ";
-		insCmd << "'" << payload << "'," << time(0) << ")";
+		insCmd << "'" << quotedPayload << "'," << time(0) << ")";
 		if (sqlite3_exec(sDB, insCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
 			pmm::Log << "Unable to add notification payload to persistent queue(" << insCmd.str() << "): " << errmsg << pmm::NL;
 		}
