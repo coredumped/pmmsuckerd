@@ -128,7 +128,7 @@ namespace pmm {
 			/* message format is, |COMMAND|ID|EXPIRY|TOKENLEN|TOKEN|PAYLOADLEN|PAYLOAD| */
 			char *binaryMessagePt = binaryMessageBuff;
 			uint32_t whicheverOrderIWantToGetBackInAErrorResponse_ID = msgUUIDGenerate();
-			APNSLog << "Just created a paylod with ID=" << (int)whicheverOrderIWantToGetBackInAErrorResponse_ID << pmm::NL;
+			APNSLog << "Just created a payload with ID=" << (int)whicheverOrderIWantToGetBackInAErrorResponse_ID << pmm::NL;
 			uint32_t networkOrderExpiryEpochUTC = htonl(time(NULL)+86400); // expire message if not delivered in 1 day
 			uint16_t networkOrderTokenLength = htons(DEVICE_BINARY_SIZE);
 			uint16_t networkOrderPayloadLength = htons(payloadLength);
@@ -428,7 +428,7 @@ namespace pmm {
 				}
 #ifdef DEBUG
 				int nSize = notificationQueue->size();
-				if((nSize + 1) % 10 == 0) APNSLog << "DEBUG: There are " << nSize << " elements in the notification queue." << pmm::NL;
+				if((nSize + 1) % 20 == 0) APNSLog << "DEBUG: There are " << nSize << " elements in the notification queue." << pmm::NL;
 #endif
 				//Verify here if we should notify the event or not
 				time_t rightNow;
@@ -533,7 +533,7 @@ namespace pmm {
 #ifdef DEBUG_FULL_MESSAGE
 		APNSLog << "DEBUG: Sending notification " << jsonMsg << pmm::NL;
 #else
-		APNSLog << "DEBUG: Sending message to device " << devToken << pmm::NL;
+		APNSLog << "DEBUG: Sending message to device " << devToken << ": " << msg.origMailMessage.to << pmm::NL;
 #endif
 		if (devTokenCache.find(devToken) == devTokenCache.end()) {
 			std::string binaryDevToken;
