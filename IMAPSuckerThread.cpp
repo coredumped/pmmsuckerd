@@ -243,10 +243,10 @@ namespace pmm {
 			IMAPFetchControl imapFetch;
 			while (fetchQueue->extractEntry(imapFetch)) {
 				time_t rightNow = time(0);
-				if (rightNow - imapFetch.issuedDate > 600){
+				/*if (rightNow - imapFetch.issuedDate > 600){
 					imapLog << "Purging fetch request to " << imapFetch.mailAccountInfo.email() << " because it is " << (int)(rightNow - imapFetch.issuedDate) << " secs old." << pmm::NL;
 					continue; //This is a really old element in the queue, let's just skip it	
-				}
+				}*/
 				if (imapFetch.madeAttempts > 0 && rightNow < imapFetch.nextAttempt) {
 					if (fetchQueue->size() == 0) {
 						usleep(10);
