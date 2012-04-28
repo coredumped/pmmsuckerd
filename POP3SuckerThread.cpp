@@ -11,6 +11,7 @@
 #include "POP3SuckerThread.h"
 #include "ThreadDispatcher.h"
 #include "QuotaDB.h"
+#include "SharedSet.h"
 
 #ifndef DEFAULT_MAX_POP3_CONNECTION_TIME
 #define DEFAULT_MAX_POP3_CONNECTION_TIME 500
@@ -47,8 +48,12 @@
 namespace pmm {
 	MTLogger pop3Log;
 	
+	//Global POP3 fetching queue, any fetcher thread can poll accounts held here
 	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> mainFetchQueue;
+	SharedSet<std::string> busyEmailsSet;
+	
 	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> hotmailFetchQueue;
+	SharedSet<std::string> busyHotmailsSet;
 	
 	POP3SuckerThread::POP3FetchItem::POP3FetchItem(){
 		timestamp = time(0);
@@ -91,9 +96,10 @@ namespace pmm {
 		
 	}
 	
-	void POP3SuckerThread::POP3FetcherThread::fetchMessages(POP3FetchItem &pf){
+	int POP3SuckerThread::POP3FetcherThread::fetchMessages(POP3FetchItem &pf){
 		mailpop3 *pop3 = mailpop3_new(0, 0);
 		int result;
+		int messagesRetrieved = 0;
 		if (pf.mailAccountInfo.useSSL()) {
 			int prevDelay = mailstream_network_delay.tv_sec;
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
@@ -184,6 +190,7 @@ namespace pmm {
 #ifdef DEBUG_TIME_ELDERNESS
 								pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
 #endif
+								messagesRetrieved++;
 								if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 									pmm::Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
@@ -236,6 +243,7 @@ namespace pmm {
 			//mailpop3_quit(pop3);
 		}
 		mailpop3_free(pop3);
+		return messagesRetrieved;
 	}
 	
 	void POP3SuckerThread::POP3FetcherThread::operator()(){
@@ -255,25 +263,42 @@ namespace pmm {
 		mainFetchQueue.name = "POP3MainFetchQueue";
 		hotmailFetchQueue.name = "HotmailFetchQueue";
 		while (true) {
-			//MailAccountInfo m;
+			time_t startT = time(0);
+			int count = 0;
 			POP3FetchItem pf;
 			bool gotSomething = false;
 			if (isForHotmail) {
 				while (hotmailFetchQueue.extractEntry(pf)) {
-					//Fetch messages for hotmail accounts here!!!
-					fetchMessages(pf);
+					if (busyHotmailsSet.contains(pf.mailAccountInfo.email())) {
+						pop3Log << "WARNING: No need to monitor " << pf.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
+						continue;
+					}
+					//Fetch messages for Hotmail accounts here!!!
+					busyHotmailsSet.insert(pf.mailAccountInfo.email());
+					count += fetchMessages(pf);
 					gotSomething = true;
+					busyHotmailsSet.erase(pf.mailAccountInfo.email());
 				}
 			}
 			else {
 				//Fetch regular pop3 accounts here
 				while (mainFetchQueue.extractEntry(pf)) {
+					if (busyEmailsSet.contains(pf.mailAccountInfo.email())) {
+						pop3Log << "WARNING: No need to monitor " << pf.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
+						continue;
+					}
 					//Fetch messages for account here!!!
-					fetchMessages(pf);
+					busyEmailsSet.insert(pf.mailAccountInfo.email());
+					count += fetchMessages(pf);
 					gotSomething = true;
+					busyEmailsSet.erase(pf.mailAccountInfo.email());
 				}
 			}
-			if(!gotSomething) usleep(250);
+			time_t endT = time(0);
+			if(startT != endT){
+				pop3Log << "STAT: " << (double)(count / (endT - startT)) << "/s messages retrieved." << pmm::NL;
+			}
+			if(!gotSomething) usleep(1000);
 		}
 	}
 

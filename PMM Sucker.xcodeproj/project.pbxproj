@@ -71,6 +71,17 @@
 		82571EAF1442B1730047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
 		82571EB01442B9080047347E /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
 		82571EB2144363D20047347E /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
+		8262B2A515470B89005E9243 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8262B2A415470B89005E9243 /* main.cpp */; };
+		8262B2A715470B89005E9243 /* fetchCacheTest.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8262B2A615470B89005E9243 /* fetchCacheTest.1 */; };
+		8262B2AC15470E8B005E9243 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		8262B2AD15470E8B005E9243 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
+		8262B2AE15470E8B005E9243 /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
+		8262B2AF15470E8B005E9243 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		8262B2B015470EED005E9243 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		8262B2B115470F0A005E9243 /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		8262B2B215471B61005E9243 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
+		8262B2B3154751FA005E9243 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		8262B2B415475551005E9243 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		82805982145FB18200E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
@@ -103,6 +114,34 @@
 		8290FB9B142F51940080BB85 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
 		8293E231142CCD0000F62897 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
 		8293E232142CCD1100F62897 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
+		82AA3D79154A1F6F006CC761 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82AA3D78154A1F6F006CC761 /* main.cpp */; };
+		82AA3D7B154A1F6F006CC761 /* loadMessages.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82AA3D7A154A1F6F006CC761 /* loadMessages.1 */; };
+		82AA3D80154A21CA006CC761 /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
+		82AA3D81154A21CA006CC761 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
+		82AA3D82154A21CA006CC761 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		82AA3D83154A21CA006CC761 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		82AA3D84154A21CA006CC761 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		82AA3D85154A21CA006CC761 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
+		82AA3D86154A21CA006CC761 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
+		82AA3D87154A21CA006CC761 /* SharedQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B171435123100444844 /* SharedQueue.cpp */; };
+		82AA3D88154A21CA006CC761 /* NotificationPayload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1B1435380A00444844 /* NotificationPayload.cpp */; };
+		82AA3D89154A21CA006CC761 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		82AA3D8A154A21CA006CC761 /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		82AA3D8B154A21CA006CC761 /* FetchedMailsCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82571EAE1442B1730047347E /* FetchedMailsCache.cpp */; };
+		82AA3D8C154A21CA006CC761 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		82AA3D8D154A21CA006CC761 /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
+		82AA3D8E154A21CA006CC761 /* MessageUploaderThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857C1144D4DA5000B43B8 /* MessageUploaderThread.cpp */; };
+		82AA3D8F154A21CA006CC761 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
+		82AA3D90154A21CA006CC761 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
+		82AA3D91154A21CA006CC761 /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
+		82AA3D92154A21E7006CC761 /* libetpan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 820BBE25154240B1005A1C5A /* libetpan.a */; };
+		82AA3D93154A21E7006CC761 /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
+		82AA3D94154A21EE006CC761 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		82AA3D95154A21F9006CC761 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
+		82AA3D96154A2209006CC761 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
+		82AA3D97154A222D006CC761 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		82AA3D98154A2235006CC761 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
+		82AA3D99154A2245006CC761 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
 		82AA9FCD1426B22000E3FB3C /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
 		82B081DC153AD30200F78A4D /* APNSFeedbackThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */; };
@@ -170,6 +209,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		8262B29F15470B89005E9243 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8262B2A715470B89005E9243 /* fetchCacheTest.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		828879B51544607300DEF837 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -177,6 +226,16 @@
 			dstSubfolderSpec = 0;
 			files = (
 				828879BD1544607300DEF837 /* msgParser.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		82AA3D73154A1F6F006CC761 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				82AA3D7B154A1F6F006CC761 /* loadMessages.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -216,6 +275,9 @@
 		82571EA914413E0F0047347E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		82571EAC1442AC220047347E /* FetchedMailsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchedMailsCache.h; sourceTree = "<group>"; };
 		82571EAE1442B1730047347E /* FetchedMailsCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FetchedMailsCache.cpp; sourceTree = "<group>"; };
+		8262B2A115470B89005E9243 /* fetchCacheTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fetchCacheTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8262B2A415470B89005E9243 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		8262B2A615470B89005E9243 /* fetchCacheTest.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = fetchCacheTest.1; sourceTree = "<group>"; };
 		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		8280597F145FB0E600E7B614 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
@@ -231,6 +293,9 @@
 		8290FB98142F508B0080BB85 /* Mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mutex.cpp; sourceTree = "<group>"; };
 		8293E22F142CCD0000F62897 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.cc"; sourceTree = "<group>"; };
 		8293E230142CCD0000F62897 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = "../../cxxLibraries/jsonxx-jvg/jsonxx.h"; sourceTree = "<group>"; };
+		82AA3D75154A1F6F006CC761 /* loadMessages */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = loadMessages; sourceTree = BUILT_PRODUCTS_DIR; };
+		82AA3D78154A1F6F006CC761 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		82AA3D7A154A1F6F006CC761 /* loadMessages.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = loadMessages.1; sourceTree = "<group>"; };
 		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
 		82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNSFeedbackThread.h; sourceTree = "<group>"; };
 		82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = APNSFeedbackThread.cpp; sourceTree = "<group>"; };
@@ -238,6 +303,7 @@
 		82B6109314F2A2FC00975C32 /* UserPreferences.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UserPreferences.cpp; sourceTree = "<group>"; };
 		82BD8EBA148BBAAA008DDEA1 /* SilentMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SilentMode.h; sourceTree = "<group>"; };
 		82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SilentMode.cpp; sourceTree = "<group>"; };
+		82BE124F154B84700020B9D6 /* SharedSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedSet.h; sourceTree = "<group>"; };
 		82ED5B071431761400444844 /* APNSNotificationThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APNSNotificationThread.h; sourceTree = "<group>"; };
 		82ED5B09143176B300444844 /* GenericThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericThread.h; sourceTree = "<group>"; };
 		82ED5B0A14317FD000444844 /* GenericThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenericThread.cpp; sourceTree = "<group>"; };
@@ -321,6 +387,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8262B29E15470B89005E9243 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8262B2B015470EED005E9243 /* libsqlite3.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		828879B41544607300DEF837 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -330,6 +404,20 @@
 				828879C5154463B800DEF837 /* libiconv.dylib in Frameworks */,
 				828879C3154463B000DEF837 /* libetpan.a in Frameworks */,
 				828879C4154463B000DEF837 /* libetpan.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82AA3D72154A1F6F006CC761 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82AA3D99154A2245006CC761 /* CoreFoundation.framework in Frameworks */,
+				82AA3D98154A2235006CC761 /* libiconv.dylib in Frameworks */,
+				82AA3D97154A222D006CC761 /* Security.framework in Frameworks */,
+				82AA3D95154A21F9006CC761 /* libcurl.dylib in Frameworks */,
+				82AA3D94154A21EE006CC761 /* libsqlite3.dylib in Frameworks */,
+				82AA3D92154A21E7006CC761 /* libetpan.a in Frameworks */,
+				82AA3D93154A21E7006CC761 /* libetpan.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,6 +477,15 @@
 			path = apnNotificator;
 			sourceTree = "<group>";
 		};
+		8262B2A315470B89005E9243 /* fetchCacheTest */ = {
+			isa = PBXGroup;
+			children = (
+				8262B2A415470B89005E9243 /* main.cpp */,
+				8262B2A615470B89005E9243 /* fetchCacheTest.1 */,
+			);
+			path = fetchCacheTest;
+			sourceTree = "<group>";
+		};
 		82708493142ADF5E00D05386 /* jsonxx */ = {
 			isa = PBXGroup;
 			children = (
@@ -405,6 +502,15 @@
 				828879BC1544607300DEF837 /* msgParser.1 */,
 			);
 			path = msgParser;
+			sourceTree = "<group>";
+		};
+		82AA3D77154A1F6F006CC761 /* loadMessages */ = {
+			isa = PBXGroup;
+			children = (
+				82AA3D78154A1F6F006CC761 /* main.cpp */,
+				82AA3D7A154A1F6F006CC761 /* loadMessages.1 */,
+			);
+			path = loadMessages;
 			sourceTree = "<group>";
 		};
 		82F86B201425A457006ACFEB = {
@@ -431,6 +537,8 @@
 				820BBE1115423FAB005A1C5A /* apnFeedback */,
 				820BBE391542F466005A1C5A /* apnNotificator */,
 				828879B91544607300DEF837 /* msgParser */,
+				8262B2A315470B89005E9243 /* fetchCacheTest */,
+				82AA3D77154A1F6F006CC761 /* loadMessages */,
 				82F86B2E1425A457006ACFEB /* Frameworks */,
 				82F86B2C1425A457006ACFEB /* Products */,
 			);
@@ -444,6 +552,8 @@
 				820BBE0F15423FAB005A1C5A /* apnFeedback */,
 				820BBE371542F466005A1C5A /* apnNotificator */,
 				828879B71544607300DEF837 /* msgParser */,
+				8262B2A115470B89005E9243 /* fetchCacheTest */,
+				82AA3D75154A1F6F006CC761 /* loadMessages */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -553,6 +663,7 @@
 				820BBDF6153E7164005A1C5A /* PendingNotificationStore.h */,
 				820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */,
 				820BBDFB15408CF3005A1C5A /* ExclusiveSharedQueue.h */,
+				82BE124F154B84700020B9D6 /* SharedSet.h */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -594,6 +705,23 @@
 			productReference = 820BBE371542F466005A1C5A /* apnNotificator */;
 			productType = "com.apple.product-type.tool";
 		};
+		8262B2A015470B89005E9243 /* fetchCacheTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8262B2AA15470B89005E9243 /* Build configuration list for PBXNativeTarget "fetchCacheTest" */;
+			buildPhases = (
+				8262B29D15470B89005E9243 /* Sources */,
+				8262B29E15470B89005E9243 /* Frameworks */,
+				8262B29F15470B89005E9243 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = fetchCacheTest;
+			productName = fetchCacheTest;
+			productReference = 8262B2A115470B89005E9243 /* fetchCacheTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		828879B61544607300DEF837 /* msgParser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */;
@@ -609,6 +737,23 @@
 			name = msgParser;
 			productName = msgParser;
 			productReference = 828879B71544607300DEF837 /* msgParser */;
+			productType = "com.apple.product-type.tool";
+		};
+		82AA3D74154A1F6F006CC761 /* loadMessages */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82AA3D7E154A1F6F006CC761 /* Build configuration list for PBXNativeTarget "loadMessages" */;
+			buildPhases = (
+				82AA3D71154A1F6F006CC761 /* Sources */,
+				82AA3D72154A1F6F006CC761 /* Frameworks */,
+				82AA3D73154A1F6F006CC761 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = loadMessages;
+			productName = loadMessages;
+			productReference = 82AA3D75154A1F6F006CC761 /* loadMessages */;
 			productType = "com.apple.product-type.tool";
 		};
 		82F86B2A1425A457006ACFEB /* PMM Sucker */ = {
@@ -670,6 +815,8 @@
 				820BBE0E15423FAB005A1C5A /* apnFeedback */,
 				820BBE361542F466005A1C5A /* apnNotificator */,
 				828879B61544607300DEF837 /* msgParser */,
+				8262B2A015470B89005E9243 /* fetchCacheTest */,
+				82AA3D74154A1F6F006CC761 /* loadMessages */,
 			);
 		};
 /* End PBXProject section */
@@ -745,6 +892,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8262B29D15470B89005E9243 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8262B2B415475551005E9243 /* MailAccountInfo.cpp in Sources */,
+				8262B2B3154751FA005E9243 /* UtilityFunctions.cpp in Sources */,
+				8262B2B215471B61005E9243 /* ThreadDispatcher.cpp in Sources */,
+				8262B2B115470F0A005E9243 /* GenericException.cpp in Sources */,
+				8262B2AC15470E8B005E9243 /* Mutex.cpp in Sources */,
+				8262B2AD15470E8B005E9243 /* GenericThread.cpp in Sources */,
+				8262B2AE15470E8B005E9243 /* FetchedMailsCache.cpp in Sources */,
+				8262B2AF15470E8B005E9243 /* MTLogger.cpp in Sources */,
+				8262B2A515470B89005E9243 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		828879B31544607300DEF837 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -753,6 +916,33 @@
 				828879C11544637B00DEF837 /* MTLogger.cpp in Sources */,
 				828879C21544637B00DEF837 /* MailMessage.cpp in Sources */,
 				828879BB1544607300DEF837 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82AA3D71154A1F6F006CC761 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82AA3D96154A2209006CC761 /* jsonxx.cc in Sources */,
+				82AA3D80154A21CA006CC761 /* PMMSuckerSession.cpp in Sources */,
+				82AA3D81154A21CA006CC761 /* ServerResponse.cpp in Sources */,
+				82AA3D82154A21CA006CC761 /* JSONParseException.cpp in Sources */,
+				82AA3D83154A21CA006CC761 /* MailAccountInfo.cpp in Sources */,
+				82AA3D84154A21CA006CC761 /* Mutex.cpp in Sources */,
+				82AA3D85154A21CA006CC761 /* GenericThread.cpp in Sources */,
+				82AA3D86154A21CA006CC761 /* ThreadDispatcher.cpp in Sources */,
+				82AA3D87154A21CA006CC761 /* SharedQueue.cpp in Sources */,
+				82AA3D88154A21CA006CC761 /* NotificationPayload.cpp in Sources */,
+				82AA3D89154A21CA006CC761 /* UtilityFunctions.cpp in Sources */,
+				82AA3D8A154A21CA006CC761 /* GenericException.cpp in Sources */,
+				82AA3D8B154A21CA006CC761 /* FetchedMailsCache.cpp in Sources */,
+				82AA3D8C154A21CA006CC761 /* MTLogger.cpp in Sources */,
+				82AA3D8D154A21CA006CC761 /* MailMessage.cpp in Sources */,
+				82AA3D8E154A21CA006CC761 /* MessageUploaderThread.cpp in Sources */,
+				82AA3D8F154A21CA006CC761 /* DataTypes.cpp in Sources */,
+				82AA3D90154A21CA006CC761 /* UserPreferences.cpp in Sources */,
+				82AA3D91154A21CA006CC761 /* PendingNotificationStore.cpp in Sources */,
+				82AA3D79154A1F6F006CC761 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -932,6 +1122,42 @@
 			};
 			name = Release;
 		};
+		8262B2A815470B89005E9243 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"ENABLE_MULTIPLE_TABLES=1",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Debug;
+		};
+		8262B2A915470B89005E9243 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "ENABLE_MULTIPLE_TABLES=1";
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Release;
+		};
 		828879BF1544607300DEF837 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -968,6 +1194,51 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Release;
+		};
+		82AA3D7C154A1F6F006CC761 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"CHEAT_SESSION_MANAGER=1",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Debug;
+		};
+		82AA3D7D154A1F6F006CC761 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1116,6 +1387,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		8262B2AA15470B89005E9243 /* Build configuration list for PBXNativeTarget "fetchCacheTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8262B2A815470B89005E9243 /* Debug */,
+				8262B2A915470B89005E9243 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1123,6 +1403,16 @@
 				828879C01544607300DEF837 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		82AA3D7E154A1F6F006CC761 /* Build configuration list for PBXNativeTarget "loadMessages" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				82AA3D7C154A1F6F006CC761 /* Debug */,
+				82AA3D7D154A1F6F006CC761 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		82F86B251425A457006ACFEB /* Build configuration list for PBXProject "PMM Sucker" */ = {
 			isa = XCConfigurationList;

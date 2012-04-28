@@ -83,10 +83,10 @@ FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h
 MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h
 	$(GCC) $(CFLAGS) -c -o MailSuckerThread.o ../MailSuckerThread.cpp
 
-IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h
+IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h
 	$(GCC) $(CFLAGS) -c -o IMAPSuckerThread.o ../IMAPSuckerThread.cpp
 
-POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h
+POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h
 	$(GCC) $(CFLAGS) -c -o POP3SuckerThread.o ../POP3SuckerThread.cpp
 
 DataTypes.o: ../DataTypes.cpp ../DataTypes.h

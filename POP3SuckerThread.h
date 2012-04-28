@@ -47,7 +47,7 @@ namespace pmm {
 		private:
 			FetchedMailsCache fetchedMails;
 		protected:
-			void fetchMessages(POP3FetchItem &pf);
+			int fetchMessages(POP3FetchItem &pf);
 		public:
 			bool isForHotmail;
 			time_t startedOn;
