@@ -95,6 +95,7 @@ namespace pmm {
 		mailpop3 *pop3 = mailpop3_new(0, 0);
 		int result;
 		if (pf.mailAccountInfo.useSSL()) {
+			int prevDelay = mailstream_network_delay.tv_sec;
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
 		else {
@@ -162,8 +163,12 @@ namespace pmm {
 							MailMessage theMessage;
 							theMessage.msgUid = info->msg_uidl;
 							result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
-							if(etpanOperationFailed(result)){
-								pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;
+							if(result != MAILPOP3_NO_ERROR){
+								if(result == MAILPOP3_ERROR_STREAM){
+									pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan of " << pf.mailAccountInfo.email() << pmm::NL;
+									break;
+								}
+								else pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;
 							}
 							else {
 								if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
@@ -254,11 +259,7 @@ namespace pmm {
 			POP3FetchItem pf;
 			if (isForHotmail) {
 				while (hotmailFetchQueue.extractEntry(pf)) {
-					time_t rightNow = time(0);
-					/*if (rightNow - pf.timestamp > 600) {
-						pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs, queue has" << (int)mainFetchQueue.size() << " elements" << pmm::NL;
-						continue;
-					}*/
+					//time_t rightNow = time(0);
 					//Fetch messages for account here!!!
 					fetchMessages(pf);
 				}
@@ -266,16 +267,11 @@ namespace pmm {
 			else {
 				//Fetch regular pop3 accounts here
 				while (mainFetchQueue.extractEntry(pf)) {
-					/*time_t rightNow = time(0);
-					if (rightNow - pf.timestamp > 600) {
-						pop3Log << "Purging " << pf.mailAccountInfo.email() << " from fetch queue, element is too old " << (int)(time(0) - pf.timestamp) << " secs, queue has" << (int)mainFetchQueue.size() << " elements" << pmm::NL;
-						continue;
-					}*/
 					//Fetch messages for account here!!!
 					fetchMessages(pf);
 				}
 			}
-			usleep(250000);
+			usleep(250);
 		}
 	}
 
