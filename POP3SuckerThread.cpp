@@ -89,7 +89,7 @@ namespace pmm {
 		quotaUpdateVector = NULL;
 		pmmStorageQueue = NULL;
 		isForHotmail = false;
-		mailstream_network_delay.tv_sec = 5;
+		mailstream_network_delay.tv_sec = 15;
 	}
 	
 	POP3SuckerThread::POP3FetcherThread::~POP3FetcherThread(){
@@ -101,7 +101,6 @@ namespace pmm {
 		int result;
 		int messagesRetrieved = 0;
 		if (pf.mailAccountInfo.useSSL()) {
-			int prevDelay = mailstream_network_delay.tv_sec;
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
 		else {
