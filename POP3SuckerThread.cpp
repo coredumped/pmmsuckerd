@@ -257,11 +257,12 @@ namespace pmm {
 		while (true) {
 			//MailAccountInfo m;
 			POP3FetchItem pf;
+			bool gotSomething = false;
 			if (isForHotmail) {
 				while (hotmailFetchQueue.extractEntry(pf)) {
-					//time_t rightNow = time(0);
-					//Fetch messages for account here!!!
+					//Fetch messages for hotmail accounts here!!!
 					fetchMessages(pf);
+					gotSomething = true;
 				}
 			}
 			else {
@@ -269,9 +270,10 @@ namespace pmm {
 				while (mainFetchQueue.extractEntry(pf)) {
 					//Fetch messages for account here!!!
 					fetchMessages(pf);
+					gotSomething = true;
 				}
 			}
-			usleep(250);
+			if(!gotSomething) usleep(250);
 		}
 	}
 
