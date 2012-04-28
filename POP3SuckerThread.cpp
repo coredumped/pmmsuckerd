@@ -263,7 +263,7 @@ namespace pmm {
 		hotmailFetchQueue.name = "HotmailFetchQueue";
 		while (true) {
 			time_t startT = time(0);
-			int count = 0;
+			double count = 0;
 			POP3FetchItem pf;
 			bool gotSomething = false;
 			if (isForHotmail) {
@@ -295,7 +295,7 @@ namespace pmm {
 			}
 			time_t endT = time(0);
 			if(startT != endT){
-				pop3Log << "STAT: " << (double)(count / (endT - startT)) << "/s messages retrieved." << pmm::NL;
+				pop3Log << "STAT: " << (double)(count / (double)(endT - startT)) << "/s messages retrieved." << pmm::NL;
 			}
 			if(!gotSomething) usleep(1000);
 		}
