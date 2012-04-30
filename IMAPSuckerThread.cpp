@@ -241,114 +241,121 @@ namespace pmm {
 		fetchQueue->name = "IMAPFetchQueue";
 		while (true) {
 			IMAPFetchControl imapFetch;
+			time_t startT = time(0);
 			while (fetchQueue->extractEntry(imapFetch)) {
+				if (busyEmails->contains(imapFetch.mailAccountInfo.email())) {
+					imapLog << "WARNING: No need to monitor " << imapFetch.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
+					continue;
+				}
+				busyEmails->insert(imapFetch.mailAccountInfo.email());
 				time_t rightNow = time(0);
-				/*if (rightNow - imapFetch.issuedDate > 600){
-					imapLog << "Purging fetch request to " << imapFetch.mailAccountInfo.email() << " because it is " << (int)(rightNow - imapFetch.issuedDate) << " secs old." << pmm::NL;
-					continue; //This is a really old element in the queue, let's just skip it	
-				}*/
 				if (imapFetch.madeAttempts > 0 && rightNow < imapFetch.nextAttempt) {
 					if (fetchQueue->size() == 0) {
 						usleep(10);
 					}
 					fetchQueue->add(imapFetch);
-					break;
-				}
-#ifdef DEBUG
-				pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
-#endif
-				struct mailimap *imap = mailimap_new(0, NULL);
-				int result;
-				if (imapFetch.mailAccountInfo.useSSL()) {
-					result = mailimap_ssl_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
 				}
 				else {
-					result = mailimap_socket_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
-				}
-				if (etpanOperationFailed(result)) {
-					imapFetch.madeAttempts++;
-					imapFetch.nextAttempt = rightNow + fetchRetryInterval;
-					fetchQueue->add(imapFetch);
 #ifdef DEBUG
-					if (imap->imap_response == 0) {
-						pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", RE-SCHEDULING fetch!!!" << pmm::NL;
+					pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
+#endif
+					struct mailimap *imap = mailimap_new(0, NULL);
+					int result;
+					if (imapFetch.mailAccountInfo.useSSL()) {
+						result = mailimap_ssl_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
 					}
 					else {
-						pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
+						result = mailimap_socket_connect(imap, imapFetch.mailAccountInfo.serverAddress().c_str(), imapFetch.mailAccountInfo.serverPort());
 					}
-#endif				
-				}
-				else {
-					result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
-					if(etpanOperationFailed(result)){
-#warning TODO: Remember to report the user whenever we have too many login attempts
-#ifdef DEBUG
-						if(imap->imap_response == 0) pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << result << pmm::NL;
-						else pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
-#endif				
+					if (etpanOperationFailed(result)) {
 						imapFetch.madeAttempts++;
 						imapFetch.nextAttempt = rightNow + fetchRetryInterval;
 						fetchQueue->add(imapFetch);
-					}
-					else {
-						result = mailimap_select(imap, "INBOX");
-						if (etpanOperationFailed(result)) {
-							imapFetch.madeAttempts++;
-							imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
-							fetchQueue->add(imapFetch);
 #ifdef DEBUG
-							pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
-#endif				
-							continue;
-						}
-						clist *unseenMails = clist_new();
-						struct mailimap_search_key *sKey = mailimap_search_key_new(MAILIMAP_SEARCH_KEY_UNSEEN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-						result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
-						if (etpanOperationFailed(result)) {
-							if (imap->imap_response == 0) {
-								imapLog << "CRITICAL: Can't find unseen messages, IMAP SEARCH failed miserably" << pmm::NL;
-							}
+						if (imap->imap_response == 0) {
+							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", RE-SCHEDULING fetch!!!" << pmm::NL;
 						}
 						else {
-#ifdef DEBUG
-							if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
-#endif
-							imapFetch.badgeCounter = 0;
-							std::vector<uint32_t> uidSet;
-							for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
-								if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
-									pmm::Log << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
-									break;
-								}
-								uint32_t uid;
-								uid = *((uint32_t *)clist_content(cur));
-#ifdef DEBUG_IMAP
-								pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
-#endif
-								imapFetch.badgeCounter++;
-								if (imapFetch.mailAccountInfo.devel) {
-									//pmm::imapLog << "Using development notification queue..." << pmm::NL;
-									fetch_msg(imap, uid, develNotificationQueue, imapFetch);
-								}
-								else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
-								uidSet.push_back(uid);
-							}
-							//Remove old entries if the current time is a multiple of 60 seconds
-							if (rightNow % 600 == 0) {
-#ifdef DEBUG
-								pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
-#endif
-								fetchedMails.removeEntriesNotInSet2(imapFetch.mailAccountInfo.email(), uidSet);
-							}
+							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
 						}
-						mailimap_search_result_free(unseenMails);	
-						mailimap_logout(imap);
+#endif				
 					}
-					mailimap_close(imap);
+					else {
+						result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
+						if(etpanOperationFailed(result)){
+#warning TODO: Remember to report the user whenever we have too many login attempts
+#ifdef DEBUG
+							if(imap->imap_response == 0) pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << result << pmm::NL;
+							else pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
+#endif				
+							imapFetch.madeAttempts++;
+							imapFetch.nextAttempt = rightNow + fetchRetryInterval;
+							fetchQueue->add(imapFetch);
+						}
+						else {
+							result = mailimap_select(imap, "INBOX");
+							if (etpanOperationFailed(result)) {
+								imapFetch.madeAttempts++;
+								imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
+								fetchQueue->add(imapFetch);
+#ifdef DEBUG
+								pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
+#endif				
+							}
+							else {
+								clist *unseenMails = clist_new();
+								struct mailimap_search_key *sKey = mailimap_search_key_new(MAILIMAP_SEARCH_KEY_UNSEEN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+								result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
+								if (etpanOperationFailed(result)) {
+									if (imap->imap_response == 0) {
+										imapLog << "CRITICAL: Can't find unseen messages, IMAP SEARCH failed miserably" << pmm::NL;
+									}
+								}
+								else {
+#ifdef DEBUG
+									if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
+#endif
+									imapFetch.badgeCounter = 0;
+									std::vector<uint32_t> uidSet;
+									for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
+										if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
+											pmm::Log << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
+											break;
+										}
+										uint32_t uid;
+										uid = *((uint32_t *)clist_content(cur));
+#ifdef DEBUG_IMAP
+										pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
+#endif
+										imapFetch.badgeCounter++;
+										if (imapFetch.mailAccountInfo.devel) {
+											//pmm::imapLog << "Using development notification queue..." << pmm::NL;
+											fetch_msg(imap, uid, develNotificationQueue, imapFetch);
+										}
+										else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
+										uidSet.push_back(uid);
+									}
+									//Remove old entries if the current time is a multiple of 60 seconds
+									if (rightNow % 600 == 0) {
+#ifdef DEBUG
+										pmm::imapLog << "Removing old uid entries from fetch control database..." << pmm::NL;
+#endif
+										fetchedMails.removeEntriesNotInSet2(imapFetch.mailAccountInfo.email(), uidSet);
+									}
+									mailimap_search_result_free(unseenMails);
+								}
+							}
+							mailimap_logout(imap);
+						}
+						mailimap_close(imap);
+					}
+					mailimap_free(imap);
 				}
-				mailimap_free(imap);
+				busyEmails->erase(imapFetch.mailAccountInfo.email());
 			}
-			usleep(1000);
+			time_t endT = time(0);
+			if(startT != endT) usleep(1000);
+			else usleep(10000);
 		}
 	}
 	
@@ -399,6 +406,7 @@ namespace pmm {
 				mailFetchers[i].quotaUpdateVector = quotaUpdateVector;
 				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
 				mailFetchers[i].threadStartTime = threadStartTime;
+				mailFetchers[i].busyEmails = &busyEmails;
 				pmm::ThreadDispatcher::start(mailFetchers[i], 8 * 1024 * 1024);
 			}
 		}
