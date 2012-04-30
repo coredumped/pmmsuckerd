@@ -47,6 +47,7 @@ namespace pmm {
 		private:
 			FetchedMailsCache fetchedMails;
 		protected:
+			std::map<std::string, std::map<std::string, int> > failedIOFetches;
 			int fetchMessages(POP3FetchItem &pf);
 		public:
 			bool isForHotmail;

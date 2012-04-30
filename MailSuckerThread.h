@@ -79,6 +79,8 @@ namespace pmm {
 		
 		//Stat counters
 		AtomicVar<int> cntRetrievedMessages;
+		AtomicVar<int> cntAccountsActive;
+		AtomicVar<int> cntAccountsTotal;
 	};
 	
 	bool etpanOperationFailed(int r);

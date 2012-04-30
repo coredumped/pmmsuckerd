@@ -396,19 +396,23 @@ int main (int argc, const char * argv[])
 				notifThreads[j].cntMessageSent = 0;
 				notifThreads[j].cntMessageFailed = 0;
 			}
+			pmm::Log << "=================================================================" << pmm::NL;
 			pmm::Log << "STAT: Notifications sent: " << (double)(sent / 300.0) << "/sec failed: " << (double)(failed / 300.0) << "/sec" << pmm::NL;
-			int msgRetrieved = 0;
+			int msgRetrieved = 0, acctTotal = 0;
 			for (int j = 0; j < maxIMAPSuckerThreads; j++) {
 				msgRetrieved += imapSuckingThreads[j].cntRetrievedMessages;
+				acctTotal += imapSuckingThreads[j].cntAccountsTotal;
 				imapSuckingThreads[j].cntRetrievedMessages = 0;
 			}
-			pmm::Log << "STAT: IMAP messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec" << pmm::NL;
+			pmm::Log << "STAT: IMAP messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			msgRetrieved = 0;
+			acctTotal = 0;
 			for (int j = 0; j < maxPOP3SuckerThreads; j++) {
 				msgRetrieved += pop3SuckingThreads[j].cntRetrievedMessages;
+				acctTotal += pop3SuckingThreads[j].cntAccountsTotal;
 				pop3SuckingThreads[j].cntRetrievedMessages = 0;
 			}
-			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec" << pmm::NL;
+			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 		}
 		if (tic % 30 == 0) {
 			//Process quota updates if any

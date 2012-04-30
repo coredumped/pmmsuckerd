@@ -171,6 +171,22 @@ namespace pmm {
 							if(result != MAILPOP3_NO_ERROR){
 								if(result == MAILPOP3_ERROR_STREAM){
 									pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved." << pmm::NL;
+									std::map<std::string, int> record;
+									if(failedIOFetches.find(pf.mailAccountInfo.email()) == failedIOFetches.end()){
+										record[info->msg_uidl] = 1;
+										failedIOFetches[pf.mailAccountInfo.email()] = record;	
+									}
+									else {
+										record = failedIOFetches[pf.mailAccountInfo.email()];
+										record[info->msg_uidl]++;
+										failedIOFetches[pf.mailAccountInfo.email()] = record;
+									}
+									if(record[info->msg_uidl] > 4){
+										pop3Log << "CRITICAL: Too many attempts (" << record[info->msg_uidl] << ") to download message " << info->msg_uidl << " aborting :-(" << pmm::NL;
+										fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+										failedIOFetches[pf.mailAccountInfo.email()].erase(info->msg_uidl);
+										if(failedIOFetches[pf.mailAccountInfo.email()].size() == 0) failedIOFetches.erase(pf.mailAccountInfo.email());
+									}
 									break;
 								}
 								else pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;

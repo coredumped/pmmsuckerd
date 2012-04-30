@@ -104,6 +104,7 @@ namespace pmm {
 				}
 				else notificationQueue->add(np);
 			}
+			cntAccountsTotal = cntAccountsTotal + 1;
 			usleep(10000);
 		}
 	}
@@ -121,6 +122,7 @@ namespace pmm {
 					fetchedMails.removeAllEntriesOfEmail2(m);
 #warning TODO: Remove all preferences for this account
 					QuotaDB::removeAccount(m);
+					cntAccountsTotal = cntAccountsTotal - 1;
 					break;
 				}
 			}
@@ -179,11 +181,11 @@ namespace pmm {
 		if (rmAccountQueue == NULL) throw GenericException("Can't continue like this, the rmAccountQueue is null!!!");
 		if (devTokenAddQueue == NULL) throw GenericException("Can't continue like this, the devTokenAddQueue is null!!!");
 		if (devTokenRelinquishQueue == NULL) throw GenericException("Can't continue like this, the devTokenRelinquishQueue is null!!!");
-#ifdef DEBUG
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
+			if(emailAccounts[i].quota > 0) cntAccountsActive = cntAccountsActive + 1;
 		}
-#endif
+		cntAccountsTotal = emailAccounts.size();
 		initialize();
 		while (true) {
 			//Process account addition and removals if there is any
