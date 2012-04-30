@@ -76,6 +76,9 @@ namespace pmm {
 		
 		virtual void initialize();
 		virtual void operator()();
+		
+		//Stat counters
+		AtomicVar<int> cntRetrievedMessages;
 	};
 	
 	bool etpanOperationFailed(int r);

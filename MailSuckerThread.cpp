@@ -78,6 +78,7 @@ namespace pmm {
 		quotaUpdateVector = NULL;
 		quotaIncreaseQueue = NULL;
 		threadStartTime = time(0) - 900;
+		cntRetrievedMessages = 0;
 	}
 	
 	MailSuckerThread::~MailSuckerThread(){
@@ -85,7 +86,7 @@ namespace pmm {
 	}
 	
 	void MailSuckerThread::initialize(){
-
+		
 	}
 	
 	void MailSuckerThread::processAccountAdd(){
