@@ -189,12 +189,13 @@ namespace pmm {
 #ifdef DEBUG_TIME_ELDERNESS
 								pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
 #endif
-								messagesRetrieved++;
+
 								if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 									pmm::Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
 								}
 								else {
+									messagesRetrieved++;
 									theMessage.to = pf.mailAccountInfo.email();
 									std::vector<std::string> myDevTokens = pf.mailAccountInfo.devTokens();
 									for (size_t i = 0; i < myDevTokens.size(); i++) {
@@ -295,7 +296,7 @@ namespace pmm {
 			}
 			time_t endT = time(0);
 			if(startT != endT){
-				pop3Log << "STAT: " << (double)(count / (double)(endT - startT)) << "/s messages retrieved." << pmm::NL;
+				pop3Log << "STAT: " << (count / (endT - startT)) << "/s messages retrieved." << pmm::NL;
 			}
 			if(!gotSomething) usleep(1000);
 		}
