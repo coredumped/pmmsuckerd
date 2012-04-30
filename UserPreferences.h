@@ -33,6 +33,7 @@ namespace pmm {
 		static void defaultAlertTone(std::string &alertTonePath, const std::string &emailAccount);
 		void userPreferenceGet(std::map<std::string, std::string> &preferenceMap, const std::string &emailAccount, const std::string &domain = "user");
 		
+		void destroyPreferences(const std::string &emailAccount);
 		void operator()();
 	};
 }

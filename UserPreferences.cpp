@@ -113,6 +113,16 @@ namespace pmm {
 		}
 	}
 	
+	void PreferenceEngine::destroyPreferences(const std::string &emailAccount){
+		db = connect2PrefDB();
+		std::stringstream sqlCmd;
+		char *errmsg;
+		sqlCmd << "DELETE FROM " << prefTable << " WHERE email='" << emailAccount << "'";
+		if (sqlite3_exec(db, sqlCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
+			pmm::Log << "CRITICAL: Unable to remove preferences of user: " << emailAccount << errmsg << pmm::NL;
+		}
+	}
+	
 	void PreferenceEngine::operator()(){
 		db = connect2PrefDB();
 #warning TODO: Remember to load emailAccount preferences from appengine
