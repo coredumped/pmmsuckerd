@@ -196,6 +196,8 @@ namespace pmm {
 								}
 								else {
 									messagesRetrieved++;
+									int cnt = cntRetrieved->get() + 1;
+									cntRetrieved->set(cnt);
 									theMessage.to = pf.mailAccountInfo.email();
 									std::vector<std::string> myDevTokens = pf.mailAccountInfo.devTokens();
 									for (size_t i = 0; i < myDevTokens.size(); i++) {
@@ -263,8 +265,6 @@ namespace pmm {
 		mainFetchQueue.name = "POP3MainFetchQueue";
 		hotmailFetchQueue.name = "HotmailFetchQueue";
 		while (true) {
-			time_t startT = time(0);
-			double count = 0;
 			POP3FetchItem pf;
 			bool gotSomething = false;
 			if (isForHotmail) {
@@ -275,7 +275,7 @@ namespace pmm {
 					}
 					//Fetch messages for Hotmail accounts here!!!
 					busyHotmailsSet.insert(pf.mailAccountInfo.email());
-					count += fetchMessages(pf);
+					fetchMessages(pf);
 					gotSomething = true;
 					busyHotmailsSet.erase(pf.mailAccountInfo.email());
 				}
@@ -289,16 +289,13 @@ namespace pmm {
 					}
 					//Fetch messages for account here!!!
 					busyEmailsSet.insert(pf.mailAccountInfo.email());
-					count += fetchMessages(pf);
+					fetchMessages(pf);
 					gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
 				}
 			}
-			time_t endT = time(0);
-			if(startT != endT){
-				pop3Log << "STAT: " << (count / (endT - startT)) << "/s messages retrieved." << pmm::NL;
-			}
-			if(!gotSomething) usleep(1000);
+			if(gotSomething) usleep(10);
+			else usleep(1000);
 		}
 	}
 
@@ -354,6 +351,7 @@ namespace pmm {
 			pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 			pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 			pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
+			pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
 		}
 		for (size_t j = 0; j < maxHotmailThreads; j++) {
 			pop3Fetcher[l - j - 1].isForHotmail = true;
@@ -375,6 +373,7 @@ namespace pmm {
 				pop3Fetcher[i].pmmStorageQueue = pmmStorageQueue;
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
+				pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {
 				pop3Fetcher[l - j - 1].isForHotmail = true;

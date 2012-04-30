@@ -57,6 +57,7 @@ namespace pmm {
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
 			SharedVector<std::string> *quotaUpdateVector;
 			std::map<std::string, int> serverConnectAttempts;
+			AtomicVar<int> *cntRetrieved;
 			POP3FetcherThread();
 			~POP3FetcherThread();
 			void operator()();

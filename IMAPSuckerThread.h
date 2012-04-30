@@ -57,7 +57,7 @@ namespace pmm {
 			FetchedMailsCache fetchedMails;
 			int availableMessages;
 			int fetchRetryInterval;
-			void fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);
+			bool fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &m);
 		public:
 			time_t threadStartTime;
 			SharedSet<std::string> *busyEmails;
@@ -66,6 +66,7 @@ namespace pmm {
 			SharedQueue<NotificationPayload> *develNotificationQueue;
 			SharedQueue<NotificationPayload> *pmmStorageQueue;
 			SharedVector<std::string> *quotaUpdateVector;
+			AtomicVar<int> *cntRetrieved;
 			MailFetcher();
 			void operator()();
 		};

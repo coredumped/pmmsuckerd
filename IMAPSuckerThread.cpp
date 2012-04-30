@@ -97,11 +97,11 @@ namespace pmm {
 		return 0;
 	}
 	
-	void IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch)
+	bool IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch)
 	{
 		if (fetchedMails.entryExists2(imapFetch.mailAccountInfo.email(), uid)) {
 			//Do not fetch or even notify previously fetched e-mails
-			return;
+			return false;
 		}
 		struct mailimap_set * set;
 		struct mailimap_section * section;
@@ -115,11 +115,6 @@ namespace pmm {
 		set = mailimap_set_new_single(uid);
 		fetch_type = mailimap_fetch_type_new_fetch_att_list_empty();
 		section = mailimap_section_new(NULL);
-		/*clist *hdrsList = clist_new();
-		clist_append(hdrsList, (void *)"FROM");
-		clist_append(hdrsList, (void *)"SUBJECT");
-		struct mailimap_header_list *hdrs = mailimap_header_list_new(hdrsList);
-		section = mailimap_section_new_header_fields(hdrs);*/
 		fetch_att = mailimap_fetch_att_new_body_peek_section(section);
 		mailimap_fetch_type_new_fetch_att_list_add(fetch_type, fetch_att);
 		
@@ -139,9 +134,8 @@ namespace pmm {
 			//Parse e-mail, retrieve FROM and SUBJECT
 			msg_content = get_msg_content(fetch_result, &msg_len, theMessage);
 			if (msg_content == NULL) {
-				//fprintf(stderr, "no content\n");
 				mailimap_fetch_list_free(fetch_result);
-				return;
+				return false;
 			}
 			fetchedMails.addEntry2(imapFetch.mailAccountInfo.email(), uid);
 			//Verify if theMessage is not too old, if it is then just discard it!!!
@@ -183,6 +177,7 @@ namespace pmm {
 		}
 		mailimap_fetch_att_free(fetch_att);
 		mailimap_set_free(set);
+		return true;
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(){
@@ -244,14 +239,15 @@ namespace pmm {
 			time_t startT = time(0);
 			while (fetchQueue->extractEntry(imapFetch)) {
 				if (busyEmails->contains(imapFetch.mailAccountInfo.email())) {
-					imapLog << "WARNING: No need to monitor " << imapFetch.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
+					if(startT % 600 == 0) imapLog << "WARNING: No need to monitor " << imapFetch.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
+					usleep(100);
 					continue;
 				}
 				busyEmails->insert(imapFetch.mailAccountInfo.email());
 				time_t rightNow = time(0);
 				if (imapFetch.madeAttempts > 0 && rightNow < imapFetch.nextAttempt) {
 					if (fetchQueue->size() == 0) {
-						usleep(10);
+						usleep(100);
 					}
 					fetchQueue->add(imapFetch);
 				}
@@ -312,6 +308,7 @@ namespace pmm {
 									}
 								}
 								else {
+									imapFetch.madeAttempts = 0;
 #ifdef DEBUG
 									if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
 #endif
@@ -328,12 +325,19 @@ namespace pmm {
 										pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
 #endif
 										imapFetch.badgeCounter++;
+										bool gotMessage = false;
 										if (imapFetch.mailAccountInfo.devel) {
 											//pmm::imapLog << "Using development notification queue..." << pmm::NL;
-											fetch_msg(imap, uid, develNotificationQueue, imapFetch);
+											gotMessage = fetch_msg(imap, uid, develNotificationQueue, imapFetch);
 										}
-										else fetch_msg(imap, uid, myNotificationQueue, imapFetch);
+										else {
+											gotMessage = fetch_msg(imap, uid, myNotificationQueue, imapFetch);
+										}
 										uidSet.push_back(uid);
+										if (gotMessage) {
+											int cnt = cntRetrieved->get() + 1;
+											cntRetrieved->set(cnt);
+										}
 									}
 									//Remove old entries if the current time is a multiple of 60 seconds
 									if (rightNow % 600 == 0) {
@@ -407,6 +411,7 @@ namespace pmm {
 				mailFetchers[i].pmmStorageQueue = pmmStorageQueue;
 				mailFetchers[i].threadStartTime = threadStartTime;
 				mailFetchers[i].busyEmails = &busyEmails;
+				mailFetchers[i].cntRetrieved = &cntRetrievedMessages;
 				pmm::ThreadDispatcher::start(mailFetchers[i], 8 * 1024 * 1024);
 			}
 		}
@@ -513,17 +518,30 @@ namespace pmm {
 					fetchMails(m);
 					imapControl[theEmail].supportsIdle = true;
 					result = mailimap_idle(imapControl[theEmail].imap);
-					if(etpanOperationFailed(result)){
-						throw GenericException("Unable to start IDLE!!!");
+					if(result != MAILIMAP_NO_ERROR){
+						if(imapControl[theEmail].imap->imap_response == 0){
+							pmm::imapLog << "CRITICAL: Account " << m.email() << " said it was hosted at an IMAP IDLE capable server but we failed to monitor it!!!" << pmm::NL;
+						}
+						else {
+							pmm::imapLog << "CRITICAL: Account " << m.email() << " said it was hosted at an IMAP IDLE capable server but we failed to monitor it: " << imapControl[theEmail].imap->imap_response << pmm::NL;
+						}
+						//throw GenericException("Unable to start IDLE!!!");
+						mailboxControl[theEmail].isOpened = false;
+						mailimap_logout(imapControl[theEmail].imap);
+						mailimap_close(imapControl[theEmail].imap);
+						mailimap_free(imapControl[theEmail].imap);
+						imapControl[theEmail].imap = NULL;
 					}
-					//Report successfull login
-					mailboxControl[theEmail].isOpened = true;
-					mailboxControl[theEmail].openedOn = time(0x00);
-					imapControl[theEmail].startedOn = time(NULL);
-					//sleep(1);
+					else {
+						//Report successfull login
+						mailboxControl[theEmail].isOpened = true;
+						mailboxControl[theEmail].openedOn = time(0x00);
+						imapControl[theEmail].startedOn = time(NULL);
+						//sleep(1);
 #ifdef DEBUG
-					pmm::imapLog << theEmail << " is being succesfully monitored!!!" << pmm::NL;
+						pmm::imapLog << theEmail << " is being succesfully monitored!!!" << pmm::NL;
 #endif
+					}
 				}
 			}
 		}
