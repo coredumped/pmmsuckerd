@@ -617,7 +617,7 @@ namespace pmm {
 			}
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
-				if(etpanOperationFailed(result)){
+				if(result != MAILIMAP_NO_ERROR){
 					pmm::imapLog << "Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
 					mailimap_idle_done(imap);
 					mailimap_logout(imap);
@@ -626,8 +626,17 @@ namespace pmm {
 				}
 				else {
 					result = mailimap_idle(imap);
-					if(etpanOperationFailed(result)) throw GenericException("Unable to restart IDLE after DONE.");
-					fetchMails(m);
+					if(result != MAILIMAP_NO_ERROR){
+						//throw GenericException("Unable to restart IDLE after DONE.");
+						if(imap->imap_response == NULL) pmm::imapLog << "CRITICAL: unable to reset IDLE, perhaps this is not the time to send such command?, disconnecting..." << pmm::NL;
+						else pmm::imapLog << "CRITICAL: unable to reset IDLE: " << imap->imap_response << pmm::NL;
+						mailimap_logout(imap);
+						mailimap_close(imap);
+						mailboxControl[theEmail].isOpened = false;
+					}
+					else {
+						fetchMails(m);
+					}
 				}
 			}
 		}
