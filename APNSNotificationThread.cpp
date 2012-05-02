@@ -296,7 +296,7 @@ namespace pmm {
 	void APNSNotificationThread::useForProduction(){
 		_useSandbox = false;
 		maxBurstPauseInterval = 1;
-		maxNotificationsPerBurst = 2048;
+		maxNotificationsPerBurst = 200;
 		pmm::APNSLog << "Setting this notification thread as a production notifier" << pmm::NL;
 	}
 	
@@ -518,8 +518,11 @@ namespace pmm {
 					notificationQueue->add(payload);
 				}
 				if (++notifyCount > maxNotificationsPerBurst) {
-					APNSLog << "Too many (" << notifyCount << ") notifications in a single burst, sleeping for " << maxBurstPauseInterval << " seconds..." << pmm::NL;
-					sleep(maxBurstPauseInterval);
+					APNSLog << "Too many (" << notifyCount << ") notifications in a single burst, reconnecting..." << pmm::NL;
+					disconnectFromAPNS();
+					_socket = -1;					
+					//sleep(maxBurstPauseInterval);
+					connect2APNS();
 					break;
 				}
 			}
