@@ -465,8 +465,7 @@ namespace pmm {
 						if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){
 							payload.useSilentSound();
 						}
-						if(!_useSandbox) APNSLog << "Sending notification to production service..." << pmm::NL;
-						else APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
+						if(_useSandbox) APNSLog << "Sending notification to APNs sandbox..." << pmm::NL;
 						if (lastDevToken.compare(payload.deviceToken()) == 0) {
 							if (rightNow - lastTimeSentMap[currentDeviceToken] < 2) {
 								APNSLog << "WARNING: Got another notification for the same device in the same thread too soon, lets try to have another thread notify it..." << pmm::NL;
@@ -536,7 +535,12 @@ namespace pmm {
 #ifdef DEBUG_FULL_MESSAGE
 		APNSLog << "DEBUG: Sending notification " << jsonMsg << pmm::NL;
 #else
-		APNSLog << "DEBUG: Sending message to device " << devToken << ": " << msg.origMailMessage.to << pmm::NL;
+		if(msg.origMailMessage.to.size() == 0){
+			APNSLog << "DEBUG: Sending message to device " << devToken << ": " << jsonMsg << pmm::NL;
+		}
+		else {
+			APNSLog << "DEBUG: Sending message to device " << devToken << ": " << msg.origMailMessage.to << pmm::NL;
+		}
 #endif
 		if (devTokenCache.find(devToken) == devTokenCache.end()) {
 			std::string binaryDevToken;
