@@ -152,7 +152,7 @@ namespace pmm {
 					else pop3Log << "Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 					for (int i = 0; i < max_retrieve; i++) {
-						if(max_retrieve > 1000) mailpop3_noop(pop3);
+						//if(max_retrieve > 1000) mailpop3_noop(pop3);
 						time_t now = time(0);
 						struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 						if (info == NULL) continue;
