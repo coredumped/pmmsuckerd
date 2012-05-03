@@ -578,6 +578,7 @@ namespace pmm {
 			pelem.events = POLLIN;
 			int recent = -1;
 			bool resetIdle = false;
+			int antiLoopCounter = 0;
 			while (poll(&pelem, 1, 0) > 0) {
 				char *response = mailimap_read_line(imap);
 #ifdef DEBUG
@@ -614,6 +615,12 @@ namespace pmm {
 					}
 				}
 				if(response == NULL) break;
+				if(antiLoopCounter++ > 100) {
+					pmm::imapLog << "PANIC: Got a looped IDLE status checker, attempting to send an IDLE reset to break free!!!" << pmm::NL;
+					resetIdle = true;
+					fetchMails(m);
+					break;
+				}
 			}
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);

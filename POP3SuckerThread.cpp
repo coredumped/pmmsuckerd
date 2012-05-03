@@ -170,7 +170,8 @@ namespace pmm {
 							result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
 							if(result != MAILPOP3_NO_ERROR){
 								if(result == MAILPOP3_ERROR_STREAM){
-									pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved." << pmm::NL;
+									if(pop3->pop3_response == NULL) pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved." << pmm::NL;
+									else pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved due to: " << pop3->pop3_response << pmm::NL;
 									std::map<std::string, int> record;
 									if(failedIOFetches.find(pf.mailAccountInfo.email()) == failedIOFetches.end()){
 										record[info->msg_uidl] = 1;
