@@ -116,7 +116,7 @@ namespace pmm {
 		}
 		else {
 			result = mailpop3_login(pop3, pf.mailAccountInfo.username().c_str(), pf.mailAccountInfo.password().c_str());
-			if(etpanOperationFailed(result)){
+			if(result != MAILPOP3_NO_ERROR){
 				if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
@@ -134,7 +134,7 @@ namespace pmm {
 				}
 				else {
 					if (pop3->pop3_response == NULL) {
-						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later." << pmm::NL;
+						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", etpan code=" << result << ", I will retry later." << pmm::NL;
 					}
 					else {
 						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
