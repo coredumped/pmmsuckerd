@@ -117,27 +117,42 @@ namespace pmm {
 		else {
 			result = mailpop3_login(pop3, pf.mailAccountInfo.username().c_str(), pf.mailAccountInfo.password().c_str());
 			if(result != MAILPOP3_NO_ERROR){
-				if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
-				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
-				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
-				if (theVal % 1000 == 0) {
-					//Notify the user that we might not be able to monitor this account
+				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
+					pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
+					pf.mailAccountInfo.isEnabled = false;
 					std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
-					std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
+					std::string msgX = "Can't login to mailbox ";
 					msgX.append(pf.mailAccountInfo.email());
-					msgX.append(", have you changed your password?");
+					msgX.append(", to continue receiving notifications please update your application settings.");
 					for (size_t i = 0; i < allTokens.size(); i++) {
 						NotificationPayload np(allTokens[i], msgX);
 						np.isSystemNotification = true;
 						notificationQueue->add(np);
-					}
+					}					
 				}
 				else {
-					if (pop3->pop3_response == NULL) {
-						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", etpan code=" << result << ", I will retry later." << pmm::NL;
+					if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
+					int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
+					serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
+					if (theVal % 1000 == 0) {
+						//Notify the user that we might not be able to monitor this account
+						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
+						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
+						msgX.append(pf.mailAccountInfo.email());
+						msgX.append(", have you changed your password?");
+						for (size_t i = 0; i < allTokens.size(); i++) {
+							NotificationPayload np(allTokens[i], msgX);
+							np.isSystemNotification = true;
+							notificationQueue->add(np);
+						}
 					}
 					else {
-						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+						if (pop3->pop3_response == NULL) {
+							pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", etpan code=" << result << ", I will retry later." << pmm::NL;
+						}
+						else {
+							pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+						}
 					}
 				}
 			}
