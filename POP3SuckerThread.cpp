@@ -117,24 +117,27 @@ namespace pmm {
 		else {
 			result = mailpop3_login(pop3, pf.mailAccountInfo.username().c_str(), pf.mailAccountInfo.password().c_str());
 			if(result != MAILPOP3_NO_ERROR){
+				if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
+				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
+				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
-					pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
-					pf.mailAccountInfo.isEnabled = false;
-					std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
-					std::string msgX = "Can't login to mailbox ";
-					msgX.append(pf.mailAccountInfo.email());
-					msgX.append(", to continue receiving notifications please update your application settings.");
-					emails2Disable->insert(pf.mailAccountInfo.email());
-					/*for (size_t i = 0; i < allTokens.size(); i++) {
-						NotificationPayload np(allTokens[i], msgX);
-						np.isSystemNotification = true;
-						notificationQueue->add(np);
-					}*/					
+					if(theVal == 100){
+						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
+						pf.mailAccountInfo.isEnabled = false;
+						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
+						std::string msgX = "Can't login to mailbox ";
+						msgX.append(pf.mailAccountInfo.email());
+						msgX.append(", to continue receiving notifications please update your application settings.");
+						emails2Disable->insert(pf.mailAccountInfo.email());
+						/*for (size_t i = 0; i < allTokens.size(); i++) {
+						 NotificationPayload np(allTokens[i], msgX);
+						 np.isSystemNotification = true;
+						 notificationQueue->add(np);
+						 }*/					
+						serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
+					}
 				}
 				else {
-					if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
-					int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
-					serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 					if (theVal % 1000 == 0) {
 						//Notify the user that we might not be able to monitor this account
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
