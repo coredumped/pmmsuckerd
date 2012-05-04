@@ -124,11 +124,11 @@ namespace pmm {
 					std::string msgX = "Can't login to mailbox ";
 					msgX.append(pf.mailAccountInfo.email());
 					msgX.append(", to continue receiving notifications please update your application settings.");
-					for (size_t i = 0; i < allTokens.size(); i++) {
+					/*for (size_t i = 0; i < allTokens.size(); i++) {
 						NotificationPayload np(allTokens[i], msgX);
 						np.isSystemNotification = true;
 						notificationQueue->add(np);
-					}					
+					}*/					
 				}
 				else {
 					if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
