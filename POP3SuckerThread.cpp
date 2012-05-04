@@ -107,7 +107,12 @@ namespace pmm {
 			result = mailpop3_socket_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
 		if(etpanOperationFailed(result)){
-			pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later." << pmm::NL;
+			if (pop3->pop3_response == NULL) {
+				pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later." << pmm::NL;
+			}
+			else {
+				pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+			}
 		}
 		else {
 			result = mailpop3_login(pop3, pf.mailAccountInfo.username().c_str(), pf.mailAccountInfo.password().c_str());
@@ -115,10 +120,12 @@ namespace pmm {
 				if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
-				if (theVal == 100) {
+				if (theVal % 1000 == 0) {
 					//Notify the user that we might not be able to monitor this account
 					std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
-					std::string msgX = "From: Push Me Mail Service\nCan't login to your mailbox, have you changed your password?";
+					std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
+					msgX.append(pf.mailAccountInfo.email());
+					msgX.append(", have you changed your password?");
 					for (size_t i = 0; i < allTokens.size(); i++) {
 						NotificationPayload np(allTokens[i], msgX);
 						np.isSystemNotification = true;
@@ -126,7 +133,12 @@ namespace pmm {
 					}
 				}
 				else {
-					pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later." << pmm::NL;
+					if (pop3->pop3_response == NULL) {
+						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later." << pmm::NL;
+					}
+					else {
+						pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+					}
 				}
 			}
 			else {
