@@ -129,11 +129,11 @@ namespace pmm {
 						msgX.append(pf.mailAccountInfo.email());
 						msgX.append(", to continue receiving notifications please update your application settings.");
 						emails2Disable->insert(pf.mailAccountInfo.email());
-						/*for (size_t i = 0; i < allTokens.size(); i++) {
-						 NotificationPayload np(allTokens[i], msgX);
-						 np.isSystemNotification = true;
-						 notificationQueue->add(np);
-						 }*/					
+						for (size_t i = 0; i < allTokens.size(); i++) {
+							NotificationPayload np(allTokens[i], msgX);
+							np.isSystemNotification = true;
+							notificationQueue->add(np);
+						}					
 						serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 					}
 				}
