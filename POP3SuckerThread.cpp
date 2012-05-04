@@ -136,6 +136,7 @@ namespace pmm {
 					serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 					if (theVal % 1000 == 0) {
 						//Notify the user that we might not be able to monitor this account
+						emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
 						msgX.append(pf.mailAccountInfo.email());
@@ -143,7 +144,7 @@ namespace pmm {
 						for (size_t i = 0; i < allTokens.size(); i++) {
 							NotificationPayload np(allTokens[i], msgX);
 							np.isSystemNotification = true;
-							notificationQueue->add(np);
+							//notificationQueue->add(np);
 						}
 					}
 					else {
@@ -419,6 +420,7 @@ namespace pmm {
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 				pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
+				pop3Fetcher[i].emails2Disable = &emails2Disable;
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {
 				pop3Fetcher[l - j - 1].isForHotmail = true;

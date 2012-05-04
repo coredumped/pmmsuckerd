@@ -59,6 +59,7 @@ namespace pmm {
 			SharedVector<std::string> *quotaUpdateVector;
 			std::map<std::string, int> serverConnectAttempts;
 			AtomicVar<int> *cntRetrieved;
+			SharedSet<std::string> *emails2Disable;
 			POP3FetcherThread();
 			~POP3FetcherThread();
 			void operator()();

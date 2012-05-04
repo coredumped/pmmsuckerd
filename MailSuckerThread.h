@@ -17,6 +17,7 @@
 #include "FetchedMailsCache.h"
 #include "MTLogger.h"
 #include "DataTypes.h"
+#include "SharedSet.h"
 #include <string>
 #include <map>
 
@@ -70,6 +71,7 @@ namespace pmm {
 		
 		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenAddQueue;
 		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenRelinquishQueue;
+		pmm::SharedSet<std::string> emails2Disable;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();

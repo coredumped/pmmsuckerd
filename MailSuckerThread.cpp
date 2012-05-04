@@ -224,6 +224,11 @@ namespace pmm {
 				}
 				if (emailAccounts[i].devTokens().size() > 0) {
 					//Monitor mailboxes only if they have at least one associated device
+					if (emails2Disable.contains(emailAccounts[i].email())) {
+						emailAccounts[i].isEnabled = false;
+						emails2Disable.erase(emailAccounts[i].email());
+						cntAccountsTotal = cntAccountsTotal - 1;
+					}
 					if (emailAccounts[i].isEnabled == true) {
 						if (QuotaDB::remaning(emailAccounts[i].email()) <= 0) {
 							emailAccounts[i].isEnabled = false;

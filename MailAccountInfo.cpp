@@ -91,6 +91,7 @@ namespace pmm {
 		if(serverPort__ > 0) serverPort_ = serverPort__;
 		if(devTokens__.size() > 0) devTokens_ = devTokens__;
 		useSSL_ = useSSL__;
+		isEnabled = true;
 	}
 
 	void MailAccountInfo::deviceTokenAdd(const std::string &newDevToken){
