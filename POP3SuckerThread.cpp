@@ -124,6 +124,7 @@ namespace pmm {
 					std::string msgX = "Can't login to mailbox ";
 					msgX.append(pf.mailAccountInfo.email());
 					msgX.append(", to continue receiving notifications please update your application settings.");
+					emails2Disable->insert(pf.mailAccountInfo.email());
 					/*for (size_t i = 0; i < allTokens.size(); i++) {
 						NotificationPayload np(allTokens[i], msgX);
 						np.isSystemNotification = true;
@@ -136,7 +137,6 @@ namespace pmm {
 					serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 					if (theVal % 1000 == 0) {
 						//Notify the user that we might not be able to monitor this account
-						emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
 						msgX.append(pf.mailAccountInfo.email());
@@ -144,7 +144,7 @@ namespace pmm {
 						for (size_t i = 0; i < allTokens.size(); i++) {
 							NotificationPayload np(allTokens[i], msgX);
 							np.isSystemNotification = true;
-							//notificationQueue->add(np);
+							notificationQueue->add(np);
 						}
 					}
 					else {
