@@ -31,7 +31,20 @@ namespace pmm {
 	
 	void Mutex::lock() {
 #ifndef USE_MANAGED_MUTEXES
-		pthread_mutex_lock(&theMutex);
+		switch(pthread_mutex_lock(&theMutex)){
+			case 0:
+				//Mutex locked succesfully
+				break;
+			case EBUSY:
+				if(lFile != NULL && lLine > 0) throw MutexLockException("Can't lock an already locked mutex!!!", lFile, lLine);
+				else throw MutexLockException("Can't lock an already locked mutex!!!");
+				break;
+			case EINVAL:
+				throw MutexLockException("Unable to lock a non-properly-initialized mutex!!!");
+				break;
+			default:
+				throw MutexLockException("Can't lock this mutex!!!");
+		}
 #else
 		switch(pthread_mutex_trylock(&theMutex)){
 			case 0:
