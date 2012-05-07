@@ -78,6 +78,7 @@ namespace pmm {
 	}
 	
 	void PendingNotificationStore::savePayloads(SharedQueue<NotificationPayload> *nQueue){
+		if(nQueue == 0) return;
 		if(sDB == NULL) sDB = connect2NotifDB();
 		NotificationPayload payload;
 		int i = 1000;
