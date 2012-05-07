@@ -30,7 +30,7 @@ namespace pmm {
 	}
 	
 	void Mutex::lock() {
-#ifdef USE_REGULAR_MUTEXES
+#ifndef USE_MANAGED_MUTEXES
 		pthread_mutex_lock(&theMutex);
 #else
 		switch(pthread_mutex_trylock(&theMutex)){
