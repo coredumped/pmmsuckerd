@@ -53,7 +53,7 @@ GenericThread.o: ../GenericThread.cpp ../GenericThread.h
 GenericException.o: ../GenericException.cpp ../GenericException.h
 	$(GCC) $(CFLAGS) -c -o GenericException.o ../GenericException.cpp
 
-APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h ../SilentMode.h
+APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h ../SilentMode.h ../Mutex.h
 	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
 
 ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h ../GenericThread.h
@@ -62,10 +62,10 @@ ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h ../GenericThre
 SharedQueue.o: ../SharedQueue.cpp ../SharedQueue.h
 	$(GCC) $(CFLAGS) -c -o SharedQueue.o ../SharedQueue.cpp
 
-MTLogger.o: ../MTLogger.cpp ../MTLogger.h
+MTLogger.o: ../MTLogger.cpp ../MTLogger.h ../Mutex.h
 	$(GCC) $(CFLAGS) -c -o MTLogger.o ../MTLogger.cpp
 
-MessageUploaderThread.o: ../MessageUploaderThread.cpp ../MessageUploaderThread.h ../MailMessage.h
+MessageUploaderThread.o: ../MessageUploaderThread.cpp ../MessageUploaderThread.h ../MailMessage.h ../Mutex.h
 	$(GCC) $(CFLAGS) -c -o MessageUploaderThread.o ../MessageUploaderThread.cpp
 
 MailMessage.o: ../MailMessage.cpp ../MailMessage.h
@@ -83,10 +83,10 @@ FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h
 MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h
 	$(GCC) $(CFLAGS) -c -o MailSuckerThread.o ../MailSuckerThread.cpp
 
-IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h
+IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h
 	$(GCC) $(CFLAGS) -c -o IMAPSuckerThread.o ../IMAPSuckerThread.cpp
 
-POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h
+POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h
 	$(GCC) $(CFLAGS) -c -o POP3SuckerThread.o ../POP3SuckerThread.cpp
 
 DataTypes.o: ../DataTypes.cpp ../DataTypes.h
@@ -101,7 +101,7 @@ QuotaDB.o: ../QuotaDB.cpp ../QuotaDB.h
 UserPreferences.o: ../UserPreferences.cpp ../UserPreferences.h
 	$(GCC) $(CFLAGS) -c -o UserPreferences.o ../UserPreferences.cpp
 
-APNSFeedbackThread.o: ../APNSFeedbackThread.cpp ../APNSFeedbackThread.h ../GenericThread.h ../SharedVector.h ../APNSNotificationThread.h
+APNSFeedbackThread.o: ../APNSFeedbackThread.cpp ../APNSFeedbackThread.h ../GenericThread.h ../SharedVector.h ../APNSNotificationThread.h ../Mutex.h
 	$(GCC) $(CFLAGS) -c -o APNSFeedbackThread.o ../APNSFeedbackThread.cpp
 
 PendingNotificationStore.o: ../PendingNotificationStore.cpp ../PendingNotificationStore.h ../UtilityFunctions.h ../GenericException.h ../SharedQueue.h ../NotificationPayload.h
