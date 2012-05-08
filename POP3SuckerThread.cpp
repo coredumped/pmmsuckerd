@@ -124,12 +124,12 @@ namespace pmm {
 				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
 					if(theVal == 100){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
-						pf.mailAccountInfo.isEnabled = false;
+						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
+						emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Can't login to mailbox ";
 						msgX.append(pf.mailAccountInfo.email());
 						msgX.append(", to continue receiving notifications please update your application settings.");
-						emails2Disable->insert(pf.mailAccountInfo.email());
 						for (size_t i = 0; i < allTokens.size(); i++) {
 							NotificationPayload np(allTokens[i], msgX);
 							np.isSystemNotification = true;
