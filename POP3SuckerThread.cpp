@@ -98,6 +98,7 @@ namespace pmm {
 	
 	int POP3SuckerThread::POP3FetcherThread::fetchMessages(POP3FetchItem &pf){
 		mailpop3 *pop3 = mailpop3_new(0, 0);
+		if(pop3 == NULL){ pop3Log << "PANIC: Unable to create POP3 handle!!!" << pmm::NL; return false; }
 		int result;
 		int messagesRetrieved = 0;
 		if (pf.mailAccountInfo.useSSL()) {

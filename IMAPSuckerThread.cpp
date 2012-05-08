@@ -226,6 +226,7 @@ namespace pmm {
 	IMAPSuckerThread::MailFetcher::MailFetcher(){
 		availableMessages = 0;
 		pmmStorageQueue = NULL;
+		threadStartTime = time(0) - 43200;
 	}
 	
 	void IMAPSuckerThread::MailFetcher::operator()(){
