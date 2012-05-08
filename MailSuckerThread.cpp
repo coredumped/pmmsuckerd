@@ -79,7 +79,8 @@ namespace pmm {
 		quotaIncreaseQueue = NULL;
 		threadStartTime = time(0) - 900;
 		cntRetrievedMessages = 0;
-		emails2Disable = new SharedSet<std::string>();
+		//emails2Disable = new SharedSet<std::string>();
+		emails2Disable = 0;
 	}
 	
 	MailSuckerThread::~MailSuckerThread(){

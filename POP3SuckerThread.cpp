@@ -414,6 +414,7 @@ namespace pmm {
 	
 	void POP3SuckerThread::openConnection(const MailAccountInfo &m){
 		if (pop3Fetcher == NULL) {
+			if(emails2Disable == 0) emails2Disable = new SharedSet<std::string>();
 			pop3Log << "Instantiating pop3 message fetching threads for the first time..." << pmm::NL;
 			size_t l = maxPOP3FetcherThreads + maxHotmailThreads;
 			pop3Fetcher = new POP3FetcherThread[l];
