@@ -423,7 +423,7 @@ namespace pmm {
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 				pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
-				pop3Fetcher[i].emails2Disable = &emails2Disable;
+				pop3Fetcher[i].emails2Disable = emails2Disable;
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {
 				pop3Fetcher[l - j - 1].isForHotmail = true;

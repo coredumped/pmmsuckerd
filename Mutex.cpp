@@ -30,8 +30,8 @@ namespace pmm {
 	}
 	
 	void Mutex::lock() {
-#ifndef USE_MANAGED_MUTEXES
-		switch(pthread_mutex_lock(&theMutex)){
+#ifdef USE_MANAGED_MUTEXES
+		switch(pthread_mutex_trylock(&theMutex)){
 			case 0:
 				//Mutex locked succesfully
 				break;
@@ -46,7 +46,7 @@ namespace pmm {
 				throw MutexLockException("Can't lock this mutex!!!");
 		}
 #else
-		switch(pthread_mutex_trylock(&theMutex)){
+		switch(pthread_mutex_lock(&theMutex)){
 			case 0:
 				//Mutex locked succesfully
 				break;

@@ -71,7 +71,7 @@ namespace pmm {
 		
 		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenAddQueue;
 		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenRelinquishQueue;
-		pmm::SharedSet<std::string> emails2Disable;
+		pmm::SharedSet<std::string> *emails2Disable;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
