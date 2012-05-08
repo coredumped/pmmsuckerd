@@ -89,6 +89,7 @@ namespace pmm {
 		quotaUpdateVector = NULL;
 		pmmStorageQueue = NULL;
 		isForHotmail = false;
+		emails2Disable = NULL;
 		mailstream_network_delay.tv_sec = 15;
 	}
 	
@@ -125,7 +126,7 @@ namespace pmm {
 					if(theVal == 100){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
-						emails2Disable->insert(pf.mailAccountInfo.email());
+						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Can't login to mailbox ";
 						msgX.append(pf.mailAccountInfo.email());
