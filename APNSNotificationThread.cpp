@@ -452,14 +452,12 @@ namespace pmm {
 						invalidTokenSet.insert(newInvalidToken);
 						newInvalidDevToken = "";
 					}
-					if (invalidTokenSet.find(payload.deviceToken()) != invalidTokenSet.end()) {
+					if (_useSandbox == false && invalidTokenSet.find(payload.deviceToken()) != invalidTokenSet.end()) {
 						APNSLog << "CRITICAL: Refusing to post notification to device " << payload.deviceToken() << " this is an invalid device token." << pmm::NL;
 #warning Warn the user somehow that her device is holding an invalid device token
 						triggerSimultanousReconnect();
 					}
 					else {
-						//time_t theTime;
-						//time(&theTime);
 						struct tm tmTime;
 						gmtime_r(&rightNow, &tmTime);		
 						if(SilentMode::isInEffect(payload.origMailMessage.to, &tmTime)){

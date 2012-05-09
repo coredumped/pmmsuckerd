@@ -91,8 +91,6 @@ namespace pmm {
 		std::string _keyPath;
 		std::string _certPath;
 		std::string _certPassword;
-
-		
 	protected:
 		bool sslInitComplete;
 		void initSSL();
