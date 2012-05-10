@@ -418,7 +418,7 @@ int main (int argc, const char * argv[])
 			}
 			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 		}
-		if (tic % 30 == 0) {
+		if (tic % 45 == 0) {
 			//Process quota updates if any
 			std::vector<std::string> quotaVec;
 			quotaUpdateVector.copyTo(quotaVec);
@@ -447,30 +447,6 @@ int main (int argc, const char * argv[])
 				}
 				//In case we failed to report any quotas the service will re-report them again
 			}
-
-			/*if (quotaUpdateVector.size() > 0) {
-				quotaUpdateVector.beginCriticalSection();
-				for (size_t i = 0; i < quotaUpdateVector.unlockedSize(); i++) {
-					if (quotas.find(quotaUpdateVector.atUnlocked(i)) == quotas.end()) {
-						quotas[quotaUpdateVector.atUnlocked(i)] = 0;
-					}
-					quotas[quotaUpdateVector.atUnlocked(i)] = quotas[quotaUpdateVector.atUnlocked(i)] + 1;
-				}
-				quotaUpdateVector.unlockedClear();
-				quotaUpdateVector.endCriticalSection();
-				//Report quota changes to pmm service.
-				try{
-					if(session.reportQuotas(quotas)){
-						updateAccountQuotas(imapSuckingThreads, maxIMAPSuckerThreads, quotas);
-						//updateAccountQuotas(pop3SuckingThreads, maxPOP3SuckerThreads, quotas);
-						quotas.clear();
-					}
-				}
-				catch(pmm::HTTPException &htex0){
-					pmm::Log << "Unable to update upstream quotas due to: " << htex0.errorMessage() << ", I will retry in the next cycle" << pmm::NL;
-				}
-				//In case we failed to report any quotas the service will re-report them again
-			}*/
 		}
 		if(tic % 86400 == 0){
 			//Cleanup the fetch mail cache database
