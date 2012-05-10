@@ -13,7 +13,7 @@
 #define MAXPAYLOAD_SIZE 256
 #endif
 #ifndef DEFAULT_SILENT_SOUND
-#define DEFAULT_SILENT_SOUND "sln.caf"
+#define DEFAULT_SILENT_SOUND ""
 #endif
 
 namespace pmm {
@@ -116,45 +116,13 @@ namespace pmm {
 			jsonbuilder << "{";
 			jsonbuilder << "\"aps\":";
 			jsonbuilder << "{";
-			jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
-			jsonbuilder << "\"sound\":\"" << _soundName << "\"";
+			jsonbuilder << "\"alert\":\"" << encodedMsg << "\"";
+			if(_soundName.size() > 0) jsonbuilder << ",\"sound\":\"" << _soundName << "\"";
 			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 			jsonbuilder << "}";
 			jsonbuilder << "}";
 			addDots = true;
 		}while (jsonbuilder.str().size() > MAXPAYLOAD_SIZE);
-		/*std::stringstream jsonbuilder;
-		std::string encodedMsg = msg;
-		msg_encode(encodedMsg);
-		jsonbuilder << "{";
-		jsonbuilder << "\"aps\":";
-		jsonbuilder << "{";
-		jsonbuilder << "\"alert\":\"" << encodedMsg << "\",";
-		jsonbuilder << "\"sound\":\"" << _soundName << "\"";
-		if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
-		jsonbuilder << "}";
-		jsonbuilder << "}";
-		if (jsonbuilder.str().size() > MAXPAYLOAD_SIZE) {
-			jsonbuilder.str(std::string());
-			jsonbuilder << "{";
-			jsonbuilder << "\"aps\":";
-			jsonbuilder << "{";
-			jsonbuilder << "\"sound\":\"" << _soundName << "\"";
-			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
-			jsonbuilder << "}";
-			jsonbuilder << "}";
-			
-			size_t maxMsgLength = jsonbuilder.str().size() - 3;
-			jsonbuilder.str(std::string());
-			jsonbuilder << "{";
-			jsonbuilder << "\"aps\":";
-			jsonbuilder << "{";
-			jsonbuilder << "\"alert\":\"" << encodedMsg.substr(0, maxMsgLength) << "...\",";
-			jsonbuilder << "\"sound\":\"" << _soundName << "\"";
-			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
-			jsonbuilder << "}";
-			jsonbuilder << "}";			
-		}*/
 		jsonRepresentation = jsonbuilder.str();
 	}
 	
