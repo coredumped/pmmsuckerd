@@ -55,6 +55,7 @@ namespace pmm {
 		virtual void checkEmail(const MailAccountInfo &m); //Override me
 		virtual void processAccountAdd();
 		virtual void processAccountRemove();
+		virtual bool processAccountUpdate(const MailAccountInfo &m, size_t idx);
 		//Device token addition and removal
 		virtual void registerDeviceTokens();
 		virtual void relinquishDeviceTokens();
@@ -72,6 +73,7 @@ namespace pmm {
 		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenAddQueue;
 		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenRelinquishQueue;
 		pmm::SharedSet<std::string> emails2Disable;
+		pmm::SharedVector<pmm::MailAccountInfo> *mailAccounts2Refresh;
 
 		MailSuckerThread();
 		virtual ~MailSuckerThread();

@@ -94,6 +94,7 @@ namespace pmm {
 		const char *silentModeClear = "silentModeClear";
 		const char *refreshUserPreference = "refreshUserPreference";
 		const char *broadcastMessage = "broadcastMessage";
+		const char *refreshEmailAccount = "refreshEmailAccount";
 	}
 	
 #ifdef __APPLE__

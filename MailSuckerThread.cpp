@@ -79,6 +79,8 @@ namespace pmm {
 		quotaIncreaseQueue = NULL;
 		threadStartTime = time(0) - 900;
 		cntRetrievedMessages = 0;
+		mailAccounts2Refresh = NULL;
+		if(emails2Disable.contains("none")) pmm::Log << "Initialization of emails2Disable SharedSet is flawed!!!" << pmm::NL;
 	}
 	
 	MailSuckerThread::~MailSuckerThread(){
@@ -131,6 +133,25 @@ namespace pmm {
 		}
 	}
 	
+	bool MailSuckerThread::processAccountUpdate(const MailAccountInfo &m, size_t idx){
+		bool somethingChanged = false;
+		mailAccounts2Refresh->beginCriticalSection();
+		for (size_t i = 0; i < mailAccounts2Refresh->unlockedSize(); i++) {
+			if (m.email().compare(mailAccounts2Refresh->atUnlocked(i).email()) == 0) {
+				pmm::Log << "Initiating email account update..." << pmm::NL;
+				emailAccounts.unlockedErase(idx);
+				pmm::Log << "Adding new information for " << m.email() << "..." << pmm::NL;
+				emailAccounts.push_back(mailAccounts2Refresh->atUnlocked(i));
+				mailAccounts2Refresh->unlockedErase(i);
+				pmm::Log << "Information of " << m.email() << " updated succesfully!!!" << pmm::NL;
+				somethingChanged = true;
+				break;
+			}
+		}
+		mailAccounts2Refresh->endCriticalSection();
+		return somethingChanged;
+	}
+	
 	void MailSuckerThread::registerDeviceTokens(){
 		DevtokenQueueItem item;
 		time_t t1 = time(0);
@@ -181,6 +202,7 @@ namespace pmm {
 		if (rmAccountQueue == NULL) throw GenericException("Can't continue like this, the rmAccountQueue is null!!!");
 		if (devTokenAddQueue == NULL) throw GenericException("Can't continue like this, the devTokenAddQueue is null!!!");
 		if (devTokenRelinquishQueue == NULL) throw GenericException("Can't continue like this, the devTokenRelinquishQueue is null!!!");
+		if (mailAccounts2Refresh == NULL) throw GenericException("Can't continue with an null mailAccount2Refresh vector"); 
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
 			if(emailAccounts[i].quota > 0) cntAccountsActive = cntAccountsActive + 1;
@@ -222,6 +244,7 @@ namespace pmm {
 					}
 					else quotaIncreaseQueue->add(p);
 				}
+				processAccountUpdate(emailAccounts[i], i);
 				if (emailAccounts[i].devTokens().size() > 0) {
 					//Monitor mailboxes only if they have at least one associated device
 					if (emails2Disable.contains(emailAccounts[i].email())) {

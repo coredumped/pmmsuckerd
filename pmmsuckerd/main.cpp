@@ -133,6 +133,8 @@ int main (int argc, const char * argv[])
 	pmm::SharedQueue<std::string> invalidTokenQ;
 	pmm::SharedQueue<std::string> develInvalidTokenQ;
 	
+	pmm::SharedVector<pmm::MailAccountInfo> mailAccounts2Refresh;
+	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
 	SSL_library_init();
@@ -327,6 +329,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
 		imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
+		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
@@ -347,6 +350,7 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
 		pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
+		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		sleep(1);
 	}
@@ -474,10 +478,10 @@ int main (int argc, const char * argv[])
 			//pmm::FetchedMailsCache fCache;
 			//fCache.expireOldEntries();
 		}
-		bool doCmdCheck = false;
+		/*bool doCmdCheck = false;
 		if (tic % 900 == 0) { //At least go to app engine every 15 minutes
 			doCmdCheck = true;
-		}
+		}*/
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
 				bool doCmdCheck = false;
@@ -595,6 +599,14 @@ int main (int argc, const char * argv[])
 						else if (command.compare(pmm::Commands::broadcastMessage) == 0){
 							pmm::Log << "Prepare to broadcast message: " << parameters["message"] << " to " << parameters["count"] << " devices, hang on tight!!!" << pmm::NL;
 							broadcastMessageToAll(parameters, notificationQueue, pmmStorageQueue);
+						}
+						else if (command.compare(pmm::Commands::refreshEmailAccount) == 0){
+							//Tricky one, prepare to refresh user account
+							//Retrieve information of account...
+							pmm::MailAccountInfo info;
+							session.retrieveEmailAddressInfo(info, parameters["email"]);
+							pmm::Log << "INFO: Sending account " << parameters["email"] << " to the update queue..." << pmm::NL; 
+							mailAccounts2Refresh.push_back(info);
 						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
