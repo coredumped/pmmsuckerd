@@ -234,7 +234,7 @@ namespace pmm {
 					break;
 			}
 		}
-		if (m.subject.size() <= 128) {
+		if (m.subject.size() <= 384) {
 			std::stringstream msgBody;
 			getMIMEMsgBody(result, msgBody);
 			std::string theBody = msgBody.str();
