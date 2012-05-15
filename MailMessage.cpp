@@ -243,7 +243,7 @@ namespace pmm {
 			}
 			if (theBody.size() > 0) {
 				if(m.subject.size() > 0) m.subject.append("\n");
-				if(theBody.size() < 256){
+				if(theBody.size() < 512){
 					m.subject.append(theBody.c_str(), theBody.size());
 				}
 				else {
