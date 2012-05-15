@@ -247,7 +247,7 @@ namespace pmm {
 					m.subject.append(theBody.c_str(), theBody.size());
 				}
 				else {
-					m.subject.append(theBody.c_str(), 256);
+					m.subject.append(theBody.c_str(), 512);
 				}
 				while (m.subject[0] == '\r' || m.subject[0] == '\n') {
 					m.subject = m.subject.substr(1);
