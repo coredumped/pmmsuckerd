@@ -253,6 +253,9 @@ namespace pmm {
 					m.subject = m.subject.substr(1);
 				}
 			}
+			else {
+				m.subject.append("\n------------------\nMessage does not have a plaintext body.");
+			}
 		}
 		mailmime_free(result);
 		return true;
