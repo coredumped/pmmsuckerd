@@ -8,7 +8,8 @@
 
 #ifndef PMM_Sucker_NotificationPayload_h
 #define PMM_Sucker_NotificationPayload_h
-#include<string>
+#include <string>
+#include <map>
 #include "MailMessage.h"
 
 namespace pmm {
@@ -22,10 +23,11 @@ namespace pmm {
 		int _badgeNumber;
 		std::string jsonRepresentation;
 	public:
+		std::map<std::string, std::string> customParams;
 		NotificationPayload();
 		NotificationPayload(const std::string &devToken_, const std::string &_message, int badgeNumber = 1, const std::string &sndName = "pmm.caf");
 		NotificationPayload(const NotificationPayload &n);
-		~NotificationPayload();
+		virtual ~NotificationPayload();
 		MailMessage origMailMessage;
 		
 		const std::string &toJSON();
@@ -38,6 +40,15 @@ namespace pmm {
 		int badge();
 		
 		int attempts;
+	};
+	
+	class NoQuotaNotificationPayload : public NotificationPayload {
+	protected:
+	public:
+		NoQuotaNotificationPayload();
+		NoQuotaNotificationPayload(const std::string &devToken_, const std::string &_email, const std::string &sndName = "default", int badgeNumber = 911);
+		NoQuotaNotificationPayload(const NoQuotaNotificationPayload &n);
+		virtual ~NoQuotaNotificationPayload();
 	};
 }
 

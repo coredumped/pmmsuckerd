@@ -269,10 +269,12 @@ namespace pmm {
 											fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 											if(!QuotaDB::decrease(pf.mailAccountInfo.email())){
 												pop3Log << "ATTENTION: Account " << pf.mailAccountInfo.email() << " has ran out of quota!" << pmm::NL;
-												std::stringstream msg;
-												msg << "You have ran out of quota on " << pf.mailAccountInfo.email() << ", you may purchase more to keep receiving notifications.";
-												pmm::NotificationPayload npi(myDevTokens[i], msg.str());
-												npi.isSystemNotification = true;
+												//std::stringstream msg;
+												//msg << "You have ran out of quota on " << pf.mailAccountInfo.email() << ", you may purchase more to keep receiving notifications.";
+												//pmm::NotificationPayload npi(myDevTokens[i], msg.str());
+												
+												pmm::NoQuotaNotificationPayload npi(myDevTokens[i], pf.mailAccountInfo.email());
+												//npi.isSystemNotification = true;
 												if (pf.mailAccountInfo.devel) {
 													pmm::Log << "Using development notification queue for this message." << pmm::NL;
 													develNotificationQueue->add(npi);

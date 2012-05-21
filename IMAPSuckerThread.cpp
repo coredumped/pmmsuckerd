@@ -158,10 +158,11 @@ namespace pmm {
 					if(i == 0){
 						if (!QuotaDB::decrease(imapFetch.mailAccountInfo.email())) {
 							imapLog << "ATTENTION: Account " << imapFetch.mailAccountInfo.email() << " has ran out of quota!!!" << pmm::NL;
-							std::stringstream msg;
-							msg << "You have ran out of quota on " << imapFetch.mailAccountInfo.email() << ", you may purchase more to keep receiving notifications.";
-							pmm::NotificationPayload npi(myDevTokens[i], msg.str());
-							npi.isSystemNotification = true;
+							//std::stringstream msg;
+							//msg << "You have ran out of quota on " << imapFetch.mailAccountInfo.email() << ", you may purchase more to keep receiving notifications.";
+							//pmm::NotificationPayload npi(myDevTokens[i], msg.str());
+							pmm::NoQuotaNotificationPayload npi(myDevTokens[i], imapFetch.mailAccountInfo.email());
+							//npi.isSystemNotification = true;
 							if (imapFetch.mailAccountInfo.devel) {
 								pmm::Log << "Using development notification queue for this message." << pmm::NL;
 								develNotificationQueue->add(npi);

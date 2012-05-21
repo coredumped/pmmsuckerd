@@ -86,6 +86,7 @@ namespace pmm {
 		origMailMessage = n.origMailMessage;
 		isSystemNotification = n.isSystemNotification;
 		attempts = n.attempts;
+		customParams = n.customParams;
 	}
 	
 	NotificationPayload::~NotificationPayload(){
@@ -120,6 +121,11 @@ namespace pmm {
 			if(_soundName.size() > 0) jsonbuilder << ",\"sound\":\"" << _soundName << "\"";
 			if(_badgeNumber > 0) jsonbuilder << ",\"badge\":" << _badgeNumber;
 			jsonbuilder << "}";
+			if(customParams.size() > 0){
+				for (std::map<std::string, std::string>::iterator iter = customParams.begin(); iter != customParams.end(); iter++) {
+					jsonbuilder << ",\"" << iter->first << "\":\"" << iter->second << "\"";
+				}
+			}
 			jsonbuilder << "}";
 			addDots = true;
 		}while (jsonbuilder.str().size() > MAXPAYLOAD_SIZE);
@@ -155,4 +161,24 @@ namespace pmm {
 	int NotificationPayload::badge(){
 		return _badgeNumber;
 	}
+	
+	NoQuotaNotificationPayload::NoQuotaNotificationPayload() : pmm::NotificationPayload(){
+		
+	}
+	
+	NoQuotaNotificationPayload::NoQuotaNotificationPayload(const std::string &devToken_, const std::string &_email, const std::string &sndName, int badgeNumber) : pmm::NotificationPayload(devToken_, "", badgeNumber, sndName){
+		std::stringstream msg_s;
+		msg_s << "You have ran out of quota on: " << _email;
+		msg = msg_s.str();
+		customParams["e"] = _email;
+		isSystemNotification = true;
+	}
+	
+	NoQuotaNotificationPayload::NoQuotaNotificationPayload(const NoQuotaNotificationPayload &n) : pmm::NotificationPayload(n){
+	}
+	
+	NoQuotaNotificationPayload::~NoQuotaNotificationPayload(){
+		
+	}
+
 }
