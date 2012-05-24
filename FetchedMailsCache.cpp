@@ -107,12 +107,27 @@ namespace pmm {
 		return false;
 	}
 	
+	static time_t lastCleanup = 1;
+	
 	static sqlite3 *getUConnection(const std::string &email){
 		sqlite3 *theConn = NULL;
 		fM.lock();
 		try {
 			if (uConnMap.find(email) != uConnMap.end()) {
 				theConn = uConnMap[email].conn;
+			}
+			time_t now = time(0);
+			if (now % 180 == 0) {
+				//Time to re-cycle, sorry :-(
+				if (lastCleanup != now) {
+					CacheLog << "Cleaning up sqlite connection cache..." << pmm::NL;
+					for (std::map<std::string, UniqueDBDescriptor>::iterator iter = uConnMap.begin(); iter != uConnMap.end(); iter++) {
+						if (email.compare(iter->first) != 0) {
+							iter->second.autoRefresh();
+						}
+					}
+					lastCleanup = now;
+				}
 			}
 		} 
 		catch (...) {
