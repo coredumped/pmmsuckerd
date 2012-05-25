@@ -62,6 +62,7 @@ namespace pmm {
 		void removeEntriesNotInSet2(const std::string &email, const std::vector<uint32_t> &uidSet);
 		void removeAllEntriesOfEmail2(const std::string &email);
 
+		void closeConnection(const std::string &email);
 	};
 	
 	extern MTLogger CacheLog;

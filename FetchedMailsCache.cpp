@@ -277,6 +277,17 @@ namespace pmm {
 		}
 	}
 	
+	void FetchedMailsCache::closeConnection(const std::string &email){
+		fM.lock();
+		if (uConnMap.find(email) != uConnMap.end()) {
+			if (uConnMap[email].conn != NULL) {
+				sqlite3_close(uConnMap[email].conn);
+				uConnMap[email].conn = NULL;
+			}
+		}
+		fM.unlock();
+	}
+	
 #ifdef OLD_CACHE_INTERFACE
 	void FetchedMailsCache::addEntry(const std::string &email, uint32_t uid){
 		std::stringstream input;

@@ -293,6 +293,7 @@ namespace pmm {
 					if(max_retrieve > 1000){
 						pop3Log << "WARNING: Scan of " << pf.mailAccountInfo.email() << " took: " << (int)(time(0) - largeT1) << " secs" << pmm::NL;
 					}
+					fetchedMails.closeConnection(pf.mailAccountInfo.email());
 				}
 				mailpop3_quit(pop3);
 			}
