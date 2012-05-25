@@ -35,6 +35,7 @@ namespace pmm {
 		__connM.lock();
 		if (__lastOpen == 0) __lastOpen = time(0);
 		else if(__lastOpen != __lastCheck && _uniqueConn != NULL && __lastOpen % 300 == 0){
+			pmm::Log << "Clearing quota database connection..." << pmm::NL;
 			sqlite3_close(_uniqueConn);
 			_uniqueConn = NULL;
 			__lastCheck = __lastOpen;

@@ -24,7 +24,7 @@ namespace pmm {
 
 	static const char *qTable = DEFAULT_PENDING_NOTIFICATION_TABLE;
 	static const char *sentTable = DEFAULT_PAYLOAD_SENT_TABLE;
-	sqlite3 *sDB = NULL;
+	//sqlite3 *sDB = NULL;
 	
 	static void sqlQuote(std::string &_return, const std::string origSQL){
 		for (size_t i = 0; i < origSQL.size(); i++) {
@@ -39,7 +39,8 @@ namespace pmm {
 	
 	static sqlite3 *connect2NotifDB(){
 		sqlite3 *qDB = NULL;
-		if(sqlite3_open(DEFAULT_PENDING_NOTIFICATION_DATAFILE, &qDB) != SQLITE_OK){
+		//if(sqlite3_open(DEFAULT_PENDING_NOTIFICATION_DATAFILE, &qDB) != SQLITE_OK){
+		if(sqlite3_open_v2(DEFAULT_PENDING_NOTIFICATION_DATAFILE, &qDB, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, NULL) != SQLITE_OK){
 			pmm::Log << "Unable to open " << DEFAULT_PENDING_NOTIFICATION_DATAFILE << " datafile: " << sqlite3_errmsg(qDB) << pmm::NL;
 			throw GenericException(sqlite3_errmsg(qDB));
 		}
@@ -77,9 +78,11 @@ namespace pmm {
 		return qDB;
 	}
 	
+	static Mutex __pM;
 	void PendingNotificationStore::savePayloads(SharedQueue<NotificationPayload> *nQueue){
 		if(nQueue == 0) return;
-		if(sDB == NULL) sDB = connect2NotifDB();
+		__pM.lock();
+		sqlite3 *sDB = connect2NotifDB();
 		NotificationPayload payload;
 		int i = 1000;
 		while (nQueue->extractEntry(payload)) {
@@ -93,10 +96,13 @@ namespace pmm {
 			}
 			pmm::Log << " * Saving notification for device: " << payload.deviceToken() << pmm::NL;
 		}
+		sqlite3_close(sDB);
+		__pM.unlock();
 	}
 	
 	void PendingNotificationStore::saveSentPayload(const std::string &devToken, const std::string &payload, uint32_t _id){
-		if(sDB == NULL) sDB = connect2NotifDB();
+		__pM.lock();
+		sqlite3 *sDB = connect2NotifDB();
 		std::stringstream insCmd;
 		std::string quotedPayload;
 		char *errmsg;
@@ -107,31 +113,40 @@ namespace pmm {
 		if (sqlite3_exec(sDB, insCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
 			pmm::Log << "Unable to add notification payload to persistent queue(" << insCmd.str() << "): " << errmsg << pmm::NL;
 		}
+		sqlite3_close(sDB);
+		__pM.unlock();
 	}
 	
 	void PendingNotificationStore::setSentPayloadErrorCode(uint32_t _id, int errorCode){
-		if(sDB == NULL) sDB = connect2NotifDB();
+		__pM.lock();
+		sqlite3 *sDB = connect2NotifDB();
 		std::stringstream insCmd;
 		char *errmsg;
 		insCmd << "UPDATE " << sentTable << " SET errorcode=" << errorCode << " WHERE id=" << _id;
 		if (sqlite3_exec(sDB, insCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
 			pmm::Log << "Unable to set payload error code (" << insCmd.str() << "): " << errmsg << pmm::NL;
 		}		
+		sqlite3_close(sDB);
+		__pM.unlock();
 	}
 	
 	void PendingNotificationStore::eraseOldPayloads(){
-		if(sDB == NULL) sDB = connect2NotifDB();
+		__pM.lock();
+		sqlite3 *sDB = connect2NotifDB();
 		std::stringstream insCmd;
 		char *errmsg;
 		insCmd << "DELETE FROM " << sentTable << " WHERE tstamp < " << time(0) - 86500;
 		if (sqlite3_exec(sDB, insCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
 			pmm::Log << "Unable to erase old payloads (" << insCmd.str() << "): " << errmsg << pmm::NL;
 		}		
+		sqlite3_close(sDB);
+		__pM.unlock();
 	}
 	
 	bool PendingNotificationStore::getDeviceTokenFromMessage(std::string &devToken, uint32_t _id){
 		bool ret = false;
-		if(sDB == NULL) sDB = connect2NotifDB();
+		__pM.lock();
+		sqlite3 *sDB = connect2NotifDB();
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
 		char *szTail;
@@ -147,11 +162,14 @@ namespace pmm {
 			const char *errmsg = sqlite3_errmsg(sDB);
 			pmm::Log << "Unable to retrieve device token from notification with id=" << (int)_id << " (" << sqlCmd.str() << ") due to: " << errmsg << pmm::NL;
 		}
+		sqlite3_close(sDB);
+		__pM.unlock();
 		return ret;
 	}
 	
 	void PendingNotificationStore::loadPayloads(SharedQueue<NotificationPayload> *nQueue){
-		if(sDB == NULL) sDB = connect2NotifDB();
+		__pM.lock();
+		sqlite3 *sDB = connect2NotifDB();
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
 		char *szTail;
@@ -179,6 +197,7 @@ namespace pmm {
 		if (sqlite3_exec(sDB, delCmd.str().c_str(), 0, 0, &errmsg) != SQLITE_OK) {
 			pmm::Log << "Unable to add notification payload to persistent queue(" << delCmd.str() << "): " << errmsg << pmm::NL;
 		}
-
+		sqlite3_close(sDB);
+		__pM.unlock();
 	}
 }
