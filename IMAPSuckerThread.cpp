@@ -631,6 +631,8 @@ namespace pmm {
 					mailimap_idle_done(imap);
 					mailimap_logout(imap);
 					mailimap_close(imap);
+					mailimap_free(imap);
+					imapControl[theEmail].imap = NULL;
 					mailboxControl[theEmail].isOpened = false;
 				}
 				else {
