@@ -53,6 +53,7 @@ namespace pmm {
 	}
 	
 	void SilentMode::set(const std::string &email, int sHour, int sMinute, int eHour, int eMinute){
+		sM.lock();
 		if(silentDB == NULL) initialize();
 		std::stringstream sqlCmd, errmsg;
 		char *errmsg_s = NULL;
@@ -61,11 +62,16 @@ namespace pmm {
 		if(errcode != SQLITE_OK){
 			errmsg << "Unable to insert entry in silent mode table: " << errmsg_s << ". Insert command was: " << sqlCmd.str();
 			pmm::Log << errmsg.str() << pmm::NL;
+			sM.unlock();
 			throw GenericException(errmsg.str());			
 		}
+		sqlite3_close(silentDB);
+		silentDB = NULL;
+		sM.unlock();
 	}
 	
 	void SilentMode::clear(const std::string &email){
+		sM.lock();
 		if(silentDB == NULL) initialize();		
 		std::stringstream sqlCmd, errmsg;
 		char *errmsg_s = NULL;
@@ -74,12 +80,18 @@ namespace pmm {
 		if(errcode != SQLITE_OK){
 			errmsg << "Unable to remove entry from silent mode table: " << errmsg_s << ". Delete command was: " << sqlCmd.str();
 			pmm::Log << errmsg.str() << pmm::NL;
+			sM.unlock();
 			throw GenericException(errmsg.str());			
 		}
+		//Close database, force write
+		sqlite3_close(silentDB);
+		silentDB = NULL;
+		sM.unlock();
 	}
 	
 	bool SilentMode::isInEffect(const std::string &email, struct tm *theTime){
 		bool ret = false;
+		sM.lock();
 		if(silentDB == NULL) initialize();
 		std::stringstream sqlCmd, errmsg;
 		char *sztail = NULL;
@@ -92,6 +104,7 @@ namespace pmm {
 #ifdef DEBUG
 			pmm::Log << errmsg.str() << pmm::NL;
 #endif
+			sM.unlock();
 			throw GenericException(errmsg.str());
 		}
 		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
@@ -107,6 +120,7 @@ namespace pmm {
 			}
 		}
 		sqlite3_finalize(statement);
+		sM.unlock();
 		return ret;
 	}
 
