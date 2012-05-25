@@ -120,12 +120,16 @@ namespace pmm {
 			if (now % 180 == 0) {
 				//Time to re-cycle, sorry :-(
 				if (lastCleanup != now) {
+					int n = 0;
 					CacheLog << "Cleaning up sqlite connection cache..." << pmm::NL;
 					for (std::map<std::string, UniqueDBDescriptor>::iterator iter = uConnMap.begin(); iter != uConnMap.end(); iter++) {
 						if (email.compare(iter->first) != 0) {
-							iter->second.autoRefresh();
+							//iter->second.autoRefresh();
+							iter->second.closeConn();
+							n++;
 						}
 					}
+					CacheLog << n << " database connections to " << email << " closed" << pmm::NL;
 					lastCleanup = now;
 				}
 			}
