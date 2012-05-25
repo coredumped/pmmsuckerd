@@ -641,6 +641,8 @@ namespace pmm {
 						else pmm::imapLog << "CRITICAL: unable to reset IDLE: " << imap->imap_response << pmm::NL;
 						mailimap_logout(imap);
 						mailimap_close(imap);
+						mailimap_free(imap);
+						imapControl[theEmail].imap = NULL;
 						mailboxControl[theEmail].isOpened = false;
 					}
 					else {
