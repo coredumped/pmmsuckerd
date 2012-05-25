@@ -151,9 +151,9 @@ namespace pmm {
 	}
 	
 	sqlite3 *FetchedMailsCache::openDatabase(){
-		if (sqlite3_threadsafe() && dbConn != 0) {
+		/*if (sqlite3_threadsafe() && dbConn != 0) {
 			return dbConn;
-		}
+		}*/
 		int errCode = sqlite3_open(datafile.c_str(), &dbConn);
 		if (errCode != SQLITE_OK) {
 			throw GenericException(sqlite3_errmsg(dbConn));
@@ -249,9 +249,10 @@ namespace pmm {
 	}
 	
 	void FetchedMailsCache::closeDatabase(sqlite3 *db){
-		if (sqlite3_threadsafe() == 0) {
+		dbConn = NULL;
+		//if (sqlite3_threadsafe() == 0) {
 			sqlite3_close(db);
-		}
+		//}
 	}
 	
 	FetchedMailsCache::FetchedMailsCache(){
