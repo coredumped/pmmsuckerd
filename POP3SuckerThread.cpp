@@ -294,6 +294,7 @@ namespace pmm {
 						pop3Log << "WARNING: Scan of " << pf.mailAccountInfo.email() << " took: " << (int)(time(0) - largeT1) << " secs" << pmm::NL;
 					}
 				}
+				mailpop3_quit(pop3);
 			}
 			//mailpop3_quit(pop3);
 		}
