@@ -279,11 +279,17 @@ namespace pmm {
 	
 	void FetchedMailsCache::closeConnection(const std::string &email){
 		fM.lock();
-		if (uConnMap.find(email) != uConnMap.end()) {
-			if (uConnMap[email].conn != NULL) {
-				sqlite3_close(uConnMap[email].conn);
-				uConnMap[email].conn = NULL;
+		try {
+			if (uConnMap.find(email) != uConnMap.end()) {
+				if (uConnMap[email].conn != NULL) {
+					sqlite3_close(uConnMap[email].conn);
+					uConnMap[email].conn = NULL;
+				}
 			}
+		} 
+		catch (...) {
+			fM.unlock();
+			throw;
 		}
 		fM.unlock();
 	}
