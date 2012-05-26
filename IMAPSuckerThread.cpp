@@ -478,6 +478,7 @@ namespace pmm {
 					mailboxControl[theEmail].lastCheck = time(0);
 					mailboxControl[theEmail].isOpened = false;
 				}
+				mailimap_close(imapControl[theEmail].imap);
 				mailimap_free(imapControl[theEmail].imap);
 				imapControl[theEmail].imap = NULL;
 				mailboxControl[theEmail].isOpened = false;

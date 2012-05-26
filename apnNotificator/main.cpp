@@ -16,7 +16,7 @@
 #include "PendingNotificationStore.h"
 
 #ifndef DEFAULT_CERTIFICATE_PATH
-#define DEFAULT_CERTIFICATE_PATH "/Users/coredumped/Dropbox/MacOSXProjects/pmm_production.pem"
+#define DEFAULT_CERTIFICATE_PATH "/Users/coredumped/Dropbox/MacOSXProjects/pmm_devel.pem"
 #endif
 
 #ifndef DEFAULT_CERTIFICATE_KEY
@@ -24,7 +24,7 @@
 #endif
 
 #ifndef IPOD_DEVICE_TOKEN
-#define IPOD_DEVICE_TOKEN "4ab904318d30a0ecee730b369ea6b4acb9ab67c10023e5b497c25e035e353af5"
+#define IPOD_DEVICE_TOKEN "46275a474f55b28b2297b1caace23c977bd3fc4b29e562a71c29ca4b6b5af91f"
 #endif
 
 static const char *allTokens[] = {
@@ -329,8 +329,10 @@ static const char *allTokens[] = {
 };
 
 
+
 int main(int argc, const char * argv[])
 {
+	///const char *ipodDevToken = "46275a474f55b28b2297b1caace23c977bd3fc4b29e562a71c29ca4b6b5af91f";
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue;
 	std::string certificate = DEFAULT_CERTIFICATE_PATH;
 	std::string privateKey = DEFAULT_CERTIFICATE_KEY;
@@ -354,10 +356,12 @@ int main(int argc, const char * argv[])
 	pmm::APNSNotificationThread apnsNotifier;
 	apnsNotifier.setCertPath(certificate);
 	apnsNotifier.setKeyPath(certificate);
-	apnsNotifier.useForProduction();
+	//apnsNotifier.useForProduction();
+	pmm::SharedQueue<std::string> invalidDevTokens;
+	apnsNotifier.invalidTokens = &invalidDevTokens;
 	apnsNotifier.notificationQueue = &notificationQueue;
 
-	pmm::APNSNotificationThread apnsNotifier1;
+	/*pmm::APNSNotificationThread apnsNotifier1;
 	apnsNotifier1.setCertPath(certificate);
 	apnsNotifier1.setKeyPath(certificate);
 	apnsNotifier1.useForProduction();
@@ -373,32 +377,16 @@ int main(int argc, const char * argv[])
 	apnsNotifier3.setCertPath(certificate);
 	apnsNotifier3.setKeyPath(certificate);
 	apnsNotifier3.useForProduction();
-	apnsNotifier3.notificationQueue = &notificationQueue;
+	apnsNotifier3.notificationQueue = &notificationQueue;*/
 
 	
 	pmm::APNSLog << "Starting thread..." << pmm::NL;
 	pmm::ThreadDispatcher::start(apnsNotifier);
-	pmm::ThreadDispatcher::start(apnsNotifier1);
+	//pmm::ThreadDispatcher::start(apnsNotifier1);
 	//pmm::ThreadDispatcher::start(apnsNotifier2);
 	//pmm::ThreadDispatcher::start(apnsNotifier3);
 	sleep(5);
-	while (true) {
-		/*std::cerr << "A valid notification sent" << std::endl;
-		pmm::NotificationPayload np(ipodDevToken, "Hola Francisco :-)");
-		np.isSystemNotification = true;
-		notificationQueue.add(np);
-		//Notification added to queue
-		sleep(10);
-		pmm::NotificationPayload np2("Device token invalido :-(", ipodDevToken);
-		np2.isSystemNotification = true;
-		std::cerr << "Invalid notification sent" << std::endl;
-		notificationQueue.add(np2);
-		sleep(10);
-		std::cerr << "Another valid notification sent" << std::endl;
-		notificationQueue.add(np);		
-		std::cerr << "Waiting..." << std::endl;
-		sleep(300);
-		pmm::PendingNotificationStore::eraseOldPayloads();*/
+	/*while (true) {
 		for(int i = 116; i < 298; i++){
 			if(i == 115) continue;
 			std::cout << "Sending notification to id=" << i << " token=" << allTokens[i] << std::endl;
@@ -408,7 +396,14 @@ int main(int argc, const char * argv[])
 			sleep(1);
 		}
 		break;
-	}
+	}*/
+	pmm::NotificationPayload np(ipodDevToken, "Hey juan how are you doing?", 666, "pmm.caf");
+	pmm::NoQuotaNotificationPayload np2(ipodDevToken, "juan.guerrero@fnxsoftware.com");
+	//np.customParams["e"] = "juan.guerrero@fnxsoftware.com";
+	np.isSystemNotification = true;
+	notificationQueue.add(np2);
+	sleep(4);								
+	notificationQueue.add(np);
 	while (notificationQueue.size() > 0) {
 		sleep(1);
 	}

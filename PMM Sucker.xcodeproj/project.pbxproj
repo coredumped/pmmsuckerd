@@ -186,6 +186,7 @@
 		82CE5B6215521BBA007E8AD7 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		82CE5B6315521BBA007E8AD7 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
 		82CE5B6515521BBA007E8AD7 /* pmmsuckerd.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82F86B5A1425A810006ACFEB /* pmmsuckerd.1 */; };
+		82D5942E156A03650011FC89 /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
 		82ED5B0B14317FD000444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
 		82ED5B0C143184C800444844 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
 		82ED5B0F143187EB00444844 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
@@ -993,6 +994,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82D5942E156A03650011FC89 /* GenericException.cpp in Sources */,
 				828879C81544648000DEF837 /* Mutex.cpp in Sources */,
 				828879C11544637B00DEF837 /* MTLogger.cpp in Sources */,
 				828879C21544637B00DEF837 /* MailMessage.cpp in Sources */,
