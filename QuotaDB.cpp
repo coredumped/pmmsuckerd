@@ -27,30 +27,18 @@ namespace pmm {
 	static const char *quota_table = DEFAULT_QUOTA_DB_TABLE;
 	static const char *quota_datafile = DEFAULT_QUOTA_DB_DATAFILE;
 	static sqlite3 *_uniqueConn = NULL;
-	static time_t __lastOpen = 0, __lastCheck = 0;
-	static Mutex __connM;
 	
 	static sqlite3 *_connect2QuotaDB(){
 		sqlite3 *dbConn = NULL;
-		__connM.lock();
-		if (__lastOpen == 0) __lastOpen = time(0);
-		else if(__lastOpen != __lastCheck && _uniqueConn != NULL && __lastOpen % 300 == 0){
-			pmm::Log << "Clearing quota database connection..." << pmm::NL;
-			sqlite3_close(_uniqueConn);
-			_uniqueConn = NULL;
-			__lastCheck = __lastOpen;
-		}
 		if (_uniqueConn == NULL) {
 			int errcode = sqlite3_open_v2(quota_datafile, &dbConn, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, NULL);
 			//int errcode = sqlite3_open(quota_datafile, &dbConn);
 			if (errcode != SQLITE_OK) {
-				__connM.unlock();
 				throw GenericException(sqlite3_errmsg(dbConn));
 			}
 			_uniqueConn = dbConn;
 		}
 		else dbConn = _uniqueConn;
-		__connM.unlock();
 		return dbConn;
 	}
 	
