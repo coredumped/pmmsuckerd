@@ -306,14 +306,14 @@ namespace pmm {
 								result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
 								if (etpanOperationFailed(result)) {
 									if (imap->imap_response == 0) {
+#ifdef DEBUG
+										if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
+#endif
 										imapLog << "CRITICAL: Can't find unseen messages, IMAP SEARCH failed miserably" << pmm::NL;
 									}
 								}
 								else {
 									imapFetch.madeAttempts = 0;
-#ifdef DEBUG
-									if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
-#endif
 									imapFetch.badgeCounter = 0;
 									std::vector<uint32_t> uidSet;
 									for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
@@ -567,6 +567,10 @@ namespace pmm {
 #endif
 				//mailimap_idle_done(imap);
 				//mailimap_logout(imap);
+				if (imap->imap_stream) {
+					mailstream_close(imap->imap_stream);
+					imap->imap_stream = NULL;
+				}
 				mailimap_close(imap);
 				mailimap_free(imap);
 				imapControl[theEmail].imap = NULL;
