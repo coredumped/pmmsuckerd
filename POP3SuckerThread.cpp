@@ -192,7 +192,7 @@ namespace pmm {
 						//Verify for null here!!!
 						if (info->msg_uidl == NULL) continue;
 						if (!QuotaDB::have(pf.mailAccountInfo.email())) {
-							pmm::Log << pf.mailAccountInfo.email() << " has ran out of quota in the middle of a POP3 mailbox poll!!!" << pmm::NL;
+							pmm::pop3Log << pf.mailAccountInfo.email() << " has ran out of quota in the middle of a POP3 mailbox poll!!!" << pmm::NL;
 							break;
 						}
 						if (!fetchedMails.entryExists2(pf.mailAccountInfo.email(), info->msg_uidl)) {
@@ -228,7 +228,7 @@ namespace pmm {
 							}
 							else {
 								if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
-									pmm::Log << "Unable to parse e-mail message !!!" << pmm::NL;
+									pmm::pop3Log << "Unable to parse e-mail message !!!" << pmm::NL;
 #warning Find a something better to do when a message can't be properly parsed!!!!
 									mailpop3_retr_free(msgBuffer);
 									continue;
@@ -238,12 +238,12 @@ namespace pmm {
 									startTimeMap[pf.mailAccountInfo.email()] = now - 300;
 								}
 #ifdef DEBUG_TIME_ELDERNESS
-								pmm::Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
+								pmm::pop3Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
 #endif
 
 								if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-									pmm::Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
+									pmm::pop3Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
 								}
 								else {
 									messagesRetrieved++;
@@ -260,7 +260,7 @@ namespace pmm {
 										NotificationPayload np(myDevTokens[i], nMsg.str(), i + 1, alertTone);
 										np.origMailMessage = theMessage;
 										if (pf.mailAccountInfo.devel) {
-											pmm::Log << "Using development notification queue for this message." << pmm::NL;
+											pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
 											develNotificationQueue->add(np);
 										}
 										else notificationQueue->add(np);
@@ -276,7 +276,7 @@ namespace pmm {
 												pmm::NoQuotaNotificationPayload npi(myDevTokens[i], pf.mailAccountInfo.email());
 												//npi.isSystemNotification = true;
 												if (pf.mailAccountInfo.devel) {
-													pmm::Log << "Using development notification queue for this message." << pmm::NL;
+													pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
 													develNotificationQueue->add(npi);
 												}
 												else notificationQueue->add(npi);

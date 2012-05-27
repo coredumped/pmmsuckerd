@@ -164,7 +164,7 @@ namespace pmm {
 							pmm::NoQuotaNotificationPayload npi(myDevTokens[i], imapFetch.mailAccountInfo.email());
 							//npi.isSystemNotification = true;
 							if (imapFetch.mailAccountInfo.devel) {
-								pmm::Log << "Using development notification queue for this message." << pmm::NL;
+								pmm::imapLog << "Using development notification queue for this message." << pmm::NL;
 								develNotificationQueue->add(npi);
 							}
 							else notificationQueue->add(npi);
@@ -318,7 +318,7 @@ namespace pmm {
 									std::vector<uint32_t> uidSet;
 									for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
 										if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
-											pmm::Log << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
+											pmm::imapLog << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
 											break;
 										}
 										uint32_t uid;
@@ -494,10 +494,10 @@ namespace pmm {
 				result = mailimap_select(imapControl[theEmail].imap, "INBOX");
 				if(etpanOperationFailed(result)){
 					if (imapControl[theEmail].imap->imap_response == 0) {
-						pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << pmm::NL;
+						pmm::imapLog << "FATAL: Unable to select INBOX folder in account " << theEmail << pmm::NL;
 					}
 					else {
-						pmm::Log << "FATAL: Unable to select INBOX folder in account " << theEmail << ": " << imapControl[theEmail].imap->imap_response <<  pmm::NL;
+						pmm::imapLog << "FATAL: Unable to select INBOX folder in account " << theEmail << ": " << imapControl[theEmail].imap->imap_response <<  pmm::NL;
 					}
 					//throw GenericException("Unable to select INBOX folder");
 				}	
