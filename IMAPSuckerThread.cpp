@@ -254,7 +254,7 @@ namespace pmm {
 					fetchQueue->add(imapFetch);
 				}
 				else {
-#ifdef DEBUG
+#ifdef DEBUG_MSG_FETCH
 					pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
 #endif
 					struct mailimap *imap = mailimap_new(0, NULL);
@@ -432,7 +432,7 @@ namespace pmm {
 #warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
 				std::stringstream errmsg;
 				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, we will retry later.";
-#ifdef DEBUG
+#ifdef DEBUG_MSG_FETCH
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
 #endif
 				/*std::vector<std::string> myDevTokens = m.devTokens();
@@ -584,23 +584,24 @@ namespace pmm {
 			int antiLoopCounter = 0;
 			while (poll(&pelem, 1, 0) > 0) {
 				char *response = mailimap_read_line(imap);
-#ifdef DEBUG
 				if(response != NULL){
+#ifdef DEBUG_MSG_FETCH
 					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=" << response << " for " << theEmail << pmm::NL;
+#endif
 				}
 				else {
-					pmm::imapLog << "DEBUG: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << ", re-connecting..." << pmm::NL;
+					pmm::imapLog << "CRITICAL: IMAPSuckerThread(" << (long)pthread_self() << ") IDLE GOT response=NULL for " << theEmail << ", re-connecting..." << pmm::NL;
 					if (imap->imap_stream) {
 						mailstream_close(imap->imap_stream);
 						imap->imap_stream = NULL;
 					}
+					mailimap_close(imap);
 					mailimap_free(imap);
 					imapControl[theEmail].imap = NULL;
 					imapControl[theEmail].failedLoginAttemptsCount = 0;
 					mailboxControl[theEmail].isOpened = false;
 					return;
 				}
-#endif
 				if (response != NULL && strlen(response) > 0 && strstr(response, "OK Still") == NULL) {
 					if (strstr(response, "EXPUNGE") != NULL) {
 #warning Expire old messages here
@@ -611,7 +612,7 @@ namespace pmm {
 						//input >> recent;
 						resetIdle = true;
 						mailboxControl[theEmail].availableMessages += recent;
-#ifdef DEBUG
+#ifdef DEBUG_MSG_FETCH
 						pmm::imapLog << "DEBUG: IDLE GOT recent=" << recent << " for " << theEmail << pmm::NL;
 #endif
 						fetchMails(m);
@@ -628,7 +629,7 @@ namespace pmm {
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
 				if(result != MAILIMAP_NO_ERROR){
-					pmm::imapLog << "Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
+					pmm::imapLog << "CRITICAL: Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
 					mailimap_idle_done(imap);
 					mailimap_logout(imap);
 					mailimap_close(imap);
