@@ -514,6 +514,8 @@ namespace pmm {
 						imapControl[theEmail].startedOn = time(NULL);
 						mailimap_logout(imapControl[theEmail].imap);
 						mailimap_close(imapControl[theEmail].imap);
+						mailimap_free(imapControl[theEmail].imap);
+						imapControl[theEmail].imap = NULL;
 						imapControl[theEmail].supportsIdle = false;
 						return;
 					}
