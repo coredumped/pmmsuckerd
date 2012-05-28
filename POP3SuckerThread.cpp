@@ -45,6 +45,10 @@
 #define DEFAULT_MAX_HOTMAIL_THREADS 2
 #endif
 
+#ifndef DEFAULT_YAHOO_CHECK_INTERVAL
+#define DEFAULT_YAHOO_CHECK_INTERVAL 15
+#endif
+
 namespace pmm {
 	MTLogger pop3Log;
 	
@@ -123,23 +127,29 @@ namespace pmm {
 				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
-					if(theVal == 100){
+					if (pop3->pop3_response != NULL) {
+						pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << " due to: " << pop3->pop3_response << pmm::NL;
+						std::string email = pf.mailAccountInfo.email();
+						std::string errorMsg = pop3->pop3_response;
+						if (email.find("@yahoo") != email.npos && errorMsg.find("(error 999)") != errorMsg.npos) {
+							//Find a way to delay the fetch!!!
+#warning TODO: Implement a way to delay account refresh times
+						}
+					}
+					if(theVal > 1000){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Can't login to mailbox ";
 						msgX.append(pf.mailAccountInfo.email());
-						msgX.append(", to continue receiving notifications please update your application settings.");
+						msgX.append(", please update your e-mail settings.");
 						for (size_t i = 0; i < allTokens.size(); i++) {
 							NotificationPayload np(allTokens[i], msgX);
 							np.isSystemNotification = true;
 							notificationQueue->add(np);
 						}					
 						serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
-					}
-					if (pop3->pop3_response != NULL) {
-						pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << " due to: " << pop3->pop3_response << pmm::NL;
 					}
 				}
 				else {
@@ -448,9 +458,13 @@ namespace pmm {
 #ifdef DEBUG
 		pmm::pop3Log << m.email() << " is being succesfully monitored!!!" << pmm::NL;
 #endif		
-		if(m.email().find("@hotmail.") != m.email().npos){
+		if(m.serverAddress().find(".live.") != m.serverAddress().npos){
 			pop3Control[m.email()].minimumCheckInterval = DEFAULT_HOTMAIL_CHECK_INTERVAL;
 		}
+		else if(m.serverAddress().find(".yahoo.") != m.serverAddress().npos){
+			pop3Control[m.email()].minimumCheckInterval = DEFAULT_YAHOO_CHECK_INTERVAL;
+		}
+
 	}
 	
 	void POP3SuckerThread::checkEmail(const MailAccountInfo &m){
@@ -460,9 +474,9 @@ namespace pmm {
 			//mailpop3 *pop3 = pop3Control[m.email()].pop3;
 			if (pop3Control[m.email()].startedOn + DEFAULT_MAX_POP3_CONNECTION_TIME < currTime) {
 				//Think about closing and re-opening this connection!!!
-#ifdef DEBUG
+/*#ifdef DEBUG
 				pmm::pop3Log << "Max connection time for account " << m.email() << " exceeded (" << DEFAULT_MAX_POP3_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
-#endif
+#endif*/
 				//mailpop3_free(pop3);
 				pop3Control[m.email()].pop3 = NULL;
 				mailboxControl[theEmail].isOpened = false;
