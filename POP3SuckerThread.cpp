@@ -298,6 +298,9 @@ namespace pmm {
 				mailpop3_quit(pop3);
 			}
 			//mailpop3_quit(pop3);
+			if (pop3->pop3_stream != NULL) {
+				mailstream_close(pop3->pop3_stream);
+			}
 		}
 		mailpop3_free(pop3);
 		return messagesRetrieved;
