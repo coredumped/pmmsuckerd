@@ -271,10 +271,10 @@ namespace pmm {
 						fetchQueue->add(imapFetch);
 #ifdef DEBUG
 						if (imap->imap_response == 0) {
-							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", RE-SCHEDULING fetch!!!" << pmm::NL;
+							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", etpan=" << result << " RE-SCHEDULING fetch!!!" << pmm::NL;
 						}
 						else {
-							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
+							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", etpan=" << result << " , response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
 						}
 #endif				
 					}
