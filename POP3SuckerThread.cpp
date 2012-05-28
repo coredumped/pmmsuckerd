@@ -138,6 +138,9 @@ namespace pmm {
 						}					
 						serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 					}
+					if (pop3->pop3_response != NULL) {
+						pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << " due to: " << pop3->pop3_response << pmm::NL;
+					}
 				}
 				else {
 					if (theVal % 1000 == 0) {
