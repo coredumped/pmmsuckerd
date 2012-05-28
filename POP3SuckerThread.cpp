@@ -127,13 +127,14 @@ namespace pmm {
 				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
+					std::string errorMsg;
 					if (pop3->pop3_response != NULL) {
-						pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << " due to: " << pop3->pop3_response << pmm::NL;
+						pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
 						std::string email = pf.mailAccountInfo.email();
-						std::string errorMsg = pop3->pop3_response;
+						errorMsg = pop3->pop3_response;
 						if (email.find("@yahoo") != email.npos && errorMsg.find("(error 999)") != errorMsg.npos) {
 							//Find a way to delay the fetch!!!
-#warning TODO: Implement a way to delay account refresh times
+							return -1;
 						}
 					}
 					if(theVal > 1000){
@@ -141,9 +142,12 @@ namespace pmm {
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
-						std::string msgX = "Can't login to mailbox ";
-						msgX.append(pf.mailAccountInfo.email());
-						msgX.append(", please update your e-mail settings.");
+						std::string msgX = pf.mailAccountInfo.email();
+						if (errorMsg.size() > 0) {
+							msgX.append(": ");
+							msgX.append(errorMsg);
+						}
+						else msgX.append("authentication failed: check your app settings!!!");
 						for (size_t i = 0; i < allTokens.size(); i++) {
 							NotificationPayload np(allTokens[i], msgX);
 							np.isSystemNotification = true;
@@ -335,6 +339,8 @@ namespace pmm {
 		time(&startedOn);
 		mainFetchQueue.name = "POP3MainFetchQueue";
 		hotmailFetchQueue.name = "HotmailFetchQueue";
+		std::set<std::string> delayedAccounts;
+		std::map<std::string, time_t> nextCheck;
 		while (true) {
 			POP3FetchItem pf;
 			bool gotSomething = false;
@@ -354,13 +360,28 @@ namespace pmm {
 			else {
 				//Fetch regular pop3 accounts here
 				while (mainFetchQueue.extractEntry(pf)) {
+					time_t now = time(0);
 					if (busyEmailsSet.contains(pf.mailAccountInfo.email())) {
 						pop3Log << "WARNING: No need to monitor " << pf.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
 						continue;
 					}
+					if (delayedAccounts.find(pf.mailAccountInfo.email()) != delayedAccounts.end()) {
+						if (nextCheck[pf.mailAccountInfo.email()] < now) {
+							delayedAccounts.erase(pf.mailAccountInfo.email());
+							nextCheck.erase(pf.mailAccountInfo.email());
+							pop3Log << "NOTICE: removing " << pf.mailAccountInfo.email() << " from the delayed accounts fetch" << pmm::NL;
+						}
+						else continue;
+					}
 					//Fetch messages for account here!!!
 					busyEmailsSet.insert(pf.mailAccountInfo.email());
-					fetchMessages(pf);
+					int n = fetchMessages(pf);
+					if(n == -1 && pf.mailAccountInfo.serverAddress().find(".yahoo.") != pf.mailAccountInfo.serverAddress().npos){
+						//Perform delay here
+						delayedAccounts.insert(pf.mailAccountInfo.email());
+						nextCheck[pf.mailAccountInfo.email()] = now + 15 * 60;
+						pop3Log << "WARNING: performing delayed fetch on: " << pf.mailAccountInfo.email() << pmm::NL;
+					}
 					gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
 				}
