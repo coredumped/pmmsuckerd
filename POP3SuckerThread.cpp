@@ -361,6 +361,7 @@ namespace pmm {
 				//Fetch regular pop3 accounts here
 				while (mainFetchQueue.extractEntry(pf)) {
 					time_t now = time(0);
+					std::string lastRemovedFromDelayed;
 					if (busyEmailsSet.contains(pf.mailAccountInfo.email())) {
 						pop3Log << "WARNING: No need to monitor " << pf.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
 						continue;
@@ -370,6 +371,7 @@ namespace pmm {
 							delayedAccounts.erase(pf.mailAccountInfo.email());
 							nextCheck.erase(pf.mailAccountInfo.email());
 							pop3Log << "NOTICE: removing " << pf.mailAccountInfo.email() << " from the delayed accounts fetch" << pmm::NL;
+							lastRemovedFromDelayed = pf.mailAccountInfo.email();
 						}
 						else continue;
 					}
@@ -378,8 +380,12 @@ namespace pmm {
 					int n = fetchMessages(pf);
 					if(n == -1 && pf.mailAccountInfo.serverAddress().find(".yahoo.") != pf.mailAccountInfo.serverAddress().npos){
 						//Perform delay here
+						if(lastRemovedFromDelayed.compare(pf.mailAccountInfo.email()) == 0){
+							pop3Log << "CRITICAL: Yahoo temporarily blocked (error 999) " << pf.mailAccountInfo.email() << " not polling for 24 hrs :-(" << pmm::NL;
+							nextCheck[pf.mailAccountInfo.email()] = now + 86700;
+						}
+						else nextCheck[pf.mailAccountInfo.email()] = now + 15 * 60;
 						delayedAccounts.insert(pf.mailAccountInfo.email());
-						nextCheck[pf.mailAccountInfo.email()] = now + 15 * 60;
 						pop3Log << "WARNING: performing delayed fetch on: " << pf.mailAccountInfo.email() << pmm::NL;
 					}
 					gotSomething = true;
