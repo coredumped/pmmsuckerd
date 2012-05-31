@@ -581,7 +581,8 @@ int main (int argc, const char * argv[])
 							//Retrieve information of account...
 							pmm::MailAccountInfo info;
 							session.retrieveEmailAddressInfo(info, parameters["email"]);
-							pmm::Log << "INFO: Sending account " << parameters["email"] << " to the update queue..." << pmm::NL; 
+							pmm::Log << "INFO: Sending account " << parameters["email"] << "=" << info.email() << " to the update queue..." << pmm::NL; 
+							
 							mailAccounts2Refresh.push_back(info);
 						}
 						else {
