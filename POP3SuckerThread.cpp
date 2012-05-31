@@ -52,9 +52,12 @@
 namespace pmm {
 	MTLogger pop3Log;
 	
+	static const char *yahooServiceNotPermittedErrorMessage = "[AUTH] Access to this service is not permitted.";
+	
 	//Global POP3 fetching queue, any fetcher thread can poll accounts held here
 	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> mainFetchQueue;
 	SharedSet<std::string> busyEmailsSet;
+	SharedSet<std::string> yahooAccountsToBan;
 	
 	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> hotmailFetchQueue;
 	SharedSet<std::string> busyHotmailsSet;
@@ -129,12 +132,18 @@ namespace pmm {
 				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
 					std::string errorMsg;
 					if (pop3->pop3_response != NULL) {
-						pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
-						std::string email = pf.mailAccountInfo.email();
 						errorMsg = pop3->pop3_response;
-						if (email.find("@yahoo") != email.npos && errorMsg.find("(error 999)") != errorMsg.npos) {
-							//Find a way to delay the fetch!!!
-							return -1;
+						std::string email = pf.mailAccountInfo.email();
+						if (errorMsg.find(yahooServiceNotPermittedErrorMessage) != errorMsg.npos && email.find("@yahoo.") != email.npos) {
+							pmm::pop3Log << "PANIC: " << pf.mailAccountInfo.email() << " requires a paid Yahoo Plus! account, unable to monitor!!!" << pmm::NL;
+							return -2;
+						}
+						else {
+							pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
+							if (email.find("@yahoo") != email.npos && errorMsg.find("(error 999)") != errorMsg.npos) {
+								//Find a way to delay the fetch!!!
+								return -1;
+							}
 						}
 					}
 					if(theVal > 1000){
@@ -378,15 +387,29 @@ namespace pmm {
 					//Fetch messages for account here!!!
 					busyEmailsSet.insert(pf.mailAccountInfo.email());
 					int n = fetchMessages(pf);
-					if(n == -1 && pf.mailAccountInfo.serverAddress().find(".yahoo.") != pf.mailAccountInfo.serverAddress().npos){
-						//Perform delay here
-						if(lastRemovedFromDelayed.compare(pf.mailAccountInfo.email()) == 0){
-							pop3Log << "CRITICAL: Yahoo temporarily blocked (error 999) " << pf.mailAccountInfo.email() << " not polling for 24 hrs :-(" << pmm::NL;
-							nextCheck[pf.mailAccountInfo.email()] = now + 86700;
+					if(pf.mailAccountInfo.serverAddress().find(".yahoo.") != pf.mailAccountInfo.serverAddress().npos){
+						if(n == -1){
+							//Perform delay here
+							if(lastRemovedFromDelayed.compare(pf.mailAccountInfo.email()) == 0){
+								pop3Log << "CRITICAL: Yahoo temporarily blocked (error 999) " << pf.mailAccountInfo.email() << " not polling for 24 hrs :-(" << pmm::NL;
+								nextCheck[pf.mailAccountInfo.email()] = now + 86700;
+							}
+							else nextCheck[pf.mailAccountInfo.email()] = now + 15 * 60;
+							delayedAccounts.insert(pf.mailAccountInfo.email());
+							pop3Log << "WARNING: performing delayed fetch on: " << pf.mailAccountInfo.email() << pmm::NL;
 						}
-						else nextCheck[pf.mailAccountInfo.email()] = now + 15 * 60;
-						delayedAccounts.insert(pf.mailAccountInfo.email());
-						pop3Log << "WARNING: performing delayed fetch on: " << pf.mailAccountInfo.email() << pmm::NL;
+						else if (n == -2){
+							//This is intense now, we need to tell this guy that we can't monitor his mailbox because he/she doesn't have a paid Yahoo account :-(
+							std::stringstream msg;
+							msg << "Sorry, Yahoo Plus! is required for this app to push e-mail notifications from " << pf.mailAccountInfo.email();
+							std::vector<std::string> devTokens = pf.mailAccountInfo.devTokens();
+							for (size_t i = 0; i < devTokens.size(); i++) {
+								pmm::NotificationPayload np(devTokens[i], msg.str());
+								notificationQueue->add(np);
+							}
+							//Now we add the e-mail address to the global banned list of yahoo addresses
+							yahooAccountsToBan.insert(pf.mailAccountInfo.email());
+						}						
 					}
 					gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
@@ -522,6 +545,11 @@ namespace pmm {
 #endif
 		//Implement asynchronous retrieval code, tipically from a thread
 		std::string email = m.email();
+		if (yahooAccountsToBan.contains(email)) {
+			rmAccountQueue->add(email);
+			yahooAccountsToBan.erase(email);
+			return;
+		}
 		if (email.find("@hotmail.") == email.npos || email.find("@live.") == email.npos) {
 			//pop3Log << m.email() << " added to main fetch queue" << pmm::NL;
 			mainFetchQueue.add(m);
