@@ -109,6 +109,7 @@ namespace pmm {
 						//Retrieve failed device token from database...
 						std::string invalidToken;
 						if(PendingNotificationStore::getDeviceTokenFromMessage(invalidToken, notifID)) invalidTokens->add(invalidToken);
+						triggerSimultanousReconnect();
 					}
 					cntMessageFailed = cntMessageFailed + 1;
 				}
@@ -455,7 +456,7 @@ namespace pmm {
 					if (_useSandbox == false && invalidTokenSet.find(payload.deviceToken()) != invalidTokenSet.end()) {
 						APNSLog << "CRITICAL: Refusing to post notification to device " << payload.deviceToken() << " this is an invalid device token." << pmm::NL;
 #warning Warn the user somehow that her device is holding an invalid device token
-						triggerSimultanousReconnect();
+						//triggerSimultanousReconnect();
 					}
 					else {
 						struct tm tmTime;
