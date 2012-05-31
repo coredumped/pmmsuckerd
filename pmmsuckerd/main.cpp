@@ -580,10 +580,13 @@ int main (int argc, const char * argv[])
 							//Tricky one, prepare to refresh user account
 							//Retrieve information of account...
 							pmm::MailAccountInfo info;
-							session.retrieveEmailAddressInfo(info, parameters["email"]);
-							pmm::Log << "INFO: Sending account " << parameters["email"] << "=" << info.email() << " to the update queue..." << pmm::NL; 
-							
-							mailAccounts2Refresh.push_back(info);
+							if(session.retrieveEmailAddressInfo(info, parameters["email"])){
+								pmm::Log << "INFO: Sending account " << parameters["email"] << "=" << info.email() << " to the update queue..." << pmm::NL; 
+								mailAccounts2Refresh.push_back(info);
+							}
+							else {
+								pmm::Log << "CRITICAL: Unable to retrieve " << parameters["email"] << " entry from pmm service :-(" << pmm::NL;
+							}
 						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
