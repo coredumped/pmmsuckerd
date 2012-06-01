@@ -297,7 +297,10 @@ namespace pmm {
 								imapFetch.nextAttempt = time_t(NULL) + fetchRetryInterval;
 								fetchQueue->add(imapFetch);
 #ifdef DEBUG
-								pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
+								if(imap->imap_response == NULL)
+									pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result  << pmm::NL;
+								else
+									pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
 #endif				
 							}
 							else {
