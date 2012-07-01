@@ -225,6 +225,7 @@ namespace pmm {
 		_socket = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);       
 		if(_socket == -1)
 		{
+			APNSLog << "Socket creation failed :-(" << pmm::NL;
 			throw GenericException("Unable to create socket");
 		}
 		//Lets clear the _server_addr structure
@@ -248,7 +249,8 @@ namespace pmm {
 		}
 		else
 		{
-			throw GenericException("Can't resolver APNS server hostname");
+			APNSLog << "Unable to resolve APNS server hostname " << (_useSandbox?APPLE_SANDBOX_HOST:APPLE_HOST) << pmm::NL;
+			throw GenericException("Can't resolve APNS server hostname");
 		}
 		
 		int err = connect(_socket, (struct sockaddr*) &_server_addr, sizeof(_server_addr)); 
