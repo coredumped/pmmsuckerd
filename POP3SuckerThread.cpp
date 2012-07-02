@@ -250,7 +250,13 @@ namespace pmm {
 									}
 									break;
 								}
-								else pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;
+								else if (result == MAILPOP3_ERROR_NO_SUCH_MESSAGE) {
+									pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << pmm::NL;
+									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+								}
+								else{
+									pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;	
+								}
 							}
 							else {
 								if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){

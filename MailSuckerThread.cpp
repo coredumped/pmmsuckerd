@@ -9,6 +9,7 @@
 #include <iostream>
 #include <time.h>
 #include <map>
+#include <signal.h>
 #include "MailSuckerThread.h"
 #include "MTLogger.h"
 #include "QuotaDB.h"
@@ -209,6 +210,14 @@ namespace pmm {
 		}
 		cntAccountsTotal = emailAccounts.size();
 		initialize();
+		
+		sigset_t bSignal;
+		sigemptyset(&bSignal);
+		sigaddset(&bSignal, SIGPIPE);
+		if(pthread_sigmask(SIG_BLOCK, &bSignal, NULL) != 0){
+			pmm::Log << "WARNING: Unable to block SIGPIPE !" << pmm::NL;
+		}
+
 		while (true) {
 			//Process account addition and removals if there is any
 			registerDeviceTokens();
