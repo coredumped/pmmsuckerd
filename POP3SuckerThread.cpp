@@ -149,9 +149,9 @@ namespace pmm {
 							pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
 							if (isYahooAccount && errorMsg.find("(error 999)") != errorMsg.npos) {
 								//Find a way to delay the fetch!!!
-								if (pop3->pop3_stream != NULL) {
+								/*if (pop3->pop3_stream != NULL) {
 									mailstream_close(pop3->pop3_stream);
-								}
+								}*/
 								return -1;
 							}
 						}
