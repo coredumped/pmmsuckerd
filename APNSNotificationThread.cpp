@@ -391,7 +391,19 @@ namespace pmm {
 			}
 		}
 		initSSL();
-		connect2APNS();
+		if(_useSandbox){
+			while (true) {
+				try {
+					connect2APNS();
+					break;
+				} catch (GenericException &ge) {
+					APNSLog << "Unable to connect to APNS sandbox, retrying in a while..." << pmm::NL;
+					sleep(60);
+					continue;
+				}
+			}
+		}
+		else connect2APNS();
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		time_t start = time(NULL);
 		std::string lastDevToken;
@@ -403,7 +415,13 @@ namespace pmm {
 					APNSLog << "Max connection time (" << (currTime - start) << " > " << maxConnectionInterval << ") reached, reconnecting..." << pmm::NL;
 					disconnectFromAPNS();
 					initSSL();
-					connect2APNS();
+					try {
+						connect2APNS();
+					} catch (GenericException &ge) {
+						APNSLog << "Unable to re-connect to APNS sandbox, retrying in a while..." << pmm::NL;
+						sleep(60);
+						continue;
+					}
 					APNSLog << "Re-connected succesfully!!!" << pmm::NL;
 					start = time(NULL);
 				}
@@ -421,7 +439,15 @@ namespace pmm {
 				disconnectFromAPNS();
 				_socket = -1;
 				sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
-				connect2APNS();
+				while (true) {
+					try {
+						connect2APNS();
+						break;
+					} catch (GenericException &ge) {
+						APNSLog << "Unable to reconnect to APNS, re-trying in 60 seconds..." << pmm::NL;
+						sleep(60);
+					}
+				}
 			}
 			while (notificationQueue->extractEntry(payload)) {
 				if(stopExecution == true){
@@ -448,7 +474,16 @@ namespace pmm {
 						warmingUP = true;
 						sleep(DEFAULT_NOTIFICATION_WARMUP_TIME);
 						warmingUP = false;
-						connect2APNS();
+						//connect2APNS();
+						while (true) {
+							try {
+								connect2APNS();
+								break;
+							} catch (GenericException &ge) {
+								APNSLog << "Unable to reconnect to APNS, re-trying in 60 seconds..." << pmm::NL;
+								sleep(60);
+							}
+						}
 					}
 					std::string newInvalidToken = newInvalidDevToken;
 					if (newInvalidToken.size() > 0) {
@@ -477,7 +512,16 @@ namespace pmm {
 								sleep(1);
 								APNSLog << "WARNING: Waking up after sleeping due to repetitive messages to the same device." << pmm::NL;
 								lastDevToken = "";
-								connect2APNS();
+								//connect2APNS();
+								while (true) {
+									try {
+										connect2APNS();
+										break;
+									} catch (GenericException &ge) {
+										APNSLog << "Unable to reconnect to APNS, re-trying in 60 seconds..." << pmm::NL;
+										sleep(60);
+									}
+								}
 								continue;
 							}
 						}
@@ -522,7 +566,16 @@ namespace pmm {
 					disconnectFromAPNS();
 					_socket = -1;					
 					//sleep(maxBurstPauseInterval);
-					connect2APNS();
+					//connect2APNS();
+					while (true) {
+						try {
+							connect2APNS();
+							break;
+						} catch (GenericException &ge) {
+							APNSLog << "Unable to reconnect to APNS, re-trying in 60 seconds..." << pmm::NL;
+							sleep(60);
+						}
+					}
 					break;
 				}
 			}
