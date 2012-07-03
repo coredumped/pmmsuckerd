@@ -49,6 +49,10 @@
 #define DEFAULT_YAHOO_CHECK_INTERVAL 15
 #endif
 
+#ifndef DEFAULT_MAX_YAHOO_FETCH_TIMEOUT
+#define DEFAULT_MAX_YAHOO_FETCH_TIMEOUT 15
+#endif
+
 namespace pmm {
 	MTLogger pop3Log;
 	
@@ -109,6 +113,7 @@ namespace pmm {
 		if(pop3 == NULL){ pop3Log << "PANIC: Unable to create POP3 handle!!!" << pmm::NL; return false; }
 		int result;
 		int messagesRetrieved = 0;
+		time_t fetchT0 = time(NULL);
 		if (pf.mailAccountInfo.useSSL()) {
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
@@ -211,10 +216,13 @@ namespace pmm {
 					else pop3Log << "Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 					int maxRetrievalIterations = DEFAULT_MAX_MSG_RETRIEVE;
+					bool isYahooAccount = false;
+					if (pf.mailAccountInfo.serverAddress().find("@yahoo.") != pf.mailAccountInfo.serverAddress().npos) isYahooAccount = true;
+
 					for (int i = 0; i < max_retrieve; i++) {
-						if(messagesRetrieved > maxRetrievalIterations) break;
-						//if(max_retrieve > 1000) mailpop3_noop(pop3);
 						time_t now = time(0);
+						if(isYahooAccount && messagesRetrieved > maxRetrievalIterations) break;
+						if(isYahooAccount && now - fetchT0 > DEFAULT_MAX_YAHOO_FETCH_TIMEOUT) break;
 						struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 						if (info == NULL) continue;
 						//Verify for null here!!!
@@ -256,7 +264,7 @@ namespace pmm {
 									if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
 									else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-									if (pf.mailAccountInfo.email().find("@yahoo.") != pf.mailAccountInfo.email().npos) break;
+									if (isYahooAccount) break;
 								}
 								else{
 									pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;	
