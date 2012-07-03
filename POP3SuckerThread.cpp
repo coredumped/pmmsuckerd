@@ -251,8 +251,10 @@ namespace pmm {
 									break;
 								}
 								else if (result == MAILPOP3_ERROR_NO_SUCH_MESSAGE) {
-									pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << pmm::NL;
+									if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
+									else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+									if (pf.mailAccountInfo.email().find("@yahoo.") != pf.mailAccountInfo.email().npos) break;
 								}
 								else{
 									pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;	
