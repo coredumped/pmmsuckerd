@@ -38,7 +38,7 @@
 #endif
 
 #ifndef DEFAULT_MAX_MSG_RETRIEVE
-#define DEFAULT_MAX_MSG_RETRIEVE 200
+#define DEFAULT_MAX_MSG_RETRIEVE 5
 #endif
 
 #ifndef DEFAULT_MAX_HOTMAIL_THREADS
@@ -210,7 +210,9 @@ namespace pmm {
 					if(isForHotmail) pop3Log << "HOTMAIL: Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					else pop3Log << "Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
+					int maxRetrievalIterations = DEFAULT_MAX_MSG_RETRIEVE;
 					for (int i = 0; i < max_retrieve; i++) {
+						if(messagesRetrieved > maxRetrievalIterations) break;
 						//if(max_retrieve > 1000) mailpop3_noop(pop3);
 						time_t now = time(0);
 						struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
