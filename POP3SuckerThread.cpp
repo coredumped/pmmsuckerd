@@ -114,6 +114,8 @@ namespace pmm {
 		int result;
 		int messagesRetrieved = 0;
 		time_t fetchT0 = time(NULL);
+		bool isYahooAccount = false;
+		if (pf.mailAccountInfo.serverAddress().find("@yahoo.") != pf.mailAccountInfo.serverAddress().npos) isYahooAccount = true;
 		if (pf.mailAccountInfo.useSSL()) {
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
@@ -145,13 +147,14 @@ namespace pmm {
 						}
 						else {
 							pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
-							if (email.find("@yahoo") != email.npos && errorMsg.find("(error 999)") != errorMsg.npos) {
+							if (isYahooAccount && errorMsg.find("(error 999)") != errorMsg.npos) {
 								//Find a way to delay the fetch!!!
+								mailpop3_free(pop3);
 								return -1;
 							}
 						}
 					}
-					if(theVal > 1000){
+					if(theVal > 100){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
@@ -216,8 +219,6 @@ namespace pmm {
 					else pop3Log << "Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 					int maxRetrievalIterations = DEFAULT_MAX_MSG_RETRIEVE;
-					bool isYahooAccount = false;
-					if (pf.mailAccountInfo.serverAddress().find("@yahoo.") != pf.mailAccountInfo.serverAddress().npos) isYahooAccount = true;
 
 					for (int i = 0; i < max_retrieve; i++) {
 						time_t now = time(0);
@@ -264,7 +265,9 @@ namespace pmm {
 									if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
 									else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-									if (isYahooAccount) break;
+									if (isYahooAccount){
+										break;
+									}
 								}
 								else{
 									pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;	
