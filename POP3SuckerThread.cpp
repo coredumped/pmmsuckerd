@@ -156,7 +156,7 @@ namespace pmm {
 							}
 						}
 					}
-					if(theVal > 100){
+					if(theVal % 100 == 0){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
@@ -176,7 +176,7 @@ namespace pmm {
 					}
 				}
 				else {
-					if (theVal % 1000 == 0) {
+					if (theVal % 100 == 0) {
 						//Notify the user that we might not be able to monitor this account
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
@@ -187,6 +187,7 @@ namespace pmm {
 							np.isSystemNotification = true;
 							notificationQueue->add(np);
 						}
+						return -2;
 					}
 					else {
 						if (pop3->pop3_response == NULL) {
