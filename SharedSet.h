@@ -11,19 +11,28 @@
 #include <set>
 #include <string>
 #include "Mutex.h"
+#include "RWLock.h"
 #include "MTLogger.h"
 
 namespace pmm {
 	template <class T>
 	class SharedSet {
 		std::set<T> theSet;
+#ifdef USE_RWLOCK
+		RWLock m;
+#else
 		Mutex m;
+#endif
 	public:
 		std::string name;
 		SharedSet(){}
 		
 		void insert(const T &v){
+#ifdef USE_RWLOCK
+			m.writeLock();
+#else
 			m.lock();
+#endif
 			try {
 				theSet.insert(v);
 			} catch (...) {
@@ -35,7 +44,11 @@ namespace pmm {
 		
 		bool contains(const T &v){
 			bool ret = false;
+#ifdef USE_RWLOCK
+			m.readLock();
+#else
 			m.lock();
+#endif
 			try {
 				if(theSet.find(v) != theSet.end()) ret = true;
 			} catch (...) {
@@ -47,7 +60,11 @@ namespace pmm {
 		}
 		
 		void erase(const T &v){
+#ifdef USE_RWLOCK
+			m.writeLock();
+#else
 			m.lock();
+#endif
 			try {
 				theSet.erase(v);
 			} catch (...) {
