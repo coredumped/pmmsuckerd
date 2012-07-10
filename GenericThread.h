@@ -9,6 +9,7 @@
 #ifndef PMM_Sucker_GenericThread_h
 #define PMM_Sucker_GenericThread_h
 #include"Mutex.h"
+#include"Atomic.h"
 #include<string>
 
 namespace pmm {

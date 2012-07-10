@@ -67,6 +67,11 @@
 		8238F498142AFAD9007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
 		823BD0481444AECD001ED14E /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
 		823BD0491444AECD001ED14E /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0471444AECD001ED14E /* libssl.a */; };
+		82425BA015AC7522004E3D0F /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		82425BA115AC7522004E3D0F /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		82425BA215AC7522004E3D0F /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		82425BA315AC7522004E3D0F /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		82425BA415AC7522004E3D0F /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
 		82524A8B15ABC67E009C64ED /* RWLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82524A8A15ABC67E009C64ED /* RWLock.cpp */; };
 		82524A8C15ABC67E009C64ED /* RWLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82524A8A15ABC67E009C64ED /* RWLock.cpp */; };
 		82524A8D15ABC67E009C64ED /* RWLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82524A8A15ABC67E009C64ED /* RWLock.cpp */; };
@@ -324,6 +329,8 @@
 		8238F496142AFA3E007F76C0 /* JSONParseException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSONParseException.cpp; sourceTree = "<group>"; };
 		823BD0461444AECD001ED14E /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../cxxLibraries/openssl-mac/libcrypto.a"; sourceTree = "<group>"; };
 		823BD0471444AECD001ED14E /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../cxxLibraries/openssl-mac/libssl.a"; sourceTree = "<group>"; };
+		82425B9D15AC74E0004E3D0F /* Atomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Atomic.h; sourceTree = "<group>"; };
+		82425B9F15AC7522004E3D0F /* Atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Atomic.cpp; sourceTree = "<group>"; };
 		82524A8815ABC5D1009C64ED /* RWLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RWLock.h; sourceTree = "<group>"; };
 		82524A8A15ABC67E009C64ED /* RWLock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RWLock.cpp; sourceTree = "<group>"; };
 		82571EA914413E0F0047347E /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -737,6 +744,8 @@
 				82BE124F154B84700020B9D6 /* SharedSet.h */,
 				82524A8815ABC5D1009C64ED /* RWLock.h */,
 				82524A8A15ABC67E009C64ED /* RWLock.cpp */,
+				82425B9D15AC74E0004E3D0F /* Atomic.h */,
+				82425B9F15AC7522004E3D0F /* Atomic.cpp */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -948,6 +957,7 @@
 				820BBE2315424022005A1C5A /* APNSFeedbackThread.cpp in Sources */,
 				820BBE1315423FAB005A1C5A /* main.cpp in Sources */,
 				82524A8D15ABC67E009C64ED /* RWLock.cpp in Sources */,
+				82425BA215AC7522004E3D0F /* Atomic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -982,6 +992,7 @@
 				820BBE411542F575005A1C5A /* jsonxx.cc in Sources */,
 				820BBE3B1542F466005A1C5A /* main.cpp in Sources */,
 				82524A8E15ABC67E009C64ED /* RWLock.cpp in Sources */,
+				82425BA315AC7522004E3D0F /* Atomic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1072,6 +1083,7 @@
 				82CE5B5915521BBA007E8AD7 /* PMMSuckerSession.cpp in Sources */,
 				82CE5B5A15521BBA007E8AD7 /* main.cpp in Sources */,
 				82524A8F15ABC67E009C64ED /* RWLock.cpp in Sources */,
+				82425BA415AC7522004E3D0F /* Atomic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1108,6 +1120,7 @@
 				82B081DC153AD30200F78A4D /* APNSFeedbackThread.cpp in Sources */,
 				820BBDF9153E7187005A1C5A /* PendingNotificationStore.cpp in Sources */,
 				82524A8B15ABC67E009C64ED /* RWLock.cpp in Sources */,
+				82425BA015AC7522004E3D0F /* Atomic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1143,6 +1156,7 @@
 				82AA9FCA1426AB4500E3FB3C /* PMMSuckerSession.cpp in Sources */,
 				82F86B591425A810006ACFEB /* main.cpp in Sources */,
 				82524A8C15ABC67E009C64ED /* RWLock.cpp in Sources */,
+				82425BA115AC7522004E3D0F /* Atomic.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

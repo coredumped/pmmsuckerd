@@ -21,13 +21,13 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
 		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o \
-		QuotaDB.o UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o
+		QuotaDB.o UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o Atomic.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
 				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
 				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o QuotaDB.o \
-				UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o $(LIBS)
+				UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o Atomic.o $(LIBS)
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
@@ -47,16 +47,19 @@ Mutex.o: ../Mutex.h ../Mutex.cpp
 RWLock.o: ../RWLock.h ../RWLock.cpp
 	$(GCC) $(CFLAGS) -c -o RWLock.o ../RWLock.cpp
 
+Atomic.o: ../Atomic.h ../Atomic.cpp
+	$(GCC) $(CFLAGS) -c -o Atomic.o ../Atomic.cpp
+
 MailAccountInfo.o: ../MailAccountInfo.h ../MailAccountInfo.cpp
 	$(GCC) $(CFLAGS) -c -o MailAccountInfo.o ../MailAccountInfo.cpp
 
-GenericThread.o: ../GenericThread.cpp ../GenericThread.h
+GenericThread.o: ../GenericThread.cpp ../GenericThread.h ../Atomic.h ../Mutex.h ../RWLock.h
 	$(GCC) $(CFLAGS) -c -o GenericThread.o ../GenericThread.cpp
 
 GenericException.o: ../GenericException.cpp ../GenericException.h
 	$(GCC) $(CFLAGS) -c -o GenericException.o ../GenericException.cpp
 
-APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h ../SilentMode.h ../Mutex.h
+APNSNotificationThread.o: ../APNSNotificationThread.cpp ../APNSNotificationThread.h ../SilentMode.h ../Mutex.h ../Atomic.h
 	$(GCC) $(CFLAGS) -c -o APNSNotificationThread.o ../APNSNotificationThread.cpp
 
 ThreadDispatcher.o: ../ThreadDispatcher.cpp ../ThreadDispatcher.h ../GenericThread.h
@@ -83,13 +86,13 @@ UtilityFunctions.o: ../UtilityFunctions.cpp ../UtilityFunctions.h
 FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h
 	$(GCC) $(CFLAGS) -c -o FetchedMailsCache.o ../FetchedMailsCache.cpp
 
-MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h ../Mutex.h ../RWLock.h
+MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h ../Mutex.h ../RWLock.h ../Atomic.h
 	$(GCC) $(CFLAGS) -c -o MailSuckerThread.o ../MailSuckerThread.cpp
 
-IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h
+IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h ../Atomic.h
 	$(GCC) $(CFLAGS) -c -o IMAPSuckerThread.o ../IMAPSuckerThread.cpp
 
-POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h
+POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h ../Atomic.h
 	$(GCC) $(CFLAGS) -c -o POP3SuckerThread.o ../POP3SuckerThread.cpp
 
 DataTypes.o: ../DataTypes.cpp ../DataTypes.h

@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include "Mutex.h"
+#include "Atomic.h"
 
 namespace pmm {
 	class MailAccountInfo {
