@@ -6,13 +6,13 @@
 ##  Copyright (c) 2011 fn(x) Software. All rights reserved.
 ##
 ## Use this for building linux based pmmsuckers
-## REQUIEREMENTS:
+## REQUIREMENTS:
 ##   libcurl compiled with ssl support
 ##   libuuid
 ##
 
 GCC=g++
-CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags` -DDEBUG=1
+CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1
 LIBS=`pkg-config libcurl --libs` -luuid -lpthread -lssl -letpan -lsqlite3
 
 all: pmmsuckerd

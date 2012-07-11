@@ -214,7 +214,13 @@ namespace pmm {
 			//Verify if there are any ending notifications in the notification queue
 			fdbckLog << "Retrieving device tokens..." << pmm::NL;
 			initSSL();
-			connect2APNS();
+			try {
+				connect2APNS();
+			} catch (GenericException &ge1) {
+				APNSLog << "Unable to re-connect to APNS sandbox, retrying in a while..." << pmm::NL;
+				sleep(300);
+				continue;
+			}
 			itM.lock();
 			__invalidTokens.clear();
 			itM.unlock();
@@ -261,7 +267,7 @@ namespace pmm {
 				if(secsElapsed > 120) break;
 			}
 			disconnectFromAPNS();
-			sleep(60);
+			sleep(600);
 		}
 	}
 	

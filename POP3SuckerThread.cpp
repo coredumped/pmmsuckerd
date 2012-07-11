@@ -218,8 +218,10 @@ namespace pmm {
 						pop3Log << "WARNING: " << pf.mailAccountInfo.email() << " is a very large mailbox, it has " << max_retrieve << " messages, scanning it will take a while!!!" << pmm::NL;
 						largeT1 = time(0);
 					}
+#ifdef POP3_DEBUG
 					if(isForHotmail) pop3Log << "HOTMAIL: Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
 					else pop3Log << "Fetching messages for: " << pf.mailAccountInfo.email() << pmm::NL;
+#endif
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 					int maxRetrievalIterations = DEFAULT_MAX_MSG_RETRIEVE;
 
