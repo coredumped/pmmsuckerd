@@ -116,7 +116,7 @@ namespace pmm {
 		int messagesRetrieved = 0;
 		time_t fetchT0 = time(NULL);
 		bool isYahooAccount = false;
-		if (pf.mailAccountInfo.serverAddress().find("@yahoo.") != pf.mailAccountInfo.serverAddress().npos) isYahooAccount = true;
+		if (pf.mailAccountInfo.serverAddress().find(".yahoo.") != pf.mailAccountInfo.serverAddress().npos) isYahooAccount = true;
 		if (pf.mailAccountInfo.useSSL()) {
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
@@ -271,13 +271,13 @@ namespace pmm {
 									if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
 									else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-									if (isYahooAccount){
+									/*if (isYahooAccount){
 										//Since the socket might already be closed there is no socket leaking here
 										//However everything in the pop3 structure might still be leaking, this
 										//must be solved in the future somehow
 										//return messagesRetrieved;
 										break;
-									}
+									}*/
 								}
 								else{
 									pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;	
