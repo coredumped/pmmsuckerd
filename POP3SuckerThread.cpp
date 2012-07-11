@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <signal.h>
 #include "POP3SuckerThread.h"
 #include "ThreadDispatcher.h"
 #include "QuotaDB.h"
@@ -271,6 +272,10 @@ namespace pmm {
 									else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
 									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 									if (isYahooAccount){
+										//Since the socket might already be closed there is no socket leaking here
+										//However everything in the pop3 structure might still be leaking, this
+										//must be solved in the future somehow
+										//return messagesRetrieved;
 										break;
 									}
 								}
@@ -376,6 +381,12 @@ namespace pmm {
 		hotmailFetchQueue.name = "HotmailFetchQueue";
 		std::set<std::string> delayedAccounts;
 		std::map<std::string, time_t> nextCheck;
+		sigset_t bSignal;
+		sigemptyset(&bSignal);
+		sigaddset(&bSignal, SIGPIPE);
+		if(pthread_sigmask(SIG_BLOCK, &bSignal, NULL) != 0){
+			pmm::Log << "WARNING: Unable to block SIGPIPE !" << pmm::NL;
+		}
 		while (true) {
 			POP3FetchItem pf;
 			bool gotSomething = false;

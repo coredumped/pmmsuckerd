@@ -108,7 +108,7 @@ namespace pmm {
 				else notificationQueue->add(np);
 			}
 			cntAccountsTotal = cntAccountsTotal + 1;
-			usleep(10000);
+			usleep(500);
 		}
 	}
 	

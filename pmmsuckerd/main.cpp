@@ -288,7 +288,7 @@ int main (int argc, const char * argv[])
 		notifThreads[i].setKeyPath(sslPrivateKeyPath);
 		notifThreads[i].invalidTokens = &invalidTokenQ;
 		pmm::ThreadDispatcher::start(notifThreads[i], threadStackSize);
-		sleep(1);
+		//sleep(1);
 	}
 	pmm::Log << "Starting development notification thread..." << pmm::NL;
 	develNotifThread.notificationQueue = &develNotificationQueue;
@@ -296,7 +296,7 @@ int main (int argc, const char * argv[])
 	develNotifThread.setKeyPath(sslDevelPrivateKeyPath);
 	develNotifThread.invalidTokens = &develInvalidTokenQ;
 	pmm::ThreadDispatcher::start(develNotifThread, threadStackSize);
-	sleep(1);
+	//sleep(1);
 	
 	for (size_t i = 0; i < maxMessageUploaderThreads; i++) {
 		msgUploaderThreads[i].session = &session;
@@ -331,7 +331,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
-		sleep(1);
+		usleep(10000);
 	}
 	//6. Dispatch polling threads for POP3
 	for (size_t k = 0; k < pop3Accounts.size(); k++) {
@@ -352,7 +352,7 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
-		sleep(1);
+		usleep(10000);
 	}
 	globalNotificationQueue = &notificationQueue;
 	
