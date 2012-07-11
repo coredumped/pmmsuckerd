@@ -391,19 +391,16 @@ namespace pmm {
 			}
 		}
 		initSSL();
-		if(_useSandbox){
-			while (true) {
-				try {
-					connect2APNS();
-					break;
-				} catch (GenericException &ge) {
-					APNSLog << "Unable to connect to APNS sandbox, retrying in a while..." << pmm::NL;
-					sleep(60);
-					continue;
-				}
+		while (true) {
+			try {
+				connect2APNS();
+				break;
+			} catch (GenericException &ge) {
+				APNSLog << "Unable to connect to APNS, retrying in 60s..." << pmm::NL;
+				sleep(60);
+				continue;
 			}
 		}
-		else connect2APNS();
 		pmm::Log << "APNSNotificationThread main loop started!!!" << pmm::NL;
 		time_t start = time(NULL);
 		std::string lastDevToken;
