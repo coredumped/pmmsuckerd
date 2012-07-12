@@ -472,9 +472,12 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
+		int loop_breaker = 0;
+		while ((errCode = sqlite3_step(statement)) == SQLITE_ROW && (++loop_breaker) < 4) {
 			if (sqlite3_column_int(statement, 0) > 0) {
 				ret = true;
+				errCode = SQLITE_DONE;
+				break;
 			}
 		}
 		if(errCode != SQLITE_DONE){
@@ -523,9 +526,12 @@ namespace pmm {
 					throw GenericException(errmsg.str());
 				}
 			}
-			while ((errCode = sqlite3_step(statement)) == SQLITE_ROW) {
+			int loop_breaker = 0;
+			while ((errCode = sqlite3_step(statement)) == SQLITE_ROW && (++loop_breaker) < 4) {
 				if (sqlite3_column_int(statement, 0) > 0) {
 					ret = true;
+					errCode = SQLITE_DONE;
+					break;
 				}
 			}
 			if(errCode != SQLITE_DONE){
