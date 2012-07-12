@@ -588,6 +588,23 @@ int main (int argc, const char * argv[])
 								pmm::Log << "CRITICAL: Unable to retrieve " << parameters["email"] << " entry from pmm service :-(" << pmm::NL;
 							}
 						}
+						else if (command.compare(pmm::Commands::sendMessageToDevice) == 0) {
+							std::string emailAccount = parameters["emailAccount"];
+							//Find device token
+							for (size_t l = 0; l < emailAccounts.size(); l++) {
+								std::string theEmail = emailAccounts[l].email();
+								if (emailAccount.compare(theEmail) == 0) {
+									std::vector<std::string> devTokens = emailAccounts[l].devTokens();
+									pmm::Log << "Sending direct message to " << theEmail << pmm::NL;
+									for (size_t m = 0; m < devTokens.size(); m++) {
+										pmm::NotificationPayload np(devTokens[m], parameters["msg"]);
+										np.isSystemNotification = true;
+										notificationQueue.add(np);
+									}
+									break;
+								}
+							}
+						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 						}
