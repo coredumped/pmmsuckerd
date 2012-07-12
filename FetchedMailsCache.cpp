@@ -82,14 +82,31 @@ namespace pmm {
 			}
 		}
 	}
-	
+		
 	static bool getDataFile(std::string &dbFile, const std::string &email){
 		std::stringstream dbf, basedir;
 		//Build directory hash here
 		basedir << "fetchdb/";
-		basedir << email[0] << "/";
-		basedir << email[1] << "/";
-		basedir << email[2];
+		if(isalnum(email[0]) || email[0] == '_'){
+			basedir << email[0] << "/";
+		}
+		else {
+			basedir << "_" << ((uint32_t)email[0] & 0x000000FF) << "_/";
+		}
+
+		if(isalnum(email[1]) || email[1] == '_'){
+			basedir << email[1] << "/";
+		}
+		else {
+			basedir << "_" << ((uint32_t)email[1] & 0x000000FF) << "_/";
+		}
+
+		if(isalnum(email[2]) || email[2] == '_'){
+			basedir << email[2];
+		}
+		else {
+			basedir << "_" << ((uint32_t)email[2] & 0x000000FF) << "_/";
+		}
 		createDirIfNotExists(basedir.str());
 		dbf << basedir.str() << "/";
 		//Prepare database file build here
