@@ -594,12 +594,14 @@ int main (int argc, const char * argv[])
 							for (size_t l = 0; l < emailAccounts.size(); l++) {
 								std::string theEmail = emailAccounts[l].email();
 								if (emailAccount.compare(theEmail) == 0) {
+									bool useDevel = emailAccounts[i].devel;
 									std::vector<std::string> devTokens = emailAccounts[l].devTokens();
 									pmm::Log << "Sending direct message to " << theEmail << pmm::NL;
 									for (size_t m = 0; m < devTokens.size(); m++) {
 										pmm::NotificationPayload np(devTokens[m], parameters["msg"]);
 										np.isSystemNotification = true;
-										notificationQueue.add(np);
+										if(useDevel) develNotificationQueue.add(np);
+										else notificationQueue.add(np);
 									}
 									break;
 								}

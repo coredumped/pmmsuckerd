@@ -30,6 +30,9 @@
 #ifndef DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME
 #define DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME 1200
 #endif
+#ifndef DEFAULT_MAX_OLD_MESSAGES
+#define DEFAULT_MAX_OLD_MESSAGES 100
+#endif
 
 
 namespace pmm {
@@ -97,12 +100,13 @@ namespace pmm {
 		return 0;
 	}
 	
-	bool IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch)
+	int IMAPSuckerThread::MailFetcher::fetch_msg(struct mailimap * imap, uint32_t uid, SharedQueue<NotificationPayload> *notificationQueue, const IMAPSuckerThread::IMAPFetchControl &imapFetch)
 	{
 		if (fetchedMails.entryExists2(imapFetch.mailAccountInfo.email(), uid)) {
 			//Do not fetch or even notify previously fetched e-mails
-			return false;
+			return 0;
 		}
+		int retVal = 1;
 		struct mailimap_set * set;
 		struct mailimap_section * section;
 		size_t msg_len;
@@ -135,12 +139,13 @@ namespace pmm {
 			msg_content = get_msg_content(fetch_result, &msg_len, theMessage);
 			if (msg_content == NULL) {
 				mailimap_fetch_list_free(fetch_result);
-				return false;
+				return 0;
 			}
 			fetchedMails.addEntry2(imapFetch.mailAccountInfo.email(), uid);
 			//Verify if theMessage is not too old, if it is then just discard it!!!
 			if (theMessage.serverDate < threadStartTime) {
-				imapLog << "Message for " << imapFetch.mailAccountInfo.email() << " is too old, not notifying it!!!" << pmm::NL;				
+				imapLog << "Message(" << theMessage.msgUid << ") for " << imapFetch.mailAccountInfo.email() << " is too old, not notifying it!!!" << pmm::NL;	
+				retVal = -1;
 			}
 			else {
 				std::vector<std::string> myDevTokens = imapFetch.mailAccountInfo.devTokens();
@@ -178,7 +183,7 @@ namespace pmm {
 		}
 		mailimap_fetch_att_free(fetch_att);
 		mailimap_set_free(set);
-		return true;
+		return retVal;
 	}
 	
 	IMAPSuckerThread::IMAPFetchControl::IMAPFetchControl(){
@@ -318,7 +323,11 @@ namespace pmm {
 								else {
 									imapFetch.madeAttempts = 0;
 									imapFetch.badgeCounter = 0;
+									int oldCount = 0;
 									std::vector<uint32_t> uidSet;
+									int numMessages = clist_count(unseenMails);
+									if(numMessages > 1000) pmm::imapLog << "WARNING: " << imapFetch.mailAccountInfo.email() << " is very large, contains " << numMessages << " e-mails stored" << pmm::NL;
+									time_t fetchT0 = time(0);
 									for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
 										if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
 											pmm::imapLog << imapFetch.mailAccountInfo.email() << " has ran out of quota in the middle of a IMAP mailbox poll!!!" << pmm::NL;
@@ -330,7 +339,7 @@ namespace pmm {
 										pmm::imapLog << "DEBUG: IMAP MailFetcher " << imapFetch.mailAccountInfo.email() << " got UID=" << (int)uid << pmm::NL;
 #endif
 										imapFetch.badgeCounter++;
-										bool gotMessage = false;
+										int gotMessage = 0;
 										if (imapFetch.mailAccountInfo.devel) {
 											//pmm::imapLog << "Using development notification queue..." << pmm::NL;
 											gotMessage = fetch_msg(imap, uid, develNotificationQueue, imapFetch);
@@ -339,9 +348,24 @@ namespace pmm {
 											gotMessage = fetch_msg(imap, uid, myNotificationQueue, imapFetch);
 										}
 										uidSet.push_back(uid);
-										if (gotMessage) {
+										if (gotMessage > 0) {
 											int cnt = cntRetrieved->get() + 1;
 											cntRetrieved->set(cnt);
+										}
+										else if(gotMessage < 0){
+											if(++oldCount > DEFAULT_MAX_OLD_MESSAGES || (time(0) - fetchT0) > 900){
+												pmm::imapLog << "WARNING: " << imapFetch.mailAccountInfo.email() << " has too many old messages, looks like this user has never ever seen his inbox." << pmm::NL;
+												pmm::imapLog << "WARNING Adding all " << numMessages << " to " << imapFetch.mailAccountInfo.email() << " seen messages database :-(" << pmm::NL;
+												cur = clist_next(cur);
+												std::string theEmail = imapFetch.mailAccountInfo.email();
+												while (cur != NULL) {
+													uid = *((uint32_t *)clist_content(cur));
+													std::stringstream msgUid_s;
+													msgUid_s << (int)uid;
+													fetchedMails.addEntry2(theEmail, msgUid_s.str());
+													cur = clist_next(cur);
+												}
+											}
 										}
 									}
 									//Remove old entries if the current time is a multiple of 60 seconds
