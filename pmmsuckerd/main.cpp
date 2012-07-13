@@ -89,7 +89,7 @@ void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems
 void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount);
 void addNewEmailAccount(pmm::SuckerSession &session, pmm::SharedQueue<pmm::MailAccountInfo> *addQueue, const std::string &emailAccount);
-void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
+//void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo);
 void removeEmailAccount(pmm::SharedQueue<std::string> *rmQueue, const std::string &emailAccount);
 void relinquishDevTokenNotification(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, const std::string &devToken);
 void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &params);
@@ -520,10 +520,6 @@ int main (int argc, const char * argv[])
 							}
 						}
 						else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
-							/*for (std::map<std::string, std::string>::iterator relIter = parameters.begin(); relIter != parameters.end(); relIter++) {
-								relinquishDevTokenNotification(imapSuckingThreads, maxIMAPSuckerThreads, relIter->second);
-								relinquishDevTokenNotification(pop3SuckingThreads, maxPOP3SuckerThreads, relIter->second);
-							}*/
 							for (std::map<std::string, std::string>::iterator reliter = parameters.begin(); reliter != parameters.end(); reliter++) {
 								pmm::DevtokenQueueItem item;
 								item.email = reliter->first;
@@ -551,9 +547,8 @@ int main (int argc, const char * argv[])
 								}
 							}
 							else {
-								pmm::Log << "Performing unsafe e-mail account removal..." << pmm::NL;
-								removeEmailAccount(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-								removeEmailAccount(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
+								pmm::Log << "Malformed account remove request received!!!" << pmm::NL;
+								abort();
 							}
 						}
 						else if (command.compare(pmm::Commands::silentModeSet) == 0){
@@ -798,7 +793,7 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::SharedQueue<pmm::MailA
 #endif	
 }
 
-void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
+/*void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
 	if(mailAccountInfo.size() == 0) return;
 	for (size_t i = 0; i < nElems; i++) {
 		mailSuckerThreads[i].emailAccounts.beginCriticalSection();
@@ -814,7 +809,7 @@ void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems,
 		}
 		mailSuckerThreads[i].emailAccounts.endCriticalSection();
 	}	
-}
+}*/
 
 void removeEmailAccount(pmm::SharedQueue<std::string> *rmQueue, const std::string &emailAccount){
 	rmQueue->add(emailAccount);
