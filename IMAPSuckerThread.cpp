@@ -31,7 +31,7 @@
 #define DEFAULT_MAX_IMAP_IDLE_CONNECTION_TIME 1200
 #endif
 #ifndef DEFAULT_MAX_OLD_MESSAGES
-#define DEFAULT_MAX_OLD_MESSAGES 100
+#define DEFAULT_MAX_OLD_MESSAGES 1000
 #endif
 
 
@@ -326,7 +326,7 @@ namespace pmm {
 									int oldCount = 0;
 									std::vector<uint32_t> uidSet;
 									int numMessages = clist_count(unseenMails);
-									if(numMessages > 1000) pmm::imapLog << "WARNING: " << imapFetch.mailAccountInfo.email() << " is very large, contains " << numMessages << " e-mails stored" << pmm::NL;
+									//if(numMessages > 1000) pmm::imapLog << "WARNING: " << imapFetch.mailAccountInfo.email() << " is very large, contains " << numMessages << " e-mails stored" << pmm::NL;
 									time_t fetchT0 = time(0);
 									for(clistiter * cur = clist_begin(unseenMails) ; cur != NULL ; cur = clist_next(cur)) {
 										if (!QuotaDB::have(imapFetch.mailAccountInfo.email())) {
