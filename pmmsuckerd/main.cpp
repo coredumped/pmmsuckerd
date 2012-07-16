@@ -381,12 +381,19 @@ int main (int argc, const char * argv[])
 			for (size_t idx = 0; idx < maxNotificationThreads; idx++) {
 				notifThreads[idx].newInvalidDevToken = lastInvalidToken;
 			}
-			//Save token to local file
-			std::ofstream tfile(invalidTokensFile.c_str(), std::ios_base::app);
-			tfile << lastInvalidToken << "\n";
-			tfile.close();
-			//Here we update appengine and tell it we have one new invalid device token
-#warning TODO: Send invalid tokens to app engine
+			try {
+				//Here we update appengine and tell it we have one new invalid device token
+				std::vector<std::string> vx;
+				vx.push_back(lastInvalidToken);
+				session.reportInvalidDeviceToken(vx);
+				//Save token to local file
+				std::ofstream tfile(invalidTokensFile.c_str(), std::ios_base::app);
+				tfile << lastInvalidToken << "\n";
+				tfile.close();
+			} 
+			catch (pmm::HTTPException &httex) {
+				break;
+			}
 		}
 		if (tic % 43200 == 0){
 			pmm::PendingNotificationStore::eraseOldPayloads();

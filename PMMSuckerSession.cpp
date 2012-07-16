@@ -297,13 +297,13 @@ namespace pmm {
 		
 	}
 	
-	static void executePost(std::map<std::string, std::string> &postData, std::string &output, CURL *wwwx = NULL, const char *dest_url = DEFAULT_PMM_SERVICE_URL){
+	static void executePost(std::map<std::string, std::string> &postData, std::string &output, const char *dest_url, CURL *wwwx = NULL){
 		CURL *www;
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
 		if (wwwx == NULL) www = curl_easy_init();
 		else www = wwwx;
 		DataBuffer serverOutput;
-		preparePostRequest(www, postData, &serverOutput);
+		preparePostRequest(www, postData, &serverOutput, dest_url);
 		//Let's url encode the param map
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
 		CURLcode ret = curl_easy_perform(www);
@@ -352,7 +352,7 @@ namespace pmm {
 		pmm::Log << "DEBUG: Registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
 		std::istringstream input(response.metaData["regInterval"]);
@@ -375,7 +375,7 @@ namespace pmm {
 		pmm::Log << "DEBUG: Un-registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		expirationTime = time(NULL);
 	}
 	
@@ -399,7 +399,7 @@ namespace pmm {
 		pmm::Log << "DEBUG: Registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		//Read and parse returned data
 		pmm::ServerResponse response(output);
 		if(response.status){
@@ -423,7 +423,7 @@ namespace pmm {
 			params["emailAddress"] = specificEmail;
 		}
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		//ServerResponse xresp(output);
 		//Read and parse returned data
 		std::istringstream input(output);
@@ -502,7 +502,7 @@ namespace pmm {
 		}
 		params["quotaPayload"] = package.str();
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		pmm::ServerResponse response(output);
 		if(response.status){
 #ifdef DEBUG
@@ -524,7 +524,7 @@ namespace pmm {
 		params["opType"] = pmm::OperationTypes::pmmSuckerCommandRetrieve;
 		params["suckerID"] = this->myID;
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		std::istringstream input(output);
 		//[{"command":"quotaExceeded","parameters":{"i0":"juan.guerrero@fnxsoftware.com"}}]
 		jsonxx::Array o;
@@ -561,7 +561,7 @@ namespace pmm {
 		params["msgUID"] = np.origMailMessage.msgUid;
 		params["timezone"] = np.origMailMessage.tzone;
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		if (output.find("OK") == output.npos) {
 			pmm::Log << "Unable to upload message to " << np.origMailMessage.to << pmm::NL;
 		}
@@ -586,7 +586,7 @@ namespace pmm {
 		}
 		params["emailAccounts"] = allEmails.str();
 		std::string output;
-		executePost(params, output);
+		executePost(params, output, pmmServiceURL.c_str());
 		//Analyze server output
 		std::stringstream of(output);
 		while (!of.eof()) {
@@ -605,6 +605,37 @@ namespace pmm {
 			}
 		}
 		return (_return.size() > 0)?true:false;
+	}
+	
+	bool SuckerSession::reportInvalidDeviceToken(const std::vector<std::string> &tokVec){
+		if (tokVec.size() == 0) return true;
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerRetrieveSilentModeInfo;
+		params["suckerID"] = this->myID;
+		std::stringstream allToks;
+		for (size_t i = 0; i < tokVec.size(); i++) {
+			if (i == 0) {
+				allToks << tokVec[i];
+			}
+			else {
+				allToks << "," << tokVec[i];
+			}
+		}
+		params["devTokens"] = allToks.str();
+		std::string output;
+		executePost(params, output, pmmServiceURL.c_str());
+		pmm::ServerResponse response(output);
+		if(response.status){
+#ifdef DEBUG
+			pmm::Log << "Device tokens sent successfuly" << pmm::NL;
+#endif
+		}
+		else {
+			pmm::Log << "Unable to send invalid device token, try again later." << response.errorDescription << pmm::NL;
+			return false;
+		}
+		return true;
 	}
 
 	
