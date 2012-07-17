@@ -609,6 +609,23 @@ int main (int argc, const char * argv[])
 								}
 							}
 						}
+						else if (command.compare(pmm::Commands::sendNoQuotaMessageToDevice) == 0) {
+							std::string emailAccount = parameters["emailAccount"];
+							for (size_t l = 0; l < emailAccounts.size(); l++) {
+								std::string theEmail = emailAccounts[l].email();
+								if (emailAccount.compare(theEmail) == 0) {
+									bool useDevel = emailAccounts[l].devel;
+									std::vector<std::string> devTokens = emailAccounts[l].devTokens();
+									pmm::Log << "Sending no-quota direct message to " << theEmail << pmm::NL;
+									for (size_t m = 0; m < devTokens.size(); m++) {
+										pmm::NoQuotaNotificationPayload npi(devTokens[m], theEmail);
+										if(useDevel) develNotificationQueue.add(npi);
+										else notificationQueue.add(npi);
+									}
+									break;
+								}
+							}
+						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 						}

@@ -109,6 +109,7 @@ namespace pmm {
 		extern const char *broadcastMessage;
 		extern const char *refreshEmailAccount;
 		extern const char *sendMessageToDevice;
+		extern const char *sendNoQuotaMessageToDevice;
 	}
 }
 

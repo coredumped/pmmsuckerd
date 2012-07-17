@@ -96,6 +96,7 @@ namespace pmm {
 		const char *broadcastMessage = "broadcastMessage";
 		const char *refreshEmailAccount = "refreshEmailAccount";
 		const char *sendMessageToDevice = "sndMsg2Dev";
+		const char *sendNoQuotaMessageToDevice = "sndNoQuotaMsg";
 	}
 	
 #ifdef __APPLE__
