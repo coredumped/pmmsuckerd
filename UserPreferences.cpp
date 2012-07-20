@@ -87,9 +87,9 @@ namespace pmm {
 			pmm::Log << "Unable to retrieve default alert tone for " << emailAccount << ": " << errmsg << " using " << sqlCmd.str() << pmm::NL;
 			throw GenericException(sqlite3_errmsg(dbConn));
 		}
-		if (alertTonePath.size() == 0) {
+		/*if (alertTonePath.size() == 0) {
 			alertTonePath = "pmm.caf";
-		}
+		}*/
 	}
 	
 	void PreferenceEngine::userPreferenceGet(std::map<std::string, std::string> &preferenceMap, const std::string &emailAccount, const std::string &domain){
