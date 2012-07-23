@@ -584,6 +584,9 @@ namespace pmm {
 		if (mailboxControl[theEmail].isOpened) {
 			if (!imapControl[theEmail].supportsIdle) {
 				if(time(0) - mailboxControl[theEmail].lastCheck > 2){
+#ifdef DEBUG
+					pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for non-idle account: " << theEmail << pmm::NL;
+#endif
 					fetchMails(m);
 				}
 				return;
