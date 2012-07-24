@@ -22,6 +22,7 @@ namespace pmm {
 	}
 	namespace MIMEContentSubtype {
 		static const char *plain = "plain";
+		static const char *html = "html";
 	}
 	namespace TextEncoding {
 		static const char *utf8 = "UTF-8";
@@ -88,6 +89,11 @@ namespace pmm {
 					}
 					getMIMEData(mime->mm_data.mm_single, outputStream, charset);
 				}
+#ifdef PERFORM_HTML_DECODING
+				else if (strcasecmp(mime->mm_content_type->ct_subtype, MIMEContentSubtype::html) == 0) {
+
+				}
+#endif
 			}
 				break;
 			case MAILMIME_MULTIPLE:
@@ -179,6 +185,7 @@ namespace pmm {
 							free(newFrom);
 						}
 					}
+					if(mbox->mb_addr_spec != 0) m.fromEmail = mbox->mb_addr_spec;
 #ifdef DEBUG_FROM_FIELD
 					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
 #endif

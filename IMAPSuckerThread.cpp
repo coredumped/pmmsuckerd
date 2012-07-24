@@ -33,6 +33,9 @@
 #ifndef DEFAULT_MAX_OLD_MESSAGES
 #define DEFAULT_MAX_OLD_MESSAGES 1000
 #endif
+#ifndef DEFAULT_NON_IDLE_FETCH_MIN_INTERVAL
+#define DEFAULT_NON_IDLE_FETCH_MIN_INTERVAL 10
+#endif
 
 
 namespace pmm {
@@ -582,17 +585,18 @@ namespace pmm {
 	void IMAPSuckerThread::checkEmail(const MailAccountInfo &m){
 		std::string theEmail = m.email();
 		if (mailboxControl[theEmail].isOpened) {
+			time_t rightNow = time(0);
 			if (!imapControl[theEmail].supportsIdle) {
-				if(time(0) - mailboxControl[theEmail].lastCheck > 2){
+				if(rightNow - mailboxControl[theEmail].lastCheck > DEFAULT_NON_IDLE_FETCH_MIN_INTERVAL){
 #ifdef DEBUG
-					pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for non-idle account: " << theEmail << pmm::NL;
+					if(rightNow % 600 == 0) pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for non-idle account: " << theEmail << pmm::NL;
 #endif
 					fetchMails(m);
 				}
 				return;
 			}
 			mailimap *imap = imapControl[theEmail].imap;
-			if (imapControl[theEmail].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < time(NULL)) {
+			if (imapControl[theEmail].startedOn + DEFAULT_MAX_IMAP_CONNECTION_TIME < rightNow) {
 				//Think about closing and re-opening this connection!!!
 #ifdef DEBUG
 				pmm::imapLog << "Max connection time account for " << theEmail << " exceeded (" << DEFAULT_MAX_IMAP_CONNECTION_TIME << " seconds) dropping connection!!!" << pmm::NL;
@@ -656,7 +660,7 @@ namespace pmm {
 				}
 				if(response == NULL) break;
 				if(antiLoopCounter++ > 100) {
-					pmm::imapLog << "PANIC: Got a looped IDLE status checker, attempting to send an IDLE reset to break free!!!" << pmm::NL;
+					pmm::imapLog << "PANIC: Got a looped IDLE status checker for " << theEmail << ", attempting to send an IDLE reset to break free!!!" << pmm::NL;
 					resetIdle = true;
 					fetchMails(m);
 					break;

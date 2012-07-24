@@ -17,7 +17,9 @@ namespace pmm {
 	public:
 		std::string to;
 		std::string from;
+		std::string fromEmail;
 		std::string subject;
+		std::string htmlMsg;
 		time_t dateOfArrival;
 		int tzone;
 		std::string msgUid;

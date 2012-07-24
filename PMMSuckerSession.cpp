@@ -561,6 +561,7 @@ namespace pmm {
 		params["sound"] = np.soundName();
 		params["msgUID"] = np.origMailMessage.msgUid;
 		params["timezone"] = np.origMailMessage.tzone;
+		if(np.origMailMessage.fromEmail.size() > 0) params["fromEmail"] = np.origMailMessage.fromEmail;
 		std::string output;
 		executePost(params, output, pmmServiceURL.c_str());
 		if (output.find("OK") == output.npos) {
