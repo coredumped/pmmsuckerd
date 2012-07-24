@@ -63,12 +63,13 @@ namespace pmm {
 					}
 				}
 				break;
+				case MAILMIME_MECHANISM_8BIT:
+				case MAILMIME_MECHANISM_BINARY:
 				case MAILMIME_MECHANISM_7BIT:
 				{
 					size_t indx = 0, decodedSize = 0;
 					char *decodedMsg;
 					mailmime_part_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, data->dt_encoding, &decodedMsg, &decodedSize);
-					//mailmime_binary_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize);
 					if(decodedSize != 0){
 						size_t inleft = decodedSize, outleft = decodedSize * 2;
 						char *utf8d = (char *)malloc(outleft);
