@@ -15,6 +15,7 @@
 #include "libetpan/libetpan.h"
 #include "MailMessage.h"
 #include "UtilityFunctions.h"
+#include <iconv.h>
 
 namespace pmm {
 	namespace MIMEParameter {
@@ -43,7 +44,7 @@ namespace pmm {
 						mailmime_decoded_part_free(decodedMsg);
 					}
 				}
-					break;
+				break;
 				case MAILMIME_MECHANISM_QUOTED_PRINTABLE:
 				{
 					char *decodedMsg;
@@ -61,7 +62,26 @@ namespace pmm {
 						mailmime_decoded_part_free(decodedMsg);
 					}
 				}
-					break;
+				break;
+				case MAILMIME_MECHANISM_7BIT:
+				{
+					size_t indx = 0, decodedSize = 0;
+					char *decodedMsg;
+					mailmime_part_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, data->dt_encoding, &decodedMsg, &decodedSize);
+					//mailmime_binary_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize);
+					if(decodedSize != 0){
+						size_t inleft = decodedSize, outleft = decodedSize * 2;
+						char *utf8d = (char *)malloc(outleft);
+						char *ptr_in = decodedMsg, *ptr_out = utf8d;
+						iconv_t cd = iconv_open(TextEncoding::utf8, charset.c_str());
+						iconv(cd, &ptr_in, &inleft, &ptr_out, &outleft);
+						outputStream.write(utf8d, strlen(utf8d));
+						mailmime_decoded_part_free(decodedMsg);
+						free(utf8d);
+						iconv_close(cd);
+					}
+				}
+				break;
 				default:
 					//Consider an encoding conversion here!!!!
 					outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
@@ -133,6 +153,8 @@ namespace pmm {
 		msgUid = m.msgUid;
 		tzone = m.tzone;
 		serverDate = m.serverDate;
+		fromEmail = m.fromEmail;
+		htmlMsg = m.htmlMsg;
 	}
 	
 	bool MailMessage::parse(MailMessage &m, const std::string &rawMessage){ 
