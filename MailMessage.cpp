@@ -37,10 +37,22 @@ namespace pmm {
 				{
 					//Decode base64 encoding
 					char *decodedMsg;
-					size_t decodedSize, indx = 0;
+					size_t decodedSize = 0, indx = 0;
 					int r = mailmime_base64_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize);
 					if (r == MAILIMF_NO_ERROR) {
-						outputStream.write(decodedMsg, decodedSize);
+						if(charset.size() > 0 && charset.compare(TextEncoding::utf8) != 0){
+							size_t inleft = decodedSize, outleft = decodedSize * 2;
+							char *utf8d = (char *)malloc(outleft);
+							bzero(utf8d, outleft);
+							char *ptr_in = decodedMsg, *ptr_out = utf8d;
+							iconv_t cd = iconv_open(TextEncoding::utf8, charset.c_str());
+							iconv(cd, &ptr_in, &inleft, &ptr_out, &outleft);
+							outputStream.write(utf8d, strlen(utf8d));
+							mailmime_decoded_part_free(decodedMsg);
+							free(utf8d);
+							iconv_close(cd);
+						}
+						else outputStream.write(decodedMsg, decodedSize);
 						mailmime_decoded_part_free(decodedMsg);
 					}
 				}
@@ -69,10 +81,12 @@ namespace pmm {
 				{
 					size_t indx = 0, decodedSize = 0;
 					char *decodedMsg;
-					mailmime_part_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, data->dt_encoding, &decodedMsg, &decodedSize);
+					//mailmime_part_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, data->dt_encoding, &decodedMsg, &decodedSize);
+					mailmime_binary_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize);
 					if(decodedSize != 0){
 						size_t inleft = decodedSize, outleft = decodedSize * 2;
 						char *utf8d = (char *)malloc(outleft);
+						bzero(utf8d, outleft);
 						char *ptr_in = decodedMsg, *ptr_out = utf8d;
 						iconv_t cd = iconv_open(TextEncoding::utf8, charset.c_str());
 						iconv(cd, &ptr_in, &inleft, &ptr_out, &outleft);
@@ -85,7 +99,18 @@ namespace pmm {
 				break;
 				default:
 					//Consider an encoding conversion here!!!!
-					outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
+					if(charset.size() > 0 && charset.compare(TextEncoding::utf8) != 0){
+						size_t inleft = data->dt_data.dt_text.dt_length, outleft = data->dt_data.dt_text.dt_length * 2;
+						char *utf8d = (char *)malloc(outleft);
+						bzero(utf8d, outleft);
+						char *ptr_in = (char *)data->dt_data.dt_text.dt_data, *ptr_out = utf8d;
+						iconv_t cd = iconv_open(TextEncoding::utf8, charset.c_str());
+						iconv(cd, &ptr_in, &inleft, &ptr_out, &outleft);
+						outputStream.write(utf8d, strlen(utf8d));
+						free(utf8d);
+						iconv_close(cd);
+					}
+					else outputStream.write(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length);
 					break;
 			}
 		}
@@ -187,8 +212,14 @@ namespace pmm {
 		bool gotTime = false;
 		for (clistiter *iter = clist_begin(fields->fld_list); iter != clist_end(fields->fld_list); iter = iter->next) {
 			struct mailimf_field *field = (struct mailimf_field *)clist_content(iter);
-			//pmm::Log << "Field type: " << field->fld_type << pmm::NL;
 			switch (field->fld_type) {
+#ifdef DEBUG_FROM_FIELD
+				case MAILIMF_FIELD_OPTIONAL_FIELD:
+				{
+					pmm::Log << field->fld_data.fld_optional_field->fld_name << " = " << field->fld_data.fld_optional_field->fld_value << pmm::NL;
+				}
+					break;
+#endif
 				case MAILIMF_FIELD_FROM:
 				{
 					clistiter *iter2 = clist_begin(field->fld_data.fld_from->frm_mb_list->mb_list);
@@ -210,7 +241,7 @@ namespace pmm {
 					}
 					if(mbox->mb_addr_spec != 0) m.fromEmail = mbox->mb_addr_spec;
 #ifdef DEBUG_FROM_FIELD
-					pmm::Log << "DEBUG: From=\"" << m.from << "\"" << pmm::NL;
+					pmm::Log << "DEBUG: From=\"" << m.from << "\" fromEmail=\"" << m.fromEmail << "\"" << pmm::NL;
 #endif
 					if (m.from.size() > 0 && m.subject.size() > 0 && gotTime) break;
 				}

@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "MailMessage.h"
+#include "MTLogger.h"
 
 #ifndef DEFAULT_DIRECTORY
 #define DEFAULT_DIRECTORY "/Users/coredumped/Downloads/raw-emails"
@@ -45,6 +46,7 @@ int main(int argc, const char * argv[])
 	for (int i = 1; i < argc; i++) {
 		workDirectory = argv[i];
 	}
+	pmm::Log.open("msgParser.log");
 	DIR *tDir = opendir(workDirectory.c_str());
 	if (tDir != NULL) {
 		struct dirent *d;

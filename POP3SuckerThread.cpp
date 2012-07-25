@@ -130,6 +130,9 @@ namespace pmm {
 			else {
 				pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
 			}
+			if (serverConnectAttempts[pf.mailAccountInfo.serverAddress()] % 100 == 0) {
+				messagesRetrieved = -3;
+			}
 		}
 		else {
 			result = mailpop3_login(pop3, pf.mailAccountInfo.username().c_str(), pf.mailAccountInfo.password().c_str());
@@ -173,6 +176,7 @@ namespace pmm {
 							notificationQueue->add(np);
 						}					
 						serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
+						messagesRetrieved = -3;
 					}
 				}
 				else {
@@ -395,10 +399,16 @@ namespace pmm {
 						pop3Log << "WARNING: No need to monitor " << pf.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
 						continue;
 					}
+					time_t now = time(0);
 					//Fetch messages for Hotmail accounts here!!!
 					busyHotmailsSet.insert(pf.mailAccountInfo.email());
-					fetchMessages(pf);
+					int n = fetchMessages(pf);
 					gotSomething = true;
+					if (n == -3) {
+						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 1 hour have passed" << pmm::NL;
+						nextCheck[pf.mailAccountInfo.email()] = now + 3600;
+						delayedAccounts.insert(pf.mailAccountInfo.email());
+					}
 					busyHotmailsSet.erase(pf.mailAccountInfo.email());
 				}
 			}
@@ -445,7 +455,12 @@ namespace pmm {
 							}
 							//Now we add the e-mail address to the global banned list of yahoo addresses
 							yahooAccountsToBan.insert(pf.mailAccountInfo.email());
-						}						
+						}	
+					}
+					if (n == -3) {
+						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 1 hour have passed" << pmm::NL;
+						nextCheck[pf.mailAccountInfo.email()] = now + 3600;
+						delayedAccounts.insert(pf.mailAccountInfo.email());
 					}
 					gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
