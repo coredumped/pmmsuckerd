@@ -130,7 +130,9 @@ namespace pmm {
 			else {
 				pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
 			}
-			if (serverConnectAttempts[pf.mailAccountInfo.serverAddress()] % 100 == 0) {
+			int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
+			serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
+			if (theVal % 100 == 0) {
 				messagesRetrieved = -3;
 			}
 		}
