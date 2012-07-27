@@ -449,6 +449,7 @@ namespace pmm {
 		}
 		if(imapControl[theEmail].imap == NULL) imapControl[theEmail].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
+		imapLog << "Connecting to " << theEmail << " port " << m.serverPort() << pmm::NL;
 		if (m.useSSL()) {
 			result = mailimap_ssl_connect(imapControl[theEmail].imap, m.serverAddress().c_str(), m.serverPort());
 		}
