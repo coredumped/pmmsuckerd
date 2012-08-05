@@ -239,7 +239,7 @@ namespace pmm {
 						emailAccounts.endCriticalSection();
 						pmm::Log << "Notifying quota increase of " << p.quotaValue << " to " << p.emailAddress << pmm::NL;
 						std::stringstream incNotif;
-						incNotif << "We have incremented your notification quota on " << p.emailAddress << " by " << p.quotaValue << ".\nThanks for showing us some love!";
+						incNotif << "We have increased your notification quota on " << p.emailAddress << " by " << p.quotaValue << ".\nThanks for showing us some love!";
 						std::vector<std::string> myDevTokens = emailAccounts[i].devTokens();
 						for (size_t npi = 0; npi < myDevTokens.size(); npi++) {
 							NotificationPayload np(myDevTokens[npi], incNotif.str());
