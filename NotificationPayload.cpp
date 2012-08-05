@@ -39,26 +39,12 @@ namespace pmm {
 			else if (theMsg[i] == '\'') {
 				newString.append("\\'");
 			}
-			/*else if (((unsigned char)theMsg[i]) >= 0x7f) {
-				newString.append("\\u");
-				std::stringstream hconv;
-				hconv.fill('0');
-				hconv.width(2);
-				while ((unsigned char)theMsg[i] >= 0x7f) {
-					hconv << std::right << std::hex << (int)((unsigned char)theMsg[i]);
-					i++;
-				}
-				i--;
-				newString.append(hconv.str());
-			}*/
 			else {
 				char tbuf[2] = { theMsg[i], 0x00};
 				newString.append(tbuf);
 			}
 		}
-		//if (newString.size() > theMsg.size()) {
-			theMsg = newString;
-		//}
+		theMsg = newString;
 	}
 
 	NotificationPayload::NotificationPayload(){
