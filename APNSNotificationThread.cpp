@@ -453,8 +453,8 @@ namespace pmm {
 					sleep(1);
 				}
 #ifdef DEBUG
-				int nSize = notificationQueue->size();
-				if((nSize + 1) % 20 == 0) APNSLog << "DEBUG: There are " << nSize << " elements in the notification queue." << pmm::NL;
+				size_t nSize = notificationQueue->size();
+				if((nSize + 1) % 20 == 0) APNSLog << "DEBUG: There are " << (int)nSize << " elements in the notification queue." << pmm::NL;
 #endif
 				//Verify here if we should notify the event or not
 				time_t rightNow;
@@ -489,7 +489,7 @@ namespace pmm {
 					}
 					if (_useSandbox == false && invalidTokenSet.find(payload.deviceToken()) != invalidTokenSet.end()) {
 						APNSLog << "CRITICAL: Refusing to post notification to device " << payload.deviceToken() << " this is an invalid device token." << pmm::NL;
-#warning Warn the user somehow that her device is holding an invalid device token
+						//No way to warn user that the message can't be posted because his/her device is holding an invalid token
 						//triggerSimultanousReconnect();
 					}
 					else {
