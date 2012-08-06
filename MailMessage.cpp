@@ -63,15 +63,15 @@ namespace pmm {
 					size_t indx = 0, decodedSize = 0;
 					int r = mailmime_quoted_printable_body_parse(data->dt_data.dt_text.dt_data, data->dt_data.dt_text.dt_length, &indx, &decodedMsg, &decodedSize, 0);
 					if (r == MAILIMF_NO_ERROR) {
-						size_t indx2 = 0;
+						/*size_t indx2 = 0;
 						char *newText = 0;
 						mailmime_encoded_phrase_parse(charset.c_str(), decodedMsg, decodedSize, &indx2, TextEncoding::utf8, &newText);
 						if(newText != 0){
 							outputStream << newText;
 							free(newText);
 						}
-						else outputStream.write(decodedMsg, decodedSize);
-						mailmime_decoded_part_free(decodedMsg);
+						else*/ outputStream.write(decodedMsg, decodedSize);
+						//mailmime_decoded_part_free(decodedMsg);
 					}
 				}
 				break;
@@ -116,7 +116,7 @@ namespace pmm {
 		}
 	}
 
-	static void getMIMEMsgBody(struct mailmime * mime, std::stringstream &outputStream)
+	static void getMIMEMsgBody(struct mailmime * mime, std::stringstream &outputStream, std::stringstream &htmlOutputStream)
 	{
 		clistiter * cur;		
 		switch (mime->mm_type) {
@@ -135,23 +135,30 @@ namespace pmm {
 					}
 					getMIMEData(mime->mm_data.mm_single, outputStream, charset);
 				}
-#ifdef PERFORM_HTML_DECODING
 				else if (strcasecmp(mime->mm_content_type->ct_subtype, MIMEContentSubtype::html) == 0) {
-
+					clist *params = mime->mm_content_type->ct_parameters;
+					std::string charset = TextEncoding::utf8;
+					for (clistiter *param = clist_begin(params); param != NULL; param = clist_next(param)) {
+						struct mailmime_parameter *theParam = (struct mailmime_parameter *)clist_content(param);
+						//std::cout << theParam->pa_name << "=" << theParam->pa_value << std::endl;
+						if (strcasecmp(theParam->pa_name, MIMEParameter::charset) == 0) {
+							charset = theParam->pa_value;
+						}
+					}
+					getMIMEData(mime->mm_data.mm_single, htmlOutputStream, charset);
 				}
-#endif
 			}
 				break;
 			case MAILMIME_MULTIPLE:
 				for(cur = clist_begin(mime->mm_data.mm_multipart.mm_mp_list) ; cur != NULL ; cur = clist_next(cur)) {
-					getMIMEMsgBody((struct mailmime *)clist_content(cur), outputStream);
+					getMIMEMsgBody((struct mailmime *)clist_content(cur), outputStream, htmlOutputStream);
 				}
 				break;
 				
 			case MAILMIME_MESSAGE:
 				if (mime->mm_data.mm_message.mm_fields) {					
 					if (mime->mm_data.mm_message.mm_msg_mime != NULL) {
-						getMIMEMsgBody(mime->mm_data.mm_message.mm_msg_mime, outputStream);
+						getMIMEMsgBody(mime->mm_data.mm_message.mm_msg_mime, outputStream, htmlOutputStream);
 					}
 					break;
 				}
@@ -297,11 +304,19 @@ namespace pmm {
 		}
 		if (m.subject.size() <= 384) {
 			std::stringstream msgBody;
-			getMIMEMsgBody(result, msgBody);
+			std::stringstream htmlBody;
+			getMIMEMsgBody(result, msgBody, htmlBody);
 			std::string theBody = msgBody.str();
-			while (theBody[0] == '\r' || theBody[0] == '\n') {
-				theBody = theBody.substr(1);
+			std::string theHtmlBody = htmlBody.str();
+			if(theBody.size() == 0 &&  theHtmlBody.size() > 0){
+				stripHTMLTags(htmlBody.str(), theHtmlBody, 4096);
+				theBody = theHtmlBody;
 			}
+			std::string tmpBody = theBody;
+			stripBlankLines(tmpBody, theBody);
+			/*while (theBody[0] == '\r' || theBody[0] == '\n') {
+				theBody = theBody.substr(1);
+			}*/
 			if (theBody.size() > 0) {
 				if(m.subject.size() > 0) m.subject.append("\n");
 				if(theBody.size() < 512){
@@ -320,5 +335,23 @@ namespace pmm {
 		}
 		mailmime_free(result);
 		return true;
+	}
+	
+	void MailMessage::toJson(std::string &_result, const std::string &sound){
+		std::stringstream json;
+		if(to.size() == 0) throw GenericException("Unable to create ");
+		json << "{\"emailAccount\":\"" << to << "\",";
+		json << "\"tStamp\":\"" << dateOfArrival << "\",";
+		json << "\"from\":\"" << from << "\",";
+		if(fromEmail.size() > 0) json << "\"fromEmail\":\"" << fromEmail << "\",";
+		json << "\"sound\":\"" << sound << "\",";
+		json << "\"msgUID\":\"" << msgUid << "\",";
+		json << "\"timezone\":\"" << tzone << "\",";
+		
+		std::string encodedSubject = subject;
+		jsonTextEncode(encodedSubject);
+		json << "\"subject\":\"" << encodedSubject << "\"";
+		json << "}";
+		_result = json.str();
 	}
 }

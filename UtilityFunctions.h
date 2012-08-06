@@ -17,6 +17,8 @@
 #include "MailAccountInfo.h"
 
 namespace pmm {
+	
+	void buildHTMLEntityMap();
 
 	void url_encode(std::string &theString);
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken);
@@ -28,6 +30,11 @@ namespace pmm {
 	bool tableExists(sqlite3 *dbConn, const std::string &tablename);
 	
 	void splitString(std::vector<std::string> &_return, const std::string &theString, const std::string &delim);
+	
+	void jsonTextEncode(std::string &theMsg);
+	void stripHTMLTags(const std::string &htmlCode, std::string &output, int maxTextSize = 16384);
+	
+	void stripBlankLines(const std::string &input, std::string &output);
 }
 
 #endif

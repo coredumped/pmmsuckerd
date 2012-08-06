@@ -29,6 +29,8 @@ namespace pmm {
 		MailMessage(const MailMessage &m);
 		static bool parse(MailMessage &m, const std::string &rawMessage);
 		static bool parse(MailMessage &m, const char *msgBuffer, size_t msgSize);
+		
+		void toJson(std::string &_result, const std::string &sound);
 	};
 }
 
