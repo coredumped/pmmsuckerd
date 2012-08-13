@@ -449,7 +449,9 @@ namespace pmm {
 		}
 		if(imapControl[theEmail].imap == NULL) imapControl[theEmail].imap = mailimap_new(0, NULL);
 		if (serverConnectAttempts.find(m.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[m.serverAddress()] = 0;
+#ifdef DEBUG_IMAP_CONNECT
 		imapLog << "Connecting to " << theEmail << " port " << m.serverPort() << pmm::NL;
+#endif
 		if (m.useSSL()) {
 			result = mailimap_ssl_connect(imapControl[theEmail].imap, m.serverAddress().c_str(), m.serverPort());
 		}
@@ -660,6 +662,7 @@ namespace pmm {
 					}
 				}
 				if(response == NULL) break;
+				if(antiLoopCounter > 0 && antiLoopCounter % 2 == 0) usleep(1000); //Sleep 1 milliseconds se we don't starve our CPU
 				if(antiLoopCounter++ > 100) {
 					pmm::imapLog << "PANIC: Got a looped IDLE status checker for " << theEmail << ", attempting to send an IDLE reset to break free!!!" << pmm::NL;
 					resetIdle = true;

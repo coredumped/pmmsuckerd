@@ -468,8 +468,8 @@ namespace pmm {
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
 				}
 			}
-			if(gotSomething) usleep(10);
-			else usleep(1000);
+			if(gotSomething) usleep(1000);
+			else usleep(10000);
 		}
 	}
 
