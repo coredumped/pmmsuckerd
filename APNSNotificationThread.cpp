@@ -77,7 +77,7 @@ namespace pmm {
 	static uint32_t msgUUIDGenerate(){
 		uint32_t newUUID = 0;
 		uuidGenM.lock();
-		if(_uuidCnt == 0) _uuidCnt = time(0);
+		if(_uuidCnt == 0) _uuidCnt = (uint32_t)time(0);
 		_uuidCnt++;
 		newUUID = _uuidCnt;
 		uuidGenM.unlock();
@@ -199,7 +199,6 @@ namespace pmm {
 #ifdef DEBUG
 			APNSLog << "Loading certificate: " << _certPath << pmm::NL;
 #endif
-#warning TODO: Verify that the certificate has not expired, if it has send a very loud panic alert
 			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
 				ERR_print_errors_fp(stderr);
 				throw SSLException(NULL, 0, "Unable to load certificate file");
@@ -375,13 +374,13 @@ namespace pmm {
 		{
 			struct stat st;
 			if(stat("apns-logout-time.log", &st) == 0){
-				int rightNow = time(0);
-				int lastRun = time(0);
+				time_t rightNow = time(0);
+				time_t lastRun = time(0);
 				//Read file, find las execution value and wait for 5 minutes....
 				std::ifstream inf("apns-logout-time.log");
 				inf >> lastRun;
 				inf.close();
-				int deltaT = rightNow - lastRun;
+				time_t deltaT = rightNow - lastRun;
 				if (deltaT < 300) {
 					warmingUP = true;
 					APNSLog << "Warming up thread..." << pmm::NL;
@@ -581,7 +580,10 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::notifyTo(const std::string &devToken, NotificationPayload &msg){
-		//Add some code here for god sake!!!
+		if(devToken.size() == 0){
+			APNSLog << "PANIC: A message for " << msg.origMailMessage.to << " was scheduled for notification to a device with an empty device token? WTF!!!" << pmm::NL;
+			return;
+		}
 		std::string jsonMsg = msg.toJSON();
 #ifdef DEBUG_FULL_MESSAGE
 		APNSLog << "DEBUG: Sending notification " << jsonMsg << pmm::NL;

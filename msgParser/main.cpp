@@ -32,12 +32,16 @@ static size_t loadFile(const std::string &theFile, std::string &allData){
 static void parseMessage(const std::string &emlPath){
 	std::string msg;
 	pmm::MailMessage m;
+	m.to = "support@fnxsoftware.com";
 	//Read emal file here
 	loadFile(emlPath, msg);
 	std::cout << "\n------------- " << emlPath << " ----------" << std::endl;
 	pmm::MailMessage::parse(m, msg);
 	std::cout << "From:    " << m.from << std::endl;
 	std::cout << "Subject: " << m.subject << std::endl;
+	std::string jsonTxt;
+	m.toJson(jsonTxt, "pmm.caf");
+	std::cout << "Json:\n\t" << jsonTxt << std::endl;
 }
 
 int main(int argc, const char * argv[])
@@ -62,8 +66,6 @@ int main(int argc, const char * argv[])
 		}
 		closedir(tDir);
 	}
-
-	
     return 0;
 }
 

@@ -82,6 +82,7 @@ namespace pmm {
 		
 		//Upload notification messages to server
 		void uploadNotificationMessage(const NotificationPayload &np);
+		void uploadMultipleNotificationMessages(const std::vector<NotificationPayload> &msgs);
 		
 		//Checks if a new task has been registered in fnxsoftware.com
 		bool fnxHasPendingTasks();

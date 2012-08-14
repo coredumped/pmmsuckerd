@@ -123,7 +123,6 @@ namespace pmm {
 					emailAccounts.erase(i);
 					found = true;
 					fetchedMails.removeAllEntriesOfEmail2(m);
-#warning TODO: Remove all preferences for this account
 					QuotaDB::removeAccount(m);
 					cntAccountsTotal = cntAccountsTotal - 1;
 					break;

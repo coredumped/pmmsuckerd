@@ -159,9 +159,12 @@ namespace pmm {
 								mailpop3_free(pop3);
 								return -1;
 							}
+							if(errorMsg.find("LDAP: error code 50 - Blocked by ITS") != errorMsg.npos){
+								messagesRetrieved = -4;
+							}
 						}
 					}
-					if(theVal % 100 == 0){
+					if(theVal > 0 && theVal % 20 == 0){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
@@ -182,7 +185,7 @@ namespace pmm {
 					}
 				}
 				else {
-					if (theVal % 100 == 0) {
+					if (theVal % 10 == 0) {
 						//Notify the user that we might not be able to monitor this account
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
@@ -193,7 +196,7 @@ namespace pmm {
 							np.isSystemNotification = true;
 							notificationQueue->add(np);
 						}
-						return -2;
+						messagesRetrieved = -3;
 					}
 					else {
 						if (pop3->pop3_response == NULL) {
@@ -319,7 +322,7 @@ namespace pmm {
 										std::string alertTone;
 										PreferenceEngine::defaultAlertTone(alertTone, pf.mailAccountInfo.email()); //Here we retrieve the user alert tone
 										nMsg << theMessage.from << "\n" << theMessage.subject;
-										NotificationPayload np(myDevTokens[i], nMsg.str(), i + 1, alertTone);
+										NotificationPayload np(myDevTokens[i], nMsg.str(), (int)(i + 1), alertTone);
 										np.origMailMessage = theMessage;
 										if (pf.mailAccountInfo.devel) {
 											pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
@@ -359,10 +362,6 @@ namespace pmm {
 				}
 				mailpop3_quit(pop3);
 			}
-			//mailpop3_quit(pop3);
-			/*if (pop3->pop3_stream != NULL) {
-				mailstream_close(pop3->pop3_stream);
-			}*/
 		}
 		mailpop3_free(pop3);
 		return messagesRetrieved;
@@ -407,8 +406,8 @@ namespace pmm {
 					int n = fetchMessages(pf);
 					gotSomething = true;
 					if (n == -3) {
-						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 1 hour have passed" << pmm::NL;
-						nextCheck[pf.mailAccountInfo.email()] = now + 3600;
+						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 3 hours have passed" << pmm::NL;
+						nextCheck[pf.mailAccountInfo.email()] = now + 3600 * 3;
 						delayedAccounts.insert(pf.mailAccountInfo.email());
 					}
 					busyHotmailsSet.erase(pf.mailAccountInfo.email());
@@ -460,9 +459,12 @@ namespace pmm {
 						}	
 					}
 					if (n == -3) {
-						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 1 hour have passed" << pmm::NL;
-						nextCheck[pf.mailAccountInfo.email()] = now + 3600;
+						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 2 hour have passed" << pmm::NL;
+						nextCheck[pf.mailAccountInfo.email()] = now + 7200;
 						delayedAccounts.insert(pf.mailAccountInfo.email());
+					}
+					else if(n == -4){
+						yahooAccountsToBan.insert(pf.mailAccountInfo.email());
 					}
 					gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());

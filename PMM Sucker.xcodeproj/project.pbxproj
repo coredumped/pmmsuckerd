@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8202751115C25D9100B713F9 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		8202751315C25DA900B713F9 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		8202751415C25DC400B713F9 /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		8202751515C25DD700B713F9 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		8202751615C2628B00B713F9 /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
+		8202751715C2628B00B713F9 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
+		8202751815C2628B00B713F9 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		8202751915C2637300B713F9 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		8202751A15C2638800B713F9 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
+		8202751B15C2638C00B713F9 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
+		8202751C15C263A000B713F9 /* NotificationPayload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1B1435380A00444844 /* NotificationPayload.cpp */; };
+		8202751D15C263AD00B713F9 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
 		820BBDF9153E7187005A1C5A /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
 		820BBDFA153E7242005A1C5A /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
 		820BBE1315423FAB005A1C5A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBE1215423FAB005A1C5A /* main.cpp */; };
@@ -461,6 +473,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8202751D15C263AD00B713F9 /* libcurl.dylib in Frameworks */,
+				8202751A15C2638800B713F9 /* CoreFoundation.framework in Frameworks */,
+				8202751915C2637300B713F9 /* Security.framework in Frameworks */,
+				8202751515C25DD700B713F9 /* libsqlite3.dylib in Frameworks */,
 				828879C61544642A00DEF837 /* libcrypto.a in Frameworks */,
 				828879C71544642A00DEF837 /* libssl.a in Frameworks */,
 				828879C5154463B800DEF837 /* libiconv.dylib in Frameworks */,
@@ -1016,6 +1032,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8202751C15C263A000B713F9 /* NotificationPayload.cpp in Sources */,
+				8202751B15C2638C00B713F9 /* jsonxx.cc in Sources */,
+				8202751615C2628B00B713F9 /* PMMSuckerSession.cpp in Sources */,
+				8202751715C2628B00B713F9 /* ServerResponse.cpp in Sources */,
+				8202751815C2628B00B713F9 /* JSONParseException.cpp in Sources */,
+				8202751415C25DC400B713F9 /* Atomic.cpp in Sources */,
+				8202751315C25DA900B713F9 /* MailAccountInfo.cpp in Sources */,
+				8202751115C25D9100B713F9 /* UtilityFunctions.cpp in Sources */,
 				82D5942E156A03650011FC89 /* GenericException.cpp in Sources */,
 				828879C81544648000DEF837 /* Mutex.cpp in Sources */,
 				828879C11544637B00DEF837 /* MTLogger.cpp in Sources */,

@@ -79,6 +79,8 @@ namespace pmm {
 		static const char *pmmSuckerCommandRetrieve = "pmmSuckerCommandRetrieve";
 		static const char *pmmSuckerUploadMessage = "pmmSuckerUploadMessage";
 		static const char *pmmSuckerRetrieveSilentModeInfo = "pmmSuckerRetrieveSilentModeInfo";
+		static const char *pmmSuckerUploadMultipleMessages = "pmmSuckerUploadMultipleMessages";
+		static const char *pmmSuckerReportInvalidToken = "pmmSuckerReportInvalidToken";
 	};
 	
 	namespace Commands {
@@ -569,6 +571,31 @@ namespace pmm {
 		}
 	}
 	
+	void SuckerSession::uploadMultipleNotificationMessages(const std::vector<NotificationPayload> &msgs){
+		if(msgs.size() == 0) return;
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMultipleMessages;
+		params["suckerID"] = this->myID;
+
+		std::stringstream jsonVec;
+		jsonVec << "[";
+		for (size_t i = 0; i < msgs.size(); i++) {
+			std::string jsonEnc;
+			MailMessage m = msgs[i].origMailMessage;
+			m.toJson(jsonEnc, msgs[i].soundName());
+			if(i == 0) jsonVec << jsonEnc;
+			else jsonVec << "," << jsonEnc;
+		}
+		jsonVec << "]";
+		std::string output;
+		executePost(params, output, pmmServiceURL.c_str());
+		if (output.find("OK") == output.npos) {
+			throw GenericException("Unable to upload multiple messages");
+		}
+	}
+	
 	bool SuckerSession::silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::string &emailAccounts){
 		std::vector<std::string> all;
 		all.push_back(emailAccounts);
@@ -577,6 +604,9 @@ namespace pmm {
 	
 	bool SuckerSession::silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::vector<std::string> &emailAccounts){
 		_return.clear();
+		if (emailAccounts.size() == 0) {
+			return true;
+		}
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::pmmSuckerRetrieveSilentModeInfo;
@@ -613,12 +643,15 @@ namespace pmm {
 		if (tokVec.size() == 0) return true;
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
-		params["opType"] = pmm::OperationTypes::pmmSuckerRetrieveSilentModeInfo;
+		params["opType"] = pmm::OperationTypes::pmmSuckerReportInvalidToken;
 		params["suckerID"] = this->myID;
 		std::stringstream allToks;
+		bool gotOne = false;
 		for (size_t i = 0; i < tokVec.size(); i++) {
-			if (i == 0) {
+			if(tokVec[i].size() == 0) continue; //Make sure we don't report empty device tokens
+			if (!gotOne) {
 				allToks << tokVec[i];
+				gotOne = true;
 			}
 			else {
 				allToks << "," << tokVec[i];
