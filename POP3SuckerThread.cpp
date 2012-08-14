@@ -190,11 +190,26 @@ namespace pmm {
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
 						msgX.append(pf.mailAccountInfo.email());
-						msgX.append(", have you changed your password?");
+						if (pop3->pop3_response != NULL) {
+							msgX.append(", ");
+							msgX.append(pop3->pop3_response);
+						}
+						else msgX.append(", have you changed your password?");
 						for (size_t i = 0; i < allTokens.size(); i++) {
 							NotificationPayload np(allTokens[i], msgX);
 							np.isSystemNotification = true;
 							notificationQueue->add(np);
+							if (i == 0) {
+								std::stringstream fakeUid;
+								np.origMailMessage.from = "PushMeMail";
+								np.origMailMessage.to = pf.mailAccountInfo.email();
+								np.origMailMessage.dateOfArrival = time(0);
+								fakeUid << "pmm-err-" << np.origMailMessage.dateOfArrival;
+								np.origMailMessage.msgUid = fakeUid.str();
+								np.origMailMessage.subject = msgX;
+								np.origMailMessage.serverDate = np.origMailMessage.dateOfArrival;
+								pmmStorageQueue->add(np);
+							}
 						}
 						messagesRetrieved = -3;
 					}
@@ -334,12 +349,8 @@ namespace pmm {
 											fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 											if(!QuotaDB::decrease(pf.mailAccountInfo.email())){
 												pop3Log << "ATTENTION: Account " << pf.mailAccountInfo.email() << " has ran out of quota!" << pmm::NL;
-												//std::stringstream msg;
-												//msg << "You have ran out of quota on " << pf.mailAccountInfo.email() << ", you may purchase more to keep receiving notifications.";
-												//pmm::NotificationPayload npi(myDevTokens[i], msg.str());
 												
 												pmm::NoQuotaNotificationPayload npi(myDevTokens[i], pf.mailAccountInfo.email());
-												//npi.isSystemNotification = true;
 												if (pf.mailAccountInfo.devel) {
 													pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
 													develNotificationQueue->add(npi);
