@@ -124,15 +124,33 @@ namespace pmm {
 			result = mailpop3_socket_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());
 		}
 		if(etpanOperationFailed(result)){
-			if (pop3->pop3_response == NULL) {
-				pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later." << pmm::NL;
-			}
-			else {
-				pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
-			}
 			int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 			serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
-			if (theVal % 100 == 0) {
+			if (pop3->pop3_response == NULL) {
+				pop3Log << "PANIC: (attempt=" << theVal << ") Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later" << pmm::NL;
+			}
+			else {
+				pop3Log << "PANIC: (attempt=" << theVal << ") Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+			}
+			if (theVal > 0 && theVal % 5 == 0) {
+				std::vector<std::string> myDevTokens = pf.mailAccountInfo.devTokens();
+				std::stringstream msgX;
+				msgX << "Unable to connect to " << pf.mailAccountInfo.serverAddress() << ", check your settings.";
+				for (size_t i = 0; i < myDevTokens.size(); i++) {
+					NotificationPayload np(myDevTokens[i], msgX.str());
+					if (i == 0) {
+						std::stringstream fakeUid;
+						np.origMailMessage.from = "PushMeMail";
+						np.origMailMessage.fromEmail = "support@fnxsoftware.com";
+						np.origMailMessage.to = pf.mailAccountInfo.email();
+						np.origMailMessage.dateOfArrival = fetchT0;
+						fakeUid << "pmm-err-" << np.origMailMessage.dateOfArrival;
+						np.origMailMessage.msgUid = fakeUid.str();
+						np.origMailMessage.subject = msgX.str();
+						np.origMailMessage.serverDate = np.origMailMessage.dateOfArrival;
+						pmmStorageQueue->add(np);
+					}
+				}
 				messagesRetrieved = -3;
 			}
 		}
@@ -203,7 +221,7 @@ namespace pmm {
 								std::stringstream fakeUid;
 								np.origMailMessage.from = "PushMeMail";
 								np.origMailMessage.to = pf.mailAccountInfo.email();
-								np.origMailMessage.dateOfArrival = time(0);
+								np.origMailMessage.dateOfArrival = fetchT0;
 								fakeUid << "pmm-err-" << np.origMailMessage.dateOfArrival;
 								np.origMailMessage.msgUid = fakeUid.str();
 								np.origMailMessage.subject = msgX;
