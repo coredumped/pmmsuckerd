@@ -28,7 +28,8 @@ namespace pmm {
 		void verifyTables(sqlite3 *conn, const std::string &email);
 	protected:
 		sqlite3 *openDatabase();
-		sqlite3 *openDatabase(const std::string &email);
+		//sqlite3 *openDatabase(const std::string &email);
+		sqlite3 *openDatabase(const std::string &email, bool &createTable);
 		void closeDatabase(sqlite3 *db);
 	public:
 		FetchedMailsCache();
@@ -45,13 +46,13 @@ namespace pmm {
 		void removeEntriesNotInSet(const std::string &email, const std::vector<uint32_t> &uidSet);
 		void removeAllEntriesOfEmail(const std::string &email);
 #endif
-		void addEntry2(const std::string &email, const std::string &uid);
-		void addEntry2(const std::string &email, uint32_t &uid);
+		bool addEntry2(const std::string &email, const std::string &uid);
+		bool addEntry2(const std::string &email, uint32_t &uid);
 
 
 		
 
-		bool entryExists2(const std::string &email, const std::string &uid);
+		bool entryExists2(const std::string &email, const std::string &uid, bool &tableCreated);
 		bool entryExists2(const std::string &email, uint32_t uid);
 		bool hasAllTheseEntries(const std::string &email, carray *msgList);
 		

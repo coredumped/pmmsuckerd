@@ -184,7 +184,7 @@ namespace pmm {
 	
 	static Mutex migrM;
 	
-	sqlite3 *FetchedMailsCache::openDatabase(const std::string &email){
+	sqlite3 *FetchedMailsCache::openDatabase(const std::string &email, bool &createTable){
 		sqlite3 *theConn;
 		theConn = getUConnection(email);
 		if (sqlite3_threadsafe() && theConn != 0) {
@@ -192,7 +192,7 @@ namespace pmm {
 		}
 		int errCode;
 		std::string dbf;
-		bool createTable = getDataFile(dbf, email);
+		createTable = getDataFile(dbf, email);
 		//errCode = sqlite3_open(dbf.c_str(), &theConn);
 		errCode = sqlite3_open_v2(dbf.c_str(), &theConn, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, NULL);
 		if (errCode != SQLITE_OK) {
@@ -354,8 +354,9 @@ namespace pmm {
 	}
 #endif
 	
-	void FetchedMailsCache::addEntry2(const std::string &email, const std::string &uid){
-		sqlite3 *conn = openDatabase(email);
+	bool FetchedMailsCache::addEntry2(const std::string &email, const std::string &uid){
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid << "' )";
@@ -371,9 +372,12 @@ namespace pmm {
 			throw GenericException(errmsg.str());
 		}
 		autoRefreshUConn(email);
+		return tableCreated;
 	}
-	void FetchedMailsCache::addEntry2(const std::string &email, uint32_t &uid){
-		sqlite3 *conn = openDatabase(email);
+	
+	bool FetchedMailsCache::addEntry2(const std::string &email, uint32_t &uid){
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << "," << uid << ")";
@@ -388,7 +392,8 @@ namespace pmm {
 #endif
 			throw GenericException(errmsg.str());
 		}
-		autoRefreshUConn(email);		
+		autoRefreshUConn(email);
+		return tableCreated;
 	}
 #ifdef OLD_CACHE_INTERFACE
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
@@ -470,9 +475,9 @@ namespace pmm {
 	}
 #endif
 	
-	bool FetchedMailsCache::entryExists2(const std::string &email, const std::string &uid){
+	bool FetchedMailsCache::entryExists2(const std::string &email, const std::string &uid, bool &tableCreated){
 		bool ret = false;
-		sqlite3 *conn = openDatabase(email);
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
 		
@@ -517,7 +522,8 @@ namespace pmm {
 		bool ret = false;
 		int attempts = 0;
 		while (attempts++ < 3){
-			sqlite3 *conn = openDatabase(email);
+			bool tableCreated;
+			sqlite3 *conn = openDatabase(email, tableCreated);
 			std::stringstream sqlCmd;
 			sqlite3_stmt *statement;
 			
@@ -625,7 +631,8 @@ namespace pmm {
 	
 	bool FetchedMailsCache::hasAllTheseEntries(const std::string &email, carray *msgList){
 		bool ret = false;
-		sqlite3 *conn = openDatabase(email);
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		std::stringstream sqlCmd;
 		sqlite3_stmt *statement;
 		char *sztail;
@@ -698,7 +705,8 @@ namespace pmm {
 	
 	void FetchedMailsCache::expireOldEntries(const std::string &email){
 #warning TODO: Implement a way to expire old e-mail entries plus a trigger to activate it
-		sqlite3 *conn = openDatabase(email);
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE timestamp < " << (int)time(NULL) - 5184000;
@@ -784,7 +792,8 @@ namespace pmm {
 	
 	void FetchedMailsCache::removeMultipleEntries2(const std::string &email, const std::vector<uint32_t> &uidList){
 		if(uidList.size() == 0) return;
-		sqlite3 *conn = openDatabase(email);
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE uniqueid IN (";
@@ -807,7 +816,8 @@ namespace pmm {
 	}
 	void FetchedMailsCache::removeEntriesNotInSet2(const std::string &email, const std::vector<uint32_t> &uidSet){
 		if(uidSet.size() == 0) return;
-		sqlite3 *conn = openDatabase(email);
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "DELETE FROM " << fetchedMailsTable << " WHERE uniqueid NOT IN (";
@@ -830,7 +840,8 @@ namespace pmm {
 	}
 	
 	void FetchedMailsCache::removeAllEntriesOfEmail2(const std::string &email){
-		sqlite3 *conn = openDatabase(email);
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
 		sqlCmd << "DELETE FROM " << fetchedMailsTable;

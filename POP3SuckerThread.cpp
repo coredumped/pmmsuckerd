@@ -171,7 +171,7 @@ namespace pmm {
 							return -2;
 						}
 						else {
-							pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
+							pmm::pop3Log << "CRITICAL: Password failed(" << theVal << ") [dt=" << (int)(time(0) - fetchT0) << "s] for " << pf.mailAccountInfo.email() << ", server: " << pf.mailAccountInfo.serverAddress() <<", due to: " << pop3->pop3_response << pmm::NL;
 							if (isYahooAccount && errorMsg.find("(error 999)") != errorMsg.npos) {
 								//Return -1 so the caller method knows that the fetch must be delayed somehow
 								mailpop3_free(pop3);
@@ -182,12 +182,13 @@ namespace pmm {
 							}
 						}
 					}
-					if(theVal > 0 && theVal % 20 == 0){
+					if(theVal > 0 && theVal % 5 == 0){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
-						std::string msgX = pf.mailAccountInfo.email();
+						std::string msgX = "Can't login to ";
+						msgX.append(pf.mailAccountInfo.email());
 						if (errorMsg.size() > 0) {
 							msgX.append(": ");
 							msgX.append(errorMsg);
@@ -266,7 +267,7 @@ namespace pmm {
 #endif
 					//if(max_retrieve > DEFAULT_MAX_MSG_RETRIEVE) max_retrieve = DEFAULT_MAX_MSG_RETRIEVE;
 					int maxRetrievalIterations = DEFAULT_MAX_MSG_RETRIEVE;
-
+					bool emailAccountIsNew = false;
 					for (int i = 0; i < max_retrieve; i++) {
 						time_t now = time(0);
 						if(isYahooAccount && messagesRetrieved > maxRetrievalIterations) break;
@@ -275,108 +276,118 @@ namespace pmm {
 						if (info == NULL) continue;
 						//Verify for null here!!!
 						if (info->msg_uidl == NULL) continue;
+						if(emailAccountIsNew){
+							fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+							continue;
+						}
 						if (!QuotaDB::have(pf.mailAccountInfo.email())) {
 							pmm::pop3Log << pf.mailAccountInfo.email() << " has ran out of quota in the middle of a POP3 mailbox poll!!!" << pmm::NL;
 							break;
 						}
-						if (!fetchedMails.entryExists2(pf.mailAccountInfo.email(), info->msg_uidl)) {
-							//Perform real message retrieval
-							char *msgBuffer;
-							size_t msgSize;
-							MailMessage theMessage;
-							theMessage.msgUid = info->msg_uidl;
-							result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
-							if(result != MAILPOP3_NO_ERROR){
-								if(result == MAILPOP3_ERROR_STREAM){
-									if(pop3->pop3_response == NULL) pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved." << pmm::NL;
-									else pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved due to: " << pop3->pop3_response << pmm::NL;
-									std::map<std::string, int> record;
-									if(failedIOFetches.find(pf.mailAccountInfo.email()) == failedIOFetches.end()){
-										record[info->msg_uidl] = 1;
-										failedIOFetches[pf.mailAccountInfo.email()] = record;	
-									}
-									else {
-										record = failedIOFetches[pf.mailAccountInfo.email()];
-										record[info->msg_uidl]++;
-										failedIOFetches[pf.mailAccountInfo.email()] = record;
-									}
-									if(record[info->msg_uidl] > 4){
-										pop3Log << "CRITICAL: Too many attempts (" << record[info->msg_uidl] << ") to download message " << info->msg_uidl << " aborting :-(" << pmm::NL;
-										fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-										failedIOFetches[pf.mailAccountInfo.email()].erase(info->msg_uidl);
-										if(failedIOFetches[pf.mailAccountInfo.email()].size() == 0) failedIOFetches.erase(pf.mailAccountInfo.email());
-									}
-									break;
-								}
-								else if (result == MAILPOP3_ERROR_NO_SUCH_MESSAGE) {
-									if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
-									else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
-									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-									/*if (isYahooAccount){
-										//Since the socket might already be closed there is no socket leaking here
-										//However everything in the pop3 structure might still be leaking, this
-										//must be solved in the future somehow
-										//return messagesRetrieved;
-										break;
-									}*/
-								}
-								else{
-									pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;	
-								}
+						if (!fetchedMails.entryExists2(pf.mailAccountInfo.email(), info->msg_uidl, emailAccountIsNew)) {
+							if(emailAccountIsNew){
+								pop3Log << "INFO: Indexing new e-mail account: " << pf.mailAccountInfo.email() << pmm::NL;
+								fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
 							}
 							else {
-								if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
-									pmm::pop3Log << "Unable to parse e-mail message !!!" << pmm::NL;
-#warning Find a something better to do when a message can't be properly parsed!!!!
-									mailpop3_retr_free(msgBuffer);
-									continue;
-								}
-								mailpop3_retr_free(msgBuffer);
-								if (startTimeMap.find(pf.mailAccountInfo.email()) == startTimeMap.end()) {
-									startTimeMap[pf.mailAccountInfo.email()] = now - 300;
-								}
-#ifdef DEBUG_TIME_ELDERNESS
-								pmm::pop3Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
-#endif
-
-								if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
-									fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-									pmm::pop3Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
+							//Perform real message retrieval
+								char *msgBuffer;
+								size_t msgSize;
+								MailMessage theMessage;
+								theMessage.msgUid = info->msg_uidl;
+								result = mailpop3_retr(pop3, info->msg_index, &msgBuffer, &msgSize);
+								if(result != MAILPOP3_NO_ERROR){
+									if(result == MAILPOP3_ERROR_STREAM){
+										if(pop3->pop3_response == NULL) pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved." << pmm::NL;
+										else pop3Log << "CRITICAL: Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << ". Unable to perform I/O on stream, aborting scan, " << messagesRetrieved << "/" << max_retrieve << " retrieved due to: " << pop3->pop3_response << pmm::NL;
+										std::map<std::string, int> record;
+										if(failedIOFetches.find(pf.mailAccountInfo.email()) == failedIOFetches.end()){
+											record[info->msg_uidl] = 1;
+											failedIOFetches[pf.mailAccountInfo.email()] = record;
+										}
+										else {
+											record = failedIOFetches[pf.mailAccountInfo.email()];
+											record[info->msg_uidl]++;
+											failedIOFetches[pf.mailAccountInfo.email()] = record;
+										}
+										if(record[info->msg_uidl] > 4){
+											pop3Log << "CRITICAL: Too many attempts (" << record[info->msg_uidl] << ") to download message " << info->msg_uidl << " aborting :-(" << pmm::NL;
+											fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+											failedIOFetches[pf.mailAccountInfo.email()].erase(info->msg_uidl);
+											if(failedIOFetches[pf.mailAccountInfo.email()].size() == 0) failedIOFetches.erase(pf.mailAccountInfo.email());
+										}
+										break;
+									}
+									else if (result == MAILPOP3_ERROR_NO_SUCH_MESSAGE) {
+										if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
+										else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
+										fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+										/*if (isYahooAccount){
+										 //Since the socket might already be closed there is no socket leaking here
+										 //However everything in the pop3 structure might still be leaking, this
+										 //must be solved in the future somehow
+										 //return messagesRetrieved;
+										 break;
+										 }*/
+									}
+									else{
+										pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;
+									}
 								}
 								else {
-									messagesRetrieved++;
-									int cnt = cntRetrieved->get() + 1;
-									cntRetrieved->set(cnt);
-									theMessage.to = pf.mailAccountInfo.email();
-									std::vector<std::string> myDevTokens = pf.mailAccountInfo.devTokens();
-									for (size_t i = 0; i < myDevTokens.size(); i++) {
-										//Apply all processing rules before notifying
-										std::stringstream nMsg;
-										std::string alertTone;
-										PreferenceEngine::defaultAlertTone(alertTone, pf.mailAccountInfo.email()); //Here we retrieve the user alert tone
-										nMsg << theMessage.from << "\n" << theMessage.subject;
-										NotificationPayload np(myDevTokens[i], nMsg.str(), (int)(i + 1), alertTone);
-										np.origMailMessage = theMessage;
-										if (pf.mailAccountInfo.devel) {
-											pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
-											develNotificationQueue->add(np);
-										}
-										else notificationQueue->add(np);
-										if(i == 0){
-											quotaUpdateVector->push_back(pf.mailAccountInfo.email());
-											fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-											if(!QuotaDB::decrease(pf.mailAccountInfo.email())){
-												pop3Log << "ATTENTION: Account " << pf.mailAccountInfo.email() << " has ran out of quota!" << pmm::NL;
-												
-												pmm::NoQuotaNotificationPayload npi(myDevTokens[i], pf.mailAccountInfo.email());
-												if (pf.mailAccountInfo.devel) {
-													pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
-													develNotificationQueue->add(npi);
-												}
-												else notificationQueue->add(npi);
+									if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
+										pmm::pop3Log << "Unable to parse e-mail message !!!" << pmm::NL;
+#warning Find a something better to do when a message can't be properly parsed!!!!
+										mailpop3_retr_free(msgBuffer);
+										continue;
+									}
+									mailpop3_retr_free(msgBuffer);
+									if (startTimeMap.find(pf.mailAccountInfo.email()) == startTimeMap.end()) {
+										startTimeMap[pf.mailAccountInfo.email()] = now - 300;
+									}
+#ifdef DEBUG_TIME_ELDERNESS
+									pmm::pop3Log << "Message is " << (theMessage.serverDate - startTimeMap[pf.mailAccountInfo.email()]) << " seconds old" << pmm::NL;
+#endif
+									
+									if (theMessage.serverDate + 43200 < startTimeMap[pf.mailAccountInfo.email()]) {
+										fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+										pmm::pop3Log << "Message to " << pf.mailAccountInfo.email() << " not notified because it is too old" << pmm::NL;
+									}
+									else {
+										messagesRetrieved++;
+										int cnt = cntRetrieved->get() + 1;
+										cntRetrieved->set(cnt);
+										theMessage.to = pf.mailAccountInfo.email();
+										std::vector<std::string> myDevTokens = pf.mailAccountInfo.devTokens();
+										for (size_t i = 0; i < myDevTokens.size(); i++) {
+											//Apply all processing rules before notifying
+											std::stringstream nMsg;
+											std::string alertTone;
+											PreferenceEngine::defaultAlertTone(alertTone, pf.mailAccountInfo.email()); //Here we retrieve the user alert tone
+											nMsg << theMessage.from << "\n" << theMessage.subject;
+											NotificationPayload np(myDevTokens[i], nMsg.str(), (int)(i + 1), alertTone);
+											np.origMailMessage = theMessage;
+											if (pf.mailAccountInfo.devel) {
+												pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
+												develNotificationQueue->add(np);
 											}
-											else {
-												pmmStorageQueue->add(np);
+											else notificationQueue->add(np);
+											if(i == 0){
+												quotaUpdateVector->push_back(pf.mailAccountInfo.email());
+												fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
+												if(!QuotaDB::decrease(pf.mailAccountInfo.email())){
+													pop3Log << "ATTENTION: Account " << pf.mailAccountInfo.email() << " has ran out of quota!" << pmm::NL;
+													
+													pmm::NoQuotaNotificationPayload npi(myDevTokens[i], pf.mailAccountInfo.email());
+													if (pf.mailAccountInfo.devel) {
+														pmm::pop3Log << "Using development notification queue for this message." << pmm::NL;
+														develNotificationQueue->add(npi);
+													}
+													else notificationQueue->add(npi);
+												}
+												else {
+													pmmStorageQueue->add(np);
+												}
 											}
 										}
 									}
