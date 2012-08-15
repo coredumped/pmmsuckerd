@@ -63,6 +63,7 @@ namespace pmm {
 	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> mainFetchQueue;
 	SharedSet<std::string> busyEmailsSet;
 	SharedSet<std::string> yahooAccountsToBan;
+	SharedSet<std::string> tmpBannedEmailAccounts;
 	
 	ExclusiveSharedQueue<POP3SuckerThread::POP3FetchItem> hotmailFetchQueue;
 	SharedSet<std::string> busyHotmailsSet;
@@ -127,10 +128,10 @@ namespace pmm {
 			int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 			serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
 			if (pop3->pop3_response == NULL) {
-				pop3Log << "PANIC: (attempt=" << theVal << ") Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later" << pmm::NL;
+				pop3Log << "PANIC: (attempt=" << theVal << ", dt=" << (int)(time(0) - fetchT0) << "s) Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later" << pmm::NL;
 			}
 			else {
-				pop3Log << "PANIC: (attempt=" << theVal << ") Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+				pop3Log << "PANIC: (attempt=" << theVal << ", dt=" << (int)(time(0) - fetchT0) << "s) Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
 			}
 			if (theVal > 0 && theVal % 5 == 0) {
 				std::vector<std::string> myDevTokens = pf.mailAccountInfo.devTokens();
@@ -180,9 +181,10 @@ namespace pmm {
 							if(errorMsg.find("LDAP: error code 50 - Blocked by ITS") != errorMsg.npos){
 								messagesRetrieved = -4;
 							}
+
 						}
 					}
-					if(theVal > 0 && theVal % 5 == 0){
+					if(theVal > 0 && theVal % 2 == 0){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
@@ -192,6 +194,7 @@ namespace pmm {
 						if (errorMsg.size() > 0) {
 							msgX.append(": ");
 							msgX.append(errorMsg);
+							msgX.append("\nCheck your settings!!!");
 						}
 						else msgX.append("authentication failed: check your app settings!!!");
 						for (size_t i = 0; i < allTokens.size(); i++) {
@@ -204,7 +207,7 @@ namespace pmm {
 					}
 				}
 				else {
-					if (theVal % 10 == 0) {
+					if (theVal > 0 && theVal % 10 == 0) {
 						//Notify the user that we might not be able to monitor this account
 						std::vector<std::string> allTokens = pf.mailAccountInfo.devTokens();
 						std::string msgX = "Push Me Mail Service:\nCan't login to mailbox ";
@@ -234,10 +237,10 @@ namespace pmm {
 					}
 					else {
 						if (pop3->pop3_response == NULL) {
-							pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", etpan code=" << result << ", I will retry later." << pmm::NL;
+							pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", etpan code=" << result << ", dt=" << (int)(time(0) - fetchT0) << "s, I will retry later." << pmm::NL;
 						}
 						else {
-							pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ": " << pop3->pop3_response << pmm::NL;
+							pop3Log << "Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", dt=" << (int)(time(0) - fetchT0) << "s: " << pop3->pop3_response << pmm::NL;
 						}
 					}
 				}
@@ -322,13 +325,6 @@ namespace pmm {
 										if(pop3->pop3_response == NULL) pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << ")" << pmm::NL;
 										else pop3Log << "PANIC: Unable to download non-existent message " << info->msg_uidl << " (" << pf.mailAccountInfo.email() << "): " << pop3->pop3_response << pmm::NL;
 										fetchedMails.addEntry2(pf.mailAccountInfo.email(), info->msg_uidl);
-										/*if (isYahooAccount){
-										 //Since the socket might already be closed there is no socket leaking here
-										 //However everything in the pop3 structure might still be leaking, this
-										 //must be solved in the future somehow
-										 //return messagesRetrieved;
-										 break;
-										 }*/
 									}
 									else{
 										pop3Log << "Unable to download message " << info->msg_uidl << " from " << pf.mailAccountInfo.email() << ": etpan code=" << result << pmm::NL;
@@ -336,8 +332,7 @@ namespace pmm {
 								}
 								else {
 									if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
-										pmm::pop3Log << "Unable to parse e-mail message !!!" << pmm::NL;
-#warning Find a something better to do when a message can't be properly parsed!!!!
+										pmm::pop3Log << "PANIC: Unable to parse e-mail message " << info->msg_uidl << ", user: " << pf.mailAccountInfo.email() << pmm::NL;
 										mailpop3_retr_free(msgBuffer);
 										continue;
 									}
@@ -407,6 +402,30 @@ namespace pmm {
 		return messagesRetrieved;
 	}
 	
+	static SharedSet<std::string> delayedAccounts;
+	static RWLock _ncLock;
+	static std::map<std::string, time_t> _nextCheck;
+	static void setNextCheck_(const std::string &emailAccount, time_t nextCheckTimestamp){
+		_ncLock.writeLock();
+		_nextCheck[emailAccount] = nextCheckTimestamp;
+		_ncLock.unlock();
+	}
+	
+	static time_t getNextCheck_(const std::string &emailAccount){
+		time_t t;
+		_ncLock.readLock();
+		if(_nextCheck.find(emailAccount) == _nextCheck.end()) t = time(0) - 300;
+		else t = _nextCheck[emailAccount];
+		_ncLock.unlock();
+		return t;
+	}
+	
+	static void eraseNextCheck_(const std::string &emailAccount){
+		_ncLock.writeLock();
+		_nextCheck.erase(emailAccount);
+		_ncLock.unlock();
+	}
+	
 	void POP3SuckerThread::POP3FetcherThread::operator()(){
 		/*if (fetchQueue == NULL) {
 			throw GenericException("Unable to start a POP3 message fetching thread with a NULL fetchQueue.");
@@ -423,8 +442,6 @@ namespace pmm {
 		time(&startedOn);
 		mainFetchQueue.name = "POP3MainFetchQueue";
 		hotmailFetchQueue.name = "HotmailFetchQueue";
-		std::set<std::string> delayedAccounts;
-		std::map<std::string, time_t> nextCheck;
 		sigset_t bSignal;
 		sigemptyset(&bSignal);
 		sigaddset(&bSignal, SIGPIPE);
@@ -441,13 +458,24 @@ namespace pmm {
 						continue;
 					}
 					time_t now = time(0);
+					if (delayedAccounts.contains(pf.mailAccountInfo.email())) {
+						time_t nxChk = getNextCheck_(pf.mailAccountInfo.email());
+						if (nxChk <= now) {
+							delayedAccounts.erase(pf.mailAccountInfo.email());
+							eraseNextCheck_(pf.mailAccountInfo.email());
+							pop3Log << "NOTICE: removing " << pf.mailAccountInfo.email() << " from the delayed accounts fetch" << pmm::NL;
+							tmpBannedEmailAccounts.erase(pf.mailAccountInfo.email());
+						}
+						else continue;
+					}
 					//Fetch messages for Hotmail accounts here!!!
 					busyHotmailsSet.insert(pf.mailAccountInfo.email());
 					int n = fetchMessages(pf);
 					gotSomething = true;
 					if (n == -3) {
 						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 3 hours have passed" << pmm::NL;
-						nextCheck[pf.mailAccountInfo.email()] = now + 3600 * 3;
+						//nextCheck[pf.mailAccountInfo.email()] = now + 3600 * 3;
+						setNextCheck_(pf.mailAccountInfo.email(), now + 3600 * 3);
 						delayedAccounts.insert(pf.mailAccountInfo.email());
 					}
 					busyHotmailsSet.erase(pf.mailAccountInfo.email());
@@ -462,14 +490,20 @@ namespace pmm {
 						pop3Log << "WARNING: No need to monitor " << pf.mailAccountInfo.email() << " in this thread, another thread is taking care of it." << pmm::NL;
 						continue;
 					}
-					if (delayedAccounts.find(pf.mailAccountInfo.email()) != delayedAccounts.end()) {
-						if (nextCheck[pf.mailAccountInfo.email()] < now) {
+					//if (delayedAccounts.find(pf.mailAccountInfo.email()) != delayedAccounts.end()) {
+					if (delayedAccounts.contains(pf.mailAccountInfo.email())) {
+						time_t nxChk = getNextCheck_(pf.mailAccountInfo.email());
+						if (nxChk <= now) {
 							delayedAccounts.erase(pf.mailAccountInfo.email());
-							nextCheck.erase(pf.mailAccountInfo.email());
+							eraseNextCheck_(pf.mailAccountInfo.email());
 							pop3Log << "NOTICE: removing " << pf.mailAccountInfo.email() << " from the delayed accounts fetch" << pmm::NL;
 							lastRemovedFromDelayed = pf.mailAccountInfo.email();
+							tmpBannedEmailAccounts.erase(pf.mailAccountInfo.email());
 						}
 						else continue;
+					}
+					if (tmpBannedEmailAccounts.contains(pf.mailAccountInfo.email())) {
+						continue;
 					}
 					//Fetch messages for account here!!!
 					busyEmailsSet.insert(pf.mailAccountInfo.email());
@@ -479,9 +513,9 @@ namespace pmm {
 							//Perform delay here
 							if(lastRemovedFromDelayed.compare(pf.mailAccountInfo.email()) == 0){
 								pop3Log << "CRITICAL: Yahoo temporarily blocked (error 999) " << pf.mailAccountInfo.email() << " not polling for 24 hrs :-(" << pmm::NL;
-								nextCheck[pf.mailAccountInfo.email()] = now + 86700;
+								setNextCheck_(pf.mailAccountInfo.email(), now + 86700);
 							}
-							else nextCheck[pf.mailAccountInfo.email()] = now + 15 * 60;
+							else setNextCheck_(pf.mailAccountInfo.email(), now + 15 * 60);
 							delayedAccounts.insert(pf.mailAccountInfo.email());
 							pop3Log << "WARNING: performing delayed fetch on: " << pf.mailAccountInfo.email() << pmm::NL;
 						}
@@ -499,9 +533,10 @@ namespace pmm {
 						}	
 					}
 					if (n == -3) {
-						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 2 hour have passed" << pmm::NL;
-						nextCheck[pf.mailAccountInfo.email()] = now + 7200;
+						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 2 hours have passed" << pmm::NL;
+						setNextCheck_(pf.mailAccountInfo.email(), now + 7200);
 						delayedAccounts.insert(pf.mailAccountInfo.email());
+						tmpBannedEmailAccounts.insert(pf.mailAccountInfo.email());
 					}
 					else if(n == -4){
 						yahooAccountsToBan.insert(pf.mailAccountInfo.email());
