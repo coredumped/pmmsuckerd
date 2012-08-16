@@ -184,7 +184,7 @@ namespace pmm {
 
 						}
 					}
-					if(theVal > 0 && theVal % 2 == 0){
+					if(theVal > 0 && theVal % 5 == 0){
 						pop3Log << "CRITICAL: Password changed!!! " << pf.mailAccountInfo.email() << " can't login to server " << pf.mailAccountInfo.serverAddress() << ", account monitoring is being disabled!!!" << pmm::NL;
 						//pf.mailAccountInfo.isEnabled = false; //This piece of code does nothing!!!
 						if(emails2Disable != NULL) emails2Disable->insert(pf.mailAccountInfo.email());
@@ -202,7 +202,6 @@ namespace pmm {
 							np.isSystemNotification = true;
 							notificationQueue->add(np);
 						}					
-						serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 						messagesRetrieved = -3;
 					}
 				}
@@ -246,6 +245,7 @@ namespace pmm {
 				}
 			}
 			else {
+				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 				carray *msgList;
 				result = mailpop3_list(pop3, &msgList);
 				if(result != MAILPOP3_NO_ERROR){
