@@ -531,16 +531,16 @@ int main (int argc, const char * argv[])
 								pmm::DevtokenQueueItem item;
 								item.email = reliter->first;
 								item.devToken = reliter->second;
+								item.expirationTimestamp = time(0) + 10; //Every thread has at least 10 seconds to release a device token
 								devTokenRelinquishQueue.add(item);
 							}
 						}
 						else if (command.compare(pmm::Commands::refreshDeviceTokenList) == 0){
-							//updateEmailNotificationDevices(imapSuckingThreads, maxIMAPSuckerThreads, parameters);
-							//updateEmailNotificationDevices(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
 							for (std::map<std::string, std::string>::iterator reliter = parameters.begin(); reliter != parameters.end(); reliter++) {
 								pmm::DevtokenQueueItem item;
 								item.email = reliter->first;
 								item.devToken = reliter->second;
+								item.expirationTimestamp = time(0) + 60;
 								devTokenAddQueue.add(item);
 							}
 						}

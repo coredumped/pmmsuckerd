@@ -28,6 +28,7 @@ namespace pmm {
 	struct DevtokenQueueItem {
 		std::string email;
 		std::string devToken;
+		time_t expirationTimestamp;
 	};
 	
 	class MailboxControl {

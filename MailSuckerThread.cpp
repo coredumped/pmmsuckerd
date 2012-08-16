@@ -178,18 +178,25 @@ namespace pmm {
 			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				//Verify that this account has that devToken
-				for (size_t j = 0; j < emailAccounts[i].devTokens().size(); j++) {
-					if (item.devToken.compare(emailAccounts[i].devTokens()[j]) == 0) {
-						pmm::Log << item.email << " will no longer receive notifications on device " << item.devToken << pmm::NL;
-						emailAccounts.atUnlocked(i).deviceTokenRemove(item.devToken);
+				std::vector<std::string> tokList = emailAccounts[i].devTokens();
+				std::string theEmail = emailAccounts[i].email();
+				for (size_t j = 0; j < tokList.size(); j++) {
+					if (item.devToken.compare(tokList[j]) == 0) {
+						pmm::Log << "INFO: " << theEmail << " will no longer receive notifications on device " << item.devToken << pmm::NL;
+						emailAccounts[i].deviceTokenRemove(item.devToken);
 						found = true;
-						usleep(500); //Give another MailSuckerThread a chance to find this guy
 						break;
 					}
 				}
 			}
-			if (!found) devTokenRelinquishQueue->add(item);
-			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
+			time_t now = time(0);
+			if (!found) {
+				if(item.expirationTimestamp > now){
+					devTokenRelinquishQueue->add(item); //Only add it back to the queue if it has not expired
+					usleep(10000);
+				}
+			}
+			if (now - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
 		}		
 	}
 
@@ -283,13 +290,13 @@ namespace pmm {
 							mailboxControl[emailAccounts[i].email()].lastCheck = rightNow;
 						}
 					}
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED_EMAIL_ACCOUNTS
 					else {
 						if(currTime % 600 == 0) pmm::Log << emailAccounts[i].email() << " is not enabled, ignoring..." << pmm::NL;
 					}
 #endif
 				}
-#ifdef DEBUG
+#ifdef DEBUG_EMAILS_WITH_NO_TOKENS
 				else {
 					if(currTime % 600 == 0) pmm::Log << emailAccounts[i].email() << " has no registered devtokens, ignoring..." << pmm::NL;
 				}
