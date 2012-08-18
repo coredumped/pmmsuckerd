@@ -18,6 +18,10 @@
 #define DEFAULT_MAX_POP3_CONNECTION_TIME 500
 #endif
 
+#ifndef DEFAULT_MAX_MAILBOX_SCAN_TIMEOUT
+#define DEFAULT_MAX_MAILBOX_SCAN_TIMEOUT 120
+#endif
+
 #ifndef DEFAULT_MAX_POP3_FETCHER_THREADS
 #define DEFAULT_MAX_POP3_FETCHER_THREADS 2
 #endif
@@ -103,6 +107,7 @@ namespace pmm {
 		pmmStorageQueue = NULL;
 		isForHotmail = false;
 		emails2Disable = NULL;
+		mailboxScanTimeout = DEFAULT_MAX_MAILBOX_SCAN_TIMEOUT;
 		mailstream_network_delay.tv_sec = 15;
 	}
 	
@@ -275,6 +280,10 @@ namespace pmm {
 						time_t now = time(0);
 						if(isYahooAccount && messagesRetrieved > maxRetrievalIterations) break;
 						if(isYahooAccount && now - fetchT0 > DEFAULT_MAX_YAHOO_FETCH_TIMEOUT) break;
+						if (now - fetchT0 > mailboxScanTimeout) {
+							pmm::pop3Log << "CRITICAL: Cancelling mail fetch of " << pf.mailAccountInfo.email() << ", timeout (" << mailboxScanTimeout << "secs) reached!" << pmm::NL;
+							break;
+						}
 						struct mailpop3_msg_info *info = (struct mailpop3_msg_info *)carray_get(msgList, i);
 						if (info == NULL) continue;
 						//Verify for null here!!!
@@ -470,7 +479,9 @@ namespace pmm {
 					}
 					//Fetch messages for Hotmail accounts here!!!
 					busyHotmailsSet.insert(pf.mailAccountInfo.email());
+					time_t fetchT0 = time(0);
 					int n = fetchMessages(pf);
+					time_t diffT = time(0) - fetchT0;
 					gotSomething = true;
 					if (n == -3) {
 						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 3 hours have passed" << pmm::NL;
@@ -479,7 +490,8 @@ namespace pmm {
 						delayedAccounts.insert(pf.mailAccountInfo.email());
 					}
 					busyHotmailsSet.erase(pf.mailAccountInfo.email());
-					usleep(100000);
+					if(diffT >= mailboxScanTimeout) sleep(5); //Just wait 5 seconds if time spent during mailbox check is too long
+					else usleep(250000);
 				}
 			}
 			else {

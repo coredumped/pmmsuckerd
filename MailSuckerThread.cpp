@@ -155,7 +155,7 @@ namespace pmm {
 	void MailSuckerThread::registerDeviceTokens(){
 		DevtokenQueueItem item;
 		time_t t1 = time(0);
-		while (devTokenAddQueue->extractEntry(item)) {
+		while (devTokenAddQueue.extractEntry(item)) {
 			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				if (item.email.compare(emailAccounts[i].email()) == 0) {
@@ -166,15 +166,12 @@ namespace pmm {
 					break;
 				}
 			}
-			if (!found) devTokenAddQueue->add(item);
-			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
 		}
 	}
 	
 	void MailSuckerThread::relinquishDeviceTokens(){
 		DevtokenQueueItem item;
-		time_t t1 = time(0);
-		while (devTokenRelinquishQueue->extractEntry(item)) {
+		while (devTokenRelinquishQueue.extractEntry(item)) {
 			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				//Verify that this account has that devToken
@@ -189,14 +186,6 @@ namespace pmm {
 					}
 				}
 			}
-			time_t now = time(0);
-			if (!found) {
-				if(item.expirationTimestamp > now){
-					devTokenRelinquishQueue->add(item); //Only add it back to the queue if it has not expired
-					usleep(10000);
-				}
-			}
-			if (now - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
 		}
 	}
 	
@@ -207,14 +196,14 @@ namespace pmm {
 		if (quotaIncreaseQueue == NULL) throw GenericException("Can't continue like this, the quotaIncreaseQueue is null!!!");
 		if (addAccountQueue == NULL) throw GenericException("Can't continue like this, the addAccountQueue is null!!!");
 		if (rmAccountQueue == NULL) throw GenericException("Can't continue like this, the rmAccountQueue is null!!!");
-		if (devTokenAddQueue == NULL) throw GenericException("Can't continue like this, the devTokenAddQueue is null!!!");
-		if (devTokenRelinquishQueue == NULL) throw GenericException("Can't continue like this, the devTokenRelinquishQueue is null!!!");
+		//if (devTokenAddQueue == NULL) throw GenericException("Can't continue like this, the devTokenAddQueue is null!!!");
+		//		if (devTokenRelinquishQueue == NULL) throw GenericException("Can't continue like this, the devTokenRelinquishQueue is null!!!");
 		if (mailAccounts2Refresh == NULL) throw GenericException("Can't continue with an null mailAccount2Refresh vector");
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
 			if(emailAccounts[i].quota > 0) cntAccountsActive = cntAccountsActive + 1;
 		}
-		cntAccountsTotal = emailAccounts.size();
+		cntAccountsTotal = (int)emailAccounts.size();
 		initialize();
 		
 		sigset_t bSignal;
@@ -286,8 +275,14 @@ namespace pmm {
 						if (maxOpenTime > 0 && currTime - mailboxControl[emailAccounts[i].email()].openedOn > maxOpenTime) closeConnection(emailAccounts[i]);
 						if (mCtrl.isOpened == false) openConnection(emailAccounts[i]);
 						if (rightNow - mCtrl.lastCheck >= minimumMailCheckInterval) {
+							time_t t0 = time(0);
 							checkEmail(emailAccounts[i]);
 							mailboxControl[emailAccounts[i].email()].lastCheck = rightNow;
+							time_t tx = time(0);
+							int tdiff = (int)(tx - t0);
+							if (tdiff > 30) {
+								pmm::Log << "Check mail interval to server " << emailAccounts[i].serverAddress() << " for account " << emailAccounts[i].email() << " is taking at least " << tdiff << " secs to complete, what is going wrong?" << pmm::NL;
+							}
 						}
 					}
 #ifdef DEBUG_ENABLED_EMAIL_ACCOUNTS
@@ -296,11 +291,9 @@ namespace pmm {
 					}
 #endif
 				}
-#ifdef DEBUG_EMAILS_WITH_NO_TOKENS
 				else {
 					if(currTime % 600 == 0) pmm::Log << emailAccounts[i].email() << " has no registered devtokens, ignoring..." << pmm::NL;
 				}
-#endif
 			}
 			usleep(iterationWaitMicroSeconds);
 		}

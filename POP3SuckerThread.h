@@ -51,6 +51,7 @@ namespace pmm {
 			int fetchMessages(POP3FetchItem &pf);
 		public:
 			bool isForHotmail;
+			time_t mailboxScanTimeout;
 			time_t startedOn;
 			std::map<std::string, time_t> startTimeMap;
 			SharedQueue<NotificationPayload> *notificationQueue;

@@ -71,8 +71,8 @@ namespace pmm {
 		pmm::SharedQueue<pmm::MailAccountInfo> *addAccountQueue;
 		pmm::SharedQueue<std::string> *rmAccountQueue;
 		
-		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenAddQueue;
-		pmm::SharedQueue<pmm::DevtokenQueueItem> *devTokenRelinquishQueue;
+		pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue;
+		pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue;
 		pmm::SharedSet<std::string> emails2Disable;
 		pmm::SharedVector<pmm::MailAccountInfo> *mailAccounts2Refresh;
 		

@@ -128,8 +128,8 @@ int main (int argc, const char * argv[])
 	pmm::SharedQueue<pmm::MailAccountInfo> addPOP3AccountQueue("AddPOP3AccountQueue");
 	pmm::SharedQueue<std::string> rmPOP3AccountQueue("RemovePOP3AccountQueue");
 	
-	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue("DeviceTokenAddQueue");
-	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
+	//pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue("DeviceTokenAddQueue");
+	//pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
 	pmm::SharedQueue<std::string> invalidTokenQ;
 	pmm::SharedQueue<std::string> develInvalidTokenQ;
 	
@@ -326,8 +326,8 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
 		imapSuckingThreads[i].addAccountQueue = &addIMAPAccountQueue;
 		imapSuckingThreads[i].rmAccountQueue = &rmIMAPAccountQueue;
-		imapSuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
-		imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
+		//imapSuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
+		//imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
@@ -347,8 +347,8 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].quotaIncreaseQueue = &quotaIncreaseQueue;
 		pop3SuckingThreads[i].addAccountQueue = &addPOP3AccountQueue;
 		pop3SuckingThreads[i].rmAccountQueue = &rmPOP3AccountQueue;
-		pop3SuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
-		pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
+		//pop3SuckingThreads[i].devTokenAddQueue = &devTokenAddQueue;
+		//pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
@@ -471,7 +471,7 @@ int main (int argc, const char * argv[])
 				if(doCmdCheck == false && session.fnxHasPendingTasks()){
 					doCmdCheck = true;
 				}
-				int nNotif = notificationQueue.size();
+				int nNotif = (int) notificationQueue.size();
 				if(nNotif > 0) pmm::Log << "Notification queue has " << nNotif << " pending elements" << pmm::NL;
 #ifdef SEND_PUSH_KEEPALIVES
 				if (tic % 120 == 0) {
@@ -532,7 +532,15 @@ int main (int argc, const char * argv[])
 								item.email = reliter->first;
 								item.devToken = reliter->second;
 								item.expirationTimestamp = time(0) + 10; //Every thread has at least 10 seconds to release a device token
-								devTokenRelinquishQueue.add(item);
+								//devTokenRelinquishQueue.add(item);
+								//Add this device token to evry single monitoring thread
+								for (int j = 0; j < maxIMAPSuckerThreads; j++) {
+									imapSuckingThreads[j].devTokenRelinquishQueue.add(item);
+								}
+								for (int j = 0; j < maxPOP3SuckerThreads; j++) {
+									pop3SuckingThreads[j].devTokenRelinquishQueue.add(item);
+								}
+
 							}
 						}
 						else if (command.compare(pmm::Commands::refreshDeviceTokenList) == 0){
@@ -541,7 +549,12 @@ int main (int argc, const char * argv[])
 								item.email = reliter->first;
 								item.devToken = reliter->second;
 								item.expirationTimestamp = time(0) + 60;
-								devTokenAddQueue.add(item);
+								for (int j = 0; j < maxIMAPSuckerThreads; j++) {
+									imapSuckingThreads[j].devTokenAddQueue.add(item);
+								}
+								for (int j = 0; j < maxPOP3SuckerThreads; j++) {
+									pop3SuckingThreads[j].devTokenAddQueue.add(item);
+								}
 							}
 						}
 						else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){
