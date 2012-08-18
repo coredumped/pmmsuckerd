@@ -479,6 +479,7 @@ namespace pmm {
 						delayedAccounts.insert(pf.mailAccountInfo.email());
 					}
 					busyHotmailsSet.erase(pf.mailAccountInfo.email());
+					usleep(100000);
 				}
 			}
 			else {
@@ -543,6 +544,7 @@ namespace pmm {
 					}
 					gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
+					if(n == 0) usleep(1000);
 				}
 			}
 			if(gotSomething) usleep(1000);
