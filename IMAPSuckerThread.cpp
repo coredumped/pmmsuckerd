@@ -434,6 +434,11 @@ namespace pmm {
 	void IMAPSuckerThread::openConnection(const MailAccountInfo &m){
 		int result;
 		std::string theEmail = m.email();
+		if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects && mailboxControl[theEmail].lastCheck > time(0)) {
+			time_t now = time(0);
+			if(now % 3 == 0) imapLog << "INFO: Delaying connection to " << m.serverAddress() << " for " << m.email() << (int)(mailboxControl[theEmail].lastCheck - now) << "secs remaining to reconnect." << pmm::NL;
+			return;
+		}
 		for (size_t i = 0; i < maxMailFetchers; i++) {
 			if (mailFetchers[i].isRunning == false) {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
