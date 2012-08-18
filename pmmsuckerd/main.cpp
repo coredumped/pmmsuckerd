@@ -35,10 +35,10 @@
 #define DEFAULT_MAX_POP3_POLLING_THREADS 4
 #endif
 #ifndef DEFAULT_MAX_IMAP_POLLING_THREADS
-#define DEFAULT_MAX_IMAP_POLLING_THREADS 6
+#define DEFAULT_MAX_IMAP_POLLING_THREADS 8
 #endif
 #ifndef DEFAULT_MAX_MESSAGE_UPLOADER_THREADS
-#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 2
+#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 4
 #endif
 
 #ifndef DEFAULT_SSL_CERTIFICATE_PATH
@@ -113,7 +113,7 @@ int main (int argc, const char * argv[])
 	std::string sslDevelCertificatePath = DEFAULT_DEVEL_SSL_CERTIFICATE_PATH;
 	std::string sslDevelPrivateKeyPath = DEFAULT_DEVEL_SSL_PRIVATE_KEY_PATH;
 	std::string invalidTokensFile = DEFAULT_INVALID_TOKEN_FILE;
-
+	
 	int commandPollingInterval = DEFAULT_COMMAND_POLLING_INTERVAL;
 	pmm::SharedQueue<pmm::NotificationPayload> notificationQueue("NotificationQueue");
 	pmm::SharedQueue<pmm::NotificationPayload> develNotificationQueue("DevelNotificationQueue");
@@ -130,7 +130,6 @@ int main (int argc, const char * argv[])
 	
 	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue("DeviceTokenAddQueue");
 	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
-	pmm::SharedVector<pmm::DevtokenQueueItem> devTokens2Relinquish;
 	pmm::SharedQueue<std::string> invalidTokenQ;
 	pmm::SharedQueue<std::string> develInvalidTokenQ;
 	
@@ -169,11 +168,11 @@ int main (int argc, const char * argv[])
 		}
 		else if(arg.compare("--max-imap-threads") == 0 && (i + 1) < argc) {
 			std::stringstream input(argv[++i]);
-			input >> maxIMAPSuckerThreads;			
+			input >> maxIMAPSuckerThreads;
 		}
 		else if(arg.compare("--max-pop3-threads") == 0 && (i + 1) < argc) {
 			std::stringstream input(argv[++i]);
-			input >> maxPOP3SuckerThreads;			
+			input >> maxPOP3SuckerThreads;
 		}
 		else if(arg.compare("--ssl-certificate") == 0 && (i + 1) < argc){
 			sslCertificatePath = argv[++i];
@@ -192,7 +191,7 @@ int main (int argc, const char * argv[])
 		}
 		else if(arg.compare("--command-polling-interval") == 0 && (i + 1) < argc){
 			std::stringstream input(argv[++i]);
-			input >> commandPollingInterval;			
+			input >> commandPollingInterval;
 		}
 		else if(arg.compare("--devel-apns") == 0){
 			enableDevelAPNS = true;
@@ -223,7 +222,7 @@ int main (int argc, const char * argv[])
 				session.reqMembership("Automated membership petition, please help!!!");
 				std::cerr << "Membership request issued to pmm controller, try again later" << std::endl;
 			}
-			catch(pmm::ServerResponseException  &se2){ 
+			catch(pmm::ServerResponseException  &se2){
 				pmm::Log << "Failed to request membership automatically: " << se2.errorDescription << pmm::NL;
 				std::cerr << "Failed to request membership automatically: " << se2.errorDescription << std::endl;
 			}
@@ -253,7 +252,7 @@ int main (int argc, const char * argv[])
 	pmm::APNSNotificationThread *notifThreads = new pmm::APNSNotificationThread[maxNotificationThreads];
 	globalNotifThreads = notifThreads;
 	globalMaxNotificationThreads = maxNotificationThreads;
-	pmm::APNSNotificationThread develNotifThread;	
+	pmm::APNSNotificationThread develNotifThread;
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
@@ -331,12 +330,9 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
-		imapSuckingThreads[i].devTokens2Relinquish = &devTokens2Relinquish;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
-	pmm::Log << "Warming IMAP Threads..." << pmm::NL;
-	sleep(60);
 	//6. Dispatch polling threads for POP3
 	for (size_t k = 0; k < pop3Accounts.size(); k++) {
 		pop3SuckingThreads[popAssignationIndex++].emailAccounts.push_back(pop3Accounts[k]);
@@ -355,7 +351,6 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
-		pop3SuckingThreads[i].devTokens2Relinquish = &devTokens2Relinquish;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
@@ -378,7 +373,7 @@ int main (int argc, const char * argv[])
 			pmm::Log << "CRITICAL: Unable to re-register, something's wrong with app engine: " << httex.errorMessage() << pmm::NL;
 			sleep(1);
 			continue;
-		} 
+		}
 		std::string lastInvalidToken;
 		while (invalidTokenQ.extractEntry(lastInvalidToken)) {
 			pmm::Log << "CRITICAL: " << lastInvalidToken << " is an invalid token, no more messages will be sent to it!!" << pmm::NL;
@@ -395,7 +390,7 @@ int main (int argc, const char * argv[])
 				std::ofstream tfile(invalidTokensFile.c_str(), std::ios_base::app);
 				tfile << lastInvalidToken << "\n";
 				tfile.close();
-			} 
+			}
 			catch (pmm::HTTPException &httex) {
 				break;
 			}
@@ -467,9 +462,9 @@ int main (int argc, const char * argv[])
 			//fCache.expireOldEntries();
 		}
 		/*bool doCmdCheck = false;
-		if (tic % 900 == 0) { //At least go to app engine every 15 minutes
-			doCmdCheck = true;
-		}*/
+		 if (tic % 900 == 0) { //At least go to app engine every 15 minutes
+		 doCmdCheck = true;
+		 }*/
 		if(tic % commandPollingInterval == 0){ //Server commands processing
 			try{
 				bool doCmdCheck = false;
@@ -516,12 +511,18 @@ int main (int argc, const char * argv[])
 							std::stringstream input(parameters["quota"]);
 							input >> p.quotaValue;
 							quotaIncreaseQueue.add(p);
+							/*std::stringstream lnx;
+							 lnx << "User " << p.emailAddress << " has increased her quota to: " << p.quotaValue;
+							 pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, lnx.str(), 1, "sln.caf");
+							 notificationQueue.add(np);*/
 						}
 						else if (command.compare(pmm::Commands::newMailAccountRegistered) == 0){
 							if (parameters["mailboxType"].compare("IMAP") == 0) {
+								//addNewEmailAccount(session, imapSuckingThreads, maxIMAPSuckerThreads, &imapAssignationIndex, parameters["email"]);
 								addNewEmailAccount(session, &addIMAPAccountQueue, parameters["email"]);
 							}
 							else {
+								//addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
 								addNewEmailAccount(session, &addPOP3AccountQueue, parameters["email"]);
 							}
 						}
@@ -530,7 +531,7 @@ int main (int argc, const char * argv[])
 								pmm::DevtokenQueueItem item;
 								item.email = reliter->first;
 								item.devToken = reliter->second;
-								item.expirationTimestamp = time(0) + 60; //Every thread has at least 10 seconds to release a device token
+								item.expirationTimestamp = time(0) + 10; //Every thread has at least 10 seconds to release a device token
 								devTokenRelinquishQueue.add(item);
 							}
 						}
@@ -582,7 +583,7 @@ int main (int argc, const char * argv[])
 							//Retrieve information of account...
 							pmm::MailAccountInfo info;
 							if(session.retrieveEmailAddressInfo(info, parameters["email"])){
-								pmm::Log << "INFO: Sending account " << parameters["email"] << "=" << info.email() << " to the update queue..." << pmm::NL; 
+								pmm::Log << "INFO: Sending account " << parameters["email"] << "=" << info.email() << " to the update queue..." << pmm::NL;
 								mailAccounts2Refresh.push_back(info);
 							}
 							else {
@@ -682,28 +683,28 @@ void signalHandler(int s){
 void disableAccountsWithExceededQuota(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &accounts){
 	//Disable email accounts that require it
 	/*for (size_t k = 0; k < nElems; k++) {
-		mailSuckerThreads[k].emailAccounts.beginCriticalSection();
-		for (std::map<std::string, std::string>::iterator iter2 = accounts.begin(); iter2 != accounts.end(); iter2++) {
-			for (size_t l = 0; l < mailSuckerThreads[k].emailAccounts.unlockedSize(); l++) {
-				if (mailSuckerThreads[k].emailAccounts.atUnlocked(l).email().compare(iter2->second) == 0) {
-					mailSuckerThreads[k].emailAccounts.atUnlocked(l).quota = 0;
-					mailSuckerThreads[k].emailAccounts.atUnlocked(l).isEnabled = false;
-#ifdef DEBUG
-					pmm::Log << "disableAccountsWithExceededQuota: disabling monitoring for: " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << pmm::NL;
-#endif
-					std::vector<std::string> dt = mailSuckerThreads[k].emailAccounts.atUnlocked(l).devTokens();
-					std::stringstream msg;
-					msg << "You have ran out of quota on " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << ", you may purchase more to keep receiving notifications.";
-					for (size_t z = 0; z < dt.size(); z++) {
-						pmm::NotificationPayload np(dt[z], msg.str());
-						np.isSystemNotification = false;
-						mailSuckerThreads[k].notificationQueue->add(np);
-					}
-				}
-			}
-		}	
-		mailSuckerThreads[k].emailAccounts.endCriticalSection();
-	}*/
+	 mailSuckerThreads[k].emailAccounts.beginCriticalSection();
+	 for (std::map<std::string, std::string>::iterator iter2 = accounts.begin(); iter2 != accounts.end(); iter2++) {
+	 for (size_t l = 0; l < mailSuckerThreads[k].emailAccounts.unlockedSize(); l++) {
+	 if (mailSuckerThreads[k].emailAccounts.atUnlocked(l).email().compare(iter2->second) == 0) {
+	 mailSuckerThreads[k].emailAccounts.atUnlocked(l).quota = 0;
+	 mailSuckerThreads[k].emailAccounts.atUnlocked(l).isEnabled = false;
+	 #ifdef DEBUG
+	 pmm::Log << "disableAccountsWithExceededQuota: disabling monitoring for: " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << pmm::NL;
+	 #endif
+	 std::vector<std::string> dt = mailSuckerThreads[k].emailAccounts.atUnlocked(l).devTokens();
+	 std::stringstream msg;
+	 msg << "You have ran out of quota on " << mailSuckerThreads[k].emailAccounts.atUnlocked(l).email() << ", you may purchase more to keep receiving notifications.";
+	 for (size_t z = 0; z < dt.size(); z++) {
+	 pmm::NotificationPayload np(dt[z], msg.str());
+	 np.isSystemNotification = false;
+	 mailSuckerThreads[k].notificationQueue->add(np);
+	 }
+	 }
+	 }
+	 }
+	 mailSuckerThreads[k].emailAccounts.endCriticalSection();
+	 }*/
 }
 
 void updateAccountQuotas(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, int> &quotaInfo){
@@ -757,16 +758,16 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 					devToken_s = devToken_s.substr(cpos + 1);
 				}
 				if(devToken_s.size() > 0) devTokens.push_back(devToken_s);
-				mailSuckerThreads[j].emailAccounts.atUnlocked(k).updateInfo(mailAccountInfo["password"], 
-																		   mailAccountInfo["serverAddress"], 
-																		   serverPort, 
-																		   devTokens, 
-																		   useSSL);
+				mailSuckerThreads[j].emailAccounts.atUnlocked(k).updateInfo(mailAccountInfo["password"],
+																			mailAccountInfo["serverAddress"],
+																			serverPort,
+																			devTokens,
+																			useSSL);
 				accountFound = true;
 			}
 		}
 		mailSuckerThreads[j].emailAccounts.endCriticalSection();
-	}	
+	}
 }
 
 void addNewEmailAccount(pmm::SuckerSession &session, pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, size_t *assignationIndex, const std::string &emailAccount) {
@@ -807,32 +808,32 @@ void addNewEmailAccount(pmm::SuckerSession &session, pmm::SharedQueue<pmm::MailA
 		pmm::QuotaDB::set(m.email(), m.quota);
 		//std::stringstream lnx;
 		//lnx << "User " << m.username() << " has added a new e-mail account: " << m.email();
-		//pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, lnx.str(), 1, "sln.caf");		
+		//pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, lnx.str(), 1, "sln.caf");
 	}
 #ifdef DEBUG
 	else {
 		pmm::Log << "WARNING: No information returned from app engine regarding " << emailAccount << ", perhaps it is being monitored by another sucker?" << pmm::NL;
 	}
-#endif	
+#endif
 }
 
 /*void removeEmailAccount(pmm::MailSuckerThread *mailSuckerThreads, size_t nElems, std::map<std::string, std::string> &mailAccountInfo){
-	if(mailAccountInfo.size() == 0) return;
-	for (size_t i = 0; i < nElems; i++) {
-		mailSuckerThreads[i].emailAccounts.beginCriticalSection();
-		for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
-			std::string theEmail = mailSuckerThreads[i].emailAccounts.atUnlocked(j).email();
-			if (theEmail.compare(mailAccountInfo["email"]) == 0) {
-				pmm::Log << "Removing e-mail account " << mailAccountInfo["email"] << " because it was deleted from the client app." << pmm::NL;
-				mailSuckerThreads[i].emailAccounts.unlockedErase(j);
-				mailSuckerThreads[i].emailAccounts.endCriticalSection();
-				mailAccountInfo.erase(theEmail);
-				return;
-			}
-		}
-		mailSuckerThreads[i].emailAccounts.endCriticalSection();
-	}	
-}*/
+ if(mailAccountInfo.size() == 0) return;
+ for (size_t i = 0; i < nElems; i++) {
+ mailSuckerThreads[i].emailAccounts.beginCriticalSection();
+ for (size_t j = 0; j < mailSuckerThreads[i].emailAccounts.unlockedSize(); j++) {
+ std::string theEmail = mailSuckerThreads[i].emailAccounts.atUnlocked(j).email();
+ if (theEmail.compare(mailAccountInfo["email"]) == 0) {
+ pmm::Log << "Removing e-mail account " << mailAccountInfo["email"] << " because it was deleted from the client app." << pmm::NL;
+ mailSuckerThreads[i].emailAccounts.unlockedErase(j);
+ mailSuckerThreads[i].emailAccounts.endCriticalSection();
+ mailAccountInfo.erase(theEmail);
+ return;
+ }
+ }
+ mailSuckerThreads[i].emailAccounts.endCriticalSection();
+ }
+ }*/
 
 void removeEmailAccount(pmm::SharedQueue<std::string> *rmQueue, const std::string &emailAccount){
 	rmQueue->add(emailAccount);
@@ -875,7 +876,7 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 			}
 		}
 		mailSuckerThreads[i].emailAccounts.endCriticalSection();
-	}	
+	}
 }
 
 void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts){
@@ -895,10 +896,10 @@ void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &
 			pmm::Log << info[theAccount]["endHour"] << ":";
 			pmm::Log << info[theAccount]["endMinute"] << pmm::NL;
 			//Save data here
-			pmm::SilentMode::set(theAccount, 
-								 info[theAccount]["startHour"], 
-								 info[theAccount]["startMinute"], 
-								 info[theAccount]["endHour"], 
+			pmm::SilentMode::set(theAccount,
+								 info[theAccount]["startHour"],
+								 info[theAccount]["startMinute"],
+								 info[theAccount]["endHour"],
 								 info[theAccount]["endMinute"]
 								 );
 		}
@@ -917,6 +918,3 @@ void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::Shar
 		//pmmStorageQueue.add(np);
 	}
 }
-
-
-

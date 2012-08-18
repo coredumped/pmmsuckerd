@@ -44,10 +44,6 @@ namespace pmm {
 	};
 	
 	class MailSuckerThread : public GenericThread {
-	private:
-		/** Holds a relation of email vs device token, meaning for every e-mail it stores a
-		 * set of device tokens */
-		std::map<std::string, std::set<std::string> > email2DevToken;
 	protected:
 		time_t threadStartTime;
 		std::map<std::string, MailboxControl> mailboxControl;
@@ -62,10 +58,8 @@ namespace pmm {
 		virtual void processAccountRemove();
 		virtual bool processAccountUpdate(const MailAccountInfo &m, size_t idx);
 		//Device token addition and removal
-		virtual bool registerDeviceTokens();
-		virtual bool relinquishDeviceTokens();
-		
-		virtual void relinquishDeviceTokens(MailAccountInfo &m, time_t now);
+		virtual void registerDeviceTokens();
+		virtual void relinquishDeviceTokens();
 	public:
 		FetchedMailsCache fetchedMails;
 		SharedVector<MailAccountInfo> emailAccounts;
@@ -82,8 +76,6 @@ namespace pmm {
 		pmm::SharedSet<std::string> emails2Disable;
 		pmm::SharedVector<pmm::MailAccountInfo> *mailAccounts2Refresh;
 		
-		pmm::SharedVector<pmm::DevtokenQueueItem> *devTokens2Relinquish;
-
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
 		
