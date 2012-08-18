@@ -35,10 +35,10 @@
 #define DEFAULT_MAX_POP3_POLLING_THREADS 4
 #endif
 #ifndef DEFAULT_MAX_IMAP_POLLING_THREADS
-#define DEFAULT_MAX_IMAP_POLLING_THREADS 8
+#define DEFAULT_MAX_IMAP_POLLING_THREADS 6
 #endif
 #ifndef DEFAULT_MAX_MESSAGE_UPLOADER_THREADS
-#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 4
+#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 2
 #endif
 
 #ifndef DEFAULT_SSL_CERTIFICATE_PATH
@@ -335,6 +335,8 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
+	pmm::Log << "Warming IMAP Threads..." << pmm::NL;
+	sleep(60);
 	//6. Dispatch polling threads for POP3
 	for (size_t k = 0; k < pop3Accounts.size(); k++) {
 		pop3SuckingThreads[popAssignationIndex++].emailAccounts.push_back(pop3Accounts[k]);
