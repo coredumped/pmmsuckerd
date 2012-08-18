@@ -130,6 +130,7 @@ int main (int argc, const char * argv[])
 	
 	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenAddQueue("DeviceTokenAddQueue");
 	pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
+	pmm::SharedVector<pmm::DevtokenQueueItem> devTokens2Relinquish;
 	pmm::SharedQueue<std::string> invalidTokenQ;
 	pmm::SharedQueue<std::string> develInvalidTokenQ;
 	
@@ -330,6 +331,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
+		imapSuckingThreads[i].devTokens2Relinquish = &devTokens2Relinquish;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
@@ -351,6 +353,7 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
+		pop3SuckingThreads[i].devTokens2Relinquish = &devTokens2Relinquish;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
@@ -511,18 +514,12 @@ int main (int argc, const char * argv[])
 							std::stringstream input(parameters["quota"]);
 							input >> p.quotaValue;
 							quotaIncreaseQueue.add(p);
-							/*std::stringstream lnx;
-							lnx << "User " << p.emailAddress << " has increased her quota to: " << p.quotaValue;
-							pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, lnx.str(), 1, "sln.caf");
-							notificationQueue.add(np);*/
 						}
 						else if (command.compare(pmm::Commands::newMailAccountRegistered) == 0){
 							if (parameters["mailboxType"].compare("IMAP") == 0) {
-								//addNewEmailAccount(session, imapSuckingThreads, maxIMAPSuckerThreads, &imapAssignationIndex, parameters["email"]);
 								addNewEmailAccount(session, &addIMAPAccountQueue, parameters["email"]);
 							}
 							else {
-								//addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
 								addNewEmailAccount(session, &addPOP3AccountQueue, parameters["email"]);
 							}
 						}
@@ -531,7 +528,7 @@ int main (int argc, const char * argv[])
 								pmm::DevtokenQueueItem item;
 								item.email = reliter->first;
 								item.devToken = reliter->second;
-								item.expirationTimestamp = time(0) + 10; //Every thread has at least 10 seconds to release a device token
+								item.expirationTimestamp = time(0) + 60; //Every thread has at least 10 seconds to release a device token
 								devTokenRelinquishQueue.add(item);
 							}
 						}

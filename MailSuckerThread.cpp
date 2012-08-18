@@ -100,6 +100,9 @@ namespace pmm {
 			msg << "Monitoring of " + m.email() + " has been enabled :-)";
 			std::vector<std::string> myDevTokens = m.devTokens();
 			for (size_t i = 0; i < myDevTokens.size(); i++) {
+				//Update the email2Devtoken cache
+				email2DevToken[m.email()].insert(myDevTokens[i]);
+				
 				pmm::NotificationPayload np(myDevTokens[i], msg.str());
 				np.isSystemNotification = true;
 				if (m.devel) {
@@ -125,6 +128,8 @@ namespace pmm {
 					fetchedMails.removeAllEntriesOfEmail2(m);
 					QuotaDB::removeAccount(m);
 					cntAccountsTotal = cntAccountsTotal - 1;
+					//Update the email2Devtoken cache
+					email2DevToken.erase(emailAccounts[i].email());
 					break;
 				}
 			}
@@ -151,26 +156,95 @@ namespace pmm {
 		mailAccounts2Refresh->endCriticalSection();
 		return somethingChanged;
 	}
+		
+	void MailSuckerThread::relinquishDeviceTokens(MailAccountInfo &m, time_t now){
+		std::vector<std::string> allToks = m.devTokens();
+		if(allToks.size() == 0) return; //User might have signed off, just ignore it!
+		devTokens2Relinquish->beginCriticalSection();
+		for (size_t i = 0; i < devTokens2Relinquish->unlockedSize(); i++) {
+			std::string deviceToken = devTokens2Relinquish->atUnlocked(i).devToken;
+			if(email2DevToken[m.email()].find(deviceToken) != email2DevToken[m.email()].end()){
+				m.deviceTokenRemove(deviceToken);
+				email2DevToken[m.email()].erase(deviceToken);
+			}
+		}
+		for (size_t i = 0; i < devTokens2Relinquish->unlockedSize(); i++) {
+			if (devTokens2Relinquish->atUnlocked(i).expirationTimestamp < now) {
+				devTokens2Relinquish->unlockedErase(i);
+				break;
+			}
+		}
+		devTokens2Relinquish->endCriticalSection();
+	}
 	
-	void MailSuckerThread::registerDeviceTokens(){
+	bool MailSuckerThread::registerDeviceTokens(){
+		bool somethingAdded = false;
 		DevtokenQueueItem item;
 		time_t t1 = time(0);
 		while (devTokenAddQueue->extractEntry(item)) {
-			bool found = false;
+			time_t now = time(0);
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				if (item.email.compare(emailAccounts[i].email()) == 0) {
 					pmm::Log << "Adding device " << item.devToken << " as recipient for messages of: " << item.email << pmm::NL;
-					emailAccounts.atUnlocked(i).deviceTokenAdd(item.devToken);
-					found = true;
-					usleep(500); //Give another MailSuckerThread a chance to find this guy
+					emailAccounts[i].deviceTokenAdd(item.devToken);
+					email2DevToken[emailAccounts[i].email()].insert(item.devToken);
+					somethingAdded = true;
+					devTokens2Relinquish->beginCriticalSection();
+					for (size_t k = 0; k < devTokens2Relinquish->unlockedSize(); k++) {
+						DevtokenQueueItem ritem = devTokens2Relinquish->atUnlocked(i);
+						if(item.devToken.compare(ritem.devToken) == 0){
+							devTokens2Relinquish->unlockedErase(k);
+							break;
+						}
+					}
+					devTokens2Relinquish->endCriticalSection();
+				}
+			}
+			if (item.expirationTimestamp > now) devTokenAddQueue->add(item);
+			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
+			else usleep(25000); //Check this queue only 40 times
+		}
+		return somethingAdded;
+	}
+	
+	bool MailSuckerThread::relinquishDeviceTokens(){
+		bool somethingRelinquished = false;
+		time_t now = time(0);
+		for (size_t i = 0; i < emailAccounts.size(); i++) {
+			if(emailAccounts[i].devTokens().size() == 0) continue; //User might have signed off, just ignore it!
+			devTokens2Relinquish->beginCriticalSection();
+			for (size_t i = 0; i < devTokens2Relinquish->unlockedSize(); i++) {
+				//For every device token to be relinquished
+				//Verify that there is an e-mail address that contains it,
+				//if it does, then we erase such device token from that
+				//MailAccountiInfo object
+				std::string deviceToken = devTokens2Relinquish->atUnlocked(i).devToken;
+				if(email2DevToken[emailAccounts[i].email()].find(deviceToken) != email2DevToken[emailAccounts[i].email()].end()){
+					emailAccounts[i].deviceTokenRemove(deviceToken);
+					pmm::Log << "INFO: " << emailAccounts[i].email() << " will no longer receive notifications on device " << deviceToken << pmm::NL;
+					email2DevToken[emailAccounts[i].email()].erase(deviceToken);
+					somethingRelinquished = true;
+					//Now we should remove this device token from devTokenAddQueue if it is there
+					if (devTokenAddQueue->size() > 0) {
+						DevtokenQueueItem item;
+						devTokenAddQueue->extractEntry(item);
+						if(item.devToken.compare(deviceToken) != 0) devTokenAddQueue->add(item);
+					}
+				}
+			}
+			//Verify that every 
+			for (size_t i = 0; i < devTokens2Relinquish->unlockedSize(); i++) {
+				if (devTokens2Relinquish->atUnlocked(i).expirationTimestamp <= now) {
+					pmm::Log << "INFO: expiring from relinquishing vector: " << devTokens2Relinquish->atUnlocked(i).devToken << pmm::NL;
+					devTokens2Relinquish->unlockedErase(i);
 					break;
 				}
 			}
-			if (!found) devTokenAddQueue->add(item);
-			if (time(0) - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
+			devTokens2Relinquish->endCriticalSection();			
 		}
+		return somethingRelinquished;
 	}
-	
+	/*
 	void MailSuckerThread::relinquishDeviceTokens(){
 		DevtokenQueueItem item;
 		time_t t1 = time(0);
@@ -199,6 +273,7 @@ namespace pmm {
 			if (now - t1 > 0) break; //Only inspect the device token registration queue for 1 second.
 		}		
 	}
+	 */
 
 	void MailSuckerThread::operator()(){
 		if (notificationQueue == NULL) throw GenericException("notificationQueue is still NULL, it must point to a valid notification queue.");
@@ -209,12 +284,13 @@ namespace pmm {
 		if (rmAccountQueue == NULL) throw GenericException("Can't continue like this, the rmAccountQueue is null!!!");
 		if (devTokenAddQueue == NULL) throw GenericException("Can't continue like this, the devTokenAddQueue is null!!!");
 		if (devTokenRelinquishQueue == NULL) throw GenericException("Can't continue like this, the devTokenRelinquishQueue is null!!!");
-		if (mailAccounts2Refresh == NULL) throw GenericException("Can't continue with an null mailAccount2Refresh vector"); 
+		if (mailAccounts2Refresh == NULL) throw GenericException("Can't continue with an null mailAccount2Refresh vector");
+		if (devTokens2Relinquish == NULL) throw GenericException("The global devTokens2Relinquish shared queue has not been initialized");
 		for (size_t i = 0; i < emailAccounts.size(); i++) {
 			pmm::Log << "MailSuckerThread: Starting monitoring of " << emailAccounts[i].email() << pmm::NL;
 			if(emailAccounts[i].quota > 0) cntAccountsActive = cntAccountsActive + 1;
 		}
-		cntAccountsTotal = emailAccounts.size();
+		cntAccountsTotal = (int)emailAccounts.size();
 		initialize();
 		
 		sigset_t bSignal;
@@ -224,6 +300,15 @@ namespace pmm {
 			pmm::Log << "WARNING: Unable to block SIGPIPE !" << pmm::NL;
 		}
 
+		//Initialize the email2DevToken map here
+		pmm::Log << "INFO: Initializing the email2DevToken cache..." << pmm::NL;
+		for (size_t i = 0; i < emailAccounts.size(); i++) {
+			std::vector<std::string> allToks = emailAccounts[i].devTokens();
+			for (size_t j = 0; j < allToks.size(); j++) {
+				email2DevToken[emailAccounts[i].email()].insert(allToks[j]);
+			}
+		}
+		
 		while (true) {
 			//Process account addition and removals if there is any
 			registerDeviceTokens();
