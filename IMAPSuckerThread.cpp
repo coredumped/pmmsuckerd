@@ -46,7 +46,7 @@ namespace pmm {
 	{
 		clistiter * cur;
 		/* iterate on each result of one given message */
-		for(cur = clist_begin(msg_att->att_list) ; cur != NULL ; cur = clist_next(cur)) {			
+		for(cur = clist_begin(msg_att->att_list) ; cur != NULL ; cur = clist_next(cur)) {
 			struct mailimap_msg_att_item * item = (struct mailimap_msg_att_item *)clist_content(cur);
 			if (item->att_type != MAILIMAP_MSG_ATT_ITEM_STATIC) {
 				continue;
@@ -147,7 +147,7 @@ namespace pmm {
 			fetchedMails.addEntry2(imapFetch.mailAccountInfo.email(), uid);
 			//Verify if theMessage is not too old, if it is then just discard it!!!
 			if (theMessage.serverDate < threadStartTime) {
-				imapLog << "Message(" << theMessage.msgUid << ") for " << imapFetch.mailAccountInfo.email() << " is too old, not notifying it!!!" << pmm::NL;	
+				imapLog << "Message(" << theMessage.msgUid << ") for " << imapFetch.mailAccountInfo.email() << " is too old, not notifying it!!!" << pmm::NL;
 				retVal = -1;
 			}
 			else {
@@ -181,7 +181,7 @@ namespace pmm {
 						pmmStorageQueue->add(np);
 					}
 				}
-			}			
+			}
 			mailimap_fetch_list_free(fetch_result);
 		}
 		mailimap_fetch_att_free(fetch_att);
@@ -284,7 +284,7 @@ namespace pmm {
 						else {
 							pmm::imapLog << "CRITICAL: IMAP MailFetcher(" << (long)pthread_self() << ") Unable to connect to: " << imapFetch.mailAccountInfo.email() << ", etpan=" << result << " , response=" << imap->imap_response << " RE-SCHEDULING fetch!!!" << pmm::NL;
 						}
-#endif				
+#endif
 					}
 					else {
 						result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
@@ -293,7 +293,7 @@ namespace pmm {
 #ifdef DEBUG
 							if(imap->imap_response == 0) pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << result << pmm::NL;
 							else pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to login to: " << imapFetch.mailAccountInfo.email() << ", response=" << imap->imap_response << pmm::NL;
-#endif				
+#endif
 							imapFetch.madeAttempts++;
 							imapFetch.nextAttempt = rightNow + fetchRetryInterval;
 							fetchQueue->add(imapFetch);
@@ -309,7 +309,7 @@ namespace pmm {
 									pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result  << pmm::NL;
 								else
 									pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
-#endif				
+#endif
 							}
 							else {
 								clist *unseenMails = clist_new();
@@ -434,11 +434,6 @@ namespace pmm {
 	void IMAPSuckerThread::openConnection(const MailAccountInfo &m){
 		int result;
 		std::string theEmail = m.email();
-		if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects && mailboxControl[theEmail].lastCheck > time(0)) {
-			time_t now = time(0);
-			if(now % 3 == 0) imapLog << "INFO: Delaying connection to " << m.serverAddress() << " for " << m.email() << (int)(mailboxControl[theEmail].lastCheck - now) << "secs remaining to reconnect." << pmm::NL;
-			return;
-		}
 		for (size_t i = 0; i < maxMailFetchers; i++) {
 			if (mailFetchers[i].isRunning == false) {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
@@ -469,16 +464,18 @@ namespace pmm {
 				//Max reconnect exceeded, notify user
 #warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
 				std::stringstream errmsg;
-				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << theEmail << " has been temporarily suspended, we will retry later.";
-				pmm::imapLog << "CRITICAL: " << errmsg.str() << pmm::NL;
+				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, we will retry later.";
+#ifdef DEBUG_MSG_FETCH
+				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
+#endif
 				/*std::vector<std::string> myDevTokens = m.devTokens();
-				for (size_t i = 0; m.devTokens().size(); i++) {
-					NotificationPayload msg(myDevTokens[i], errmsg.str());
-					if (m.devel) {
-						develNotificationQueue->add(msg);
-					}
-					else notificationQueue->add(msg);
-				}*/
+				 for (size_t i = 0; m.devTokens().size(); i++) {
+				 NotificationPayload msg(myDevTokens[i], errmsg.str());
+				 if (m.devel) {
+				 develNotificationQueue->add(msg);
+				 }
+				 else notificationQueue->add(msg);
+				 }*/
 				serverConnectAttempts[m.serverAddress()] = 0;
 				mailboxControl[theEmail].lastCheck = time(0) + 300;
 #warning Add method for relinquishing email account monitoring
@@ -486,7 +483,7 @@ namespace pmm {
 			mailboxControl[theEmail].isOpened = false;
 			mailimap_free(imapControl[theEmail].imap);
 			imapControl[theEmail].imap = NULL;
-#warning TODO: delay reconnections			
+#warning TODO: delay reconnections
 		}
 		else {
 			mailboxControl[theEmail].openedOn = time(NULL);
@@ -500,16 +497,16 @@ namespace pmm {
 						std::stringstream errmsg;
 #warning TODO: Find a better way to notify the user that we are unable to login into their mail account
 						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, please reset your authentication information.";
-/*						std::vector<std::string> myDevTokens = m.devTokens();
-						for (size_t i = 0; myDevTokens.size(); i++) {
-							NotificationPayload np(myDevTokens[i], errmsg.str());
-							if (m.devel) {
-								develNotificationQueue->add(np);
-							}
-							else notificationQueue->add(np);
-						}*/
+						/*						std::vector<std::string> myDevTokens = m.devTokens();
+						 for (size_t i = 0; myDevTokens.size(); i++) {
+						 NotificationPayload np(myDevTokens[i], errmsg.str());
+						 if (m.devel) {
+						 develNotificationQueue->add(np);
+						 }
+						 else notificationQueue->add(np);
+						 }*/
 					}
-
+					
 #warning Add method for relinquishing email account monitoring
 					mailboxControl[theEmail].lastCheck = time(0);
 					mailboxControl[theEmail].isOpened = false;
@@ -536,7 +533,7 @@ namespace pmm {
 						pmm::imapLog << "FATAL: Unable to select INBOX folder in account " << theEmail << ": " << imapControl[theEmail].imap->imap_response <<  pmm::NL;
 					}
 					//throw GenericException("Unable to select INBOX folder");
-				}	
+				}
 				else {
 					int idleEnabled;
 					if (theEmail.compare("jinny27@nate.com") == 0) {
