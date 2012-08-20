@@ -340,6 +340,8 @@ namespace pmm {
 									}
 								}
 								else {
+									int bytesDld = cntBytesDownloaded->get() + 1;
+									cntBytesDownloaded->set(bytesDld);
 									if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
 										pmm::pop3Log << "PANIC: Unable to parse e-mail message " << info->msg_uidl << ", user: " << pf.mailAccountInfo.email() << pmm::NL;
 										mailpop3_retr_free(msgBuffer);
@@ -639,6 +641,7 @@ namespace pmm {
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 				pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
+				pop3Fetcher[i].cntBytesDownloaded = &cntBytesDownloaded;
 				pop3Fetcher[i].emails2Disable = &this->emails2Disable;
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {

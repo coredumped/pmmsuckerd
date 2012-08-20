@@ -370,6 +370,7 @@
 		82AA3D78154A1F6F006CC761 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		82AA3D7A154A1F6F006CC761 /* loadMessages.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = loadMessages.1; sourceTree = "<group>"; };
 		82AA9FCC1426B22000E3FB3C /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = usr/lib/libcurl.dylib; sourceTree = SDKROOT; };
+		82AE041515E077970076696C /* SharedMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedMap.h; sourceTree = "<group>"; };
 		82B081DA153AD22F00F78A4D /* APNSFeedbackThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNSFeedbackThread.h; sourceTree = "<group>"; };
 		82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = APNSFeedbackThread.cpp; sourceTree = "<group>"; };
 		82B6109114F2A28200975C32 /* UserPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserPreferences.h; sourceTree = "<group>"; };
@@ -762,6 +763,7 @@
 				82524A8A15ABC67E009C64ED /* RWLock.cpp */,
 				82425B9D15AC74E0004E3D0F /* Atomic.h */,
 				82425B9F15AC7522004E3D0F /* Atomic.cpp */,
+				82AE041515E077970076696C /* SharedMap.h */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";

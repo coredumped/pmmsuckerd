@@ -28,6 +28,7 @@
 #include "UserPreferences.h"
 #include "APNSFeedbackThread.h"
 #include "PendingNotificationStore.h"
+//#include "SharedMap.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 4
 #endif
@@ -134,6 +135,7 @@ int main (int argc, const char * argv[])
 	pmm::SharedQueue<std::string> develInvalidTokenQ;
 	
 	pmm::SharedVector<pmm::MailAccountInfo> mailAccounts2Refresh;
+	//pmm::SharedMap<std::string, int> statCounter;
 	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
@@ -409,21 +411,43 @@ int main (int argc, const char * argv[])
 			}
 			pmm::Log << "=================================================================" << pmm::NL;
 			pmm::Log << "STAT: Notifications sent: " << (double)(sent / 300.0) << "/sec failed: " << (double)(failed / 300.0) << "/sec" << pmm::NL;
-			int msgRetrieved = 0, acctTotal = 0;
+			int msgRetrieved = 0, acctTotal = 0, bytesDlds = 0;
 			for (int j = 0; j < maxIMAPSuckerThreads; j++) {
 				msgRetrieved += imapSuckingThreads[j].cntRetrievedMessages;
 				acctTotal += imapSuckingThreads[j].cntAccountsTotal;
+				bytesDlds += imapSuckingThreads[j].cntBytesDownloaded;
 				imapSuckingThreads[j].cntRetrievedMessages = 0;
+				imapSuckingThreads[j].cntBytesDownloaded = 0;
 			}
 			pmm::Log << "STAT: IMAP messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
+			pmm::Log << "STAT: IMAP downloaded data: ";
+			if (bytesDlds > 1024 == 0) {
+				pmm::Log << (bytesDlds / 1024) << "K";
+			}
+			else {
+				pmm::Log << bytesDlds << "bytes";
+			}
+			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
+
 			msgRetrieved = 0;
 			acctTotal = 0;
+			bytesDlds = 0;
 			for (int j = 0; j < maxPOP3SuckerThreads; j++) {
 				msgRetrieved += pop3SuckingThreads[j].cntRetrievedMessages;
 				acctTotal += pop3SuckingThreads[j].cntAccountsTotal;
+				bytesDlds += pop3SuckingThreads[j].cntBytesDownloaded;
 				pop3SuckingThreads[j].cntRetrievedMessages = 0;
+				pop3SuckingThreads[j].cntBytesDownloaded = 0;
 			}
 			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
+			pmm::Log << "STAT: POP3 downloaded data: ";
+			if (bytesDlds > 1024 == 0) {
+				pmm::Log << (double)(bytesDlds / 1024) << "K";
+			}
+			else {
+				pmm::Log << bytesDlds << "bytes";
+			}
+			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
 		}
 		if (tic % 45 == 0) {
 			//Process quota updates if any

@@ -154,7 +154,6 @@ namespace pmm {
 	
 	void MailSuckerThread::registerDeviceTokens(){
 		DevtokenQueueItem item;
-		time_t t1 = time(0);
 		while (devTokenAddQueue.extractEntry(item)) {
 			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
@@ -179,7 +178,7 @@ namespace pmm {
 				for (size_t j = 0; j < tokList.size(); j++) {
 					if (item.devToken.compare(tokList[j]) == 0) {
 						pmm::Log << "INFO: " << theEmail << " will no longer receive notifications on device " << item.devToken << pmm::NL;
-						emailAccounts[i].deviceTokenRemove(item.devToken);
+						emailAccounts.atUnlocked(i).deviceTokenRemove(item.devToken);
 					}
 				}
 			}
