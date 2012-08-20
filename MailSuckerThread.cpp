@@ -172,7 +172,6 @@ namespace pmm {
 	void MailSuckerThread::relinquishDeviceTokens(){
 		DevtokenQueueItem item;
 		while (devTokenRelinquishQueue.extractEntry(item)) {
-			bool found = false;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				//Verify that this account has that devToken
 				std::vector<std::string> tokList = emailAccounts[i].devTokens();
@@ -181,8 +180,6 @@ namespace pmm {
 					if (item.devToken.compare(tokList[j]) == 0) {
 						pmm::Log << "INFO: " << theEmail << " will no longer receive notifications on device " << item.devToken << pmm::NL;
 						emailAccounts[i].deviceTokenRemove(item.devToken);
-						found = true;
-						break;
 					}
 				}
 			}
