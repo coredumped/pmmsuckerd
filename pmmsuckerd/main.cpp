@@ -415,7 +415,7 @@ int main (int argc, const char * argv[])
 			for (int j = 0; j < maxIMAPSuckerThreads; j++) {
 				msgRetrieved += imapSuckingThreads[j].cntRetrievedMessages;
 				acctTotal += imapSuckingThreads[j].cntAccountsTotal;
-				bytesDlds += imapSuckingThreads[j].cntBytesDownloaded;
+				//bytesDlds += imapSuckingThreads[j].cntBytesDownloaded;
 				imapSuckingThreads[j].cntRetrievedMessages = 0;
 				imapSuckingThreads[j].cntBytesDownloaded = 0;
 			}
@@ -435,7 +435,7 @@ int main (int argc, const char * argv[])
 			for (int j = 0; j < maxPOP3SuckerThreads; j++) {
 				msgRetrieved += pop3SuckingThreads[j].cntRetrievedMessages;
 				acctTotal += pop3SuckingThreads[j].cntAccountsTotal;
-				bytesDlds += pop3SuckingThreads[j].cntBytesDownloaded;
+				//bytesDlds += pop3SuckingThreads[j].cntBytesDownloaded;
 				pop3SuckingThreads[j].cntRetrievedMessages = 0;
 				pop3SuckingThreads[j].cntBytesDownloaded = 0;
 			}
