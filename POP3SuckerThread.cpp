@@ -58,6 +58,10 @@
 #define DEFAULT_MAX_YAHOO_FETCH_TIMEOUT 15
 #endif
 
+#ifndef DEFAULT_HOTMAIL_POP3_WARMUP_SECS
+#define DEFAULT_HOTMAIL_POP3_WARMUP_SECS 330
+#endif
+
 namespace pmm {
 	MTLogger pop3Log;
 	
@@ -458,6 +462,17 @@ namespace pmm {
 		sigaddset(&bSignal, SIGPIPE);
 		if(pthread_sigmask(SIG_BLOCK, &bSignal, NULL) != 0){
 			pmm::Log << "WARNING: Unable to block SIGPIPE !" << pmm::NL;
+		}
+		if (isForHotmail) {
+#ifdef DEBUG
+			pop3Log << "Waiting " << DEFAULT_HOTMAIL_POP3_WARMUP_SECS << "s before starting Hotmail POP3 polling..." << pmm::NL;
+#endif
+			sleep(DEFAULT_HOTMAIL_POP3_WARMUP_SECS);
+			pop3Log << "Initiating Hotmail POP3 polling...." << pmm::NL;
+		}
+		else {
+			pop3Log << "Warming POP3 Fetcher thread..." << pmm::NL;
+			sleep(5);
 		}
 		while (true) {
 			POP3FetchItem pf;
