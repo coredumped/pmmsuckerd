@@ -712,7 +712,7 @@ namespace pmm {
 			yahooAccountsToBan.erase(email);
 			return;
 		}
-		if (email.find("@hotmail.") == email.npos || email.find("@live.") == email.npos) {
+		if (email.find("@hotmail.") == email.npos || email.find("@live.") == email.npos || email.find("@outlook.") == email.npos) {
 			//pop3Log << m.email() << " added to main fetch queue" << pmm::NL;
 			mainFetchQueue.add(m);
 		}
