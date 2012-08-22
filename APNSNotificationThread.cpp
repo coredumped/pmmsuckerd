@@ -455,6 +455,12 @@ namespace pmm {
 				size_t nSize = notificationQueue->size();
 				if((nSize + 1) % 20 == 0) APNSLog << "DEBUG: There are " << (int)nSize << " elements in the notification queue." << pmm::NL;
 #endif
+				//Verify if there are any new device tokens we need to remove from the invalid token list
+				std::string devToken2Allow;
+				while (permitDeviceToken.extractEntry(devToken2Allow)) {
+					invalidTokenSet.erase(devToken2Allow);
+					APNSLog << "Removing " << devToken2Allow << " device token from the invalid token list." << pmm::NL;
+				}
 				//Verify here if we should notify the event or not
 				time_t rightNow;
 				rightNow = time(0);

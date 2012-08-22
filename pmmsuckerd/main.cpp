@@ -573,12 +573,23 @@ int main (int argc, const char * argv[])
 								item.email = reliter->first;
 								item.devToken = reliter->second;
 								item.expirationTimestamp = time(0) + 60;
+								//Now schedule the device token to be removed from any APNS invalidating list
+								for (size_t j = 0; j < maxNotificationThreads; j++) {
+									notifThreads[j].permitDeviceToken.add(item.devToken);
+									std::stringstream cmd;
+#warning TODO: Find a better way to edit the invalidTokensFile
+									cmd << "cat " << invalidTokensFile << " | grep -v " << item.devToken << " > /tmp/invtoken.dat && cp -f /tmp/invtoken.dat " << invalidTokensFile;
+									system(cmd.str().c_str());
+								}
+								//Add device token to any appropiate IMAP e-mail accounts
 								for (int j = 0; j < maxIMAPSuckerThreads; j++) {
 									imapSuckingThreads[j].devTokenAddQueue.add(item);
 								}
+								//Add device token to any appropiate POP3 e-mail accounts
 								for (int j = 0; j < maxPOP3SuckerThreads; j++) {
 									pop3SuckingThreads[j].devTokenAddQueue.add(item);
 								}
+
 							}
 						}
 						else if (command.compare(pmm::Commands::deleteEmailAccount) == 0){

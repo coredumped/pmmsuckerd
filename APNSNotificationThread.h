@@ -101,6 +101,7 @@ namespace pmm {
 		std::set<std::string> invalidTokenSet;
 		SharedQueue<NotificationPayload> *notificationQueue;
 		SharedQueue<std::string> *invalidTokens;
+		SharedQueue<std::string> permitDeviceToken;
 		AtomicVar<std::string> newInvalidDevToken;
 		APNSNotificationThread();
 		void setKeyPath(const std::string &keyPath);
