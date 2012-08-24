@@ -111,6 +111,7 @@ namespace pmm {
 		pmmStorageQueue = NULL;
 		isForHotmail = false;
 		emails2Disable = NULL;
+		cntBytesDownloaded = NULL;
 		mailboxScanTimeout = DEFAULT_MAX_MAILBOX_SCAN_TIMEOUT;
 		mailstream_network_delay.tv_sec = 15;
 	}
@@ -344,8 +345,10 @@ namespace pmm {
 									}
 								}
 								else {
-									//int bytesDld = cntBytesDownloaded->get() + 1;
-									//cntBytesDownloaded->set(bytesDld);
+									if(cntBytesDownloaded != 0){
+										int bytesDld = cntBytesDownloaded->get() + 1;
+										cntBytesDownloaded->set(bytesDld);
+									}
 									if(!MailMessage::parse(theMessage, msgBuffer, msgSize)){
 										pmm::pop3Log << "PANIC: Unable to parse e-mail message " << info->msg_uidl << ", user: " << pf.mailAccountInfo.email() << pmm::NL;
 										mailpop3_retr_free(msgBuffer);
@@ -502,7 +505,6 @@ namespace pmm {
 					gotSomething = true;
 					if (n == -3) {
 						pop3Log << "CRITICAL: account " << pf.mailAccountInfo.email() << " won't be polled again until 3 hours have passed" << pmm::NL;
-						//nextCheck[pf.mailAccountInfo.email()] = now + 3600 * 3;
 						setNextCheck_(pf.mailAccountInfo.email(), now + 3600 * 3);
 						delayedAccounts.insert(pf.mailAccountInfo.email());
 					}
@@ -634,6 +636,8 @@ namespace pmm {
 			pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 			pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 			pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
+			pop3Fetcher[i].cntBytesDownloaded = &cntBytesDownloaded;
+			pop3Fetcher[i].emails2Disable = &this->emails2Disable;
 		}
 		for (size_t j = 0; j < maxHotmailThreads; j++) {
 			pop3Fetcher[l - j - 1].isForHotmail = true;
@@ -656,7 +660,7 @@ namespace pmm {
 				pop3Fetcher[i].quotaUpdateVector = quotaUpdateVector;
 				pop3Fetcher[i].develNotificationQueue = develNotificationQueue;
 				pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
-				//pop3Fetcher[i].cntBytesDownloaded = &cntBytesDownloaded;
+				pop3Fetcher[i].cntBytesDownloaded = &cntBytesDownloaded;
 				pop3Fetcher[i].emails2Disable = &this->emails2Disable;
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {

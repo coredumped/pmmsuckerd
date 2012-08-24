@@ -490,25 +490,57 @@ namespace pmm {
 			//Proceed to login stage
 			result = mailimap_login(imapControl[theEmail].imap, m.username().c_str(), m.password().c_str());
 			if(etpanOperationFailed(result)){
-				serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
+				int attempt = serverConnectAttempts[m.serverAddress()] + 1;
+				serverConnectAttempts[m.serverAddress()] = attempt;
+				int f_tmp = cntFailedLoginAttempts.get() + 1;
+				cntFailedLoginAttempts = f_tmp;
+				time_t now = time(0);
+#ifdef DEBUG
+				if(now % 60 == 0){
+					if(imapControl[theEmail].imap->imap_response == 0) pmm::imapLog << "CRITICAL: (" << attempt << ") Unable to login to: " << m.email() << ", response=" << result << pmm::NL;
+					else pmm::imapLog << "CRITICAL: (" << attempt << ") Unable to login to: " << m.email() << ", response=" << imapControl[theEmail].imap->imap_response << pmm::NL;
+				}
+#endif
 				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
-					if (mailboxControl[theEmail].lastCheck % 43200 == 0) {
+
+					if (mailboxControl[theEmail].lastCheck % 900 == 0) {
 						std::stringstream errmsg;
-#warning TODO: Find a better way to notify the user that we are unable to login into their mail account
-						errmsg << "Unable to LOGIN to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, please reset your authentication information.";
-						/*						std::vector<std::string> myDevTokens = m.devTokens();
-						 for (size_t i = 0; myDevTokens.size(); i++) {
-						 NotificationPayload np(myDevTokens[i], errmsg.str());
-						 if (m.devel) {
-						 develNotificationQueue->add(np);
-						 }
-						 else notificationQueue->add(np);
-						 }*/
+						errmsg << "Unable to login to " << theEmail;
+						if(imapControl[theEmail].imap->imap_response == 0) {
+							errmsg << ", please check your app settings.";
+						}
+						else {
+							errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
+						}
+						std::vector<std::string> myDevTokens = m.devTokens();
+						for (size_t i = 0; myDevTokens.size(); i++) {
+							NotificationPayload np(myDevTokens[i], errmsg.str());
+							np.isSystemNotification = true;
+							if (m.devel) {
+								develNotificationQueue->add(np);
+							}
+							else notificationQueue->add(np);
+							if(i == 0){
+								std::stringstream errUid;
+								errUid << "-pmm-err-" << now;
+								MailMessage msg;
+								msg.fromEmail = "support@fnxsoftware.com";
+								msg.dateOfArrival = now;
+								msg.msgUid = errUid.str();
+								msg.serverDate = now;
+								msg.to = theEmail;
+								msg.from = "PushMeMail";
+								msg.subject = errmsg.str();
+								np.origMailMessage = msg;
+								pmmStorageQueue->add(np);
+							}
+						}
+						mailboxControl[theEmail].lastCheck = now + 7200;
 					}
-					
-#warning Add method for relinquishing email account monitoring
-					mailboxControl[theEmail].lastCheck = time(0);
+					else {
+						mailboxControl[theEmail].lastCheck = now + 60;
+					}
 					mailboxControl[theEmail].isOpened = false;
 				}
 				mailimap_close(imapControl[theEmail].imap);

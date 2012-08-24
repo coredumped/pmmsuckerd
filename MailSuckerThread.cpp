@@ -80,6 +80,7 @@ namespace pmm {
 		quotaIncreaseQueue = NULL;
 		threadStartTime = time(0) - 900;
 		cntRetrievedMessages = 0;
+		cntFailedLoginAttempts = 0;
 		mailAccounts2Refresh = NULL;
 		if(emails2Disable.contains("none")) pmm::Log << "Initialization of emails2Disable SharedSet is flawed!!!" << pmm::NL;
 	}

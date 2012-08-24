@@ -411,13 +411,15 @@ int main (int argc, const char * argv[])
 			}
 			pmm::Log << "=================================================================" << pmm::NL;
 			pmm::Log << "STAT: Notifications sent: " << (double)(sent / 300.0) << "/sec failed: " << (double)(failed / 300.0) << "/sec" << pmm::NL;
-			int msgRetrieved = 0, acctTotal = 0, bytesDlds = 0;
+			int msgRetrieved = 0, acctTotal = 0, bytesDlds = 0, failedLogins = 0;
 			for (int j = 0; j < maxIMAPSuckerThreads; j++) {
 				msgRetrieved += imapSuckingThreads[j].cntRetrievedMessages;
 				acctTotal += imapSuckingThreads[j].cntAccountsTotal;
 				//bytesDlds += imapSuckingThreads[j].cntBytesDownloaded;
+				failedLogins += imapSuckingThreads[j].cntFailedLoginAttempts;
 				imapSuckingThreads[j].cntRetrievedMessages = 0;
 				imapSuckingThreads[j].cntBytesDownloaded = 0;
+				imapSuckingThreads[j].cntFailedLoginAttempts = 0;
 			}
 			pmm::Log << "STAT: IMAP messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			pmm::Log << "STAT: IMAP downloaded data: ";
@@ -428,16 +430,20 @@ int main (int argc, const char * argv[])
 				pmm::Log << bytesDlds << "bytes";
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
+			pmm::Log << "Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
 
 			msgRetrieved = 0;
 			acctTotal = 0;
 			bytesDlds = 0;
+			failedLogins = 0;
 			for (int j = 0; j < maxPOP3SuckerThreads; j++) {
 				msgRetrieved += pop3SuckingThreads[j].cntRetrievedMessages;
 				acctTotal += pop3SuckingThreads[j].cntAccountsTotal;
-				//bytesDlds += pop3SuckingThreads[j].cntBytesDownloaded;
+				bytesDlds += pop3SuckingThreads[j].cntBytesDownloaded;
+				failedLogins += pop3SuckingThreads[j].cntFailedLoginAttempts;
 				pop3SuckingThreads[j].cntRetrievedMessages = 0;
 				pop3SuckingThreads[j].cntBytesDownloaded = 0;
+				pop3SuckingThreads[j].cntFailedLoginAttempts = 0;
 			}
 			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			pmm::Log << "STAT: POP3 downloaded data: ";
@@ -448,6 +454,7 @@ int main (int argc, const char * argv[])
 				pmm::Log << bytesDlds << "bytes";
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
+			pmm::Log << "Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
 		}
 		if (tic % 45 == 0) {
 			//Process quota updates if any

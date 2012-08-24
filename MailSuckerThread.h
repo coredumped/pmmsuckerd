@@ -87,6 +87,7 @@ namespace pmm {
 		AtomicVar<int> cntAccountsActive;
 		AtomicVar<int> cntAccountsTotal;
 		AtomicVar<int> cntBytesDownloaded;
+		AtomicVar<int> cntFailedLoginAttempts;
 	};
 	
 	bool etpanOperationFailed(int r);
