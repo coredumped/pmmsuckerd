@@ -423,14 +423,17 @@ int main (int argc, const char * argv[])
 			}
 			pmm::Log << "STAT: IMAP messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			pmm::Log << "STAT: IMAP downloaded data: ";
-			if (bytesDlds > 1024 == 0) {
-				pmm::Log << (bytesDlds / 1024) << "K";
+			if (bytesDlds > 1048576){
+				pmm::Log << (double)(bytesDlds / 1048576.0) << "M";
+			}
+			else if (bytesDlds > 1024 == 0) {
+				pmm::Log << (double)(bytesDlds / 1024.0) << "K";
 			}
 			else {
 				pmm::Log << bytesDlds << "bytes";
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
-			pmm::Log << "Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
+			pmm::Log << "STAT: Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
 
 			msgRetrieved = 0;
 			acctTotal = 0;
@@ -447,14 +450,17 @@ int main (int argc, const char * argv[])
 			}
 			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			pmm::Log << "STAT: POP3 downloaded data: ";
-			if (bytesDlds > 1024 == 0) {
-				pmm::Log << (double)(bytesDlds / 1024) << "K";
+			if (bytesDlds > 1048576){
+				pmm::Log << (double)(bytesDlds / 1048576.0) << "M";
+			}
+			else if (bytesDlds > 1024 == 0) {
+				pmm::Log << (double)(bytesDlds / 1024.0) << "K";
 			}
 			else {
 				pmm::Log << bytesDlds << "bytes";
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
-			pmm::Log << "Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
+			pmm::Log << "STAT: Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
 		}
 		if (tic % 45 == 0) {
 			//Process quota updates if any

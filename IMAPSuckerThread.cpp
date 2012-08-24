@@ -513,9 +513,8 @@ namespace pmm {
 						else {
 							errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
 						}
-						std::vector<std::string> myDevTokens = m.devTokens();
-						for (size_t i = 0; myDevTokens.size(); i++) {
-							NotificationPayload np(myDevTokens[i], errmsg.str());
+						for (size_t i = 0; m.devTokens().size(); i++) {
+							NotificationPayload np(m.devTokens()[i], errmsg.str());
 							np.isSystemNotification = true;
 							if (m.devel) {
 								develNotificationQueue->add(np);
