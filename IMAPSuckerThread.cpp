@@ -465,7 +465,14 @@ namespace pmm {
 			if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 				//Max reconnect exceeded, notify user
 				std::stringstream errmsg;
-				errmsg << "Unable to connect to server " << m.serverAddress() << " and port " << m.serverPort() << " we will retry in aproximately 1 hour.\nPerhaps something might be wrong with " << m.email() << " account settings.";
+				errmsg << "Unable to connect to server " << m.serverAddress() << ", port=" << m.serverPort() << ", ssl=";
+				if(m.useSSL()){
+					errmsg << "ON";
+				}
+				else {
+					errmsg << "OFF";
+				}
+				errmsg << " we will retry in aproximately 1 hour.\nPerhaps something might be wrong with " << m.email() << " account settings.";
 				pmm::imapLog << "PANIC: " << errmsg.str() << pmm::NL;
 				serverConnectAttempts[m.serverAddress()] = 0;
 				mailboxControl[theEmail].lastCheck = now + 3600;
