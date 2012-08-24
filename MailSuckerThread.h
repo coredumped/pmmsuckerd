@@ -31,6 +31,12 @@ namespace pmm {
 		time_t expirationTimestamp;
 	};
 	
+	struct FailedLoginItem {
+		std::string email;
+		std::string errmsg;
+		time_t tstamp;
+	};
+	
 	class MailboxControl {
 	public:
 		std::string email;
@@ -48,6 +54,7 @@ namespace pmm {
 		time_t threadStartTime;
 		std::map<std::string, MailboxControl> mailboxControl;
 		std::map<std::string, int> serverConnectAttempts;
+		std::map<std::string, time_t> nextConnectAttempt;
 		int iterationWaitMicroSeconds;
 		int maxOpenTime;
 		int maxServerReconnects;
@@ -57,6 +64,8 @@ namespace pmm {
 		virtual void processAccountAdd();
 		virtual void processAccountRemove();
 		virtual bool processAccountUpdate(const MailAccountInfo &m, size_t idx);
+		
+		virtual void reportFailedLogins();
 		//Device token addition and removal
 		virtual void registerDeviceTokens();
 		virtual void relinquishDeviceTokens();
@@ -75,6 +84,8 @@ namespace pmm {
 		pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue;
 		pmm::SharedSet<std::string> emails2Disable;
 		pmm::SharedVector<pmm::MailAccountInfo> *mailAccounts2Refresh;
+		
+		pmm::SharedQueue<FailedLoginItem> emailsFailingLoginsQ;
 		
 		MailSuckerThread();
 		virtual ~MailSuckerThread();

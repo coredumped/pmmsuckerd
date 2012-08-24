@@ -153,6 +153,40 @@ namespace pmm {
 		return somethingChanged;
 	}
 	
+	void MailSuckerThread::reportFailedLogins(){
+		FailedLoginItem email2Report;
+		while (emailsFailingLoginsQ.extractEntry(email2Report)) {
+			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				if (email2Report.email.compare(emailAccounts[i].email()) == 0) {
+					std::vector<std::string> myDevTokens = emailAccounts.atUnlocked(i).devTokens();
+					for (size_t i = 0; myDevTokens.size(); i++) {
+						NotificationPayload np(myDevTokens[i], email2Report.errmsg);
+						np.isSystemNotification = true;
+						if (emailAccounts.atUnlocked(i).devel) {
+							develNotificationQueue->add(np);
+						}
+						else notificationQueue->add(np);
+						if(i == 0){
+							std::stringstream errUid;
+							errUid << "-pmm-err-" << email2Report.tstamp;
+							MailMessage msg;
+							msg.fromEmail = "support@fnxsoftware.com";
+							msg.dateOfArrival = email2Report.tstamp;
+							msg.msgUid = errUid.str();
+							msg.serverDate = email2Report.tstamp;
+							msg.to = email2Report.email;
+							msg.from = "PushMeMail";
+							msg.subject = email2Report.errmsg;
+							np.origMailMessage = msg;
+							pmmStorageQueue->add(np);
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+	
 	void MailSuckerThread::registerDeviceTokens(){
 		DevtokenQueueItem item;
 		while (devTokenAddQueue.extractEntry(item)) {
@@ -219,6 +253,7 @@ namespace pmm {
 			time_t currTime = time(0);
 			if(emailAccounts.size() == 0 && currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
+				if(nextConnectAttempt.find(emailAccounts[i].email()) == nextConnectAttempt.end()) nextConnectAttempt[emailAccounts[i].email()] = 0;
 				time_t rightNow = time(0);
 				QuotaIncreasePetition p;
 				if(quotaIncreaseQueue->extractEntry(p)){

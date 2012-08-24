@@ -434,6 +434,7 @@ namespace pmm {
 	void IMAPSuckerThread::openConnection(const MailAccountInfo &m){
 		int result;
 		std::string theEmail = m.email();
+		if(nextConnectAttempt[theEmail] > time(0)) return;
 		for (size_t i = 0; i < maxMailFetchers; i++) {
 			if (mailFetchers[i].isRunning == false) {
 				mailFetchers[i].myNotificationQueue = notificationQueue;
@@ -501,44 +502,30 @@ namespace pmm {
 					else pmm::imapLog << "CRITICAL: (" << attempt << ") Unable to login to: " << m.email() << ", response=" << imapControl[theEmail].imap->imap_response << pmm::NL;
 				}
 #endif
-				if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
+				if (attempt > 0 && attempt % maxServerReconnects == 0) {
 					//Max reconnect exceeded, notify user
 
 					if (mailboxControl[theEmail].lastCheck % 900 == 0) {
 						std::stringstream errmsg;
 						errmsg << "Unable to login to " << theEmail;
 						if(imapControl[theEmail].imap->imap_response == 0) {
-							errmsg << ", please check your app settings.";
+							errmsg << ", please check your app settings and or IMAP credentials information.";
 						}
 						else {
 							errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
 						}
-						/*for (size_t i = 0; m.devTokens().size(); i++) {
-							NotificationPayload np(m.devTokens()[i], errmsg.str());
-							np.isSystemNotification = true;
-							if (m.devel) {
-								develNotificationQueue->add(np);
-							}
-							else notificationQueue->add(np);
-							if(i == 0){
-								std::stringstream errUid;
-								errUid << "-pmm-err-" << now;
-								MailMessage msg;
-								msg.fromEmail = "support@fnxsoftware.com";
-								msg.dateOfArrival = now;
-								msg.msgUid = errUid.str();
-								msg.serverDate = now;
-								msg.to = theEmail;
-								msg.from = "PushMeMail";
-								msg.subject = errmsg.str();
-								np.origMailMessage = msg;
-								pmmStorageQueue->add(np);
-							}
-						}*/
+						errmsg << "\nWe will re-attempt to login in at least 2 hours.";
+						FailedLoginItem fItem;
+						fItem.email = theEmail;
+						fItem.tstamp = now;
+						fItem.errmsg = errmsg.str();
+						emailsFailingLoginsQ.add(fItem);
+						nextConnectAttempt[theEmail] = now + 7200;
 						mailboxControl[theEmail].lastCheck = now + 7200;
 					}
 					else {
-						mailboxControl[theEmail].lastCheck = now + 60;
+						nextConnectAttempt[theEmail] = now + 30;
+						mailboxControl[theEmail].lastCheck = now + 30;
 					}
 					mailboxControl[theEmail].isOpened = false;
 				}
@@ -549,7 +536,7 @@ namespace pmm {
 			}
 			else {
 				//Start IMAP IDLE processing...
-				
+				nextConnectAttempt[theEmail] = 0;
 				serverConnectAttempts[m.serverAddress()] = 0;
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << theEmail << pmm::NL;
