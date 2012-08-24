@@ -505,7 +505,7 @@ namespace pmm {
 				if (attempt > 0 && attempt % maxServerReconnects == 0) {
 					//Max reconnect exceeded, notify user
 
-					if (mailboxControl[theEmail].lastCheck % 900 == 0) {
+					if (now % 180 == 0 && attempt > maxServerReconnects) {
 						std::stringstream errmsg;
 						errmsg << "Unable to login to " << theEmail;
 						if(imapControl[theEmail].imap->imap_response == 0) {
