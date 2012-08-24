@@ -513,7 +513,7 @@ namespace pmm {
 						else {
 							errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
 						}
-						for (size_t i = 0; m.devTokens().size(); i++) {
+						/*for (size_t i = 0; m.devTokens().size(); i++) {
 							NotificationPayload np(m.devTokens()[i], errmsg.str());
 							np.isSystemNotification = true;
 							if (m.devel) {
@@ -534,7 +534,7 @@ namespace pmm {
 								np.origMailMessage = msg;
 								pmmStorageQueue->add(np);
 							}
-						}
+						}*/
 						mailboxControl[theEmail].lastCheck = now + 7200;
 					}
 					else {
