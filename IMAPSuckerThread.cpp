@@ -460,31 +460,28 @@ namespace pmm {
 			result = mailimap_socket_connect(imapControl[theEmail].imap, m.serverAddress().c_str(), m.serverPort());
 		}
 		if (etpanOperationFailed(result)) {
+			time_t now = time(0);
 			serverConnectAttempts[m.serverAddress()] = serverConnectAttempts[m.serverAddress()] + 1;
 			if (serverConnectAttempts[m.serverAddress()] > maxServerReconnects) {
 				//Max reconnect exceeded, notify user
-#warning TODO: Find a better way to notify the user that we are unable to connect into their mail server
 				std::stringstream errmsg;
-				errmsg << "Unable to connect to " << m.serverAddress() << " monitoring of " << theEmail << " has been stopped, we will retry later.";
-#ifdef DEBUG_MSG_FETCH
-				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): " << errmsg.str() << pmm::NL;
-#endif
-				/*std::vector<std::string> myDevTokens = m.devTokens();
-				 for (size_t i = 0; m.devTokens().size(); i++) {
-				 NotificationPayload msg(myDevTokens[i], errmsg.str());
-				 if (m.devel) {
-				 develNotificationQueue->add(msg);
-				 }
-				 else notificationQueue->add(msg);
-				 }*/
+				errmsg << "Unable to connect to server " << m.serverAddress() << " we will retry in aproximately 1 hour.\nPerhaps something might be wrong with this e-mail account settings.";
+				pmm::imapLog << "PANIC: " << errmsg.str() << pmm::NL;
 				serverConnectAttempts[m.serverAddress()] = 0;
-				mailboxControl[theEmail].lastCheck = time(0) + 300;
-#warning Add method for relinquishing email account monitoring
+				mailboxControl[theEmail].lastCheck = now + 3600;
+				nextConnectAttempt[theEmail] = now + 3600;
+				FailedLoginItem fItem;
+				fItem.email = theEmail;
+				fItem.errmsg = errmsg.str();
+				fItem.tstamp = now;
+				emailsFailingLoginsQ.add(fItem);
+			}
+			else {
+				nextConnectAttempt[theEmail] = now + 30 + (90 % serverConnectAttempts[m.serverAddress()]);
 			}
 			mailboxControl[theEmail].isOpened = false;
 			mailimap_free(imapControl[theEmail].imap);
 			imapControl[theEmail].imap = NULL;
-#warning TODO: delay reconnections
 		}
 		else {
 			mailboxControl[theEmail].openedOn = time(NULL);
@@ -502,32 +499,29 @@ namespace pmm {
 					else pmm::imapLog << "CRITICAL: (" << attempt << ") Unable to login to: " << m.email() << ", response=" << imapControl[theEmail].imap->imap_response << pmm::NL;
 				}
 #endif
-				if (attempt > 0 && attempt % maxServerReconnects == 0) {
+				if (attempt > maxServerReconnects == 0) {
 					//Max reconnect exceeded, notify user
-
-					if (now % 180 == 0 && attempt > maxServerReconnects) {
-						std::stringstream errmsg;
-						errmsg << "Unable to login to " << theEmail;
-						if(imapControl[theEmail].imap->imap_response == 0) {
-							errmsg << ", please check your app settings and or IMAP credentials information.";
-						}
-						else {
-							errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
-						}
-						errmsg << "\nWe will re-attempt to login in at least 2 hours.";
-						FailedLoginItem fItem;
-						fItem.email = theEmail;
-						fItem.tstamp = now;
-						fItem.errmsg = errmsg.str();
-						emailsFailingLoginsQ.add(fItem);
-						nextConnectAttempt[theEmail] = now + 7200;
-						mailboxControl[theEmail].lastCheck = now + 7200;
+					std::stringstream errmsg;
+					errmsg << "Unable to login to " << theEmail;
+					if(imapControl[theEmail].imap->imap_response == 0) {
+						errmsg << ", please check your app settings and or IMAP credentials information.";
 					}
 					else {
-						nextConnectAttempt[theEmail] = now + 30;
-						mailboxControl[theEmail].lastCheck = now + 30;
+						errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
 					}
+					errmsg << "\nWe will re-attempt to login in at least 2 hours.";
+					FailedLoginItem fItem;
+					fItem.email = theEmail;
+					fItem.tstamp = now;
+					fItem.errmsg = errmsg.str();
+					emailsFailingLoginsQ.add(fItem);
+					nextConnectAttempt[theEmail] = now + 7200;
+					mailboxControl[theEmail].lastCheck = now + 7200;
 					mailboxControl[theEmail].isOpened = false;
+				}
+				else {
+					nextConnectAttempt[theEmail] = now + 30;
+					mailboxControl[theEmail].lastCheck = now + 30;
 				}
 				mailimap_close(imapControl[theEmail].imap);
 				mailimap_free(imapControl[theEmail].imap);

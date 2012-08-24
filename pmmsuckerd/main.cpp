@@ -433,7 +433,7 @@ int main (int argc, const char * argv[])
 				pmm::Log << bytesDlds << "bytes";
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
-			pmm::Log << "STAT: Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
+			pmm::Log << "STAT: IMAP Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
 
 			msgRetrieved = 0;
 			acctTotal = 0;
@@ -460,7 +460,7 @@ int main (int argc, const char * argv[])
 				pmm::Log << bytesDlds << "bytes";
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
-			pmm::Log << "STAT: Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
+			pmm::Log << "STAT: POP3 Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
 		}
 		if (tic % 45 == 0) {
 			//Process quota updates if any
