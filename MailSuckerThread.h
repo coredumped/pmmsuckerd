@@ -32,9 +32,9 @@ namespace pmm {
 	};
 	
 	struct FailedLoginItem {
-		std::string email;
 		std::string errmsg;
 		time_t tstamp;
+		MailAccountInfo m;
 	};
 	
 	class MailboxControl {
@@ -69,6 +69,7 @@ namespace pmm {
 		//Device token addition and removal
 		virtual void registerDeviceTokens();
 		virtual void relinquishDeviceTokens();
+		virtual void scheduleFailureReport(const MailAccountInfo &m, const std::string &errmsg);
 	public:
 		FetchedMailsCache fetchedMails;
 		SharedVector<MailAccountInfo> emailAccounts;

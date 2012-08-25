@@ -157,35 +157,36 @@ namespace pmm {
 	void MailSuckerThread::reportFailedLogins(){
 		FailedLoginItem email2Report;
 		while (emailsFailingLoginsQ.extractEntry(email2Report)) {
-			for (size_t i = 0; i < emailAccounts.size(); i++) {
-				if (email2Report.email.compare(emailAccounts[i].email()) == 0) {
-					std::vector<std::string> myDevTokens = emailAccounts.atUnlocked(i).devTokens();
-					for (size_t i = 0; myDevTokens.size(); i++) {
-						NotificationPayload np(myDevTokens[i], email2Report.errmsg);
-						np.isSystemNotification = true;
-						if (emailAccounts.atUnlocked(i).devel) {
-							develNotificationQueue->add(np);
-						}
-						else notificationQueue->add(np);
-						if(i == 0){
-							std::stringstream errUid;
-							errUid << "-pmm-err-" << email2Report.tstamp;
-							MailMessage msg;
-							msg.fromEmail = "support@fnxsoftware.com";
-							msg.dateOfArrival = email2Report.tstamp;
-							msg.msgUid = errUid.str();
-							msg.serverDate = email2Report.tstamp;
-							msg.to = email2Report.email;
-							msg.from = "PushMeMail";
-							msg.subject = email2Report.errmsg;
-							np.origMailMessage = msg;
-							pmmStorageQueue->add(np);
-						}
-					}
-					break;
+			std::vector<std::string> myDevTokens = email2Report.m.devTokens();
+			for (size_t i = 0; i < myDevTokens.size(); i++) {
+				NotificationPayload np(myDevTokens[i], email2Report.errmsg);
+				np.isSystemNotification = true;
+				if (email2Report.m.devel) {
+					develNotificationQueue->add(np);
 				}
+				else notificationQueue->add(np);
+				std::stringstream errUid;
+				errUid << "-pmm-err-" << email2Report.tstamp;
+				MailMessage msg;
+				msg.fromEmail = "support@fnxsoftware.com";
+				msg.dateOfArrival = email2Report.tstamp;
+				msg.msgUid = errUid.str();
+				msg.serverDate = email2Report.tstamp;
+				msg.to = email2Report.m.email();
+				msg.from = "PushMeMail";
+				msg.subject = email2Report.errmsg;
+				np.origMailMessage = msg;
+				pmmStorageQueue->add(np);
 			}
 		}
+	}
+	
+	void MailSuckerThread::scheduleFailureReport(const MailAccountInfo &m, const std::string &errmsg){
+		FailedLoginItem fItem;
+		fItem.errmsg = errmsg;
+		fItem.m = m;
+		fItem.tstamp = time(0);
+		emailsFailingLoginsQ.add(fItem);
 	}
 	
 	void MailSuckerThread::registerDeviceTokens(){

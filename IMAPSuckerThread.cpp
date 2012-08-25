@@ -477,11 +477,7 @@ namespace pmm {
 				serverConnectAttempts[m.serverAddress()] = 0;
 				mailboxControl[theEmail].lastCheck = now + 3600;
 				nextConnectAttempt[theEmail] = now + 3600;
-				FailedLoginItem fItem;
-				fItem.email = theEmail;
-				fItem.errmsg = errmsg.str();
-				fItem.tstamp = now;
-				emailsFailingLoginsQ.add(fItem);
+				scheduleFailureReport(m, errmsg.str());
 			}
 			else {
 				nextConnectAttempt[theEmail] = now + 30 + (90 % serverConnectAttempts[m.serverAddress()]);
@@ -517,11 +513,7 @@ namespace pmm {
 						errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
 					}
 					errmsg << "\nWe will re-attempt to login in at least 2 hours.";
-					FailedLoginItem fItem;
-					fItem.email = theEmail;
-					fItem.tstamp = now;
-					fItem.errmsg = errmsg.str();
-					emailsFailingLoginsQ.add(fItem);
+					scheduleFailureReport(m, errmsg.str());
 					nextConnectAttempt[theEmail] = now + 7200;
 					mailboxControl[theEmail].lastCheck = now + 7200;
 					mailboxControl[theEmail].isOpened = false;
