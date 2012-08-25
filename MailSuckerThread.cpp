@@ -247,6 +247,7 @@ namespace pmm {
 		
 		while (true) {
 			//Process account addition and removals if there is any
+			reportFailedLogins();
 			registerDeviceTokens();
 			processAccountAdd();
 			relinquishDeviceTokens();
