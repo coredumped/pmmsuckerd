@@ -502,7 +502,7 @@ namespace pmm {
 					else pmm::imapLog << "CRITICAL: (" << attempt << ") Unable to login to: " << m.email() << ", response=" << imapControl[theEmail].imap->imap_response << pmm::NL;
 				}
 #endif
-				if (attempt > maxServerReconnects == 0) {
+				if (attempt > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
 					std::stringstream errmsg;
 					errmsg << "Unable to login to " << theEmail;
@@ -547,10 +547,13 @@ namespace pmm {
 				}
 				else {
 					int idleEnabled;
+#ifdef ENABLE_NATE_DOT_COM_WORKAROUND
 					if (theEmail.compare("jinny27@nate.com") == 0) {
 						idleEnabled = 0;
 					}
-					else idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
+					else
+#endif
+					idleEnabled = mailimap_has_idle(imapControl[theEmail].imap);
 					if(!idleEnabled){
 						imapLog << "WARNING: " << theEmail << " is not hosted in an IMAP IDLE environment." << pmm::NL;
 						mailboxControl[theEmail].isOpened = true;
