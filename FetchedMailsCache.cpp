@@ -856,6 +856,15 @@ namespace pmm {
 			throw GenericException(errmsg.str());
 		}
 		autoRefreshUConn(email);
+#ifdef ENABLE_AUTOMATIC_DATAFILE_REMOVAL
+#warning Automatic removal of data files is not enabled
+		//Erase data file immediately
+		std::string dbFile;
+		getDataFile(dbFile, email);
+		if(dbFile.size() > 0){
+			unlink(dbFile.c_str());
+		}
+#endif
 	}
 
 	
