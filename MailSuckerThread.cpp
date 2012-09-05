@@ -98,7 +98,10 @@ namespace pmm {
 		while (addAccountQueue->extractEntry(m)) {
 			emailAccounts.push_back(m);
 			std::stringstream msg;
-			msg << "Monitoring of " + m.email() + " has been enabled :-)";
+			if(m.mailboxType().find("POP") == 0){
+				msg << "Monitoring of " + m.email() + " has been enabled, wait a few minutes while message indexing takes place :-)";
+			}
+			else msg << "Monitoring of " + m.email() + " has been enabled, you'll start receiving e-mail notifications shortly :-)";
 			std::vector<std::string> myDevTokens = m.devTokens();
 			for (size_t i = 0; i < myDevTokens.size(); i++) {
 				pmm::NotificationPayload np(myDevTokens[i], msg.str());
