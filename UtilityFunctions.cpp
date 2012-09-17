@@ -187,7 +187,7 @@ namespace pmm {
 	static int getTag(const std::string &input, int offset, std::string &tagName){
 		int n = 0;
 		tagName = "";
-		for (int i = offset; i < input.size() && !isblank(input[i]); i++, n++) {
+		for (int i = offset; i < input.size() && !isblank(input[i]) && input[i] != '>'; i++, n++) {
 			tagName.append(1, tolower(input[i]));
 		}
 		return n;
@@ -255,7 +255,7 @@ namespace pmm {
 			if(j > maxTextSize) break;
 			if (htmlCode[i] == '<') {
 				ignoreChar = true;
-				int n = getTag(htmlCode, i, currentTag);
+				int n = getTag(htmlCode, i + 1, currentTag);
 				i += n;
 				if(currentTag.compare("br") == 0 || currentTag.compare("div") == 0){
 					if(!gotNewline){
@@ -264,7 +264,7 @@ namespace pmm {
 						gotNewline = true;
 					}
 				}
-				else if(currentTag.compare("span")){
+				else if(currentTag.compare("span") == 0){
 					if (!gotBlank) {
 						output.append(" ");
 						j++;
