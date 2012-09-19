@@ -309,7 +309,21 @@ namespace pmm {
 			std::string theBody = msgBody.str();
 			std::string theHtmlBody = htmlBody.str();
 			if(theBody.size() == 0 &&  theHtmlBody.size() > 0){
-				stripHTMLTags(htmlBody.str(), theHtmlBody, 4096);
+				std::map<std::string, std::string> htmlProps;
+				stripHTMLTags(htmlBody.str(), theHtmlBody, htmlProps, 4096);
+				if (!(htmlProps["charset"].compare(TextEncoding::utf8) == 0 || htmlProps["charset"].compare("utf-8") == 0)) {
+					//Encoding is different convert it to utf8
+					std::string html_s = theHtmlBody;
+					size_t inleft = html_s.size(), outleft = html_s.size() * 2;
+					char *utf8d = (char *)malloc(outleft);
+					bzero(utf8d, outleft);
+					char *ptr_in = (char *)html_s.c_str(), *ptr_out = utf8d;
+					iconv_t cd = iconv_open(TextEncoding::utf8, htmlProps["charset"].c_str());
+					iconv(cd, &ptr_in, &inleft, &ptr_out, &outleft);
+					theHtmlBody = utf8d;
+					free(utf8d);
+					iconv_close(cd);
+				}
 				theBody = theHtmlBody;
 			}
 			std::string tmpBody = theBody;

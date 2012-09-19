@@ -166,11 +166,7 @@ namespace pmm {
 					if(i == 0){
 						if (!QuotaDB::decrease(imapFetch.mailAccountInfo.email())) {
 							imapLog << "ATTENTION: Account " << imapFetch.mailAccountInfo.email() << " has ran out of quota!!!" << pmm::NL;
-							//std::stringstream msg;
-							//msg << "You have ran out of quota on " << imapFetch.mailAccountInfo.email() << ", you may purchase more to keep receiving notifications.";
-							//pmm::NotificationPayload npi(myDevTokens[i], msg.str());
 							pmm::NoQuotaNotificationPayload npi(myDevTokens[i], imapFetch.mailAccountInfo.email());
-							//npi.isSystemNotification = true;
 							if (imapFetch.mailAccountInfo.devel) {
 								pmm::imapLog << "Using development notification queue for this message." << pmm::NL;
 								develNotificationQueue->add(npi);
@@ -687,7 +683,12 @@ namespace pmm {
 			if (resetIdle) {
 				int result = mailimap_idle_done(imap);
 				if(result != MAILIMAP_NO_ERROR){
-					pmm::imapLog << "CRITICAL: Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
+					if(imap->imap_response == NULL){
+						pmm::imapLog << "CRITICAL: Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle" << pmm::NL;
+					}
+					else {
+						pmm::imapLog << "CRITICAL: Unable to send DONE to IMAP after IDLE for: " << theEmail << " disconnecting from monitoring, we will reconnect in the next cycle, response: " << imap->imap_response << pmm::NL;
+					}
 					mailimap_idle_done(imap);
 					mailimap_logout(imap);
 					mailimap_close(imap);

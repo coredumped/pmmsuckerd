@@ -228,7 +228,7 @@ namespace pmm {
 	static int translateEntities(const std::string &input, int offset, std::string &output){
 		std::string entity;
 		bool isCode = false;
-		int j = 0;
+		int j = 1;
 		for (int i = offset + 1; i < input.size() && input[i] != ';'; i++, j++) {
 			if (input[i] == '#' && i == offset + 1) isCode = true;
 			else {
@@ -242,8 +242,39 @@ namespace pmm {
 		else if(entity.compare("apos") == 0) output.append(1, '\'');
 		return j;
 	}
+		
+	static size_t getMetaValue(const std::string &input, int offset, std::string &variable, std::string &value){
+		size_t pos;
+		size_t n = 0;
+		if((pos = input.find(">", offset)) != input.npos){
+			variable = "";
+			value = "";
+			std::string tagProps = input.substr(offset, pos - offset);
+			std::string input2 = tagProps;
+			std::transform(input2.begin(), input2.end(), input2.begin(), ::tolower);
+			n += tagProps.size();
+			size_t equivPos = input2.find("http-equiv=\"");
+			if (equivPos == input2.npos) return n;
+			size_t contentPos = input2.find("content=\"");
+			if (contentPos == input2.npos) return n;
+			//Find the http-equiv variable
+			for (size_t i = equivPos + 12; i < input2.size() && input2[i] != '"'; i++) {
+				variable.append(1, input2[i]);
+			}
+			if(variable.size() == 0) return n;
+			//Find the content variable
+			for (size_t i = contentPos + 9; i < tagProps.size() && tagProps[i] != '"'; i++) {
+				value.append(1, tagProps[i]);
+			}
+			if(value.size() == 0) {
+				variable = "";
+			}
+		}
+		return n;
+	}
 	
-	void stripHTMLTags(const std::string &htmlCode, std::string &output, int maxTextSize){
+	void stripHTMLTags(const std::string &htmlCode, std::string &output, std::map<std::string, std::string> &htmlProperties, int maxTextSize){
+		htmlProperties["charset"] = "UTF-8";
 		output = "";
 		int j = 0;
 		bool ignoreChar = false;
@@ -257,6 +288,9 @@ namespace pmm {
 				ignoreChar = true;
 				int n = getTag(htmlCode, i + 1, currentTag);
 				i += n;
+/*#ifdef DEBUG_MESSAGE_PARSING
+				std::cerr << "DEBUG: Tag: " << currentTag << std::endl;
+#endif*/
 				if(currentTag.compare("br") == 0 || currentTag.compare("div") == 0){
 					if(!gotNewline){
 						output.append("\n");
@@ -273,6 +307,25 @@ namespace pmm {
 				}
 				else if(currentTag.compare("style") == 0) styleTagOpened = true;
 				else if(currentTag.compare("/style") == 0) styleTagOpened = false;
+				else if(currentTag.compare("meta") == 0){
+					std::string var, value;
+					getMetaValue(htmlCode, i, var, value);
+					if (var.compare("content-type") == 0) {
+						//Parse value, find charset;
+						size_t cpos;
+						if((cpos = value.find("charset=")) != value.npos){
+							std::string newCharset;
+							for (size_t k = cpos + 8; k < value.size() && !isblank(value[k]); k++) {
+								newCharset.append(1, value[k]);
+							}
+							if(newCharset.size() > 0) htmlProperties["charset"] = newCharset;
+#ifdef DEBUG_MESSAGE_PARSING
+							std::cerr << "DEBUG: Using charset: " << newCharset << std::endl;
+#endif
+						}
+					}
+				}
+
 				else{
 					//gotBlank = false;
 					//gotNewline = false;
@@ -293,6 +346,7 @@ namespace pmm {
 				else {
 					if(!styleTagOpened){
 						if(gotNewline && htmlCode[i] == '\r') continue;
+						if(gotNewline && htmlCode[i] == '\n') continue;
 						if(gotBlank && htmlCode[i] == ' ') continue;
 						if (htmlCode[i] == '\n') {
 							if(gotNewline) continue;

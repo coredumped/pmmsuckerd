@@ -10,6 +10,7 @@
 #define PMM_Sucker_UtilityFunctions_h
 #include <string>
 #include <vector>
+#include <map>
 #include <sqlite3.h>
 #ifdef __linux__
 #include <stdint.h>
@@ -32,7 +33,7 @@ namespace pmm {
 	void splitString(std::vector<std::string> &_return, const std::string &theString, const std::string &delim);
 	
 	void jsonTextEncode(std::string &theMsg);
-	void stripHTMLTags(const std::string &htmlCode, std::string &output, int maxTextSize = 16384);
+	void stripHTMLTags(const std::string &htmlCode, std::string &output, std::map<std::string, std::string> &htmlProperties, int maxTextSize = 16384);
 	
 	void stripBlankLines(const std::string &input, std::string &output);
 }
