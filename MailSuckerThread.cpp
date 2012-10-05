@@ -49,6 +49,7 @@ namespace pmm {
 	
 	MailboxControl::MailboxControl(){
 		openedOn = time(0);
+		monitoringStartedOn = openedOn;
 		isOpened = false;
 		availableMessages = 0;
 		lastCheck = 0;
@@ -60,6 +61,7 @@ namespace pmm {
 		email = m.email;
 		availableMessages = m.availableMessages;
 		lastCheck = m.lastCheck;
+		monitoringStartedOn = m.monitoringStartedOn;
 	}
 	
 	MailboxControl &MailboxControl::operator=(const MailboxControl &m){
@@ -68,6 +70,7 @@ namespace pmm {
 		email = m.email;
 		availableMessages = m.availableMessages;
 		lastCheck = m.lastCheck;
+		monitoringStartedOn = m.monitoringStartedOn;
 		return *this;
 	}
 	

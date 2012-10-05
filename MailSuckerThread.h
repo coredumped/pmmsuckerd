@@ -31,19 +31,27 @@ namespace pmm {
 		time_t expirationTimestamp;
 	};
 	
+	/** A queue object for describing e-mail accounts to be notified in the case of multiple failed login attempts */
 	struct FailedLoginItem {
 		std::string errmsg;
 		time_t tstamp;
 		MailAccountInfo m;
 	};
 	
+	/** Has information regarding mailbox monitoring parameters a very few stats (if any) */
 	class MailboxControl {
 	public:
+		/** User e-mail being monitored */
 		std::string email;
+		/** Timestamp holding the point in time when the last succesful login happened. */
 		time_t openedOn;
+		/** Tells wheter we have an open connection to such mailbox */
 		bool isOpened;
-		int availableMessages;
+		/** Holds the amount of available (unseen) messages in the mailbox */
+		int availableMessages __attribute__ ((deprecated));
 		time_t lastCheck;
+		/** Timestamp holding the moment when this MailboxControl object was first instanced */
+		time_t monitoringStartedOn;
 		MailboxControl();
 		MailboxControl(const MailboxControl &m);
 		MailboxControl &operator=(const MailboxControl &m);

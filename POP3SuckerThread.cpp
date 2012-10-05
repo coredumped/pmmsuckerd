@@ -137,6 +137,8 @@ namespace pmm {
 		if(etpanOperationFailed(result)){
 			int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 			serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
+			int failedLogins = cntFailedLoginAttempts->get();
+			cntFailedLoginAttempts->set(failedLogins + 1);
 			if (pop3->pop3_response == NULL) {
 				pop3Log << "PANIC: (attempt=" << theVal << ", dt=" << (int)(time(0) - fetchT0) << "s) Unable to retrieve messages for: " << pf.mailAccountInfo.email() << " can't connect to server " << pf.mailAccountInfo.serverAddress() << ", I will retry later" << pmm::NL;
 			}
@@ -171,6 +173,8 @@ namespace pmm {
 				if(serverConnectAttempts.find(pf.mailAccountInfo.serverAddress()) == serverConnectAttempts.end()) serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = 0;
 				int theVal = serverConnectAttempts[pf.mailAccountInfo.serverAddress()] + 1;
 				serverConnectAttempts[pf.mailAccountInfo.serverAddress()] = theVal;
+				int failedLogins = cntFailedLoginAttempts->get();
+				cntFailedLoginAttempts->set(failedLogins + 1);
 				if (result == MAILPOP3_ERROR_BAD_PASSWORD) {
 					std::string errorMsg;
 					if (pop3->pop3_response != NULL) {
@@ -638,6 +642,7 @@ namespace pmm {
 			pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
 			pop3Fetcher[i].cntBytesDownloaded = &cntBytesDownloaded;
 			pop3Fetcher[i].emails2Disable = &this->emails2Disable;
+			pop3Fetcher[i].cntFailedLoginAttempts = &cntFailedLoginAttempts;
 		}
 		for (size_t j = 0; j < maxHotmailThreads; j++) {
 			pop3Fetcher[l - j - 1].isForHotmail = true;
@@ -662,6 +667,7 @@ namespace pmm {
 				pop3Fetcher[i].cntRetrieved = &cntRetrievedMessages;
 				pop3Fetcher[i].cntBytesDownloaded = &cntBytesDownloaded;
 				pop3Fetcher[i].emails2Disable = &this->emails2Disable;
+				pop3Fetcher[i].cntFailedLoginAttempts = &cntFailedLoginAttempts;
 			}
 			for (size_t j = 0; j < maxHotmailThreads; j++) {
 				pop3Fetcher[l - j - 1].isForHotmail = true;

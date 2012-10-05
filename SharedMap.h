@@ -58,6 +58,12 @@ namespace pmm {
 			return Y(val);
 		}
 		
+		void get(const X &key, Y &val){
+			readLock();
+			val = theMap[key];
+			unlock();
+		}
+		
 		Y &operator[](const X &key){
 			return this->get(key);
 		}
@@ -68,6 +74,15 @@ namespace pmm {
 			if(theMap.find(key) == theMap.end()) ret = false;
 			unlock();
 			return ret;
+		}
+		
+		void getAllKeys(std::vector<X> &theKeys){
+			readLock();
+			std::map<X, Y>::iterator iter;
+			for (iter = theMap.begin(); iter != theMap.end(); iter++) {
+				theKeys.push_back(iter->first);
+			}
+			unlock();
 		}
 	};
 }

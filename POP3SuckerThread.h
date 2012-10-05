@@ -61,6 +61,7 @@ namespace pmm {
 			std::map<std::string, int> serverConnectAttempts;
 			AtomicVar<int> *cntRetrieved;
 			AtomicVar<int> *cntBytesDownloaded;
+			AtomicVar<int> *cntFailedLoginAttempts;
 			SharedSet<std::string> *emails2Disable;
 			POP3FetcherThread();
 			~POP3FetcherThread();
