@@ -279,9 +279,9 @@ namespace pmm {
 		//iconv_t cnv = iconv_open("UTF-8", "");
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
-			char *p = curl_easy_escape(www, keypair->first.c_str(), keypair->first.size());
+			char *p = curl_easy_escape(www, keypair->first.c_str(), (int)keypair->first.size());
 			char *v;
-			v = curl_easy_escape(www, keypair->second.c_str(), keypair->second.size());
+			v = curl_easy_escape(www, keypair->second.c_str(), (int)keypair->second.size());
 			if (encodedPost.str().size() == 0) encodedPost << p << "=" << v;
 			else encodedPost << "&" << p << "=" << v;
 			curl_free(p);
@@ -718,5 +718,105 @@ namespace pmm {
 		return retval;
 	}
 
+	void SuckerSession::putStat(const std::string &var, double val){
+		char errorBuffer[CURL_ERROR_SIZE + 4096];
+		static const char *sURL = "http://fnxsoftware.com/pmm/putstat.php";
+		CURL *www = curl_easy_init();
+		DataBuffer buffer;
+		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(www, CURLOPT_URL, sURL);
+		curl_easy_setopt(www, CURLOPT_USERAGENT, suckerUserAgent);
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, &buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+		curl_easy_setopt(www, CURLOPT_TIMEOUT, 10);
+		curl_easy_setopt(www, CURLOPT_POST, 1);
+#ifdef DEBUG
+		pmm::Log << "DEBUG: Uploading stats to fn(x) " << var << "=" << val << pmm::NL;
+#endif
+		//Build stat vars
+		char *p = curl_easy_escape(www, var.c_str(), (int)var.size());
+		std::stringstream s_val;
+		s_val << val;
+		std::string val_s = s_val.str();
+		char *v = curl_easy_escape(www, val_s.c_str(), (int) val_s.size());
+		std::stringstream encodedParms;
+		encodedParms << p << "=" << v;
+		encodedParms << "&pmmsucker=" << myID;
+		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedParms.str().c_str());
+		curl_free(p);
+		curl_free(v);
+		
+		CURLcode ret = curl_easy_perform(www);
+		if(ret == CURLE_OK){
+			std::string output(buffer.buffer, buffer.size);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Got this from stats server: " << output << pmm::NL;
+#endif
+		}
+		else {
+			int http_errcode;
+			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Unable to perform request to " << sURL << ": HTTP Status=" << http_errcode << ": " << errorBuffer << pmm::NL;
+#endif
+		}
+		curl_easy_cleanup(www);
+	}
+	
+	void SuckerSession::putStatMultiple(const std::map<std::string, double> &dataMap) {
+		char errorBuffer[CURL_ERROR_SIZE + 4096];
+		static const char *sURL = "http://fnxsoftware.com/pmm/putstatm.php";
+		CURL *www = curl_easy_init();
+		DataBuffer buffer;
+		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(www, CURLOPT_URL, sURL);
+		curl_easy_setopt(www, CURLOPT_USERAGENT, suckerUserAgent);
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, &buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+		curl_easy_setopt(www, CURLOPT_TIMEOUT, 10);
+		curl_easy_setopt(www, CURLOPT_POST, 1);
+#ifdef DEBUG
+		pmm::Log << "DEBUG: Uploading " << (int)dataMap.size() << " stats to fn(x)..." << pmm::NL;
+#endif
+		//Build stat vars
+		std::stringstream encodedParms;
+		encodedParms << "pmmsucker=" << myID;
+		for (std::map<std::string, double>::iterator iter; iter != dataMap.end(); iter++) {
+			std::string var = iter->first;
+			char *p = curl_easy_escape(www, var.c_str(), (int)var.size());
+			std::stringstream s_val;
+			double val = iter->second;
+			s_val << val;
+			std::string val_s = s_val.str();
+			char *v = curl_easy_escape(www, val_s.c_str(), (int) val_s.size());
+			encodedParms << "&" << p << "=" << v;
+			curl_free(p);
+			curl_free(v);			
+		}
+
+		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedParms.str().c_str());
+		
+		CURLcode ret = curl_easy_perform(www);
+		if(ret == CURLE_OK){
+			std::string output(buffer.buffer, buffer.size);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Got this from stats server: " << output << pmm::NL;
+#endif
+		}
+		else {
+			int http_errcode;
+			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Unable to perform request to " << sURL << ": HTTP Status=" << http_errcode << ": " << errorBuffer << pmm::NL;
+#endif
+		}
+		curl_easy_cleanup(www);
+	}
 }
 

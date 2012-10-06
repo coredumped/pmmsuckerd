@@ -368,6 +368,13 @@ int main (int argc, const char * argv[])
 	
 	//9. Dispatch pending notifications not sent due to a unexpected crash or unhandled exception
 	pmm::PendingNotificationStore::loadPayloads(&notificationQueue);
+	//Local counters
+	int cntAccountsAdded = 0;
+	int cntAccountsRemoved = 0;
+	int cntAccountsUpdated = 0;
+	int cntNoQuota = 0;
+	int cntDeviceReg = 0;
+	int cntDeviceUnReg = 0;
 	while (keepRunning) {
 		try {
 			session.performAutoRegister();
@@ -410,6 +417,9 @@ int main (int argc, const char * argv[])
 				notifThreads[j].cntMessageFailed = 0;
 			}
 			pmm::Log << "=================================================================" << pmm::NL;
+			std::map<std::string, double> statMap;
+			statMap["notitications.sent"] = sent;
+			statMap["notitications.failed"] = failed;
 			pmm::Log << "STAT: Notifications sent: " << (double)(sent / 300.0) << "/sec failed: " << (double)(failed / 300.0) << "/sec" << pmm::NL;
 			int msgRetrieved = 0, acctTotal = 0, bytesDlds = 0, failedLogins = 0;
 			for (int j = 0; j < maxIMAPSuckerThreads; j++) {
@@ -421,6 +431,10 @@ int main (int argc, const char * argv[])
 				imapSuckingThreads[j].cntBytesDownloaded = 0;
 				imapSuckingThreads[j].cntFailedLoginAttempts = 0;
 			}
+			statMap["imap.received"] = msgRetrieved;
+			statMap["imap.accounts.monitored"] = acctTotal;
+			statMap["imap.data.downloaded"] = bytesDlds;
+			statMap["imap.login.failed"] = failedLogins;
 			pmm::Log << "STAT: IMAP messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			pmm::Log << "STAT: IMAP downloaded data: ";
 			if (bytesDlds > 1048576){
@@ -448,6 +462,10 @@ int main (int argc, const char * argv[])
 				pop3SuckingThreads[j].cntBytesDownloaded = 0;
 				pop3SuckingThreads[j].cntFailedLoginAttempts = 0;
 			}
+			statMap["pop3.received"] = msgRetrieved;
+			statMap["pop3.accounts.monitored"] = acctTotal;
+			statMap["pop3.data.downloaded"] = bytesDlds;
+			statMap["pop3.login.failed"] = failedLogins;
 			pmm::Log << "STAT: POP3 messages retrieved: " << (double)(msgRetrieved / 300.0) << "/sec. Monitored accounts: " << acctTotal << pmm::NL;
 			pmm::Log << "STAT: POP3 downloaded data: ";
 			if (bytesDlds > 1048576){
@@ -461,6 +479,14 @@ int main (int argc, const char * argv[])
 			}
 			pmm::Log << ". Rate: " << (double)(bytesDlds / 300.0) << " bytes/sec" << pmm::NL;
 			pmm::Log << "STAT: POP3 Failed logins: " << failedLogins << ". Rate: " << (double)(failedLogins / 300.0) << "/sec" << pmm::NL;
+			statMap["emailAccounts.added"] = cntAccountsAdded;
+			statMap["emailAccounts.removed"] = cntAccountsRemoved;
+			statMap["emailAccounts.updated"] = cntAccountsUpdated;
+			statMap["quota.zero"] = cntNoQuota;
+			statMap["device.reg"] = cntDeviceReg;
+			statMap["device.unreg"] = cntDeviceUnReg;
+			cntAccountsAdded = cntAccountsRemoved = cntAccountsUpdated = cntNoQuota = cntDeviceReg = cntDeviceUnReg = 0;
+			session.putStatMultiple(statMap);
 		}
 		if (tic % 45 == 0) {
 			//Process quota updates if any
@@ -541,6 +567,7 @@ int main (int argc, const char * argv[])
 							else {
 								updateAccountProperties(pop3SuckingThreads, maxPOP3SuckerThreads, parameters);
 							}
+							cntAccountsUpdated++;
 						}
 						else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
 							pmm::QuotaIncreasePetition p;
@@ -562,6 +589,7 @@ int main (int argc, const char * argv[])
 								//addNewEmailAccount(session, pop3SuckingThreads, maxPOP3SuckerThreads, &popAssignationIndex, parameters["email"]);
 								addNewEmailAccount(session, &addPOP3AccountQueue, parameters["email"]);
 							}
+							cntAccountsAdded++;
 						}
 						else if (command.compare(pmm::Commands::relinquishDevToken) == 0){
 							for (std::map<std::string, std::string>::iterator reliter = parameters.begin(); reliter != parameters.end(); reliter++) {
@@ -617,6 +645,7 @@ int main (int argc, const char * argv[])
 								else {
 									removeEmailAccount(&rmPOP3AccountQueue, parameters["email"]);
 								}
+								cntAccountsRemoved++;
 							}
 							else {
 								pmm::Log << "Malformed account remove request received!!!" << pmm::NL;
@@ -650,6 +679,7 @@ int main (int argc, const char * argv[])
 							if(session.retrieveEmailAddressInfo(info, parameters["email"])){
 								pmm::Log << "INFO: Sending account " << parameters["email"] << "=" << info.email() << " to the update queue..." << pmm::NL;
 								mailAccounts2Refresh.push_back(info);
+								cntAccountsUpdated++;
 							}
 							else {
 								pmm::Log << "CRITICAL: Unable to retrieve " << parameters["email"] << " entry from pmm service :-(" << pmm::NL;

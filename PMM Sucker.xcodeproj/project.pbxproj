@@ -913,7 +913,7 @@
 		82F86B221425A457006ACFEB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 82F86B251425A457006ACFEB /* Build configuration list for PBXProject "PMM Sucker" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1524,6 +1524,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "PMM Sucker/PMM Sucker.entitlements";
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PMM Sucker/PMM Sucker-Prefix.pch";
 				INFOPLIST_FILE = "PMM Sucker/PMM Sucker-Info.plist";
@@ -1536,6 +1537,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "PMM Sucker/PMM Sucker.entitlements";
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PMM Sucker/PMM Sucker-Prefix.pch";
 				INFOPLIST_FILE = "PMM Sucker/PMM Sucker-Info.plist";

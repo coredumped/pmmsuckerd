@@ -93,6 +93,10 @@ namespace pmm {
 		
 		//Invalid token handling
 		bool reportInvalidDeviceToken(const std::vector<std::string> &tokVec);
+		
+		//Sends stat information to the fnx server
+		void putStat(const std::string &var, double val);
+		void putStatMultiple(const std::map<std::string, double> &dataMap);
 	};
 	
 	namespace Commands {
