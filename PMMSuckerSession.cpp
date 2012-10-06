@@ -766,7 +766,7 @@ namespace pmm {
 		curl_easy_cleanup(www);
 	}
 	
-	void SuckerSession::putStatMultiple(const std::map<std::string, double> &dataMap) {
+	void SuckerSession::putStatMultiple(std::map<std::string, double> &dataMap) {
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
 		static const char *sURL = "http://fnxsoftware.com/pmm/putstatm.php";
 		CURL *www = curl_easy_init();
@@ -787,7 +787,7 @@ namespace pmm {
 		//Build stat vars
 		std::stringstream encodedParms;
 		encodedParms << "pmmsucker=" << myID;
-		for (std::map<std::string, double>::iterator iter; iter != dataMap.end(); iter++) {
+		for (std::map<std::string, double>::iterator iter = dataMap.begin(); iter != dataMap.end(); iter++) {
 			std::string var = iter->first;
 			char *p = curl_easy_escape(www, var.c_str(), (int)var.size());
 			std::stringstream s_val;
