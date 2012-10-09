@@ -41,6 +41,8 @@
 namespace pmm {
 	MTLogger imapLog;
 	
+	static const char *kGoogleIMAPNotAllowed1 = "[AUTH] Web login required: https://support.google.com/mail";
+	static const char *kGoogleIMAPNotAllowed2 = "Please log in via your web browser: http://support.google.com/mail";
 	
 	static char * get_msg_att_msg_content(struct mailimap_msg_att * msg_att, size_t * p_msg_size, MailMessage &tm)
 	{
@@ -498,6 +500,18 @@ namespace pmm {
 					else pmm::imapLog << "CRITICAL: (" << attempt << ") Unable to login to: " << m.email() << ", response=" << imapControl[theEmail].imap->imap_response << pmm::NL;
 				}
 #endif
+				int multiplier = attempt / maxServerReconnects + 1;
+				if (m.serverAddress().compare("imap.gmail.com") == 0) {
+					if (imapControl[theEmail].imap->imap_response != 0) {
+						if (strncasecmp(imapControl[theEmail].imap->imap_response, kGoogleIMAPNotAllowed1, 57) == 0 ||
+							strncasecmp(imapControl[theEmail].imap->imap_response, kGoogleIMAPNotAllowed2, 57) == 0) {
+							multiplier = multiplier + 12;
+#ifdef DEBUG
+							pmm::imapLog << "PANIC: Google requested web login for account " << theEmail << " not retrying until at least " << multiplier << " hours." << pmm::NL;
+#endif
+						}
+					}
+				}
 				if (attempt > maxServerReconnects) {
 					//Max reconnect exceeded, notify user
 					std::stringstream errmsg;
@@ -508,10 +522,12 @@ namespace pmm {
 					else {
 						errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
 					}
-					errmsg << "\nWe will re-attempt to login in at least 2 hours.";
+					errmsg << "\nWe will re-attempt to login in at least " << multiplier << " hours.";
 					scheduleFailureReport(m, errmsg.str());
-					nextConnectAttempt[theEmail] = now + 7200;
-					mailboxControl[theEmail].lastCheck = now + 7200;
+					
+					int rndTime = now % 300;
+					nextConnectAttempt[theEmail] = now + 3600 * multiplier + rndTime;
+					mailboxControl[theEmail].lastCheck = now + 3600 * multiplier + rndTime;
 					mailboxControl[theEmail].isOpened = false;
 				}
 				else {
