@@ -97,6 +97,7 @@ namespace pmm {
 		void notifyTo(const std::string &devToken, NotificationPayload &msg);
 		bool gotErrorFromApple();
 	public:
+		bool dummyMode;
 		AtomicFlag warmingUP;
 		std::set<std::string> invalidTokenSet;
 		SharedQueue<NotificationPayload> *notificationQueue;

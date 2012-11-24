@@ -18,6 +18,7 @@ namespace pmm {
 	private:
 	protected:
 	public:
+		bool dummyMode;
 		SharedQueue<NotificationPayload> *pmmStorageQueue;
 		SuckerSession *session;
 		MessageUploaderThread();

@@ -49,6 +49,7 @@ namespace pmm {
 #ifdef CHEAT_SESSION_MANAGER
 		std::string myID;
 #endif
+		bool dummyMode;
 		SuckerSession();
 		SuckerSession(const std::string &srvURL);
 

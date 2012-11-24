@@ -38,6 +38,9 @@
 #ifndef DEFAULT_NOTIFICATION_WARMUP_TIME
 #define DEFAULT_NOTIFICATION_WARMUP_TIME 1
 #endif
+#ifndef DEFAULT_DUMMY_MODE_ENABLED
+#define DEFAULT_DUMMY_MODE_ENABLED false
+#endif
 #include <pthread.h>
 #include <signal.h>
 #include <sys/stat.h>
@@ -317,6 +320,7 @@ namespace pmm {
 		warmingUP = false;
 		cntMessageFailed = 0;
 		cntMessageSent = 0;
+		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
 	}
 	
 	APNSNotificationThread::~APNSNotificationThread(){
@@ -608,7 +612,7 @@ namespace pmm {
 			devToken2Binary(devToken, binaryDevToken);
 			devTokenCache[devToken] = binaryDevToken;
 		}
-		sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size(), _useSandbox, devToken);
+		if(!dummyMode) sendPayload(apnsConnection, devTokenCache[devToken].c_str(), jsonMsg.c_str(), jsonMsg.size(), _useSandbox, devToken);
 	}
 	
 	SSLException::SSLException(){ 

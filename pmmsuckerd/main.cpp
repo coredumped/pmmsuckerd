@@ -76,6 +76,10 @@
 #define DEFAULT_INVALID_TOKEN_FILE "invalid-devices.dat"
 #endif
 
+#ifndef DEFAULT_DUMMY_MODE_ENABLED
+#define DEFAULT_DUMMY_MODE_ENABLED false
+#endif
+
 void printHelpInfo();
 pmm::SuckerSession *globalSession;
 pmm::APNSNotificationThread *globalNotifThreads;
@@ -102,6 +106,7 @@ void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::Shar
 int main (int argc, const char * argv[])
 {
 	bool enableDevelAPNS = false;
+	bool dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
 	std::string pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
 	std::string logFilePath = DEFAULT_LOGFILE;
 	size_t maxNotificationThreads = DEFAULT_MAX_NOTIFICATION_THREADS;
@@ -198,6 +203,9 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--devel-apns") == 0){
 			enableDevelAPNS = true;
 		}
+		else if(arg.compare("--dummy") == 0){
+			dummyMode = true;
+		}
 	}
 	pmm::Log.open(logFilePath);
 	pmm::CacheLog.open("mailcache.log");
@@ -214,6 +222,7 @@ int main (int argc, const char * argv[])
 	preferenceEngine.preferenceQueue = &preferenceSetQueue;
 	//1. Register to PMMService...
 	try {
+		session.dummyMode = dummyMode;
 		session.register2PMM();
 	} catch (pmm::ServerResponseException &se1) {
 		if (se1.errorCode == pmm::PMM_ERROR_SUCKER_DENIED) {
@@ -289,6 +298,7 @@ int main (int argc, const char * argv[])
 		notifThreads[i].setCertPath(sslCertificatePath);
 		notifThreads[i].setKeyPath(sslPrivateKeyPath);
 		notifThreads[i].invalidTokens = &invalidTokenQ;
+		notifThreads[i].dummyMode = dummyMode;
 		pmm::ThreadDispatcher::start(notifThreads[i], threadStackSize);
 		//sleep(1);
 	}
@@ -297,12 +307,14 @@ int main (int argc, const char * argv[])
 	develNotifThread.setCertPath(sslDevelCertificatePath);
 	develNotifThread.setKeyPath(sslDevelPrivateKeyPath);
 	develNotifThread.invalidTokens = &develInvalidTokenQ;
+	develNotifThread.dummyMode = dummyMode;
 	pmm::ThreadDispatcher::start(develNotifThread, threadStackSize);
 	//sleep(1);
 	
 	for (size_t i = 0; i < maxMessageUploaderThreads; i++) {
 		msgUploaderThreads[i].session = &session;
 		msgUploaderThreads[i].pmmStorageQueue = &pmmStorageQueue;
+		msgUploaderThreads[i].dummyMode = dummyMode;
 		pmm::ThreadDispatcher::start(msgUploaderThreads[i], threadStackSize);
 	}
 	//Initiate Preference Management Engine

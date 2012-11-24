@@ -14,11 +14,16 @@
 #define MAX_DEFAULT_UPLOAD_ATTEMPTS 5
 #endif
 
+#ifndef DEFAULT_DUMMY_MODE_ENABLED
+#define DEFAULT_DUMMY_MODE_ENABLED false
+#endif
+
 namespace pmm {
 	MessageUploaderThread::MessageUploaderThread(){
 		pmmStorageQueue = NULL;
 		session = NULL;
 		maxUploadAttempts = MAX_DEFAULT_UPLOAD_ATTEMPTS;
+		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
 	}
 	
 	MessageUploaderThread::~MessageUploaderThread(){
@@ -37,7 +42,7 @@ namespace pmm {
 					pmm::Log << "Uploading message to: " << np.origMailMessage.to << pmm::NL;
 #endif
 					np.attempts++;
-					session->uploadNotificationMessage(np);
+					if(!dummyMode) session->uploadNotificationMessage(np);
 				} catch (pmm::HTTPException &htex1) {
 					pmm::Log << "Can't upload message due to: " << htex1.errorMessage() << ", will retry in the next cycle." << pmm::NL;
 					sleep(1);

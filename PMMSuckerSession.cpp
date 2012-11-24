@@ -66,6 +66,10 @@
 #endif
 #endif
 
+#ifndef DEFAULT_DUMMY_MODE_ENABLED
+#define DEFAULT_DUMMY_MODE_ENABLED false
+#endif
+
 namespace pmm {
 	
 	static const char *suckerUserAgent = DEFAULT_PMM_SUCKER_USER_AGENT;
@@ -337,12 +341,14 @@ namespace pmm {
 		apiKey = DEFAULT_API_KEY;
 		pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
 		expirationTime = time(0x00) + 600;
+		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
 	}
 	
 	SuckerSession::SuckerSession(const std::string &srvURL) {
 		apiKey = DEFAULT_API_KEY;
 		pmmServiceURL = srvURL;
 		expirationTime = time(0x00) + 600;
+		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
 	}
 	
 	bool SuckerSession::register2PMM(){
@@ -494,6 +500,7 @@ namespace pmm {
 	bool SuckerSession::reportQuotas(std::map<std::string, int> &quotas){
 		bool ret = false;
 		performAutoRegister();
+		if (dummyMode) return true;
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::pmmSuckerQuotaUpdate;
@@ -521,6 +528,7 @@ namespace pmm {
 	
 	int SuckerSession::getPendingTasks(std::vector< std::map<std::string, std::map<std::string, std::string> > > &tasksToRun){
 		int tCount = 0;
+		if (dummyMode) return 0;
 		performAutoRegister();
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
@@ -549,6 +557,7 @@ namespace pmm {
 		
 	void SuckerSession::uploadNotificationMessage(const NotificationPayload &np){
 		performAutoRegister();
+		if (dummyMode) return;
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMessage;
@@ -573,6 +582,7 @@ namespace pmm {
 	
 	void SuckerSession::uploadMultipleNotificationMessages(const std::vector<NotificationPayload> &msgs){
 		if(msgs.size() == 0) return;
+		if (dummyMode) return;
 		performAutoRegister();
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
@@ -641,6 +651,7 @@ namespace pmm {
 	
 	bool SuckerSession::reportInvalidDeviceToken(const std::vector<std::string> &tokVec){
 		if (tokVec.size() == 0) return true;
+		if (dummyMode) return true;
 		std::map<std::string, std::string> params;
 		params["apiKey"] = apiKey;
 		params["opType"] = pmm::OperationTypes::pmmSuckerReportInvalidToken;
@@ -679,6 +690,7 @@ namespace pmm {
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
 		static const char *sURL = "http://fnxsoftware.com/pmm/pmmgottask.php?pmmsucker=";
 		std::stringstream theURL;
+		if (dummyMode) return false;
 		theURL  << sURL << myID;
 		CURL *www = curl_easy_init();
 		DataBuffer buffer;
@@ -721,6 +733,7 @@ namespace pmm {
 	void SuckerSession::putStat(const std::string &var, double val){
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
 		static const char *sURL = "http://fnxsoftware.com/pmm/putstat.php";
+		if (dummyMode) return;
 		CURL *www = curl_easy_init();
 		DataBuffer buffer;
 		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
@@ -769,6 +782,7 @@ namespace pmm {
 	void SuckerSession::putStatMultiple(std::map<std::string, double> &dataMap) {
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
 		static const char *sURL = "http://fnxsoftware.com/pmm/putstatm.php";
+		if (dummyMode) return;
 		CURL *www = curl_easy_init();
 		DataBuffer buffer;
 		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);

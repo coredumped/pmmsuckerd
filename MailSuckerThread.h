@@ -96,6 +96,10 @@ namespace pmm {
 		
 		pmm::SharedQueue<FailedLoginItem> emailsFailingLoginsQ;
 		
+		/* Unlimited subscription-related data-structures */
+		/** Tells wheter the given mailbox is associated to an in-app subscription */
+		pmm::SharedSet<std::string> *subscribedSet;
+		
 		MailSuckerThread();
 		virtual ~MailSuckerThread();
 		
