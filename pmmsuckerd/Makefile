@@ -12,7 +12,7 @@
 ##
 
 GCC=g++
-CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1
+CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1 -DENABLE_NATE_DOT_COM_WORKAROUND=1
 LIBS=`pkg-config libcurl --libs` -luuid -lpthread -lssl -letpan -lsqlite3
 
 all: pmmsuckerd

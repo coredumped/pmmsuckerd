@@ -560,7 +560,7 @@ namespace pmm {
 				else {
 					int idleEnabled;
 #ifdef ENABLE_NATE_DOT_COM_WORKAROUND
-					if (theEmail.compare("jinny27@nate.com") == 0) {
+					if (theEmail.find("@nate.com") != theEmail.npos) {
 						idleEnabled = 0;
 					}
 					else
