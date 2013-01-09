@@ -138,6 +138,9 @@ int main (int argc, const char * argv[])
 	//pmm::SharedQueue<pmm::DevtokenQueueItem> devTokenRelinquishQueue("DeviceTokenRelinquishQueue");
 	pmm::SharedQueue<std::string> invalidTokenQ;
 	pmm::SharedQueue<std::string> develInvalidTokenQ;
+	pmm::SharedQueue<std::string> gmailAuthRequestedQ;
+	std::set<std::string> gmailAuthReqAlreadySent;
+	
 	
 	pmm::SharedVector<pmm::MailAccountInfo> mailAccounts2Refresh;
 	//pmm::SharedMap<std::string, int> statCounter;
@@ -344,6 +347,7 @@ int main (int argc, const char * argv[])
 		//imapSuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
+		imapSuckingThreads[i].gmailAuthRequestedQ = &gmailAuthRequestedQ;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
@@ -365,6 +369,7 @@ int main (int argc, const char * argv[])
 		//pop3SuckingThreads[i].devTokenRelinquishQueue = &devTokenRelinquishQueue;
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
+		pop3SuckingThreads[i].gmailAuthRequestedQ = &gmailAuthRequestedQ;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
@@ -396,6 +401,16 @@ int main (int argc, const char * argv[])
 			continue;
 		}
 		std::string lastInvalidToken;
+		std::string gmailAccount2ReqAdditionalAuth;
+		while (gmailAuthRequestedQ.extractEntry(gmailAccount2ReqAdditionalAuth)) {
+			if (gmailAuthReqAlreadySent.find(gmailAccount2ReqAdditionalAuth) != gmailAuthReqAlreadySent.end()) {
+				gmailAuthReqAlreadySent.insert(gmailAccount2ReqAdditionalAuth);
+				//Send a complimentary e-mail to user reporting that additional steps are required
+				//to authorize account polling
+				session.notifyGmailAdditionalAuth(gmailAccount2ReqAdditionalAuth, "en");
+			}
+		}
+		
 		while (invalidTokenQ.extractEntry(lastInvalidToken)) {
 			pmm::Log << "CRITICAL: " << lastInvalidToken << " is an invalid token, no more messages will be sent to it!!" << pmm::NL;
 			//First update each notification thread internal cache

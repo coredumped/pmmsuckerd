@@ -98,6 +98,8 @@ namespace pmm {
 		//Sends stat information to the fnx server
 		void putStat(const std::string &var, double val);
 		void putStatMultiple(std::map<std::string, double> &dataMap);
+		
+		void notifyGmailAdditionalAuth(const std::string &emailAccount, const std::string &languageCode);
 	};
 	
 	namespace Commands {

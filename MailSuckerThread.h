@@ -36,6 +36,10 @@ namespace pmm {
 		std::string errmsg;
 		time_t tstamp;
 		MailAccountInfo m;
+		bool gmailAuthReq;
+		FailedLoginItem() {
+			gmailAuthReq = false;
+		}
 	};
 	
 	/** Has information regarding mailbox monitoring parameters a very few stats (if any) */
@@ -77,7 +81,7 @@ namespace pmm {
 		//Device token addition and removal
 		virtual void registerDeviceTokens();
 		virtual void relinquishDeviceTokens();
-		virtual void scheduleFailureReport(const MailAccountInfo &m, const std::string &errmsg);
+		virtual void scheduleFailureReport(const MailAccountInfo &m, const std::string &errmsg, bool isGmailAuthReq);
 	public:
 		FetchedMailsCache fetchedMails;
 		SharedVector<MailAccountInfo> emailAccounts;
@@ -95,6 +99,7 @@ namespace pmm {
 		pmm::SharedVector<pmm::MailAccountInfo> *mailAccounts2Refresh;
 		
 		pmm::SharedQueue<FailedLoginItem> emailsFailingLoginsQ;
+		pmm::SharedQueue<std::string> *gmailAuthRequestedQ;
 		
 		/* Unlimited subscription-related data-structures */
 		/** Tells wheter the given mailbox is associated to an in-app subscription */

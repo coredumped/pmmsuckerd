@@ -516,14 +516,26 @@ namespace pmm {
 					//Max reconnect exceeded, notify user
 					std::stringstream errmsg;
 					errmsg << "Unable to login to " << theEmail;
+					bool gmailAuthReq = false;
 					if(imapControl[theEmail].imap->imap_response == 0) {
-						errmsg << ", please check your app settings and or IMAP credentials information.";
+						errmsg << ", please check your app settings and/or IMAP credentials information.";
 					}
 					else {
-						errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
+						std::string respx = imapControl[theEmail].imap->imap_response;
+						if (respx.find("Web login required: https://support.google.") == respx.npos) {
+							
+							errmsg << " due to: " << imapControl[theEmail].imap->imap_response << "\nCheck your app settings.";
+						}
+						else {
+							multiplier = 1;
+							errmsg.str(std::string());
+							errmsg << "Additional Gmail authorization is required, check your inbox to authorize Push Me Mail.";
+							//Send an e-mail to the user explaining
+							gmailAuthReq = true;
+						}
 					}
 					errmsg << "\nWe will re-attempt to login in at least " << multiplier << " hours.";
-					scheduleFailureReport(m, errmsg.str());
+					scheduleFailureReport(m, errmsg.str(), gmailAuthReq);
 					
 					int rndTime = now % 300;
 					nextConnectAttempt[theEmail] = now + 3600 * multiplier + rndTime;

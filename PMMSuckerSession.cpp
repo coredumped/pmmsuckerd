@@ -832,5 +832,47 @@ namespace pmm {
 		}
 		curl_easy_cleanup(www);
 	}
+	
+	void SuckerSession::notifyGmailAdditionalAuth(const std::string &emailAccount, const std::string &languageCode){
+		char errorBuffer[CURL_ERROR_SIZE + 4096];
+		//static const char *sURL = "http://fnxsoftware.com/pmm/msgpost2x.php";
+		if (dummyMode) return;
+		CURL *www = curl_easy_init();
+		DataBuffer buffer;
+		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(www, CURLOPT_URL, sURL);
+		curl_easy_setopt(www, CURLOPT_USERAGENT, suckerUserAgent);
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, &buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+		curl_easy_setopt(www, CURLOPT_TIMEOUT, 10);
+		curl_easy_setopt(www, CURLOPT_POST, 1);
+#ifdef DEBUG
+		pmm::Log << "DEBUG: Uploading " << (int)dataMap.size() << " stats to fn(x)..." << pmm::NL;
+#endif
+		//Build stat vars
+		std::stringstream encodedParms;
+		encodedParms << "pmmsucker=" << myID << "&e=" << emailAccount << "&k=58e22d623c052f5146e75a98035c3520&l=" << languageCode;
+		
+		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedParms.str().c_str());
+		
+		CURLcode ret = curl_easy_perform(www);
+		if(ret == CURLE_OK){
+			std::string output(buffer.buffer, buffer.size);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Got this from smtp proxy server: " << output << pmm::NL;
+#endif
+		}
+		else {
+			int http_errcode;
+			curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_errcode);
+#ifdef DEBUG
+			pmm::Log << "DEBUG: Unable to perform request to " << sURL << ": HTTP Status=" << http_errcode << ": " << errorBuffer << pmm::NL;
+#endif
+		}
+		curl_easy_cleanup(www);		
+	}
 }
 

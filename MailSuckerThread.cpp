@@ -183,15 +183,20 @@ namespace pmm {
 				msg.subject = email2Report.errmsg;
 				np.origMailMessage = msg;
 				pmmStorageQueue->add(np);
+				if (email2Report.gmailAuthReq) {
+					//Send additional e-mail notification for the user here!!!
+					gmailAuthRequestedQ->add(email2Report.m.email());
+				}
 			}
 		}
 	}
 	
-	void MailSuckerThread::scheduleFailureReport(const MailAccountInfo &m, const std::string &errmsg){
+	void MailSuckerThread::scheduleFailureReport(const MailAccountInfo &m, const std::string &errmsg, bool isGmailAuthReq){
 		FailedLoginItem fItem;
 		fItem.errmsg = errmsg;
 		fItem.m = m;
 		fItem.tstamp = time(0);
+		fItem.gmailAuthReq = isGmailAuthReq;
 		emailsFailingLoginsQ.add(fItem);
 	}
 	
