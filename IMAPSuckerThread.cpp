@@ -509,6 +509,7 @@ namespace pmm {
 #ifdef DEBUG
 							pmm::imapLog << "PANIC: Google requested web login for account " << theEmail << " not retrying until at least " << multiplier << " hours." << pmm::NL;
 #endif
+							gmailAuthRequestedQ->add(theEmail);
 						}
 					}
 				}
