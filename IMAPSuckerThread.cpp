@@ -475,7 +475,7 @@ namespace pmm {
 				serverConnectAttempts[m.serverAddress()] = 0;
 				mailboxControl[theEmail].lastCheck = now + 3600;
 				nextConnectAttempt[theEmail] = now + 3600;
-				scheduleFailureReport(m, errmsg.str());
+				scheduleFailureReport(m, errmsg.str(), false);
 			}
 			else {
 				nextConnectAttempt[theEmail] = now + 30 + (90 % serverConnectAttempts[m.serverAddress()]);

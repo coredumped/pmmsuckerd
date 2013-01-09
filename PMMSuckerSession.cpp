@@ -835,7 +835,7 @@ namespace pmm {
 	
 	void SuckerSession::notifyGmailAdditionalAuth(const std::string &emailAccount, const std::string &languageCode){
 		char errorBuffer[CURL_ERROR_SIZE + 4096];
-		//static const char *sURL = "http://fnxsoftware.com/pmm/msgpost2x.php";
+		static const char *sURL = "http://fnxsoftware.com/pmm/msgpost2x.php";
 		if (dummyMode) return;
 		CURL *www = curl_easy_init();
 		DataBuffer buffer;
@@ -850,7 +850,7 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_TIMEOUT, 10);
 		curl_easy_setopt(www, CURLOPT_POST, 1);
 #ifdef DEBUG
-		pmm::Log << "DEBUG: Uploading " << (int)dataMap.size() << " stats to fn(x)..." << pmm::NL;
+		pmm::Log << "DEBUG:  Notifying additional auth steps required to access " << emailAccount << pmm::NL;
 #endif
 		//Build stat vars
 		std::stringstream encodedParms;
