@@ -403,7 +403,7 @@ int main (int argc, const char * argv[])
 		std::string lastInvalidToken;
 		std::string gmailAccount2ReqAdditionalAuth;
 		while (gmailAuthRequestedQ.extractEntry(gmailAccount2ReqAdditionalAuth)) {
-			if (gmailAuthReqAlreadySent.find(gmailAccount2ReqAdditionalAuth) != gmailAuthReqAlreadySent.end()) {
+			if (gmailAuthReqAlreadySent.find(gmailAccount2ReqAdditionalAuth) == gmailAuthReqAlreadySent.end()) {
 				gmailAuthReqAlreadySent.insert(gmailAccount2ReqAdditionalAuth);
 				//Send a complimentary e-mail to user reporting that additional steps are required
 				//to authorize account polling
