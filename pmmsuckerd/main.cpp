@@ -405,6 +405,7 @@ int main (int argc, const char * argv[])
 		while (gmailAuthRequestedQ.extractEntry(gmailAccount2ReqAdditionalAuth)) {
 			if (gmailAuthReqAlreadySent.find(gmailAccount2ReqAdditionalAuth) == gmailAuthReqAlreadySent.end()) {
 				gmailAuthReqAlreadySent.insert(gmailAccount2ReqAdditionalAuth);
+				pmm::Log << "INFO: Reporting " << gmailAccount2ReqAdditionalAuth << " to authorize PushMeMail in Gmail" << pmm::NL;
 				//Send a complimentary e-mail to user reporting that additional steps are required
 				//to authorize account polling
 				session.notifyGmailAdditionalAuth(gmailAccount2ReqAdditionalAuth, "en");
