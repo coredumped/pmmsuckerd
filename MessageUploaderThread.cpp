@@ -35,6 +35,7 @@ namespace pmm {
 		if (session == NULL) throw GenericException("Unable to start MessageUploaderThread, the session is NULL!!!");
 		pmm::Log << "Starting message uploader thread..." << pmm::NL;
 		while (true) {
+#ifdef USE_OLD_MSG_UPLOADER
 			NotificationPayload np;
 			while (pmmStorageQueue->extractEntry(np)) {
 				try {
@@ -54,6 +55,12 @@ namespace pmm {
 					}
 				}
 			}
+#else
+			int msgs_sent = session->uploadMultipleNotificationMessages(pmmStorageQueue);
+#ifdef DEBUG
+			pmm::Log << msgs_sent << " messages uploaded to app engine." << pmm::NL;
+#endif
+#endif
 			sleep(2);
 		}
 	}

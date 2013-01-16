@@ -16,6 +16,7 @@
 #include "MailAccountInfo.h"
 #include "NotificationPayload.h"
 #include "Mutex.h"
+#include "SharedQueue.h"
 
 namespace pmm {
 	/** Exception thrown whenever we received an error response from a remote server */
@@ -84,6 +85,8 @@ namespace pmm {
 		//Upload notification messages to server
 		void uploadNotificationMessage(const NotificationPayload &np);
 		void uploadMultipleNotificationMessages(const std::vector<NotificationPayload> &msgs);
+		int uploadMultipleNotificationMessages(pmm::SharedQueue<NotificationPayload> &msgs);
+		int uploadMultipleNotificationMessages(pmm::SharedQueue<NotificationPayload> *msgs);
 		
 		//Checks if a new task has been registered in fnxsoftware.com
 		bool fnxHasPendingTasks();

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <time.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #ifndef MAX_LOG_SIZE
 #define MAX_LOG_SIZE 1073741824

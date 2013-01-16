@@ -104,6 +104,34 @@
 		8262B2B215471B61005E9243 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
 		8262B2B3154751FA005E9243 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
 		8262B2B415475551005E9243 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		826FE28616A6198E0099A8F1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE28516A6198E0099A8F1 /* main.cpp */; };
+		826FE28816A6198E0099A8F1 /* bulk_uploader_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 826FE28716A6198E0099A8F1 /* bulk_uploader_test.1 */; };
+		826FE28D16A61B870099A8F1 /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
+		826FE28E16A61B870099A8F1 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
+		826FE28F16A61B870099A8F1 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		826FE29016A61B870099A8F1 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		826FE29116A61B870099A8F1 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
+		826FE29216A61B870099A8F1 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
+		826FE29316A61B870099A8F1 /* SharedQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B171435123100444844 /* SharedQueue.cpp */; };
+		826FE29416A61B870099A8F1 /* NotificationPayload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1B1435380A00444844 /* NotificationPayload.cpp */; };
+		826FE29516A61B870099A8F1 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		826FE29616A61B870099A8F1 /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		826FE29716A61B870099A8F1 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		826FE29816A61B870099A8F1 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
+		826FE29916A61B870099A8F1 /* RWLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82524A8A15ABC67E009C64ED /* RWLock.cpp */; };
+		826FE29A16A61B870099A8F1 /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		826FE29B16A61B920099A8F1 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
+		826FE29C16A61BCC0099A8F1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
+		826FE29D16A622450099A8F1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
+		826FE29E16A6225C0099A8F1 /* MailMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F857AA1448A825000B43B8 /* MailMessage.cpp */; };
+		826FE29F16A622720099A8F1 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		826FE2A016A622840099A8F1 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
+		826FE2A116A6228F0099A8F1 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 828697CB150FF37D003E7675 /* libiconv.dylib */; };
+		826FE2A216A6229A0099A8F1 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		826FE2A316A623260099A8F1 /* libetpan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 820BBE25154240B1005A1C5A /* libetpan.a */; };
+		826FE2A516A6235A0099A8F1 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 826FE2A416A6235A0099A8F1 /* libcrypto.dylib */; };
+		826FE2A616A623630099A8F1 /* libssl.dylib in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2414355EB700444844 /* libssl.dylib */; };
+		826FE2AA16A665770099A8F1 /* MessageGeneratorThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2A816A665770099A8F1 /* MessageGeneratorThread.cpp */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		82805982145FB18200E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
@@ -278,6 +306,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		826FE28016A6198E0099A8F1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				826FE28816A6198E0099A8F1 /* bulk_uploader_test.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		828879B51544607300DEF837 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -351,6 +389,12 @@
 		8262B2A115470B89005E9243 /* fetchCacheTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fetchCacheTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8262B2A415470B89005E9243 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		8262B2A615470B89005E9243 /* fetchCacheTest.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = fetchCacheTest.1; sourceTree = "<group>"; };
+		826FE28216A6198E0099A8F1 /* bulk-uploader-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "bulk-uploader-test"; sourceTree = BUILT_PRODUCTS_DIR; };
+		826FE28516A6198E0099A8F1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		826FE28716A6198E0099A8F1 /* bulk_uploader_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = bulk_uploader_test.1; sourceTree = "<group>"; };
+		826FE2A416A6235A0099A8F1 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
+		826FE2A816A665770099A8F1 /* MessageGeneratorThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageGeneratorThread.cpp; sourceTree = "<group>"; };
+		826FE2A916A665770099A8F1 /* MessageGeneratorThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageGeneratorThread.h; sourceTree = "<group>"; };
 		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		8280597F145FB0E600E7B614 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
@@ -470,6 +514,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		826FE27F16A6198E0099A8F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				826FE2A516A6235A0099A8F1 /* libcrypto.dylib in Frameworks */,
+				826FE2A316A623260099A8F1 /* libetpan.a in Frameworks */,
+				826FE2A216A6229A0099A8F1 /* libsqlite3.dylib in Frameworks */,
+				826FE2A116A6228F0099A8F1 /* libiconv.dylib in Frameworks */,
+				826FE29D16A622450099A8F1 /* Security.framework in Frameworks */,
+				826FE29C16A61BCC0099A8F1 /* CoreFoundation.framework in Frameworks */,
+				826FE29B16A61B920099A8F1 /* libcurl.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		828879B41544607300DEF837 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -580,6 +638,17 @@
 			path = fetchCacheTest;
 			sourceTree = "<group>";
 		};
+		826FE28416A6198E0099A8F1 /* bulk-uploader-test */ = {
+			isa = PBXGroup;
+			children = (
+				826FE28516A6198E0099A8F1 /* main.cpp */,
+				826FE28716A6198E0099A8F1 /* bulk_uploader_test.1 */,
+				826FE2A816A665770099A8F1 /* MessageGeneratorThread.cpp */,
+				826FE2A916A665770099A8F1 /* MessageGeneratorThread.h */,
+			);
+			path = "bulk-uploader-test";
+			sourceTree = "<group>";
+		};
 		82708493142ADF5E00D05386 /* jsonxx */ = {
 			isa = PBXGroup;
 			children = (
@@ -610,6 +679,7 @@
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				826FE2A416A6235A0099A8F1 /* libcrypto.dylib */,
 				828879B015438F5D00DEF837 /* CoreServices.framework */,
 				820BBE25154240B1005A1C5A /* libetpan.a */,
 				828697CB150FF37D003E7675 /* libiconv.dylib */,
@@ -633,6 +703,7 @@
 				828879B91544607300DEF837 /* msgParser */,
 				8262B2A315470B89005E9243 /* fetchCacheTest */,
 				82AA3D77154A1F6F006CC761 /* loadMessages */,
+				826FE28416A6198E0099A8F1 /* bulk-uploader-test */,
 				82F86B2E1425A457006ACFEB /* Frameworks */,
 				82F86B2C1425A457006ACFEB /* Products */,
 			);
@@ -649,6 +720,7 @@
 				8262B2A115470B89005E9243 /* fetchCacheTest */,
 				82AA3D75154A1F6F006CC761 /* loadMessages */,
 				82CE5B6915521BBA007E8AD7 /* pmmsuckerd copy */,
+				826FE28216A6198E0099A8F1 /* bulk-uploader-test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -822,6 +894,23 @@
 			productReference = 8262B2A115470B89005E9243 /* fetchCacheTest */;
 			productType = "com.apple.product-type.tool";
 		};
+		826FE28116A6198E0099A8F1 /* bulk-uploader-test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 826FE28B16A6198E0099A8F1 /* Build configuration list for PBXNativeTarget "bulk-uploader-test" */;
+			buildPhases = (
+				826FE27E16A6198E0099A8F1 /* Sources */,
+				826FE27F16A6198E0099A8F1 /* Frameworks */,
+				826FE28016A6198E0099A8F1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "bulk-uploader-test";
+			productName = "bulk-uploader-test";
+			productReference = 826FE28216A6198E0099A8F1 /* bulk-uploader-test */;
+			productType = "com.apple.product-type.tool";
+		};
 		828879B61544607300DEF837 /* msgParser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */;
@@ -935,6 +1024,7 @@
 				8262B2A015470B89005E9243 /* fetchCacheTest */,
 				82AA3D74154A1F6F006CC761 /* loadMessages */,
 				82CE5B3E15521BBA007E8AD7 /* pmmsucker-devel */,
+				826FE28116A6198E0099A8F1 /* bulk-uploader-test */,
 			);
 		};
 /* End PBXProject section */
@@ -1027,6 +1117,33 @@
 				8262B2AE15470E8B005E9243 /* FetchedMailsCache.cpp in Sources */,
 				8262B2AF15470E8B005E9243 /* MTLogger.cpp in Sources */,
 				8262B2A515470B89005E9243 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		826FE27E16A6198E0099A8F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				826FE2A616A623630099A8F1 /* libssl.dylib in Sources */,
+				826FE2A016A622840099A8F1 /* jsonxx.cc in Sources */,
+				826FE29F16A622720099A8F1 /* MailAccountInfo.cpp in Sources */,
+				826FE29E16A6225C0099A8F1 /* MailMessage.cpp in Sources */,
+				826FE28D16A61B870099A8F1 /* PMMSuckerSession.cpp in Sources */,
+				826FE28E16A61B870099A8F1 /* ServerResponse.cpp in Sources */,
+				826FE28F16A61B870099A8F1 /* JSONParseException.cpp in Sources */,
+				826FE29016A61B870099A8F1 /* Mutex.cpp in Sources */,
+				826FE29116A61B870099A8F1 /* GenericThread.cpp in Sources */,
+				826FE29216A61B870099A8F1 /* ThreadDispatcher.cpp in Sources */,
+				826FE29316A61B870099A8F1 /* SharedQueue.cpp in Sources */,
+				826FE29416A61B870099A8F1 /* NotificationPayload.cpp in Sources */,
+				826FE29516A61B870099A8F1 /* UtilityFunctions.cpp in Sources */,
+				826FE29616A61B870099A8F1 /* GenericException.cpp in Sources */,
+				826FE29716A61B870099A8F1 /* MTLogger.cpp in Sources */,
+				826FE29816A61B870099A8F1 /* DataTypes.cpp in Sources */,
+				826FE29916A61B870099A8F1 /* RWLock.cpp in Sources */,
+				826FE29A16A61B870099A8F1 /* Atomic.cpp in Sources */,
+				826FE28616A6198E0099A8F1 /* main.cpp in Sources */,
+				826FE2AA16A665770099A8F1 /* MessageGeneratorThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1329,6 +1446,40 @@
 			};
 			name = Release;
 		};
+		826FE28916A6198E0099A8F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		826FE28A16A6198E0099A8F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		828879BF1544607300DEF837 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1621,6 +1772,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		826FE28B16A6198E0099A8F1 /* Build configuration list for PBXNativeTarget "bulk-uploader-test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				826FE28916A6198E0099A8F1 /* Debug */,
+				826FE28A16A6198E0099A8F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */ = {
 			isa = XCConfigurationList;

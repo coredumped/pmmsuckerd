@@ -9,6 +9,7 @@
 #include <iostream>
 #include <errno.h>
 #include <sstream>
+#include <unistd.h>
 #include "ThreadDispatcher.h"
 #include "Mutex.h"
 

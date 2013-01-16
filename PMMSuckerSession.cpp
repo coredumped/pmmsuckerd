@@ -606,6 +606,64 @@ namespace pmm {
 		}
 	}
 	
+	int SuckerSession::uploadMultipleNotificationMessages(pmm::SharedQueue<NotificationPayload> &msgs){
+		int msg_count = 0;
+		if(msgs.size() == 0) return 0;
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMultipleMessages;
+		params["suckerID"] = this->myID;		
+		std::stringstream jsonVec;
+		jsonVec << "{m:[";
+		NotificationPayload np;
+		for (int i = 0; msgs.extractEntry(np); i++) {
+			std::string jsonEnc;
+			MailMessage m = np.origMailMessage;
+			m.toJson(jsonEnc, np.soundName());
+			if(i == 0) jsonVec << jsonEnc;
+			else jsonVec << "," << jsonEnc;
+			msg_count++;
+		}
+		jsonVec << "]}";
+		std::string output;
+		params["messages"] = jsonVec.str();
+		executePost(params, output, pmmServiceURL.c_str());
+		if (output.find("OK") == output.npos) {
+			throw GenericException("Unable to upload multiple messages");
+		}
+		return msg_count;
+	}
+	
+	int SuckerSession::uploadMultipleNotificationMessages(pmm::SharedQueue<NotificationPayload> *msgs){
+		int msg_count = 0;
+		if(msgs->size() == 0) return 0;
+		performAutoRegister();
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::pmmSuckerUploadMultipleMessages;
+		params["suckerID"] = this->myID;
+		std::stringstream jsonVec;
+		jsonVec << "{m:[";
+		NotificationPayload np;
+		for (int i = 0; msgs->extractEntry(np); i++) {
+			std::string jsonEnc;
+			MailMessage m = np.origMailMessage;
+			m.toJson(jsonEnc, np.soundName());
+			if(i == 0) jsonVec << jsonEnc;
+			else jsonVec << "," << jsonEnc;
+			msg_count++;
+		}
+		jsonVec << "]}";
+		std::string output;
+		params["messages"] = jsonVec.str();
+		executePost(params, output, pmmServiceURL.c_str());
+		if (output.find("OK") == output.npos) {
+			throw GenericException("Unable to upload multiple messages");
+		}
+		return msg_count;
+	}
+	
 	bool SuckerSession::silentModeInfoGet(std::map<std::string, std::map<std::string, int> > &_return, const std::string &emailAccounts){
 		std::vector<std::string> all;
 		all.push_back(emailAccounts);
