@@ -16,6 +16,7 @@
 #include "MailMessage.h"
 #include "libetpan/libetpan.h"
 #include <string.h>
+#include <cstdlib>
 #include "QuotaDB.h"
 
 #ifndef DEFAULT_MAX_MAIL_FETCHERS
