@@ -635,6 +635,14 @@ namespace pmm {
 		return msg_count;
 	}
 	
+	static void checkMailMessageJSONification(std::string &json){
+		if (!(json[json.size() - 2] == '"' && json[json.size() - 1] == '}')) {
+			//We need to fix this string and now!
+			json.replace(json.size() - 1, 1, 1, '"');
+			json.append("}");
+		}
+	}
+	
 	int SuckerSession::uploadMultipleNotificationMessages(pmm::SharedQueue<NotificationPayload> *msgs){
 		int msg_count = 0;
 		if(msgs->size() == 0) return 0;
@@ -650,6 +658,8 @@ namespace pmm {
 			std::string jsonEnc;
 			MailMessage m = np.origMailMessage;
 			m.toJson(jsonEnc, np.soundName());
+			//re-check that the JSON package has the correct right-side format
+			checkMailMessageJSONification(jsonEnc);
 			if(i == 0) jsonVec << jsonEnc;
 			else jsonVec << "," << jsonEnc;
 			msg_count++;
