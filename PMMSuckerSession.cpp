@@ -638,8 +638,8 @@ namespace pmm {
 	static void checkMailMessageJSONification(std::string &json){
 		if (!(json[json.size() - 2] == '"' && json[json.size() - 1] == '}')) {
 			//We need to fix this string and now!
-			json.replace(json.size() - 1, 1, 1, '"');
-			json.append("    }");
+			json.replace(json.size() - 1, 1, 1, ' ');
+			json.append("    "}");
 		}
 	}
 	
