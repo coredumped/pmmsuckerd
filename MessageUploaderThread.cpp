@@ -58,10 +58,10 @@ namespace pmm {
 			sleep(2);
 #else
 			int msgs_sent = session->uploadMultipleNotificationMessages(pmmStorageQueue);
-#ifdef DEBUG
+/*#ifdef DEBUG
 			if(msgs_sent > 0) pmm::Log << msgs_sent << " messages uploaded to app engine." << pmm::NL;
-#endif
-			sleep(3);
+#endif*/
+			sleep(2);
 #endif
 
 		}
