@@ -18,6 +18,7 @@
 #include "MTLogger.h"
 #include "DataTypes.h"
 #include "SharedSet.h"
+#include "ObjectDatastore.h"
 #include <string>
 #include <map>
 
@@ -117,6 +118,9 @@ namespace pmm {
 		AtomicVar<int> cntAccountsTotal;
 		AtomicVar<int> cntBytesDownloaded;
 		AtomicVar<int> cntFailedLoginAttempts;
+		
+		//App configuration
+		ObjectDatastore *localConfig;
 	};
 	
 	bool etpanOperationFailed(int r);

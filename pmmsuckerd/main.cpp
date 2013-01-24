@@ -28,6 +28,7 @@
 #include "UserPreferences.h"
 #include "APNSFeedbackThread.h"
 #include "PendingNotificationStore.h"
+#include "ObjectDatastore.h"
 //#include "SharedMap.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 4
@@ -39,7 +40,7 @@
 #define DEFAULT_MAX_IMAP_POLLING_THREADS 8
 #endif
 #ifndef DEFAULT_MAX_MESSAGE_UPLOADER_THREADS
-#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 1
+#define DEFAULT_MAX_MESSAGE_UPLOADER_THREADS 2
 #endif
 
 #ifndef DEFAULT_SSL_CERTIFICATE_PATH
@@ -221,6 +222,8 @@ int main (int argc, const char * argv[])
 	pmm::imapLog.setTag("IMAPSuckerThread");
 	pmm::pop3Log.open("pop3-fetch.log");
 	pmm::pop3Log.setTag("POP3SuckerThread");
+	
+	pmm::ObjectDatastore localConfig;
 	pmm::SuckerSession session(pmmServiceURL);
 	preferenceEngine.preferenceQueue = &preferenceSetQueue;
 	//1. Register to PMMService...
@@ -348,6 +351,7 @@ int main (int argc, const char * argv[])
 		imapSuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		imapSuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		imapSuckingThreads[i].gmailAuthRequestedQ = &gmailAuthRequestedQ;
+		imapSuckingThreads[i].localConfig = &localConfig;
 		pmm::ThreadDispatcher::start(imapSuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}
@@ -370,6 +374,7 @@ int main (int argc, const char * argv[])
 		pop3SuckingThreads[i].develNotificationQueue = &develNotificationQueue;
 		pop3SuckingThreads[i].mailAccounts2Refresh = &mailAccounts2Refresh;
 		pop3SuckingThreads[i].gmailAuthRequestedQ = &gmailAuthRequestedQ;
+		pop3SuckingThreads[i].localConfig = &localConfig;
 		pmm::ThreadDispatcher::start(pop3SuckingThreads[i], threadStackSize);
 		usleep(10000);
 	}

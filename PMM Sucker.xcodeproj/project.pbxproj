@@ -132,6 +132,22 @@
 		826FE2A516A6235A0099A8F1 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 826FE2A416A6235A0099A8F1 /* libcrypto.dylib */; };
 		826FE2A616A623630099A8F1 /* libssl.dylib in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B2414355EB700444844 /* libssl.dylib */; };
 		826FE2AA16A665770099A8F1 /* MessageGeneratorThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2A816A665770099A8F1 /* MessageGeneratorThread.cpp */; };
+		826FE2AD16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2AB16AF61EB0099A8F1 /* ObjectDatastore.cpp */; };
+		826FE2AE16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2AB16AF61EB0099A8F1 /* ObjectDatastore.cpp */; };
+		826FE2B716AF7C8B0099A8F1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2B616AF7C8B0099A8F1 /* main.cpp */; };
+		826FE2B916AF7C8B0099A8F1 /* obj_datastore_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 826FE2B816AF7C8B0099A8F1 /* obj_datastore_test.1 */; };
+		826FE2BD16AF7C9D0099A8F1 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		826FE2BE16AF7CB50099A8F1 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		826FE2BF16AF7CB50099A8F1 /* ObjectDatastore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2AB16AF61EB0099A8F1 /* ObjectDatastore.cpp */; };
+		826FE2C016AF7CB50099A8F1 /* RWLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82524A8A15ABC67E009C64ED /* RWLock.cpp */; };
+		826FE2C116AF7CB50099A8F1 /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
+		826FE2C216AF7E780099A8F1 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		826FE2C316AF7EE60099A8F1 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		826FE2C416AF7EE60099A8F1 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		826FE2C516AF7EF50099A8F1 /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		826FE2C616AF828E0099A8F1 /* GenericThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0A14317FD000444844 /* GenericThread.cpp */; };
+		826FE2C916AF82BF0099A8F1 /* ConcurrentTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE2C716AF82BF0099A8F1 /* ConcurrentTest.cpp */; };
+		826FE2CA16AF87260099A8F1 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
 		8270849B142AE34F00D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		8270849C142AE37100D05386 /* ServerResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8270849A142AE34F00D05386 /* ServerResponse.cpp */; };
 		82805982145FB18200E7B614 /* DataTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82805981145FB18100E7B614 /* DataTypes.cpp */; };
@@ -316,6 +332,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		826FE2B116AF7C8B0099A8F1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				826FE2B916AF7C8B0099A8F1 /* obj_datastore_test.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		828879B51544607300DEF837 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -395,6 +421,13 @@
 		826FE2A416A6235A0099A8F1 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		826FE2A816A665770099A8F1 /* MessageGeneratorThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageGeneratorThread.cpp; sourceTree = "<group>"; };
 		826FE2A916A665770099A8F1 /* MessageGeneratorThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageGeneratorThread.h; sourceTree = "<group>"; };
+		826FE2AB16AF61EB0099A8F1 /* ObjectDatastore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectDatastore.cpp; sourceTree = "<group>"; };
+		826FE2AC16AF61EB0099A8F1 /* ObjectDatastore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectDatastore.h; sourceTree = "<group>"; };
+		826FE2B316AF7C8B0099A8F1 /* obj-datastore-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "obj-datastore-test"; sourceTree = BUILT_PRODUCTS_DIR; };
+		826FE2B616AF7C8B0099A8F1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		826FE2B816AF7C8B0099A8F1 /* obj_datastore_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = obj_datastore_test.1; sourceTree = "<group>"; };
+		826FE2C716AF82BF0099A8F1 /* ConcurrentTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConcurrentTest.cpp; sourceTree = "<group>"; };
+		826FE2C816AF82BF0099A8F1 /* ConcurrentTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConcurrentTest.h; sourceTree = "<group>"; };
 		82708498142AE23900D05386 /* ServerResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerResponse.h; sourceTree = "<group>"; };
 		8270849A142AE34F00D05386 /* ServerResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerResponse.cpp; sourceTree = "<group>"; };
 		8280597F145FB0E600E7B614 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
@@ -528,6 +561,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		826FE2B016AF7C8B0099A8F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				826FE2BD16AF7C9D0099A8F1 /* libsqlite3.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		828879B41544607300DEF837 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -649,6 +690,17 @@
 			path = "bulk-uploader-test";
 			sourceTree = "<group>";
 		};
+		826FE2B516AF7C8B0099A8F1 /* obj-datastore-test */ = {
+			isa = PBXGroup;
+			children = (
+				826FE2B616AF7C8B0099A8F1 /* main.cpp */,
+				826FE2B816AF7C8B0099A8F1 /* obj_datastore_test.1 */,
+				826FE2C716AF82BF0099A8F1 /* ConcurrentTest.cpp */,
+				826FE2C816AF82BF0099A8F1 /* ConcurrentTest.h */,
+			);
+			path = "obj-datastore-test";
+			sourceTree = "<group>";
+		};
 		82708493142ADF5E00D05386 /* jsonxx */ = {
 			isa = PBXGroup;
 			children = (
@@ -704,6 +756,7 @@
 				8262B2A315470B89005E9243 /* fetchCacheTest */,
 				82AA3D77154A1F6F006CC761 /* loadMessages */,
 				826FE28416A6198E0099A8F1 /* bulk-uploader-test */,
+				826FE2B516AF7C8B0099A8F1 /* obj-datastore-test */,
 				82F86B2E1425A457006ACFEB /* Frameworks */,
 				82F86B2C1425A457006ACFEB /* Products */,
 			);
@@ -721,6 +774,7 @@
 				82AA3D75154A1F6F006CC761 /* loadMessages */,
 				82CE5B6915521BBA007E8AD7 /* pmmsuckerd copy */,
 				826FE28216A6198E0099A8F1 /* bulk-uploader-test */,
+				826FE2B316AF7C8B0099A8F1 /* obj-datastore-test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -828,6 +882,8 @@
 				82B6109114F2A28200975C32 /* UserPreferences.h */,
 				82B6109314F2A2FC00975C32 /* UserPreferences.cpp */,
 				820BBDF6153E7164005A1C5A /* PendingNotificationStore.h */,
+				826FE2AB16AF61EB0099A8F1 /* ObjectDatastore.cpp */,
+				826FE2AC16AF61EB0099A8F1 /* ObjectDatastore.h */,
 				820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */,
 				820BBDFB15408CF3005A1C5A /* ExclusiveSharedQueue.h */,
 				82BE124F154B84700020B9D6 /* SharedSet.h */,
@@ -909,6 +965,23 @@
 			name = "bulk-uploader-test";
 			productName = "bulk-uploader-test";
 			productReference = 826FE28216A6198E0099A8F1 /* bulk-uploader-test */;
+			productType = "com.apple.product-type.tool";
+		};
+		826FE2B216AF7C8B0099A8F1 /* obj-datastore-test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 826FE2BA16AF7C8B0099A8F1 /* Build configuration list for PBXNativeTarget "obj-datastore-test" */;
+			buildPhases = (
+				826FE2AF16AF7C8B0099A8F1 /* Sources */,
+				826FE2B016AF7C8B0099A8F1 /* Frameworks */,
+				826FE2B116AF7C8B0099A8F1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "obj-datastore-test";
+			productName = "obj-datastore-test";
+			productReference = 826FE2B316AF7C8B0099A8F1 /* obj-datastore-test */;
 			productType = "com.apple.product-type.tool";
 		};
 		828879B61544607300DEF837 /* msgParser */ = {
@@ -1025,6 +1098,7 @@
 				82AA3D74154A1F6F006CC761 /* loadMessages */,
 				82CE5B3E15521BBA007E8AD7 /* pmmsucker-devel */,
 				826FE28116A6198E0099A8F1 /* bulk-uploader-test */,
+				826FE2B216AF7C8B0099A8F1 /* obj-datastore-test */,
 			);
 		};
 /* End PBXProject section */
@@ -1147,6 +1221,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		826FE2AF16AF7C8B0099A8F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				826FE2CA16AF87260099A8F1 /* ThreadDispatcher.cpp in Sources */,
+				826FE2C616AF828E0099A8F1 /* GenericThread.cpp in Sources */,
+				826FE2C516AF7EF50099A8F1 /* GenericException.cpp in Sources */,
+				826FE2C316AF7EE60099A8F1 /* MailAccountInfo.cpp in Sources */,
+				826FE2C416AF7EE60099A8F1 /* Mutex.cpp in Sources */,
+				826FE2C216AF7E780099A8F1 /* UtilityFunctions.cpp in Sources */,
+				826FE2BE16AF7CB50099A8F1 /* MTLogger.cpp in Sources */,
+				826FE2BF16AF7CB50099A8F1 /* ObjectDatastore.cpp in Sources */,
+				826FE2C016AF7CB50099A8F1 /* RWLock.cpp in Sources */,
+				826FE2C116AF7CB50099A8F1 /* Atomic.cpp in Sources */,
+				826FE2B716AF7C8B0099A8F1 /* main.cpp in Sources */,
+				826FE2C916AF82BF0099A8F1 /* ConcurrentTest.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		828879B31544607300DEF837 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1264,6 +1357,7 @@
 				820BBDF9153E7187005A1C5A /* PendingNotificationStore.cpp in Sources */,
 				82524A8B15ABC67E009C64ED /* RWLock.cpp in Sources */,
 				82425BA015AC7522004E3D0F /* Atomic.cpp in Sources */,
+				826FE2AD16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1300,6 +1394,7 @@
 				82F86B591425A810006ACFEB /* main.cpp in Sources */,
 				82524A8C15ABC67E009C64ED /* RWLock.cpp in Sources */,
 				82425BA115AC7522004E3D0F /* Atomic.cpp in Sources */,
+				826FE2AE16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1475,6 +1570,32 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		826FE2BB16AF7C8B0099A8F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		826FE2BC16AF7C8B0099A8F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1778,6 +1899,14 @@
 			buildConfigurations = (
 				826FE28916A6198E0099A8F1 /* Debug */,
 				826FE28A16A6198E0099A8F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		826FE2BA16AF7C8B0099A8F1 /* Build configuration list for PBXNativeTarget "obj-datastore-test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				826FE2BB16AF7C8B0099A8F1 /* Debug */,
+				826FE2BC16AF7C8B0099A8F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

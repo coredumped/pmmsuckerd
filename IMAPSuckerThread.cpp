@@ -510,17 +510,20 @@ namespace pmm {
 #ifdef DEBUG
 							pmm::imapLog << "PANIC: Google requested web login for account " << theEmail << " not retrying until at least " << multiplier << " hours." << pmm::NL;
 #endif
-							gmailAuthRequestedQ->add(theEmail);
-							std::vector<std::string> _allTokens = m.devTokens();
-							for (size_t k = 0; k < _allTokens.size(); k++) {
-								NotificationPayload theMsg(_allTokens[k], "In order to poll this e-mail account additional authorization from Gmail is required.");
-								theMsg.customParams["g"] = "1";
-								if (m.devel) {
-									develNotificationQueue->add(theMsg);
-								}
-								else {
+							std::string gotIt;
+							if (!localConfig->get(gotIt, m.email(), "gNotified")) {
+								gmailAuthRequestedQ->add(theEmail);
+								std::vector<std::string> _allTokens = m.devTokens();
+								for (size_t k = 0; k < _allTokens.size(); k++) {
+									NotificationPayload theMsg(_allTokens[k], "In order to poll this e-mail account additional authorization from Gmail is required.");
+									theMsg.customParams["g"] = "1";
+									if (m.devel) {
+										develNotificationQueue->add(theMsg);
+									}
+									else {
 #warning Enable the line below when 1.0.7 enters production
-									//notificationQueue->add(theMsg);
+										//notificationQueue->add(theMsg);
+									}
 								}
 							}
 							time_t nextRetry = now + 3600 + rand() % 300;
