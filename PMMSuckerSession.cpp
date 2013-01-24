@@ -654,6 +654,7 @@ namespace pmm {
 		std::stringstream jsonVec;
 		jsonVec << "{m:[";
 		NotificationPayload np;
+		SharedQueue<NotificationPayload> backupQ;
 		for (int i = 0; msgs->extractEntry(np); i++) {
 			std::string jsonEnc;
 			MailMessage m = np.origMailMessage;
@@ -667,7 +668,18 @@ namespace pmm {
 		jsonVec << "]}";
 		std::string output;
 		params["messages"] = jsonVec.str();
-		executePost(params, output, pmmServiceURL.c_str());
+		try {
+			executePost(params, output, pmmServiceURL.c_str());
+		}
+		catch (HTTPException &hte) {
+			pmm::Log << "Unable to upload multiple messages, appengine said: " << hte.errorMessage() << ", re-trying in 30 seconds" << pmm::NL;
+			sleep(28);
+			while (backupQ.extractEntry(np)) {
+				msgs->add(np);
+			}
+			sleep(2);
+			return msg_count;
+		}
 		if (output.find("OK") == output.npos) {
 			throw GenericException("Unable to upload multiple messages");
 		}
