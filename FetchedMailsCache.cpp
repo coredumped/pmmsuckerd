@@ -361,14 +361,9 @@ namespace pmm {
 		std::stringstream sqlCmd;
 		if (uid.find('\'') != uid.npos) {
 			//Escape uid
-			std::stringstream uid_s;
-			for (size_t i = 0; i < uid.size(); i++) {
-				if (uid[i] == '\'') {
-					uid_s << "'";
-				}
-				uid_s << uid[i];
-			}
-			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid_s.str() << "')";
+			std::string uid_s;
+			sqliteEscapeString(uid, uid_s);
+			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid_s << "')";
 		}
 		else {
 			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid << "' )";
@@ -495,7 +490,15 @@ namespace pmm {
 		sqlite3_stmt *statement;
 		
 		char *sztail;
-		sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE uniqueid='" << uid << "'";		
+		if (uid.find("'") == uid.npos) {
+			sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE uniqueid='" << uid << "'";
+		}
+		else {
+			std::string uid_s;
+			sqliteEscapeString(uid, uid_s);
+			sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE uniqueid='" << uid_s << "'";
+		}
+
 		int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
 		if (errCode != SQLITE_OK) {
 			std::stringstream errmsg;

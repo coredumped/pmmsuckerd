@@ -36,6 +36,8 @@ namespace pmm {
 	void stripHTMLTags(const std::string &htmlCode, std::string &output, std::map<std::string, std::string> &htmlProperties, int maxTextSize = 16384);
 	
 	void stripBlankLines(const std::string &input, std::string &output);
+	
+	void sqliteEscapeString(const std::string &input, std::string &output);
 }
 
 #endif

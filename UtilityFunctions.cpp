@@ -372,4 +372,15 @@ namespace pmm {
 			}
 		}
 	}
+	
+	void sqliteEscapeString(const std::string &input, std::string &output) {
+		std::stringstream uid_s;
+		for (size_t i = 0; i < input.size(); i++) {
+			if (input[i] == '\'') {
+				uid_s << "'";
+			}
+			uid_s << input[i];
+		}
+		output = uid_s.str();
+	}
 }
