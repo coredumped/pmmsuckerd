@@ -359,7 +359,20 @@ namespace pmm {
 		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
-		sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid << "' )";
+		if (uid.find('\'') != uid.npos) {
+			//Escape uid
+			std::stringstream uid_s;
+			for (size_t i = 0; i < uid.size(); i++) {
+				if (uid[i] == '\'') {
+					uid_s << "'";
+				}
+				uid_s << uid[i];
+			}
+			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid_s.str() << "')";
+		}
+		else {
+			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid << "' )";
+		}
 		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 		if (errCode != SQLITE_OK) {
 			sqlite3_close(conn);
