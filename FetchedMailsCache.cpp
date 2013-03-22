@@ -544,12 +544,13 @@ namespace pmm {
 			sqlite3_stmt *statement;
 			
 			char *sztail;
-			sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE uniqueid=" << uid;		
-			int errCode = sqlite3_prepare_v2(conn, sqlCmd.str().c_str(), (int)sqlCmd.str().size(), &statement, (const char **)&sztail);
+			sqlCmd << "SELECT count(1) FROM " << fetchedMailsTable << " WHERE uniqueid=" << uid;
+			std::string sqlS = sqlCmd.str();
+			int errCode = sqlite3_prepare_v2(conn, sqlS.c_str(), (int)sqlS.size(), &statement, (const char **)&sztail);
 			if (errCode != SQLITE_OK) {
 				std::stringstream errmsg;
 				std::string sqerr = sqlite3_errmsg(conn);
-				errmsg << "Unable to execute query " << sqlCmd.str() << " due to: " << sqerr;
+				errmsg << "Unable to execute query " << sqlS << " due to: " << sqerr;
 				closeDatabase(conn);
 				setUConnection(email, 0);
 #ifdef DEBUG
@@ -575,7 +576,7 @@ namespace pmm {
 			}
 			if(errCode != SQLITE_DONE){
 				std::stringstream errmsg;
-				errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlCmd.str() << " due to: " << sqlite3_errmsg(conn);
+				errmsg << "Unable to verify that an entry(" << email << "," << uid << ") exists from query: " << sqlS << " due to: " << sqlite3_errmsg(conn);
 				sqlite3_finalize(statement);
 				closeDatabase(conn);
 #ifdef DEBUG
