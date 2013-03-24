@@ -25,7 +25,7 @@
 #endif
 
 #ifndef DEFAULT_DBCONN_MAX_OPEN_TIME
-#define DEFAULT_DBCONN_MAX_OPEN_TIME 15
+#define DEFAULT_DBCONN_MAX_OPEN_TIME 120
 #endif
 
 
@@ -586,7 +586,8 @@ namespace pmm {
 				throw GenericException(errmsg.str());			
 			}
 			sqlite3_finalize(statement);
-			autoRefreshUConn(email);
+			//autoRefreshUConn(email);
+			closeConnection(email);
 			attempts = 10;
 		}
 		return ret;
