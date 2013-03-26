@@ -935,6 +935,10 @@ namespace pmm {
 		//Build stat vars
 		std::stringstream encodedParms;
 		encodedParms << "pmmsucker=" << myID << "&e=" << emailAccount << "&k=58e22d623c052f5146e75a98035c3520&l=" << languageCode;
+		char hstName[1024];
+		if(gethostname(hstName, 1024) == 0){
+			encodedParms << "&suc=" << hstName;
+		}
 		
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedParms.str().c_str());
 		
