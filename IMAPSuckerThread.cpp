@@ -579,8 +579,6 @@ namespace pmm {
 			}
 			else {
 				//Start IMAP IDLE processing...
-				nextConnectAttempt[theEmail] = 0;
-				serverConnectAttempts[m.serverAddress()] = 0;
 #ifdef DEBUG
 				pmm::imapLog << "IMAPSuckerThread(" << (long)pthread_self() << "): Starting IMAP IDLE for " << theEmail << pmm::NL;
 #endif
@@ -599,10 +597,13 @@ namespace pmm {
 					imapControl[theEmail].imap = NULL;
 					mailboxControl[theEmail].isOpened = false;
 					time_t now = time(0);
-					nextConnectAttempt[theEmail] = now + 30;
-					mailboxControl[theEmail].lastCheck = now + 30;
+					nextConnectAttempt[theEmail] = now + 60 * serverConnectAttempts[m.serverAddress()];
+					mailboxControl[theEmail].lastCheck = nextConnectAttempt[theEmail];
 				}
 				else {
+					nextConnectAttempt[theEmail] = 0;
+					serverConnectAttempts[m.serverAddress()] = 0;
+
 					int idleEnabled;
 #ifdef ENABLE_NATE_DOT_COM_WORKAROUND
 					if (theEmail.find("@nate.com") != theEmail.npos) {
