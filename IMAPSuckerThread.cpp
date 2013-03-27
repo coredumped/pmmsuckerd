@@ -309,6 +309,7 @@ namespace pmm {
 								else
 									pmm::imapLog << "CRITICAL: IMAP MailFetcher: Unable to select INBOX(" << imapFetch.mailAccountInfo.email() << ") etpan error=" << result << " response=" << imap->imap_response << pmm::NL;
 #endif
+								
 							}
 							else {
 								clist *unseenMails = clist_new();
@@ -593,6 +594,13 @@ namespace pmm {
 						pmm::imapLog << "FATAL: Unable to select INBOX folder in account " << theEmail << ": " << imapControl[theEmail].imap->imap_response <<  pmm::NL;
 					}
 					//throw GenericException("Unable to select INBOX folder");
+					mailimap_close(imapControl[theEmail].imap);
+					mailimap_free(imapControl[theEmail].imap);
+					imapControl[theEmail].imap = NULL;
+					mailboxControl[theEmail].isOpened = false;
+					time_t now = time(0);
+					nextConnectAttempt[theEmail] = now + 30;
+					mailboxControl[theEmail].lastCheck = now + 30;
 				}
 				else {
 					int idleEnabled;
