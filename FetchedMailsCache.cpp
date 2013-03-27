@@ -559,7 +559,7 @@ namespace pmm {
 				if(sqerr.find("called out of sequence") != sqerr.npos){
 					CacheLog << "Got a called out of sequence thing, resetting DB..." << pmm::NL;
 					closeDatabase(conn);
-					setUConnection(email, conn);
+					setUConnection(email, NULL);
 					continue;					
 				}
 				else {
