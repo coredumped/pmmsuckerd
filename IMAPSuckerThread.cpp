@@ -560,6 +560,7 @@ namespace pmm {
 							gmailAuthReq = true;
 						}
 					}
+					multiplier = 24;
 					errmsg << "\nWe will re-attempt to login in at least " << multiplier << " hours.";
 					scheduleFailureReport(m, errmsg.str(), gmailAuthReq);
 					
