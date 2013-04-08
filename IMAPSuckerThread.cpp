@@ -522,8 +522,7 @@ namespace pmm {
 										develNotificationQueue->add(theMsg);
 									}
 									else {
-#warning Enable the line below when 1.0.7 enters production
-										//notificationQueue->add(theMsg);
+										notificationQueue->add(theMsg);
 									}
 								}
 							}

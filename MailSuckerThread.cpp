@@ -151,7 +151,8 @@ namespace pmm {
 				emailAccounts.push_back(mailAccounts2Refresh->atUnlocked(i));
 				mailAccounts2Refresh->unlockedErase(i);
 				pmm::Log << "Information of " << m.email() << " updated succesfully!!!" << pmm::NL;
-				nextConnectAttempt[m.email()] = 0;
+				nextConnectAttempt.erase(m.email());
+				serverConnectAttempts.erase(m.email());
 				somethingChanged = true;
 				break;
 			}

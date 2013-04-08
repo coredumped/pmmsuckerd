@@ -38,6 +38,10 @@ namespace pmm {
 	void stripBlankLines(const std::string &input, std::string &output);
 	
 	void sqliteEscapeString(const std::string &input, std::string &output);
+	
+	void configValueGetInt(const std::string &varname, int &val);
+	void configValueGetBool(const std::string &varname, bool &val);
+	void configValueGetString(const std::string &varname, std::string &val);
 }
 
 #endif

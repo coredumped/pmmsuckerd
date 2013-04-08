@@ -383,4 +383,62 @@ namespace pmm {
 		}
 		output = uid_s.str();
 	}
+	
+	void configValueGetInt(const std::string &varname, int &val) {
+		std::string val_s;
+		configValueGetString(varname, val_s);
+		if (val_s.size() == 0) {
+			throw GenericException("Unable to convert NULL values to int");
+		}
+		std::istringstream inp(val_s);
+		inp >> val;
+	}
+	
+	void configValueGetBool(const std::string &varname, bool &val){
+		std::string val_s;
+		configValueGetString(varname, val_s);
+		if (val_s.size() == 0) {
+			throw GenericException("Unable to convert NULL values to bool");
+		}
+		if (val_s.compare("1") == 0 || val_s.compare("true") == 0 || val_s.compare("t") == 0) {
+			val = true;
+		}
+		else if (val_s.compare("0") == 0 || val_s.compare("false") == 0 || val_s.compare("f") == 0) {
+			val = false;
+		}
+		else {
+			std::stringstream errmsg;
+			errmsg << "Value \"" << val_s << "\" can't be converted to boolean";
+			throw GenericException(errmsg.str());
+		}
+	}
+	
+	void configValueGetString(const std::string &varname, std::string &val) {
+		int linenum = 1;
+		val = "";
+		std::ifstream cfgFile("pmmsucker.conf");
+		while (!cfgFile.eof()) {
+			std::string cfgLine;
+			std::getline(cfgFile, cfgLine);
+			if (cfgLine.size() > 1) {
+				if (cfgLine.find('#') == 0) {
+					continue;
+				}
+				size_t pos = cfgLine.find('=');
+				if (pos == cfgLine.npos) {
+					pmm::Log << "Syntax error in line " << linenum << ": " << cfgLine << pmm::NL;
+					break;
+				}
+				std::string theVar = cfgLine.substr(0, pos);
+				if (theVar.compare(varname) == 0) {
+					val = cfgLine.substr(pos + 1);
+					return;
+				}
+			}
+		}
+		std::stringstream errmsg;
+		errmsg << "Variable \"" << varname << "\" not found in configuration file :-(";
+		throw GenericException(errmsg.str());
+	}
+
 }

@@ -122,6 +122,22 @@ namespace pmm {
 			m.unlock();
 		}
 		
+		void moveTo(std::vector<T> &v) {
+#ifdef USE_RWLOCK
+			m.readLock();
+#else
+			m.lock();
+#endif
+			try {
+				v = dataVec;
+				dataVec.clear();
+			} catch (...) {
+				m.unlock();
+				throw;
+			}
+			m.unlock();
+		}
+		
 		T operator[](size_t i){
 			return at(i);
 		}

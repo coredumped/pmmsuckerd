@@ -216,6 +216,17 @@
 		82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
 		82BD8EBD148BBB4B008DDEA1 /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
 		82BD8EBE148BBB87008DDEA1 /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
+		82C1D9CA170947A3008B7BA6 /* libthrift.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 82C1D9C9170947A3008B7BA6 /* libthrift.a */; };
+		82C1D9CD17094957008B7BA6 /* pmmrpc.thrift in Resources */ = {isa = PBXBuildFile; fileRef = 82C1D9CC17094957008B7BA6 /* pmmrpc.thrift */; };
+		82C1D9D31709FC9D008B7BA6 /* pmmrpc_constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9D11709FC9D008B7BA6 /* pmmrpc_constants.cpp */; };
+		82C1D9D41709FC9D008B7BA6 /* pmmrpc_types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9D21709FC9D008B7BA6 /* pmmrpc_types.cpp */; };
+		82C1D9D9170A02EC008B7BA6 /* PMMSuckerRPC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9D7170A02EC008B7BA6 /* PMMSuckerRPC.cpp */; };
+		82C1D9DA170A0334008B7BA6 /* PMMSuckerRPC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9D7170A02EC008B7BA6 /* PMMSuckerRPC.cpp */; };
+		82C1D9DC170A61FA008B7BA6 /* pmmrpc.proto in Resources */ = {isa = PBXBuildFile; fileRef = 82C1D9DB170A61FA008B7BA6 /* pmmrpc.proto */; };
+		82C1D9DF170A698A008B7BA6 /* RPCService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9DD170A698A008B7BA6 /* RPCService.cpp */; };
+		82C1D9E0170A698A008B7BA6 /* RPCService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9DD170A698A008B7BA6 /* RPCService.cpp */; };
+		82C649F01702A13C00569666 /* PMMSuckerInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */; };
+		82C649F1170378DF00569666 /* PMMSuckerInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */; };
 		82CE5B4015521BBA007E8AD7 /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
 		82CE5B4115521BBA007E8AD7 /* APNSFeedbackThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B081DB153AD30200F78A4D /* APNSFeedbackThread.cpp */; };
 		82CE5B4215521BBA007E8AD7 /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
@@ -455,6 +466,19 @@
 		82BD8EBA148BBAAA008DDEA1 /* SilentMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SilentMode.h; sourceTree = "<group>"; };
 		82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SilentMode.cpp; sourceTree = "<group>"; };
 		82BE124F154B84700020B9D6 /* SharedSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedSet.h; sourceTree = "<group>"; };
+		82C1D9C9170947A3008B7BA6 /* libthrift.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libthrift.a; path = ../../../../../../usr/local/lib/libthrift.a; sourceTree = "<group>"; };
+		82C1D9CC17094957008B7BA6 /* pmmrpc.thrift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pmmrpc.thrift; sourceTree = "<group>"; };
+		82C1D9D11709FC9D008B7BA6 /* pmmrpc_constants.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pmmrpc_constants.cpp; sourceTree = "<group>"; };
+		82C1D9D21709FC9D008B7BA6 /* pmmrpc_types.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pmmrpc_types.cpp; sourceTree = "<group>"; };
+		82C1D9D5170A02EC008B7BA6 /* pmmrpc_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pmmrpc_constants.h; sourceTree = "<group>"; };
+		82C1D9D6170A02EC008B7BA6 /* pmmrpc_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pmmrpc_types.h; sourceTree = "<group>"; };
+		82C1D9D7170A02EC008B7BA6 /* PMMSuckerRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMMSuckerRPC.cpp; sourceTree = "<group>"; };
+		82C1D9D8170A02EC008B7BA6 /* PMMSuckerRPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMMSuckerRPC.h; sourceTree = "<group>"; };
+		82C1D9DB170A61FA008B7BA6 /* pmmrpc.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pmmrpc.proto; sourceTree = "<group>"; };
+		82C1D9DD170A698A008B7BA6 /* RPCService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RPCService.cpp; sourceTree = "<group>"; };
+		82C1D9DE170A698A008B7BA6 /* RPCService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCService.h; sourceTree = "<group>"; };
+		82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMMSuckerInfo.cpp; sourceTree = "<group>"; };
+		82C649EF1702A13C00569666 /* PMMSuckerInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMMSuckerInfo.h; sourceTree = "<group>"; };
 		82CE5B6915521BBA007E8AD7 /* pmmsuckerd copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pmmsuckerd copy"; sourceTree = BUILT_PRODUCTS_DIR; };
 		82ED5B071431761400444844 /* APNSNotificationThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APNSNotificationThread.h; sourceTree = "<group>"; };
 		82ED5B09143176B300444844 /* GenericThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericThread.h; sourceTree = "<group>"; };
@@ -627,6 +651,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82C1D9CA170947A3008B7BA6 /* libthrift.a in Frameworks */,
 				828697CC150FF37D003E7675 /* libiconv.dylib in Frameworks */,
 				823BD0481444AECD001ED14E /* libcrypto.a in Frameworks */,
 				823BD0491444AECD001ED14E /* libssl.a in Frameworks */,
@@ -728,9 +753,28 @@
 			path = loadMessages;
 			sourceTree = "<group>";
 		};
+		82C1D9CB170948E4008B7BA6 /* rpc */ = {
+			isa = PBXGroup;
+			children = (
+				82C1D9D5170A02EC008B7BA6 /* pmmrpc_constants.h */,
+				82C1D9D6170A02EC008B7BA6 /* pmmrpc_types.h */,
+				82C1D9D7170A02EC008B7BA6 /* PMMSuckerRPC.cpp */,
+				82C1D9D8170A02EC008B7BA6 /* PMMSuckerRPC.h */,
+				82C1D9D11709FC9D008B7BA6 /* pmmrpc_constants.cpp */,
+				82C1D9D21709FC9D008B7BA6 /* pmmrpc_types.cpp */,
+				82C1D9CC17094957008B7BA6 /* pmmrpc.thrift */,
+				82C1D9DB170A61FA008B7BA6 /* pmmrpc.proto */,
+				82C1D9DD170A698A008B7BA6 /* RPCService.cpp */,
+				82C1D9DE170A698A008B7BA6 /* RPCService.h */,
+			);
+			path = rpc;
+			sourceTree = "<group>";
+		};
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				82C1D9CB170948E4008B7BA6 /* rpc */,
+				82C1D9C9170947A3008B7BA6 /* libthrift.a */,
 				826FE2A416A6235A0099A8F1 /* libcrypto.dylib */,
 				828879B015438F5D00DEF837 /* CoreServices.framework */,
 				820BBE25154240B1005A1C5A /* libetpan.a */,
@@ -892,6 +936,8 @@
 				82425B9D15AC74E0004E3D0F /* Atomic.h */,
 				82425B9F15AC7522004E3D0F /* Atomic.cpp */,
 				82AE041515E077970076696C /* SharedMap.h */,
+				82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */,
+				82C649EF1702A13C00569666 /* PMMSuckerInfo.h */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -1056,6 +1102,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 82F86B5C1425A810006ACFEB /* Build configuration list for PBXNativeTarget "pmmsuckerd" */;
 			buildPhases = (
+				82C1D9D01709D8F7008B7BA6 /* ShellScript */,
 				82F86B511425A810006ACFEB /* Sources */,
 				82F86B521425A810006ACFEB /* Frameworks */,
 				82F86B531425A810006ACFEB /* CopyFiles */,
@@ -1113,10 +1160,35 @@
 				82F86B461425A458006ACFEB /* MainMenu.xib in Resources */,
 				82F86B4D1425A54F006ACFEB /* PushMeMailIcon.png in Resources */,
 				82F86B601425B0AD006ACFEB /* README in Resources */,
+				82C1D9CD17094957008B7BA6 /* pmmrpc.thrift in Resources */,
+				82C1D9DC170A61FA008B7BA6 /* pmmrpc.proto in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		82C1D9D01709D8F7008B7BA6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/rpc/pmmrpc.thrift",
+			);
+			outputPaths = (
+				"$(SRCROOT)/rpc/pmmrpc_types.h",
+				"$(SRCROOT)/rpc/pmmrpc_types.cpp",
+				"$(SRCROOT)/rpc/pmmrpc_constants.h",
+				"$(SRCROOT)/rpc/pmmrpc_constants.cpp",
+				"$(SRCROOT)/rpc/PMMSuckerRPC.h",
+				"$(SRCROOT)/rpc/PMMSuckerRPC.cpp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "pwd > /Users/coredumped/build.txt\necho \"Generating thrift source code...\"\ncd rpc\n/usr/local/bin/thrift -v -out . --gen cpp pmmrpc.thrift";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		820BBE0B15423FAB005A1C5A /* Sources */ = {
@@ -1358,6 +1430,9 @@
 				82524A8B15ABC67E009C64ED /* RWLock.cpp in Sources */,
 				82425BA015AC7522004E3D0F /* Atomic.cpp in Sources */,
 				826FE2AD16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */,
+				82C649F01702A13C00569666 /* PMMSuckerInfo.cpp in Sources */,
+				82C1D9D9170A02EC008B7BA6 /* PMMSuckerRPC.cpp in Sources */,
+				82C1D9DF170A698A008B7BA6 /* RPCService.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1365,6 +1440,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82C1D9DA170A0334008B7BA6 /* PMMSuckerRPC.cpp in Sources */,
+				82C1D9D31709FC9D008B7BA6 /* pmmrpc_constants.cpp in Sources */,
+				82C1D9D41709FC9D008B7BA6 /* pmmrpc_types.cpp in Sources */,
+				82C649F1170378DF00569666 /* PMMSuckerInfo.cpp in Sources */,
 				820BBDFA153E7242005A1C5A /* PendingNotificationStore.cpp in Sources */,
 				82B081DD153AD33100F78A4D /* APNSFeedbackThread.cpp in Sources */,
 				82B6109514F2A32100975C32 /* UserPreferences.cpp in Sources */,
@@ -1395,6 +1474,7 @@
 				82524A8C15ABC67E009C64ED /* RWLock.cpp in Sources */,
 				82425BA115AC7522004E3D0F /* Atomic.cpp in Sources */,
 				826FE2AE16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */,
+				82C1D9E0170A698A008B7BA6 /* RPCService.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1831,12 +1911,16 @@
 					"USE_RWLOCK=1",
 					"$(inherited)",
 				);
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "\"/usr/local/include\"";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				OTHER_LDFLAGS = (
+					"-L",
+					/usr/local/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
@@ -1851,12 +1935,16 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 				);
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "\"/usr/local/include\"";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e\"",
 					"\"$(SRCROOT)/../../cxxLibraries/openssl-mac\"",
+				);
+				OTHER_LDFLAGS = (
+					"-L",
+					/usr/local/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -1901,6 +1989,7 @@
 				826FE28A16A6198E0099A8F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		826FE2BA16AF7C8B0099A8F1 /* Build configuration list for PBXNativeTarget "obj-datastore-test" */ = {
 			isa = XCConfigurationList;
@@ -1909,6 +1998,7 @@
 				826FE2BC16AF7C8B0099A8F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		828879BE1544607300DEF837 /* Build configuration list for PBXNativeTarget "msgParser" */ = {
 			isa = XCConfigurationList;

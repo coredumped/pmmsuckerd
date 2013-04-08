@@ -27,6 +27,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <curl/curl.h>
 #include <iconv.h>
 #include "PMMSuckerSession.h"
@@ -342,6 +344,9 @@ namespace pmm {
 		pmmServiceURL = DEFAULT_PMM_SERVICE_URL;
 		expirationTime = time(0x00) + 600;
 		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
+		allowsIMAP = true;
+		allowsPOP3 = true;
+		myPort = DEFAULT_PMM_SERVICE_PORT;
 	}
 	
 	SuckerSession::SuckerSession(const std::string &srvURL) {
@@ -349,14 +354,72 @@ namespace pmm {
 		pmmServiceURL = srvURL;
 		expirationTime = time(0x00) + 600;
 		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
+		allowsIMAP = true;
+		allowsPOP3 = true;
+		mySecret = DefaultPMMSuckerSecret;
+		fetchDBPath = "fetchdb";
+		myPort = DEFAULT_PMM_SERVICE_PORT;
 	}
+	
+	SuckerSession::SuckerSession(const std::string &srvURL, bool usesIMAP, bool usesPOP3) {
+		apiKey = DEFAULT_API_KEY;
+		pmmServiceURL = srvURL;
+		expirationTime = time(0x00) + 600;
+		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
+		allowsIMAP = usesIMAP;
+		allowsPOP3 = usesPOP3;
+		mySecret = DefaultPMMSuckerSecret;
+		fetchDBPath = "fetchdb";
+		myPort = DEFAULT_PMM_SERVICE_PORT;
+	}
+	
+	SuckerSession::SuckerSession(const std::string &srvURL, bool usesIMAP, bool usesPOP3, std::string _secret, std::string _fetchDBDir, int _port) {
+		apiKey = DEFAULT_API_KEY;
+		pmmServiceURL = srvURL;
+		expirationTime = time(0x00) + 600;
+		dummyMode = DEFAULT_DUMMY_MODE_ENABLED;
+		allowsIMAP = usesIMAP;
+		allowsPOP3 = usesPOP3;
+		mySecret = _secret;
+		fetchDBPath = _fetchDBDir;
+		myPort = _port;
+	}
+	
+	bool _synched = false;
 	
 	bool SuckerSession::register2PMM(){
 		if(this->myID.size() == 0) suckerIdGet(this->myID);
 		std::map<std::string, std::string> params;
+		bool shouldSync = false;
 		params["apiKey"] = apiKey;
 		params["suckerID"] = this->myID;
 		params["opType"] = pmm::OperationTypes::register2PMM;
+		char htbuf[512];
+		if(gethostname(htbuf, 512) == 0){
+			myHostname = htbuf;
+			params["host"] = myHostname;
+		}
+		if (allowsIMAP)	params["allowsIMAP"] = "true";
+		else params["allowsIMAP"] = "false";
+		if (allowsPOP3) params["allowsPOP3"] = "true";
+		else params["allowsPOP3"] = "false";
+		params["secret"] = mySecret;
+		params["fetchDBPath"] = fetchDBPath;
+		std::stringstream port_s;
+		port_s << myPort;
+		params["port"] = port_s.str();
+		if (_synched == false) {
+			struct stat st;
+			if (stat(fetchDBPath.c_str(), &st) != 0) {
+				params["syncall"] = "true";
+				shouldSync = true;
+			}
+			else {
+				params["syncall"] = "false";
+			}
+		}
+		else params["syncall"] = "false";
+		_synched = true;
 #ifdef DEBUG
 		pmm::Log << "DEBUG: Registering with suckerID=" << params["suckerID"] << pmm::NL;
 #endif
@@ -371,6 +434,36 @@ namespace pmm {
 		expirationTime = time(0x00) + delta - 90;
 		pmm::Log << "Registered with expiration timestamp: " << expirationTime << pmm::NL;
 		timeM.unlock();
+		//Process siblings list
+		std::string siblings = response.metaData["siblings"];
+		std::vector<PMMSuckerInfo> sibTempV;
+		if (siblings.size() > 0) {
+			std::vector<std::string> sibDefS;
+			splitString(sibDefS, siblings, "|");
+			for (size_t j = 0; j < sibDefS.size(); j++) {
+				std::vector<std::string> props;
+				splitString(props, sibDefS[j], ";");
+				PMMSuckerInfo info;
+				if (info.suckerID.compare(myID) != 0) {
+					info.suckerID = props[0];
+					info.hostname = props[1];
+					if (props[2].compare("1") == 0) info.allowsIMAP = true;
+					else info.allowsIMAP = false;
+					if (props[3].compare("1") == 0) info.allowsPOP3 = true;
+					else info.allowsPOP3 = false;
+					std::istringstream portS(props[4]);
+					portS >> info.port;
+					sibTempV.push_back(info);
+				}
+			}
+			siblingSuckers = sibTempV;
+		}
+		if (shouldSync) {
+#ifdef DEBUG
+			pmm::Log << "Performing full fetchdb synchronization..." << pmm::NL;
+#endif
+#warning Perform fetchdb synchronization here
+		}
 		return response.status;
 	}
 	

@@ -12,11 +12,17 @@
 #define DEFAULT_PMM_SERVICE_URL "https://pmmserver.appspot.com/pmmsuckerd"
 ///#define DEFAULT_PMM_SERVICE_URL "http://localhost:8888/pmmsuckerd"
 #endif
+#ifndef DEFAULT_PMM_SERVICE_PORT
+#define DEFAULT_PMM_SERVICE_PORT 28040
+#endif
 #include<string>
+#include <vector>
 #include "MailAccountInfo.h"
 #include "NotificationPayload.h"
 #include "Mutex.h"
 #include "SharedQueue.h"
+#include "PMMSuckerInfo.h"
+#include "SharedVector.h"
 
 namespace pmm {
 	/** Exception thrown whenever we received an error response from a remote server */
@@ -44,8 +50,14 @@ namespace pmm {
 		std::string apiKey;
 		time_t expirationTime;
 		Mutex timeM;
+		std::string myHostname;
+		int myPort;
+		SharedVector<PMMSuckerInfo> siblingSuckers;
 	protected:
-
+		bool allowsIMAP;
+		bool allowsPOP3;
+		std::string fetchDBPath;
+		std::string mySecret;
 	public:
 #ifdef CHEAT_SESSION_MANAGER
 		std::string myID;
@@ -53,6 +65,8 @@ namespace pmm {
 		bool dummyMode;
 		SuckerSession();
 		SuckerSession(const std::string &srvURL);
+		SuckerSession(const std::string &srvURL, bool usesIMAP, bool usesPOP3);
+		SuckerSession(const std::string &srvURL, bool usesIMAP, bool usesPOP3, std::string _secret, std::string _fetchDBDir, int _port = DEFAULT_PMM_SERVICE_PORT);
 
 		
 		//Register to the PMM Service server, currently located at Google AppEngine

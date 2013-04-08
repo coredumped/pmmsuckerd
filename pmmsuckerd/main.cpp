@@ -29,6 +29,7 @@
 #include "APNSFeedbackThread.h"
 #include "PendingNotificationStore.h"
 #include "ObjectDatastore.h"
+#include "RPCService.h"
 //#include "SharedMap.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 4
@@ -146,6 +147,9 @@ int main (int argc, const char * argv[])
 	pmm::SharedVector<pmm::MailAccountInfo> mailAccounts2Refresh;
 	//pmm::SharedMap<std::string, int> statCounter;
 	
+	//Holds commands and parameters received from the realtime thrift service
+	pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > rtCommandV;
+	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
 	SSL_library_init();
@@ -224,7 +228,19 @@ int main (int argc, const char * argv[])
 	pmm::pop3Log.setTag("POP3SuckerThread");
 	
 	pmm::ObjectDatastore localConfig;
-	pmm::SuckerSession session(pmmServiceURL);
+
+	int rpc_port;
+	bool allowsIMAP;
+	bool allowsPOP3;
+	std::string theSecret;
+	pmm::configValueGetInt("port", rpc_port);
+	pmm::configValueGetBool("allowsIMAP", allowsIMAP);
+	pmm::configValueGetBool("allowsPOP3", allowsPOP3);
+	pmm::configValueGetString("secret", theSecret);
+
+	pmm::SuckerSession session(pmmServiceURL, allowsIMAP, allowsPOP3, theSecret, "fetchdb/", rpc_port);
+	theSecret = "";
+	
 	preferenceEngine.preferenceQueue = &preferenceSetQueue;
 	//1. Register to PMMService...
 	try {
@@ -273,6 +289,8 @@ int main (int argc, const char * argv[])
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
+	pmm::RPCService rpcService;
+	rpcService.rtCommandV = &rtCommandV;
 	
 	pmm::APNSFeedbackThread feedbackThread;
 	feedbackThread.setKeyPath(sslPrivateKeyPath);
@@ -323,6 +341,10 @@ int main (int argc, const char * argv[])
 		msgUploaderThreads[i].dummyMode = dummyMode;
 		pmm::ThreadDispatcher::start(msgUploaderThreads[i], threadStackSize);
 	}
+	
+	//Start RPC service
+	pmm::ThreadDispatcher::start(rpcService);
+
 	//Initiate Preference Management Engine
 	pmm::ThreadDispatcher::start(preferenceEngine, threadStackSize);
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
@@ -557,30 +579,36 @@ int main (int argc, const char * argv[])
 			//pmm::FetchedMailsCache fCache;
 			//fCache.expireOldEntries();
 		}
-		/*bool doCmdCheck = false;
-		 if (tic % 900 == 0) { //At least go to app engine every 15 minutes
-		 doCmdCheck = true;
-		 }*/
-		if(tic % commandPollingInterval == 0){ //Server commands processing
+
+		bool gotRTCommands = false;
+		if (rtCommandV.size() > 0) {
+			gotRTCommands = true;
+		}
+		if(tic % commandPollingInterval == 0 || gotRTCommands){ //Server commands processing
 			try{
 				bool doCmdCheck = false;
-				if(doCmdCheck == false && session.fnxHasPendingTasks()){
+				if (!gotRTCommands) {
+					if(doCmdCheck == false && session.fnxHasPendingTasks()){
+						doCmdCheck = true;
+					}
+					int nNotif = (int) notificationQueue.size();
+					if(nNotif > 0) pmm::Log << "Notification queue has " << nNotif << " pending elements" << pmm::NL;
+				}
+				else {
 					doCmdCheck = true;
 				}
-				int nNotif = (int) notificationQueue.size();
-				if(nNotif > 0) pmm::Log << "Notification queue has " << nNotif << " pending elements" << pmm::NL;
-#ifdef SEND_PUSH_KEEPALIVES
-				if (tic % 120 == 0) {
-					//Send keepalive message
-					pmm::NotificationPayload np(DEFAULT_KEEPALIVE_DEVTOKEN, "PMM is alive", 1, "sln.caf");
-					np.isSystemNotification = true;
-					notificationQueue.add(np);
-				}
-#endif
 				if(doCmdCheck){
 					std::vector< std::map<std::string, std::map<std::string, std::string> > > tasksToRun;
-					int nTasks = session.getPendingTasks(tasksToRun);
-					for (int i = 0 ; i < nTasks; i++) {
+					size_t nTasks;
+					if (gotRTCommands) {
+						//Copy the rtCommand set to tasksToRun
+						rtCommandV.moveTo(tasksToRun);
+						nTasks = tasksToRun.size();
+					}
+					else {
+						nTasks = session.getPendingTasks(tasksToRun);
+					}
+					for (size_t i = 0 ; i < nTasks; i++) {
 						//Define iterator, run thru every single key to determine the command, if needed also make use of any parameters
 						std::map<std::string, std::map<std::string, std::string> >::iterator iter = tasksToRun[i].begin();
 						std::string command = iter->first;

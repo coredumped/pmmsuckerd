@@ -12,24 +12,36 @@
 ##
 
 GCC=g++
-CFLAGS=-g -I. -I.. -I../../jsonxx `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1 -DENABLE_NATE_DOT_COM_WORKAROUND=1
+CFLAGS=-g -I. -I.. -I../../jsonxx -I../rpc `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1 -DENABLE_NATE_DOT_COM_WORKAROUND=1
 LIBS=`pkg-config libcurl --libs` -luuid -lpthread -lssl -letpan -lsqlite3
 
-all: pmmsuckerd
+all: thriftcheck pmmsuckerd
+
+thriftcheck:
+	thrift -version
 
 pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o Mutex.o MailAccountInfo.o \
 		GenericThread.o APNSNotificationThread.o ThreadDispatcher.o SharedQueue.o NotificationPayload.o \
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
 		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o \
 		QuotaDB.o UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o Atomic.o \
-		ObjectDatastore.o
+		ObjectDatastore.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
 				MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o MTLogger.o MailMessage.o \
 				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o QuotaDB.o \
 				UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o \
-				ObjectDatastore.o Atomic.o $(LIBS)
+				ObjectDatastore.o Atomic.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o $(LIBS)
+
+pmmrpc_types.o: ../rpc/pmmrpc_types.h ../rpc/pmmrpc_types.cpp
+	$(GCC) $(CFLAGS) -c -o pmmrpc_types.o pmmrpc_types.cpp
+
+pmmrpc_constants.o: ../rpc/pmmrpc_constants.h ../rpc/pmmrpc_constants.cpp
+	$(GCC) $(CFLAGS) -c -o pmmrpc_constants.o pmmrpc_constants.cpp
+
+PMMSuckerRPC.o: ../PMMSuckerSession.h ../rpc/pmmrpc_types.h ../rpc/pmmrpc_constants.h
+	$(GCC) $(CFLAGS) -c -o PMMSuckerRPC.o ../rpc/PMMSuckerRPC.cpp
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
