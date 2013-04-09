@@ -255,6 +255,10 @@ int main (int argc, const char * argv[])
 	pmm::configValueGetString("secret", theSecret);
 	
 	pmm::ThreadDispatcher::start(fetchDBSyncThread);
+	pmm::RPCService rpcService;
+	rpcService.rtCommandV = &rtCommandV;
+	//Start RPC service
+	pmm::ThreadDispatcher::start(rpcService);
 
 	pmm::SuckerSession session(pmmServiceURL, allowsIMAP, allowsPOP3, theSecret, "fetchdb/", rpc_port);
 	theSecret = "";
@@ -307,8 +311,6 @@ int main (int argc, const char * argv[])
 	pmm::MessageUploaderThread *msgUploaderThreads = new pmm::MessageUploaderThread[maxMessageUploaderThreads];
 	pmm::IMAPSuckerThread *imapSuckingThreads = new pmm::IMAPSuckerThread[maxIMAPSuckerThreads];
 	pmm::POP3SuckerThread *pop3SuckingThreads = new pmm::POP3SuckerThread[maxPOP3SuckerThreads];
-	pmm::RPCService rpcService;
-	rpcService.rtCommandV = &rtCommandV;
 	
 	pmm::APNSFeedbackThread feedbackThread;
 	feedbackThread.setKeyPath(sslPrivateKeyPath);
@@ -360,9 +362,6 @@ int main (int argc, const char * argv[])
 		pmm::ThreadDispatcher::start(msgUploaderThreads[i], threadStackSize);
 	}
 	
-	//Start RPC service
-	pmm::ThreadDispatcher::start(rpcService);
-
 	//Initiate Preference Management Engine
 	pmm::ThreadDispatcher::start(preferenceEngine, threadStackSize);
 	std::vector<pmm::MailAccountInfo> imapAccounts, pop3Accounts;
@@ -801,24 +800,27 @@ int main (int argc, const char * argv[])
 							}
 						}
 						else if (command.compare(pmm::Commands::sync2RemotePoller) == 0) {
-							//Block polling access
-							pmm::mailboxPollBlocked = true;
 							//Add remote fetchdb sync code in here!!!
 							pmm::PMMSuckerInfo suckerInfo;
 							suckerInfo.suckerID = parameters["suckerID"];
-							suckerInfo.secret = parameters["secret"];
-							suckerInfo.hostname = parameters["host"];
-							std::istringstream num(parameters["port"]);
-							num >> suckerInfo.port;
-							suckerInfo.allowsIMAP = pmm::getBoolFromString(parameters["allowsIMAP"]);
-							suckerInfo.allowsPOP3 = pmm::getBoolFromString(parameters["allowsPOP3"]);
-							//Wait 2 seconds before starting sync...
-							sleep(2);
-							sync2RemotePoller(suckerInfo);
-							//Connect via thrift to remote sucker
-							//Execute remote command sync RPC and send all local database info to remote sucker
-							//Unblock polling access
-							pmm::mailboxPollBlocked = false;
+							std::string currentSuckerID;
+							session.getSuckerID(currentSuckerID);
+							if (currentSuckerID.compare(suckerInfo.suckerID) != 0){
+								pmm::mailboxPollBlocked = true;
+								suckerInfo.secret = parameters["secret"];
+								suckerInfo.hostname = parameters["host"];
+								std::istringstream num(parameters["port"]);
+								num >> suckerInfo.port;
+								suckerInfo.allowsIMAP = pmm::getBoolFromString(parameters["allowsIMAP"]);
+								suckerInfo.allowsPOP3 = pmm::getBoolFromString(parameters["allowsPOP3"]);
+								//Wait 2 seconds before starting sync...
+								sleep(2);
+								sync2RemotePoller(suckerInfo);
+								pmm::mailboxPollBlocked = false;
+							}
+							else {
+								pmm::Log << "INFO: ignoring self-made full sync request" << pmm::NL;
+							}
 						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;

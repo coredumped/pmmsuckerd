@@ -1055,5 +1055,9 @@ namespace pmm {
 		}
 		curl_easy_cleanup(www);		
 	}
+	
+	void SuckerSession::getSuckerID(std::string mySuckerID_) {
+		mySuckerID_ = myID;
+	}
 }
 
