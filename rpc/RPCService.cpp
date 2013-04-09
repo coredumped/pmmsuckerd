@@ -48,6 +48,13 @@ namespace  pmmrpc {
 			return true;
 		}
 		
+		void fetchDBPutItemAsync(const std::string& email, const std::string& uid){
+			GenericException ex1;
+			ex1.errorCode = 666;
+			ex1.errorMessage = "Method not implemented";
+			throw ex1;
+		}
+		
 		void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) throw (GenericException) {
 			GenericException ex1;
 			ex1.errorCode = 666;

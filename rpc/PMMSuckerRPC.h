@@ -17,6 +17,7 @@ class PMMSuckerRPCIf {
   virtual ~PMMSuckerRPCIf() {}
   virtual void getAllEmailAccounts(std::vector<std::string> & _return) = 0;
   virtual bool fetchDBPutItem(const std::string& email, const std::string& uid) = 0;
+  virtual void fetchDBPutItemAsync(const std::string& email, const std::string& uid) = 0;
   virtual void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) = 0;
   virtual bool notificationPayloadPush() = 0;
   virtual bool commandSubmit(const Command& cmd) = 0;
@@ -57,6 +58,9 @@ class PMMSuckerRPCNull : virtual public PMMSuckerRPCIf {
   bool fetchDBPutItem(const std::string& /* email */, const std::string& /* uid */) {
     bool _return = false;
     return _return;
+  }
+  void fetchDBPutItemAsync(const std::string& /* email */, const std::string& /* uid */) {
+    return;
   }
   void fetchDBGetItems(std::vector<FetchDBItem> & /* _return */, const std::string& /* email */) {
     return;
@@ -315,6 +319,133 @@ class PMMSuckerRPC_fetchDBPutItem_presult {
   GenericException ex2;
 
   _PMMSuckerRPC_fetchDBPutItem_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+typedef struct _PMMSuckerRPC_fetchDBPutItemAsync_args__isset {
+  _PMMSuckerRPC_fetchDBPutItemAsync_args__isset() : email(false), uid(false) {}
+  bool email;
+  bool uid;
+} _PMMSuckerRPC_fetchDBPutItemAsync_args__isset;
+
+class PMMSuckerRPC_fetchDBPutItemAsync_args {
+ public:
+
+  PMMSuckerRPC_fetchDBPutItemAsync_args() : email(), uid() {
+  }
+
+  virtual ~PMMSuckerRPC_fetchDBPutItemAsync_args() throw() {}
+
+  std::string email;
+  std::string uid;
+
+  _PMMSuckerRPC_fetchDBPutItemAsync_args__isset __isset;
+
+  void __set_email(const std::string& val) {
+    email = val;
+  }
+
+  void __set_uid(const std::string& val) {
+    uid = val;
+  }
+
+  bool operator == (const PMMSuckerRPC_fetchDBPutItemAsync_args & rhs) const
+  {
+    if (!(email == rhs.email))
+      return false;
+    if (!(uid == rhs.uid))
+      return false;
+    return true;
+  }
+  bool operator != (const PMMSuckerRPC_fetchDBPutItemAsync_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const PMMSuckerRPC_fetchDBPutItemAsync_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class PMMSuckerRPC_fetchDBPutItemAsync_pargs {
+ public:
+
+
+  virtual ~PMMSuckerRPC_fetchDBPutItemAsync_pargs() throw() {}
+
+  const std::string* email;
+  const std::string* uid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _PMMSuckerRPC_fetchDBPutItemAsync_result__isset {
+  _PMMSuckerRPC_fetchDBPutItemAsync_result__isset() : ex1(false), ex2(false) {}
+  bool ex1;
+  bool ex2;
+} _PMMSuckerRPC_fetchDBPutItemAsync_result__isset;
+
+class PMMSuckerRPC_fetchDBPutItemAsync_result {
+ public:
+
+  PMMSuckerRPC_fetchDBPutItemAsync_result() {
+  }
+
+  virtual ~PMMSuckerRPC_fetchDBPutItemAsync_result() throw() {}
+
+  FetchDBUnableToPutItemException ex1;
+  GenericException ex2;
+
+  _PMMSuckerRPC_fetchDBPutItemAsync_result__isset __isset;
+
+  void __set_ex1(const FetchDBUnableToPutItemException& val) {
+    ex1 = val;
+  }
+
+  void __set_ex2(const GenericException& val) {
+    ex2 = val;
+  }
+
+  bool operator == (const PMMSuckerRPC_fetchDBPutItemAsync_result & rhs) const
+  {
+    if (!(ex1 == rhs.ex1))
+      return false;
+    if (!(ex2 == rhs.ex2))
+      return false;
+    return true;
+  }
+  bool operator != (const PMMSuckerRPC_fetchDBPutItemAsync_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const PMMSuckerRPC_fetchDBPutItemAsync_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _PMMSuckerRPC_fetchDBPutItemAsync_presult__isset {
+  _PMMSuckerRPC_fetchDBPutItemAsync_presult__isset() : ex1(false), ex2(false) {}
+  bool ex1;
+  bool ex2;
+} _PMMSuckerRPC_fetchDBPutItemAsync_presult__isset;
+
+class PMMSuckerRPC_fetchDBPutItemAsync_presult {
+ public:
+
+
+  virtual ~PMMSuckerRPC_fetchDBPutItemAsync_presult() throw() {}
+
+  FetchDBUnableToPutItemException ex1;
+  GenericException ex2;
+
+  _PMMSuckerRPC_fetchDBPutItemAsync_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -912,6 +1043,9 @@ class PMMSuckerRPCClient : virtual public PMMSuckerRPCIf {
   bool fetchDBPutItem(const std::string& email, const std::string& uid);
   void send_fetchDBPutItem(const std::string& email, const std::string& uid);
   bool recv_fetchDBPutItem();
+  void fetchDBPutItemAsync(const std::string& email, const std::string& uid);
+  void send_fetchDBPutItemAsync(const std::string& email, const std::string& uid);
+  void recv_fetchDBPutItemAsync();
   void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email);
   void send_fetchDBGetItems(const std::string& email);
   void recv_fetchDBGetItems(std::vector<FetchDBItem> & _return);
@@ -944,6 +1078,7 @@ class PMMSuckerRPCProcessor : public ::apache::thrift::TDispatchProcessor {
   ProcessMap processMap_;
   void process_getAllEmailAccounts(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_fetchDBPutItem(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_fetchDBPutItemAsync(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_fetchDBGetItems(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_notificationPayloadPush(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_commandSubmit(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
@@ -954,6 +1089,7 @@ class PMMSuckerRPCProcessor : public ::apache::thrift::TDispatchProcessor {
     iface_(iface) {
     processMap_["getAllEmailAccounts"] = &PMMSuckerRPCProcessor::process_getAllEmailAccounts;
     processMap_["fetchDBPutItem"] = &PMMSuckerRPCProcessor::process_fetchDBPutItem;
+    processMap_["fetchDBPutItemAsync"] = &PMMSuckerRPCProcessor::process_fetchDBPutItemAsync;
     processMap_["fetchDBGetItems"] = &PMMSuckerRPCProcessor::process_fetchDBGetItems;
     processMap_["notificationPayloadPush"] = &PMMSuckerRPCProcessor::process_notificationPayloadPush;
     processMap_["commandSubmit"] = &PMMSuckerRPCProcessor::process_commandSubmit;
@@ -1004,6 +1140,15 @@ class PMMSuckerRPCMultiface : virtual public PMMSuckerRPCIf {
       ifaces_[i]->fetchDBPutItem(email, uid);
     }
     return ifaces_[i]->fetchDBPutItem(email, uid);
+  }
+
+  void fetchDBPutItemAsync(const std::string& email, const std::string& uid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->fetchDBPutItemAsync(email, uid);
+    }
+    ifaces_[i]->fetchDBPutItemAsync(email, uid);
   }
 
   void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) {

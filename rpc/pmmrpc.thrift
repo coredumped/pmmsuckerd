@@ -53,6 +53,7 @@ service PMMSuckerRPC {
 
 	//FetchDB interface
 	bool fetchDBPutItem(1:string email, 2:string uid) throws (1:FetchDBUnableToPutItemException ex1, 2:GenericException ex2);
+	void fetchDBPutItemAsync(1:string email, 2:string uid) throws (1:FetchDBUnableToPutItemException ex1, 2:GenericException ex2);
 	list<FetchDBItem> fetchDBGetItems(1:string email) throws (1:GenericException ex1);
 
 	//Helpers for push notifications

@@ -32,6 +32,7 @@
 namespace pmm {
 	MTLogger CacheLog;
 	static const char *fetchedMailsTable = DEFAULT_FETCHED_MAILS_TABLE_NAME;
+	const char *DefaultFetchDBTableName = fetchedMailsTable;
 	static Mutex fM;
 	
 	class UniqueDBDescriptor {

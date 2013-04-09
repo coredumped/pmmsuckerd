@@ -441,4 +441,10 @@ namespace pmm {
 		throw GenericException(errmsg.str());
 	}
 
+	bool getBoolFromString(const std::string &str){
+		if(str.compare("t") == 0 || str.compare("1") == 0 || str.compare("T") == 0 || str.compare("true") == 0 || str.compare("True") == 0 || str.compare("TRUE") == 0){
+			return true;
+		}
+		return false;
+	}
 }

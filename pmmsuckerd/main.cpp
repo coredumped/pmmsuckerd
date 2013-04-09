@@ -12,6 +12,12 @@
 #include <stdlib.h>
 #include <fstream>
 #include <signal.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <thrift/transport/TTransport.h>
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TBufferTransports.h>
+#include <thrift/protocol/TBinaryProtocol.h>
 #include "ServerResponse.h"
 #include "PMMSuckerSession.h"
 #include "APNSNotificationThread.h"
@@ -30,6 +36,9 @@
 #include "PendingNotificationStore.h"
 #include "ObjectDatastore.h"
 #include "RPCService.h"
+#include "PMMSuckerRPC.h"
+#include "FetchDBSyncThread.h"
+#include "dirent.h"
 //#include "SharedMap.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
 #define DEFAULT_MAX_NOTIFICATION_THREADS 4
@@ -105,6 +114,8 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts);
 void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::SharedQueue<pmm::NotificationPayload> &notificationQueue, pmm::SharedQueue<pmm::NotificationPayload> &pmmStorageQueue);
 
+bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo);
+
 int main (int argc, const char * argv[])
 {
 	bool enableDevelAPNS = false;
@@ -149,6 +160,11 @@ int main (int argc, const char * argv[])
 	
 	//Holds commands and parameters received from the realtime thrift service
 	pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > rtCommandV;
+	
+	//FetchDB item sync queue
+	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
+	pmm::FetchDBSyncThread fetchDBSyncThread;
+	fetchDBSyncThread.items2SaveQ = &fetchDBItems2SaveQ;
 	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;
@@ -237,6 +253,8 @@ int main (int argc, const char * argv[])
 	pmm::configValueGetBool("allowsIMAP", allowsIMAP);
 	pmm::configValueGetBool("allowsPOP3", allowsPOP3);
 	pmm::configValueGetString("secret", theSecret);
+	
+	pmm::ThreadDispatcher::start(fetchDBSyncThread);
 
 	pmm::SuckerSession session(pmmServiceURL, allowsIMAP, allowsPOP3, theSecret, "fetchdb/", rpc_port);
 	theSecret = "";
@@ -782,6 +800,26 @@ int main (int argc, const char * argv[])
 								}
 							}
 						}
+						else if (command.compare(pmm::Commands::sync2RemotePoller) == 0) {
+							//Block polling access
+							pmm::mailboxPollBlocked = true;
+							//Add remote fetchdb sync code in here!!!
+							pmm::PMMSuckerInfo suckerInfo;
+							suckerInfo.suckerID = parameters["suckerID"];
+							suckerInfo.secret = parameters["secret"];
+							suckerInfo.hostname = parameters["host"];
+							std::istringstream num(parameters["port"]);
+							num >> suckerInfo.port;
+							suckerInfo.allowsIMAP = pmm::getBoolFromString(parameters["allowsIMAP"]);
+							suckerInfo.allowsPOP3 = pmm::getBoolFromString(parameters["allowsPOP3"]);
+							//Wait 2 seconds before starting sync...
+							sleep(2);
+							sync2RemotePoller(suckerInfo);
+							//Connect via thrift to remote sucker
+							//Execute remote command sync RPC and send all local database info to remote sucker
+							//Unblock polling access
+							pmm::mailboxPollBlocked = false;
+						}
 						else {
 							pmm::Log << "CRITICAL: Unknown command received from central controller: " << command << pmm::NL;
 						}
@@ -1073,4 +1111,101 @@ void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::Shar
 		notificationQueue.add(np);
 		//pmmStorageQueue.add(np);
 	}
+}
+
+static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string &dbFile){
+	sqlite3 *theDB = 0;
+	int errCode;
+	do {
+		if((errCode = sqlite3_open_v2(dbFile.c_str(), &theDB, SQLITE_OPEN_READONLY|SQLITE_OPEN_FULLMUTEX, NULL)) == SQLITE_OK){
+			std::stringstream sqlCmd;
+			sqlite3_stmt *stmt = 0;
+			char *pzTail;
+			sqlCmd << "SELECT uniqueid,timestamp FROM " << pmm::DefaultFetchDBTableName << " order by timestamp desc";
+			std::string query = sqlCmd.str();
+			errCode = sqlite3_prepare_v2(theDB, query.c_str(), (int)query.size(), &stmt, (const char **)&pzTail);
+			if (errCode == SQLITE_OK){
+				while ((errCode = sqlite3_step(stmt)) == SQLITE_ROW) {
+					//Read averything here
+					char *uniqueid = (char *)sqlite3_column_text(stmt, 0);
+					time_t timestamp = (time_t)sqlite3_column_int(stmt, 1);
+					pmmrpc::FetchDBItem fitem;
+					fitem.uid = uniqueid;
+					fitem.timestamp = timestamp;
+					
+				}
+				sqlite3_finalize(stmt);
+			}
+			else {
+				sqlite3_close(theDB);
+				pmm::Log << "Unable to read database " << dbFile << " for syncing: errorcode=" << errCode << ", " << sqlite3_errmsg(theDB) << pmm::NL;
+				throw pmm::GenericException("Unable to read full datafile!!!");
+			}
+			sqlite3_close(theDB);
+			errCode = SQLITE_OK;
+		}
+		else if(errCode == SQLITE_BUSY){
+			pmm::Log << "Retrying, the database was busy" << pmm::NL;
+			usleep(2500);
+		}
+		else {
+			pmm::Log << "Unable to open database " << dbFile << " for syncing: errorcode=" << errCode << ", " << sqlite3_errmsg(theDB) << pmm::NL;
+			throw pmm::GenericException("Unable to open database syncing");
+		}
+	}while (errCode == SQLITE_BUSY);
+}
+
+static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerRPCClient *client){
+	DIR *theDir = opendir(startDir.c_str());
+	struct dirent *dData;
+	while ((dData = readdir(theDir)) != NULL) {
+		//First level
+		if (dData->d_type == DT_DIR && strncmp(dData->d_name, "..", 2) != 0 && strcasecmp(dData->d_name, ".") != 0) {
+			std::stringstream thePath;
+			thePath << startDir << "/" << dData->d_name;
+			finddbAndSyncDBFiles(thePath.str(), client);
+		}
+		else if (dData->d_type == DT_REG) {
+			size_t theLen = strlen(dData->d_name);
+			if (theLen > 15) {
+				char *endptr = dData->d_name + (theLen - 3);
+				if (strncmp(endptr, ".db", 3) == 0) {
+					std::stringstream fullPath;
+					fullPath << startDir << "/" << dData->d_name;
+					pmm::Log << "INFO: Sending" << fullPath.str() << "..." << pmm::NL;
+					sendDBContents(client, fullPath.str());
+				}
+			}
+		}
+	}
+	closedir(theDir);
+	
+}
+
+bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo) {
+	bool ret = true;
+	pmm::Log << "INFO: Initiating initial sync feed of " << suckerInfo.suckerID << " (" << suckerInfo.hostname << ")" << pmm::NL;
+	//Connect 2 remote PMM Sucker here
+	boost::shared_ptr<apache::thrift::transport::TTransport> socket;
+	boost::shared_ptr<apache::thrift::transport::TTransport> transport;
+	boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol;
+
+	socket = boost::shared_ptr<apache::thrift::transport::TTransport>(new apache::thrift::transport::TSocket(suckerInfo.hostname, suckerInfo.port));
+	transport = boost::shared_ptr<apache::thrift::transport::TTransport>(new apache::thrift::transport::TBufferedTransport(socket));
+	protocol = boost::shared_ptr<apache::thrift::protocol::TProtocol>(new apache::thrift::protocol::TBinaryProtocol(transport));
+
+	pmmrpc::PMMSuckerRPCClient *client = new pmmrpc::PMMSuckerRPCClient(protocol);
+	try {
+		transport->open();
+		//Find all .db files and perform sync
+		finddbAndSyncDBFiles("./fetchdb", client);
+		transport->close();
+	}
+	catch(apache::thrift::TException &exx1){
+		pmm::Log << "Unable to connect to " << suckerInfo.hostname << " RPC service: " << exx1.what() << pmm::NL;
+		ret = false;
+	}
+	delete client;
+	pmm::Log << "INFO: Initial sync feed of " << suckerInfo.suckerID << " (" << suckerInfo.hostname << ") completed!!!" << pmm::NL;
+	return ret;
 }

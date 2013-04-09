@@ -69,6 +69,8 @@
 		820BBE55154335BF005A1C5A /* SilentMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82BD8EBC148BBB4B008DDEA1 /* SilentMode.cpp */; };
 		820BBE56154335D0005A1C5A /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
 		820BBE5715433DED005A1C5A /* UserPreferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82B6109314F2A2FC00975C32 /* UserPreferences.cpp */; };
+		82141E9B1713BC5100EE1278 /* FetchDBSyncThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82141E991713BC5000EE1278 /* FetchDBSyncThread.cpp */; };
+		82141E9C1713BC5100EE1278 /* FetchDBSyncThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82141E991713BC5000EE1278 /* FetchDBSyncThread.cpp */; };
 		821675BC14283DA800F8FF70 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
@@ -406,6 +408,8 @@
 		820BBE371542F466005A1C5A /* apnNotificator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = apnNotificator; sourceTree = BUILT_PRODUCTS_DIR; };
 		820BBE3A1542F466005A1C5A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		820BBE3C1542F466005A1C5A /* apnNotificator.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = apnNotificator.1; sourceTree = "<group>"; };
+		82141E991713BC5000EE1278 /* FetchDBSyncThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FetchDBSyncThread.cpp; sourceTree = "<group>"; };
+		82141E9A1713BC5000EE1278 /* FetchDBSyncThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchDBSyncThread.h; sourceTree = "<group>"; };
 		821675BB14283DA800F8FF70 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8217B24214B5DCEA00E45AA0 /* QuotaDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuotaDB.h; sourceTree = "<group>"; };
@@ -938,6 +942,8 @@
 				82AE041515E077970076696C /* SharedMap.h */,
 				82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */,
 				82C649EF1702A13C00569666 /* PMMSuckerInfo.h */,
+				82141E991713BC5000EE1278 /* FetchDBSyncThread.cpp */,
+				82141E9A1713BC5000EE1278 /* FetchDBSyncThread.h */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -1433,6 +1439,7 @@
 				82C649F01702A13C00569666 /* PMMSuckerInfo.cpp in Sources */,
 				82C1D9D9170A02EC008B7BA6 /* PMMSuckerRPC.cpp in Sources */,
 				82C1D9DF170A698A008B7BA6 /* RPCService.cpp in Sources */,
+				82141E9B1713BC5100EE1278 /* FetchDBSyncThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1475,6 +1482,7 @@
 				82425BA115AC7522004E3D0F /* Atomic.cpp in Sources */,
 				826FE2AE16AF61EB0099A8F1 /* ObjectDatastore.cpp in Sources */,
 				82C1D9E0170A698A008B7BA6 /* RPCService.cpp in Sources */,
+				82141E9C1713BC5100EE1278 /* FetchDBSyncThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

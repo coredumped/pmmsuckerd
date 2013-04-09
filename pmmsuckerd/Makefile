@@ -25,7 +25,8 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 		UtilityFunctions.o GenericException.o MailSuckerThread.o IMAPSuckerThread.o FetchedMailsCache.o \
 		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o \
 		QuotaDB.o UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o Atomic.o \
-		ObjectDatastore.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o PMMSuckerInfo.o RPCService.o
+		ObjectDatastore.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o PMMSuckerInfo.o RPCService.o \
+		FetchDBSyncThread.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
@@ -33,7 +34,7 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o QuotaDB.o \
 				UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o \
 				ObjectDatastore.o Atomic.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o \
-				PMMSuckerInfo.o RPCService.o $(LIBS)
+				PMMSuckerInfo.o RPCService.o FetchDBSyncThread.o $(LIBS)
 
 pmmrpc_types.o: ../rpc/pmmrpc_types.h ../rpc/pmmrpc_types.cpp
 	$(GCC) $(CFLAGS) -c -o pmmrpc_types.o ../rpc/pmmrpc_types.cpp
@@ -46,6 +47,9 @@ PMMSuckerRPC.o: ../PMMSuckerSession.h ../rpc/pmmrpc_types.h ../rpc/pmmrpc_consta
 
 RPCService.o: ../rpc/RPCService.h ../rpc/RPCService.cpp ../rpc/PMMSuckerRPC.h ../rpc/pmmrpc_types.h ../rpc/pmmrpc_constants.h
 	$(GCC) $(CFLAGS) -c -o RPCService.o ../rpc/RPCService.cpp
+
+FetchDBSyncThread.o: ../FetchDBSyncThread.h ../FetchDBSyncThread.cpp ../rpc/pmmrpc_types.h ../FetchedMailsCache.h
+	$(GCC) $(CFLAGS) -c -o FetchDBSyncThread.o ../FetchDBSyncThread.cpp
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc

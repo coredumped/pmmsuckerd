@@ -67,6 +67,7 @@ namespace pmm {
 	};
 	
 	extern MTLogger CacheLog;
+	extern const char *DefaultFetchDBTableName;
 }
 
 

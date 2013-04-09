@@ -121,9 +121,13 @@ namespace pmm {
 		
 		//App configuration
 		ObjectDatastore *localConfig;
+		
+
 	};
-	
 	bool etpanOperationFailed(int r);
+	
+	//Poll blocking
+	extern pmm::AtomicFlag mailboxPollBlocked;
 }
 
 

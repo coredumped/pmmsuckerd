@@ -42,6 +42,8 @@ namespace pmm {
 	void configValueGetInt(const std::string &varname, int &val);
 	void configValueGetBool(const std::string &varname, bool &val);
 	void configValueGetString(const std::string &varname, std::string &val);
+	
+	bool getBoolFromString(const std::string &str);
 }
 
 #endif

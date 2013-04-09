@@ -127,6 +127,14 @@ namespace pmm {
 		int messagesRetrieved = 0;
 		time_t fetchT0 = time(NULL);
 		bool isYahooAccount = false;
+		
+		while (mailboxPollBlocked == true) {
+			sleep(1);
+			if (time(0) % 30 == 0) {
+				pmm::pop3Log << "polling of " << pf.mailAccountInfo.email() << " is on hold!!!" << pmm::NL;
+			}
+		}
+
 		if (pf.mailAccountInfo.serverAddress().find(".yahoo.") != pf.mailAccountInfo.serverAddress().npos) isYahooAccount = true;
 		if (pf.mailAccountInfo.useSSL()) {
 			result = mailpop3_ssl_connect(pop3, pf.mailAccountInfo.serverAddress().c_str(), pf.mailAccountInfo.serverPort());

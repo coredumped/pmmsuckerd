@@ -419,6 +419,204 @@ uint32_t PMMSuckerRPC_fetchDBPutItem_presult::read(::apache::thrift::protocol::T
   return xfer;
 }
 
+uint32_t PMMSuckerRPC_fetchDBPutItemAsync_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->email);
+          this->__isset.email = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->uid);
+          this->__isset.uid = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBPutItemAsync_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("PMMSuckerRPC_fetchDBPutItemAsync_args");
+
+  xfer += oprot->writeFieldBegin("email", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->email);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("uid", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString(this->uid);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBPutItemAsync_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("PMMSuckerRPC_fetchDBPutItemAsync_pargs");
+
+  xfer += oprot->writeFieldBegin("email", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString((*(this->email)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("uid", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString((*(this->uid)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBPutItemAsync_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex1.read(iprot);
+          this->__isset.ex1 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex2.read(iprot);
+          this->__isset.ex2 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBPutItemAsync_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+
+  uint32_t xfer = 0;
+
+  xfer += oprot->writeStructBegin("PMMSuckerRPC_fetchDBPutItemAsync_result");
+
+  if (this->__isset.ex1) {
+    xfer += oprot->writeFieldBegin("ex1", ::apache::thrift::protocol::T_STRUCT, 1);
+    xfer += this->ex1.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  } else if (this->__isset.ex2) {
+    xfer += oprot->writeFieldBegin("ex2", ::apache::thrift::protocol::T_STRUCT, 2);
+    xfer += this->ex2.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBPutItemAsync_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex1.read(iprot);
+          this->__isset.ex1 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex2.read(iprot);
+          this->__isset.ex2 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
 uint32_t PMMSuckerRPC_fetchDBGetItems_args::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
@@ -1445,6 +1643,66 @@ bool PMMSuckerRPCClient::recv_fetchDBPutItem()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "fetchDBPutItem failed: unknown result");
 }
 
+void PMMSuckerRPCClient::fetchDBPutItemAsync(const std::string& email, const std::string& uid)
+{
+  send_fetchDBPutItemAsync(email, uid);
+  recv_fetchDBPutItemAsync();
+}
+
+void PMMSuckerRPCClient::send_fetchDBPutItemAsync(const std::string& email, const std::string& uid)
+{
+  int32_t cseqid = 0;
+  oprot_->writeMessageBegin("fetchDBPutItemAsync", ::apache::thrift::protocol::T_CALL, cseqid);
+
+  PMMSuckerRPC_fetchDBPutItemAsync_pargs args;
+  args.email = &email;
+  args.uid = &uid;
+  args.write(oprot_);
+
+  oprot_->writeMessageEnd();
+  oprot_->getTransport()->writeEnd();
+  oprot_->getTransport()->flush();
+}
+
+void PMMSuckerRPCClient::recv_fetchDBPutItemAsync()
+{
+
+  int32_t rseqid = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TMessageType mtype;
+
+  iprot_->readMessageBegin(fname, mtype, rseqid);
+  if (mtype == ::apache::thrift::protocol::T_EXCEPTION) {
+    ::apache::thrift::TApplicationException x;
+    x.read(iprot_);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+    throw x;
+  }
+  if (mtype != ::apache::thrift::protocol::T_REPLY) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  if (fname.compare("fetchDBPutItemAsync") != 0) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  PMMSuckerRPC_fetchDBPutItemAsync_presult result;
+  result.read(iprot_);
+  iprot_->readMessageEnd();
+  iprot_->getTransport()->readEnd();
+
+  if (result.__isset.ex1) {
+    throw result.ex1;
+  }
+  if (result.__isset.ex2) {
+    throw result.ex2;
+  }
+  return;
+}
+
 void PMMSuckerRPCClient::fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email)
 {
   send_fetchDBGetItems(email);
@@ -1879,6 +2137,65 @@ void PMMSuckerRPCProcessor::process_fetchDBPutItem(int32_t seqid, ::apache::thri
 
   if (this->eventHandler_.get() != NULL) {
     this->eventHandler_->postWrite(ctx, "PMMSuckerRPC.fetchDBPutItem", bytes);
+  }
+}
+
+void PMMSuckerRPCProcessor::process_fetchDBPutItemAsync(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+{
+  void* ctx = NULL;
+  if (this->eventHandler_.get() != NULL) {
+    ctx = this->eventHandler_->getContext("PMMSuckerRPC.fetchDBPutItemAsync", callContext);
+  }
+  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "PMMSuckerRPC.fetchDBPutItemAsync");
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preRead(ctx, "PMMSuckerRPC.fetchDBPutItemAsync");
+  }
+
+  PMMSuckerRPC_fetchDBPutItemAsync_args args;
+  args.read(iprot);
+  iprot->readMessageEnd();
+  uint32_t bytes = iprot->getTransport()->readEnd();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postRead(ctx, "PMMSuckerRPC.fetchDBPutItemAsync", bytes);
+  }
+
+  PMMSuckerRPC_fetchDBPutItemAsync_result result;
+  try {
+    iface_->fetchDBPutItemAsync(args.email, args.uid);
+  } catch (FetchDBUnableToPutItemException &ex1) {
+    result.ex1 = ex1;
+    result.__isset.ex1 = true;
+  } catch (GenericException &ex2) {
+    result.ex2 = ex2;
+    result.__isset.ex2 = true;
+  } catch (const std::exception& e) {
+    if (this->eventHandler_.get() != NULL) {
+      this->eventHandler_->handlerError(ctx, "PMMSuckerRPC.fetchDBPutItemAsync");
+    }
+
+    ::apache::thrift::TApplicationException x(e.what());
+    oprot->writeMessageBegin("fetchDBPutItemAsync", ::apache::thrift::protocol::T_EXCEPTION, seqid);
+    x.write(oprot);
+    oprot->writeMessageEnd();
+    oprot->getTransport()->writeEnd();
+    oprot->getTransport()->flush();
+    return;
+  }
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preWrite(ctx, "PMMSuckerRPC.fetchDBPutItemAsync");
+  }
+
+  oprot->writeMessageBegin("fetchDBPutItemAsync", ::apache::thrift::protocol::T_REPLY, seqid);
+  result.write(oprot);
+  oprot->writeMessageEnd();
+  bytes = oprot->getTransport()->writeEnd();
+  oprot->getTransport()->flush();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postWrite(ctx, "PMMSuckerRPC.fetchDBPutItemAsync", bytes);
   }
 }
 

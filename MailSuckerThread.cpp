@@ -34,6 +34,7 @@
 namespace pmm {
 	
 	const int minimumMailCheckInterval = DEFAULT_MINIMUM_MAIL_CHECK_INTERVAL;
+	pmm::AtomicFlag mailboxPollBlocked = false;
 	
 	bool etpanOperationFailed(int r)
 	{
@@ -266,6 +267,19 @@ namespace pmm {
 			relinquishDeviceTokens();
 			processAccountRemove();
 			time_t currTime = time(0);
+			while (mailboxPollBlocked == true) {
+				time_t nowx = time(0);
+				if (nowx % 60 == 0) {
+					pmm::Log << "Polling operations are blocked." << pmm::NL;
+				}
+				if (nowx - currTime > 300) {
+					mailboxPollBlocked = false;
+					pmm::Log << "Unblocking polling operations, the timeout has been exceeded" << pmm::NL;
+					break;
+				}
+				sleep(2);
+			}
+			currTime = time(0);
 			if(emailAccounts.size() == 0 && currTime % 60 == 0) pmm::Log << "There are no e-mail accounts to monitor" << pmm::NL;
 			for (size_t i = 0; i < emailAccounts.size(); i++) {
 				if(nextConnectAttempt.find(emailAccounts[i].email()) == nextConnectAttempt.end()) nextConnectAttempt[emailAccounts[i].email()] = 0;

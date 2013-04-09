@@ -261,6 +261,12 @@ namespace pmm {
 					fetchQueue->add(imapFetch);
 				}
 				else {
+					while (mailboxPollBlocked == true) {
+						sleep(1);
+						if (time(0) % 30 == 0) {
+							pmm::imapLog << "polling of " << imapFetch.mailAccountInfo.email() << " has been interrupted!!!" << pmm::NL;
+						}
+					}
 #ifdef DEBUG_MSG_FETCH
 					pmm::imapLog << "DEBUG: IMAP MailFetcher: Fetching messages for: " << imapFetch.mailAccountInfo.email() << pmm::NL;
 #endif

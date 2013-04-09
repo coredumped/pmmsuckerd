@@ -105,6 +105,7 @@ namespace pmm {
 		const char *refreshEmailAccount = "refreshEmailAccount";
 		const char *sendMessageToDevice = "sndMsg2Dev";
 		const char *sendNoQuotaMessageToDevice = "sndNoQuotaMsg";
+		const char *sync2RemotePoller = "snc2RmtPoller";
 	}
 	
 #ifdef __APPLE__
