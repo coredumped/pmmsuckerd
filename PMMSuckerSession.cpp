@@ -461,9 +461,12 @@ namespace pmm {
 		}
 		if (shouldSync) {
 #ifdef DEBUG
-			pmm::Log << "Performing full fetchdb synchronization..." << pmm::NL;
+			pmm::Log << "Performing full fetchdb synchronization, pausing execution for 2 minutes..." << pmm::NL;
 #endif
-#warning Perform fetchdb synchronization here
+			sleep(120);
+#ifdef DEBUG
+			pmm::Log << "Resuming normal application flow..." << pmm::NL;
+#endif
 		}
 		return response.status;
 	}

@@ -23,6 +23,7 @@ namespace pmm {
 		}
 		FetchedMailsCache fetchedMails;
 		int idx = 0;
+		pmm::Log << "Starting FetchDBSyncThread main loop..." << pmm::NL;
 		while (true) {
 			pmmrpc::FetchDBItem theItem;
 			while (items2SaveQ->extractEntry(theItem)) {
