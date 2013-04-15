@@ -455,9 +455,10 @@ namespace pmm {
 					std::istringstream portS(props[4]);
 					portS >> info.port;
 					sibTempV.push_back(info);
+					pmm::Log << "INFO: Received " << info.suckerID << " from " << info.hostname << " as sibling." << pmm::NL;
 				}
 			}
-			siblingSuckers = sibTempV;
+			siblingSuckers->operator=(sibTempV);
 		}
 		if (shouldSync) {
 #ifdef DEBUG

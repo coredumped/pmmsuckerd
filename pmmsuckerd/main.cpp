@@ -38,6 +38,7 @@
 #include "RPCService.h"
 #include "PMMSuckerRPC.h"
 #include "FetchDBSyncThread.h"
+#include "FetchDBRemoteSyncThread.h"
 #include "dirent.h"
 //#include "SharedMap.h"
 #ifndef DEFAULT_MAX_NOTIFICATION_THREADS
@@ -260,7 +261,9 @@ int main (int argc, const char * argv[])
 	//Start RPC service
 	pmm::ThreadDispatcher::start(rpcService);
 
+	pmm::SharedVector<pmm::PMMSuckerInfo> siblingSuckers;
 	pmm::SuckerSession session(pmmServiceURL, allowsIMAP, allowsPOP3, theSecret, "fetchdb/", rpc_port);
+	session.siblingSuckers = &siblingSuckers;
 	theSecret = "";
 	
 	preferenceEngine.preferenceQueue = &preferenceSetQueue;
@@ -288,6 +291,8 @@ int main (int argc, const char * argv[])
 		}
 		return 1;
 	}
+	pmm::FetchDBRemoteSyncThread fetchDBRemoteSyncThread(&siblingSuckers);
+	pmm::ThreadDispatcher::start(fetchDBRemoteSyncThread);
 	//Registration succeded, retrieve max
 #ifdef DEBUG
 	std::cout << "Initial registration succeded!!!" << std::endl;

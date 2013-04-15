@@ -26,7 +26,7 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o \
 		QuotaDB.o UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o Atomic.o \
 		ObjectDatastore.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o PMMSuckerInfo.o RPCService.o \
-		FetchDBSyncThread.o
+		FetchDBSyncThread.o FetchDBRemoteSyncThread.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
@@ -34,7 +34,7 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o QuotaDB.o \
 				UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o \
 				ObjectDatastore.o Atomic.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o \
-				PMMSuckerInfo.o RPCService.o FetchDBSyncThread.o $(LIBS)
+				PMMSuckerInfo.o RPCService.o FetchDBSyncThread.o FetchDBRemoteSyncThread.o $(LIBS)
 
 pmmrpc_types.o: ../rpc/pmmrpc_types.h ../rpc/pmmrpc_types.cpp
 	$(GCC) $(CFLAGS) -c -o pmmrpc_types.o ../rpc/pmmrpc_types.cpp
@@ -51,13 +51,16 @@ RPCService.o: ../rpc/RPCService.h ../rpc/RPCService.cpp ../rpc/PMMSuckerRPC.h ..
 FetchDBSyncThread.o: ../FetchDBSyncThread.h ../FetchDBSyncThread.cpp ../rpc/pmmrpc_types.h ../FetchedMailsCache.h
 	$(GCC) $(CFLAGS) -c -o FetchDBSyncThread.o ../FetchDBSyncThread.cpp
 
+FetchDBRemoteSyncThread.o: ../FetchDBRemoteSyncThread.h ../FetchDBRemoteSyncThread.cpp ../rpc/pmmrpc_types.h ../rpc/pmmrpc_constants.h ../rpc/PMMSuckerRPC.h
+	$(CGG) $(CFLAGS) -c -o FetchDBRemoteSyncThread.o ../FetchDBRemoteSyncThread.cpp
+
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
 
-JSONParseException.o: ../JSONParseException.h ../JSONParseException.cpp
+JSONParseException.o: ../JSONParseException.h ../JSONParseException.cpp ../PMMSuckerInfo.h
 	$(GCC) $(CFLAGS) -c -o JSONParseException.o ../JSONParseException.cpp
 
-PMMSuckerSession.o: ../PMMSuckerSession.h ../PMMSuckerSession.cpp ../PMMSuckerInfo.h
+PMMSuckerSession.o: ../PMMSuckerSession.h ../PMMSuckerSession.cpp ../PMMSuckerInfo.h ../Mutex.h ../SharedVector.h ../SharedQueue.h ../MailAccountInfo.h ../NotificationPayload.h
 	$(GCC) $(CFLAGS) -c -o PMMSuckerSession.o ../PMMSuckerSession.cpp
 
 ServerResponse.o: ../ServerResponse.h ../ServerResponse.cpp
@@ -108,7 +111,7 @@ NotificationPayload.o: ../NotificationPayload.cpp ../NotificationPayload.h
 UtilityFunctions.o: ../UtilityFunctions.cpp ../UtilityFunctions.h
 	$(GCC) $(CFLAGS) -c -o UtilityFunctions.o ../UtilityFunctions.cpp
 
-FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h
+FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h ../FetchDBRemoteSyncThread.h
 	$(GCC) $(CFLAGS) -c -o FetchedMailsCache.o ../FetchedMailsCache.cpp
 
 MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h ../Mutex.h ../RWLock.h ../Atomic.h

@@ -52,7 +52,6 @@ namespace pmm {
 		Mutex timeM;
 		std::string myHostname;
 		int myPort;
-		SharedVector<PMMSuckerInfo> siblingSuckers;
 	protected:
 		bool allowsIMAP;
 		bool allowsPOP3;
@@ -63,6 +62,7 @@ namespace pmm {
 		std::string myID;
 #endif
 		bool dummyMode;
+		SharedVector<PMMSuckerInfo> *siblingSuckers;
 		SuckerSession();
 		SuckerSession(const std::string &srvURL);
 		SuckerSession(const std::string &srvURL, bool usesIMAP, bool usesPOP3);
