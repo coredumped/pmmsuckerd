@@ -118,7 +118,7 @@ namespace pmm {
 		
 		void notifyGmailAdditionalAuth(const std::string &emailAccount, const std::string &languageCode);
 		
-		void getSuckerID(std::string mySuckerID_);
+		void getSuckerID(std::string &mySuckerID_);
 	};
 	
 	namespace Commands {

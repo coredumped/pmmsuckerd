@@ -30,7 +30,7 @@ namespace pmm {
 				//Save to fetched mails cache
 				fetchedMails.addEntry2(theItem.email, theItem.uid);
 				if (idx++ % 100 == 0) {
-					pmm::Log << idx << " items synched" << pmm::NL;
+					pmm::Log << "INFO: " << idx << " items synched" << pmm::NL;
 				}
 			}
 			sleep(100000L);

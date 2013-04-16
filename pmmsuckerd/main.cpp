@@ -1120,7 +1120,7 @@ void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::Shar
 	}
 }
 
-static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string &dbFile){
+static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string &dbFile, const std::string &email_){
 	sqlite3 *theDB = 0;
 	int errCode;
 	do {
@@ -1136,10 +1136,10 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 					//Read averything here
 					char *uniqueid = (char *)sqlite3_column_text(stmt, 0);
 					time_t timestamp = (time_t)sqlite3_column_int(stmt, 1);
-					pmmrpc::FetchDBItem fitem;
+					/*pmmrpc::FetchDBItem fitem;
 					fitem.uid = uniqueid;
-					fitem.timestamp = timestamp;
-					
+					fitem.timestamp = (int32_t)timestamp;*/
+					client->fetchDBPutItem(email_, uniqueid);
 				}
 				sqlite3_finalize(stmt);
 			}
@@ -1162,6 +1162,22 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 	}while (errCode == SQLITE_BUSY);
 }
 
+void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_){
+	std::stringstream theEmail;
+	std::vector<std::string> parts1, parts;
+	pmm::splitString(parts1, dbfile, ".");
+	pmm::splitString(parts, parts1[0], "-");
+
+	for(size_t i = 0; i < parts.size(); i++) {
+		char theChars[2];
+		theChars[0] = (parts[0] - '0') * 16 + (parts[1] - '0');
+		theChars[1] = 0x00;
+		theEmail << theChars;
+	}
+	
+	email_ = theEmail.str();
+}
+
 static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerRPCClient *client){
 	DIR *theDir = opendir(startDir.c_str());
 	struct dirent *dData;
@@ -1179,8 +1195,10 @@ static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerR
 				if (strncmp(endptr, ".db", 3) == 0) {
 					std::stringstream fullPath;
 					fullPath << startDir << "/" << dData->d_name;
-					pmm::Log << "INFO: Sending" << fullPath.str() << "..." << pmm::NL;
-					sendDBContents(client, fullPath.str());
+					std::string email_;
+					decodeEmailFromDBFile(dData->d_name, email_);
+					pmm::Log << "INFO: Sending [" << email_ << "] " << fullPath.str() << "..." << pmm::NL;
+					sendDBContents(client, fullPath.str(), email_);
 				}
 			}
 		}

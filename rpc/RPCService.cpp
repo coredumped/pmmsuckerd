@@ -121,6 +121,7 @@ namespace pmm {
 		shared_ptr<concurrency::PosixThreadFactory> tfact = shared_ptr<concurrency::PosixThreadFactory>(new concurrency::PosixThreadFactory());
 		tman->threadFactory(tfact);
 		tman->start();
+		pmm::Log << "INFO: Thrift listener starting..." << pmm::NL;
 		server::TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, tman);
 		server.serve();
 	}
