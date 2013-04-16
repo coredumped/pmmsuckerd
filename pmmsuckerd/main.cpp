@@ -1162,7 +1162,7 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 	}while (errCode == SQLITE_BUSY);
 }
 
-void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_){
+static void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_){
 	std::stringstream theEmail;
 	std::vector<std::string> parts1, parts;
 	pmm::splitString(parts1, dbfile, ".");
@@ -1170,7 +1170,8 @@ void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_){
 
 	for(size_t i = 0; i < parts.size(); i++) {
 		char theChars[2];
-		theChars[0] = (parts[0] - '0') * 16 + (parts[1] - '0');
+		std::string thePart = parts[i];
+		theChars[0] = (thePart[0] - '0') * 16 + (thePart[1] - '0');
 		theChars[1] = 0x00;
 		theEmail << theChars;
 	}
