@@ -122,6 +122,7 @@ namespace pmm {
 			abort();
 		}
 		shared_ptr<pmmrpc::PMMSuckerRPCHandler> handler(new pmmrpc::PMMSuckerRPCHandler(rtCommandV));
+		handler->items2SaveQ = items2SaveQ;
 		shared_ptr<TProcessor> processor(new pmmrpc::PMMSuckerRPCProcessor(handler));
 		shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
 		shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
