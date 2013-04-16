@@ -1128,18 +1128,19 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 			std::stringstream sqlCmd;
 			sqlite3_stmt *stmt = 0;
 			char *pzTail;
-			sqlCmd << "SELECT uniqueid,timestamp FROM " << pmm::DefaultFetchDBTableName << " order by timestamp desc";
+			//sqlCmd << "SELECT uniqueid,timestamp FROM " << pmm::DefaultFetchDBTableName << " order by timestamp desc";
+			sqlCmd << "SELECT uniqueid FROM " << pmm::DefaultFetchDBTableName << " order by timestamp desc";
 			std::string query = sqlCmd.str();
 			errCode = sqlite3_prepare_v2(theDB, query.c_str(), (int)query.size(), &stmt, (const char **)&pzTail);
 			if (errCode == SQLITE_OK){
 				while ((errCode = sqlite3_step(stmt)) == SQLITE_ROW) {
 					//Read averything here
 					char *uniqueid = (char *)sqlite3_column_text(stmt, 0);
-					time_t timestamp = (time_t)sqlite3_column_int(stmt, 1);
+					//time_t timestamp = (time_t)sqlite3_column_int(stmt, 1);
 					/*pmmrpc::FetchDBItem fitem;
 					fitem.uid = uniqueid;
 					fitem.timestamp = (int32_t)timestamp;*/
-					client->fetchDBPutItem(email_, uniqueid);
+					client->fetchDBPutItemAsync(email_, uniqueid);
 				}
 				sqlite3_finalize(stmt);
 			}
@@ -1171,7 +1172,18 @@ static void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_
 	for(size_t i = 0; i < parts.size(); i++) {
 		char theChars[2];
 		std::string thePart = parts[i];
-		theChars[0] = (thePart[0] - '0') * 16 + (thePart[1] - '0');
+		if (thePart[0] >= 0 && thePart[0] <= 9) {
+			theChars[0] = (thePart[0] - '0') * 16;
+		}
+		else {
+			theChars[0] = (thePart[0] - 'a' + 10) * 16;
+		}
+		if (thePart[1] >= 0 && thePart[1] <= 9) {
+			theChars[0] += (thePart[1] - '0');
+		}
+		else {
+			theChars[0] += (thePart[1] - 'a' + 10);
+		}
 		theChars[1] = 0x00;
 		theEmail << theChars;
 	}

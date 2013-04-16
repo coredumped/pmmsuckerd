@@ -11,6 +11,7 @@
 #include "MTLogger.h"
 #include "FetchedMailsCache.h"
 #include "PMMSuckerSession.h"
+#include "FetchDBSyncThread.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TThreadPoolServer.h>
 #include <thrift/transport/TServerSocket.h>
@@ -31,6 +32,7 @@ namespace  pmmrpc {
 		pmm::FetchedMailsCache fetchedMails;
 	public:
 		pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV;
+		pmm::SharedQueue<FetchDBItem> *items2SaveQ;
 		PMMSuckerRPCHandler(pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV_) {
 			// Your initialization goes here
 			rtCommandV = rtCommandV_;
@@ -49,10 +51,11 @@ namespace  pmmrpc {
 		}
 		
 		void fetchDBPutItemAsync(const std::string& email, const std::string& uid){
-			GenericException ex1;
-			ex1.errorCode = 666;
-			ex1.errorMessage = "Method not implemented";
-			throw ex1;
+			FetchDBItem fitem;
+			fitem.email = email;
+			fitem.timestamp = (int32_t)time(0);
+			fitem.uid = uid;
+			items2SaveQ->add(fitem);
 		}
 		
 		void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) throw (GenericException) {
