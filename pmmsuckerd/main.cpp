@@ -1168,26 +1168,15 @@ static void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_
 	std::vector<std::string> parts1, parts;
 	pmm::splitString(parts1, dbfile, ".");
 	pmm::splitString(parts, parts1[0], "-");
-
 	for(size_t i = 0; i < parts.size(); i++) {
-		char theChars[2];
-		std::string thePart = parts[i];
-		if (thePart[0] >= 0 && thePart[0] <= 9) {
-			theChars[0] = (thePart[0] - '0') * 16;
-		}
-		else {
-			theChars[0] = (thePart[0] - 'a' + 10) * 16;
-		}
-		if (thePart[1] >= 0 && thePart[1] <= 9) {
-			theChars[0] += (thePart[1] - '0');
-		}
-		else {
-			theChars[0] += (thePart[1] - 'a' + 10);
-		}
-		theChars[1] = 0x00;
+		unsigned char theChars[2] = { 0, 0};
+		std::istringstream hexVal(parts[i]);
+		uint32_t theChar;
+		hexVal >> std::hex >> theChar;
+		std::cout << std::hex << theChar << std::endl;
+		theChars[0] = theChar & 0x000000FF;
 		theEmail << theChars;
 	}
-	
 	email_ = theEmail.str();
 }
 

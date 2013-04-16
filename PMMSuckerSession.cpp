@@ -283,9 +283,17 @@ namespace pmm {
 		curl_easy_setopt(www, CURLOPT_ENCODING, "utf-8");
 		std::stringstream encodedPost;
 		std::map<std::string, std::string>::iterator keypair;
+#ifdef DEBUG
+		bool showPostData = true;
+#endif
 		//iconv_t cnv = iconv_open("UTF-8", "");
 		for (keypair = postData.begin(); keypair != postData.end(); keypair++) {
 			std::string param = keypair->first, value = keypair->second;
+#ifdef DEBUG
+			if (value.compare(OperationTypes::pmmSuckerUploadMultipleMessages) == 0) {
+				showPostData = false;
+			}
+#endif
 			char *p = curl_easy_escape(www, keypair->first.c_str(), (int)keypair->first.size());
 			char *v;
 			v = curl_easy_escape(www, keypair->second.c_str(), (int)keypair->second.size());
@@ -302,7 +310,8 @@ namespace pmm {
 		//iconv_close(cnv);
 		curl_easy_setopt(www, CURLOPT_COPYPOSTFIELDS, encodedPost.str().c_str());
 #ifdef DEBUG
-		pmm::Log << "DEBUG: Sending post data: " << encodedPost.str().c_str() << pmm::NL;
+		if (showPostData) pmm::Log << "DEBUG: Sending post data: " << encodedPost.str().c_str() << pmm::NL;
+		else pmm::Log << "DEBUG: Uploading messages to appengine..." << pmm::NL;
 #endif
 		
 	}
