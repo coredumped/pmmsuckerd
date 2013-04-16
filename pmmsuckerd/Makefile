@@ -111,7 +111,7 @@ NotificationPayload.o: ../NotificationPayload.cpp ../NotificationPayload.h
 UtilityFunctions.o: ../UtilityFunctions.cpp ../UtilityFunctions.h
 	$(GCC) $(CFLAGS) -c -o UtilityFunctions.o ../UtilityFunctions.cpp
 
-FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h ../FetchDBRemoteSyncThread.h
+FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h ../FetchDBRemoteSyncThread.h ../SharedQueue.h ../rpc/pmmrpc_types.h
 	$(GCC) $(CFLAGS) -c -o FetchedMailsCache.o ../FetchedMailsCache.cpp
 
 MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h ../Mutex.h ../RWLock.h ../Atomic.h

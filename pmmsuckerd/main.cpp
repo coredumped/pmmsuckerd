@@ -163,9 +163,8 @@ int main (int argc, const char * argv[])
 	pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > rtCommandV;
 	
 	//FetchDB item sync queue
-	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
 	pmm::FetchDBSyncThread fetchDBSyncThread;
-	fetchDBSyncThread.items2SaveQ = &fetchDBItems2SaveQ;
+	fetchDBSyncThread.items2SaveQ = &pmm::fetchDBItems2SaveQ;
 	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;

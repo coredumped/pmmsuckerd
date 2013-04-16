@@ -8,6 +8,8 @@
 #include "FetchedMailsCache.h"
 #include "Mutex.h"
 #include "UtilityFunctions.h"
+#include "SharedQueue.h"
+#include "pmmrpc_types.h"
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -34,6 +36,7 @@ namespace pmm {
 	static const char *fetchedMailsTable = DEFAULT_FETCHED_MAILS_TABLE_NAME;
 	const char *DefaultFetchDBTableName = fetchedMailsTable;
 	static Mutex fM;
+	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
 	
 	class UniqueDBDescriptor {
 	protected:
@@ -355,19 +358,22 @@ namespace pmm {
 	}
 #endif
 	
+
+	
 	bool FetchedMailsCache::addEntry2(const std::string &email, const std::string &uid){
 		bool tableCreated;
 		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
+		time_t now = time(0);
 		if (uid.find('\'') != uid.npos) {
 			//Escape uid
 			std::string uid_s;
 			sqliteEscapeString(uid, uid_s);
-			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid_s << "')";
+			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << ",'" << uid_s << "')";
 		}
 		else {
-			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << ",'" << uid << "' )";
+			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << ",'" << uid << "' )";
 		}
 		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 		if (errCode != SQLITE_OK) {
@@ -381,6 +387,13 @@ namespace pmm {
 			throw GenericException(errmsg.str());
 		}
 		autoRefreshUConn(email);
+		
+		//Inserts the item in the queue distributor
+		pmmrpc::FetchDBItem fitem;
+		fitem.email = email;
+		fitem.uid = uid;
+		fitem.timestamp = (int32_t)now;
+		fetchDBItems2SaveQ.add(fitem);
 		return tableCreated;
 	}
 	
@@ -389,7 +402,8 @@ namespace pmm {
 		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
 		std::stringstream sqlCmd;
-		sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << time(0) << "," << uid << ")";
+		time_t now = time(0);
+		sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << "," << uid << ")";
 		int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 		if (errCode != SQLITE_OK) {
 			sqlite3_close(conn);
@@ -402,8 +416,18 @@ namespace pmm {
 			throw GenericException(errmsg.str());
 		}
 		autoRefreshUConn(email);
+		
+		//Inserts the item in the queue distributor
+		pmmrpc::FetchDBItem fitem;
+		fitem.email = email;
+		std::stringstream uid_s;
+		uid_s << uid;
+		fitem.uid = uid_s.str();
+		fitem.timestamp = (int32_t)now;
+		fetchDBItems2SaveQ.add(fitem);
 		return tableCreated;
 	}
+	
 #ifdef OLD_CACHE_INTERFACE
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		bool ret = false;

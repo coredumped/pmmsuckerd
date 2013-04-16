@@ -12,6 +12,8 @@
 #include "Mutex.h"
 #include "MTLogger.h"
 #include "libetpan/libetpan.h"
+#include "SharedQueue.h"
+#include "pmmrpc_types.h"
 #include <sqlite3.h>
 #include <string>
 #include <vector>
@@ -67,6 +69,7 @@ namespace pmm {
 	};
 	
 	extern MTLogger CacheLog;
+	extern pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
 	extern const char *DefaultFetchDBTableName;
 }
 
