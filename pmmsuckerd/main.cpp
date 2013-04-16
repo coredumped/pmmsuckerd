@@ -162,9 +162,10 @@ int main (int argc, const char * argv[])
 	//Holds commands and parameters received from the realtime thrift service
 	pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > rtCommandV;
 	
+	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
 	//FetchDB item sync queue
 	pmm::FetchDBSyncThread fetchDBSyncThread;
-	fetchDBSyncThread.items2SaveQ = &pmm::fetchDBItems2SaveQ;
+	fetchDBSyncThread.items2SaveQ = &fetchDBItems2SaveQ;
 	
 	pmm::PreferenceEngine preferenceEngine;
 	size_t imapAssignationIndex = 0, popAssignationIndex = 0;

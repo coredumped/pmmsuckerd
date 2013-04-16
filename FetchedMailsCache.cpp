@@ -10,6 +10,7 @@
 #include "UtilityFunctions.h"
 #include "SharedQueue.h"
 #include "pmmrpc_types.h"
+#include "FetchDBRemoteSyncThread.h"
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -36,7 +37,6 @@ namespace pmm {
 	static const char *fetchedMailsTable = DEFAULT_FETCHED_MAILS_TABLE_NAME;
 	const char *DefaultFetchDBTableName = fetchedMailsTable;
 	static Mutex fM;
-	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
 	
 	class UniqueDBDescriptor {
 	protected:
@@ -393,7 +393,8 @@ namespace pmm {
 		fitem.email = email;
 		fitem.uid = uid;
 		fitem.timestamp = (int32_t)now;
-		fetchDBItems2SaveQ.add(fitem);
+		//fetchDBItems2SaveQ.add(fitem);
+		RemoteFetchDBSyncQueue.add(fitem);
 		return tableCreated;
 	}
 	
@@ -424,7 +425,8 @@ namespace pmm {
 		uid_s << uid;
 		fitem.uid = uid_s.str();
 		fitem.timestamp = (int32_t)now;
-		fetchDBItems2SaveQ.add(fitem);
+		//fetchDBItems2SaveQ.add(fitem);
+		RemoteFetchDBSyncQueue.add(fitem);
 		return tableCreated;
 	}
 	

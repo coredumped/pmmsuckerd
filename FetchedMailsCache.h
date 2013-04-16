@@ -69,7 +69,6 @@ namespace pmm {
 	};
 	
 	extern MTLogger CacheLog;
-	extern pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
 	extern const char *DefaultFetchDBTableName;
 }
 
