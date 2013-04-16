@@ -12,6 +12,7 @@
 #include "pmmrpc_types.h"
 #include "pmmrpc_constants.h"
 #include "SharedVector.h"
+#include "SharedQueue.h"
 #include "GenericThread.h"
 #include <map>
 
@@ -24,8 +25,10 @@ namespace pmm {
 	public:
 		pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV;
 		int port;
+		pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ;
 		RPCService();
 		RPCService(int _port);
+		RPCService(int _port, pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ_);
 		void operator()();
 	};
 	

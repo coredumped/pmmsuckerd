@@ -36,6 +36,7 @@ namespace  pmmrpc {
 		PMMSuckerRPCHandler(pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV_) {
 			// Your initialization goes here
 			rtCommandV = rtCommandV_;
+			items2SaveQ = 0x00;
 		}
 		
 		void getAllEmailAccounts(std::vector<std::string> & _return) throw (GenericException) {
@@ -103,10 +104,16 @@ namespace pmm {
 	
 	RPCService::RPCService() {
 		port = DEFAULT_PMM_SERVICE_PORT;
+		items2SaveQ = 0;
 	}
 	
 	RPCService::RPCService(int _port) {
 		port = _port;
+	}
+	
+	RPCService::RPCService(int _port, pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ_){
+		port = _port;
+		items2SaveQ = items2SaveQ_;
 	}
 	
 	void RPCService::operator()(){
