@@ -52,7 +52,7 @@ FetchDBSyncThread.o: ../FetchDBSyncThread.h ../FetchDBSyncThread.cpp ../rpc/pmmr
 	$(GCC) $(CFLAGS) -c -o FetchDBSyncThread.o ../FetchDBSyncThread.cpp
 
 FetchDBRemoteSyncThread.o: ../FetchDBRemoteSyncThread.h ../FetchDBRemoteSyncThread.cpp ../rpc/pmmrpc_types.h ../rpc/pmmrpc_constants.h ../rpc/PMMSuckerRPC.h
-	$(CGG) $(CFLAGS) -c -o FetchDBRemoteSyncThread.o ../FetchDBRemoteSyncThread.cpp
+	$(GCC) $(CFLAGS) -c -o FetchDBRemoteSyncThread.o ../FetchDBRemoteSyncThread.cpp
 
 jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 	$(GCC) $(CFLAGS) -c -o jsonxx.o ../../jsonxx/jsonxx.cc
