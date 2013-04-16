@@ -257,7 +257,7 @@ int main (int argc, const char * argv[])
 	
 	pmm::ThreadDispatcher::start(fetchDBSyncThread);
 	pmm::RPCService rpcService;
-	rpcService.items2SaveQ = fetchDBItems2SaveQ;
+	rpcService.items2SaveQ = &fetchDBItems2SaveQ;
 	rpcService.rtCommandV = &rtCommandV;
 	//Start RPC service
 	pmm::ThreadDispatcher::start(rpcService);
