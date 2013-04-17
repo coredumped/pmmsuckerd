@@ -13,6 +13,7 @@
 #include "PMMSuckerSession.h"
 #include "FetchDBSyncThread.h"
 #include "UtilityFunctions.h"
+#include "MailSuckerThread.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TThreadPoolServer.h>
 #include <thrift/transport/TServerSocket.h>
@@ -61,6 +62,7 @@ namespace  pmmrpc {
 		
 		void fetchDBInitialSyncPutItemAsync (const std::string& email, const std::string& uidBatch, const std::string &delim) throw (FetchDBUnableToPutItemException, GenericException) {
 			std::vector<std::string> uidV;
+			pmm::mailboxPollBlocked = true;
 			pmm::splitString(uidV, uidBatch, delim);
 			pmm::Log << "INFO: Batch syncing " << (int)uidV.size() << " e-mail uids for " << email << "..." << pmm::NL;
 			FetchDBInitialSyncItem fitem;
