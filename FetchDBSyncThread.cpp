@@ -34,7 +34,7 @@ namespace pmm {
 			}
 			while (items2SaveQ->extractEntry(theItem)) {
 				//Save to fetched mails cache
-				fetchedMails.addEntry2(theItem.email, theItem.uid);
+				fetchedMails.addEntry2(theItem.email, theItem.uid, false);
 				if (++idx % 100 == 0) {
 					pmm::Log << "INFO: " << idx << " items synched" << pmm::NL;
 				}
