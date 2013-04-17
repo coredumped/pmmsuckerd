@@ -68,7 +68,7 @@ namespace pmm {
 	
 	
 	
-	SharedQueue<pmmrpc::FetchDBItem> RemoteFetchDBSyncQueue;
+	SharedQueue<pmmrpc::FetchDBItem> RemoteFetchDBSyncQueue("RemoteFetchDBSyncQueue");
 	
 	FetchDBRemoteSyncThread::FetchDBRemoteSyncThread() {
 		siblingSuckers = NULL;

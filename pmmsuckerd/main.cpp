@@ -115,7 +115,7 @@ void updateEmailNotificationDevices(pmm::MailSuckerThread *mailSuckerThreads, si
 void retrieveAndSaveSilentModeSettings(const std::vector<pmm::MailAccountInfo> &emailAccounts);
 void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::SharedQueue<pmm::NotificationPayload> &notificationQueue, pmm::SharedQueue<pmm::NotificationPayload> &pmmStorageQueue);
 
-bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo);
+bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo, pmm::SuckerSession &session);
 
 int main (int argc, const char * argv[])
 {
@@ -162,7 +162,7 @@ int main (int argc, const char * argv[])
 	//Holds commands and parameters received from the realtime thrift service
 	pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > rtCommandV;
 	
-	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ;
+	pmm::SharedQueue<pmmrpc::FetchDBItem> fetchDBItems2SaveQ("initialSyncItemsQ");
 	//FetchDB item sync queue
 	pmm::FetchDBSyncThread fetchDBSyncThread;
 	fetchDBSyncThread.items2SaveQ = &fetchDBItems2SaveQ;
@@ -382,14 +382,7 @@ int main (int argc, const char * argv[])
 	
 	//Install SEGFAULT signal handler
 	signal(SIGSEGV, signalHandler);
-	
-	//Do not start polling if initial sync is still running
-	while (pmm::mailboxPollBlocked == true) {
-		pmm::Log << "WARNING: Preventing start of polling threads because an initial sync is running" << pmm::NL;
-		sleep(10);
-		session.performAutoRegister();
-	}
-	
+		
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
 		imapSuckingThreads[i].quotaUpdateVector = &quotaUpdateVector;
@@ -827,7 +820,7 @@ int main (int argc, const char * argv[])
 								suckerInfo.allowsPOP3 = pmm::getBoolFromString(parameters["allowsPOP3"]);
 								//Wait 2 seconds before starting sync...
 								sleep(2);
-								sync2RemotePoller(suckerInfo);
+								sync2RemotePoller(suckerInfo, session);
 								pmm::mailboxPollBlocked = false;
 							}
 							else {
@@ -1166,7 +1159,7 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 				}
 				sqlite3_finalize(stmt);
 				if (uidBatch.str().size() > 0) {
-#ifdef DEBUG
+#ifdef DEBUG_INITIAL_SYNC
 					pmm::Log << "Sending batch: " << uidBatch.str() << pmm::NL;
 #endif
 					client->fetchDBInitialSyncPutItemAsync(email_, uidBatch.str(), delim[delimidx]);
@@ -1211,7 +1204,7 @@ static void decodeEmailFromDBFile(const std::string &dbfile, std::string &email_
 	email_ = theEmail.str();
 }
 
-static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerRPCClient *client){
+static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerRPCClient *client, pmm::SuckerSession &session){
 	DIR *theDir = opendir(startDir.c_str());
 	struct dirent *dData;
 	while ((dData = readdir(theDir)) != NULL) {
@@ -1219,7 +1212,7 @@ static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerR
 		if (dData->d_type == DT_DIR && strncmp(dData->d_name, "..", 2) != 0 && strcasecmp(dData->d_name, ".") != 0) {
 			std::stringstream thePath;
 			thePath << startDir << "/" << dData->d_name;
-			finddbAndSyncDBFiles(thePath.str(), client);
+			finddbAndSyncDBFiles(thePath.str(), client, session);
 		}
 		else if (dData->d_type == DT_REG) {
 			size_t theLen = strlen(dData->d_name);
@@ -1232,6 +1225,7 @@ static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerR
 					decodeEmailFromDBFile(dData->d_name, email_);
 					pmm::Log << "INFO: Sending [" << email_ << "] " << fullPath.str() << "..." << pmm::NL;
 					sendDBContents(client, fullPath.str(), email_);
+					if(time(0) % 5 == 0) session.performAutoRegister();
 				}
 			}
 		}
@@ -1240,7 +1234,7 @@ static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerR
 	
 }
 
-bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo) {
+bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo, pmm::SuckerSession &session) {
 	bool ret = true;
 	pmm::Log << "INFO: Initiating initial sync feed of " << suckerInfo.suckerID << " (" << suckerInfo.hostname << ")" << pmm::NL;
 	//Connect 2 remote PMM Sucker here
@@ -1256,7 +1250,7 @@ bool sync2RemotePoller(const pmm::PMMSuckerInfo &suckerInfo) {
 	try {
 		transport->open();
 		//Find all .db files and perform sync
-		finddbAndSyncDBFiles("./fetchdb", client);
+		finddbAndSyncDBFiles("./fetchdb", client, session);
 		transport->close();
 	}
 	catch(apache::thrift::TException &exx1){

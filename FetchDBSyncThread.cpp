@@ -9,6 +9,7 @@
 #include "FetchDBSyncThread.h"
 #include "MTLogger.h"
 #include "FetchedMailsCache.h"
+#include "MailSuckerThread.h"
 
 namespace pmm {
 	
@@ -28,6 +29,9 @@ namespace pmm {
 		while (time(0) - start <= 86400) {
 			pmmrpc::FetchDBItem theItem;
 			size_t total = items2SaveQ->size();
+			if (total > 0) {
+				if(pmm::mailboxPollBlocked == false) pmm::mailboxPollBlocked = true;
+			}
 			while (items2SaveQ->extractEntry(theItem)) {
 				//Save to fetched mails cache
 				fetchedMails.addEntry2(theItem.email, theItem.uid);
@@ -37,6 +41,7 @@ namespace pmm {
 			}
 			if (total == 0) {
 				sleep(1);
+				if(pmm::mailboxPollBlocked == true) pmm::mailboxPollBlocked = false;
 			}
 			else{
 				usleep(10000L);
