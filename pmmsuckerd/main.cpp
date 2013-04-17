@@ -383,6 +383,12 @@ int main (int argc, const char * argv[])
 	//Install SEGFAULT signal handler
 	signal(SIGSEGV, signalHandler);
 	
+	//Do not start polling if initial sync is still running
+	while (pmm::mailboxPollBlocked == true) {
+		pmm::Log << "WARNING: Preventing start of polling threads because an initial sync is running" << pmm::NL;
+		sleep(10);
+		session.performAutoRegister();
+	}
 	
 	for (size_t i = 0; i < maxIMAPSuckerThreads; i++) {
 		imapSuckingThreads[i].notificationQueue = &notificationQueue;
