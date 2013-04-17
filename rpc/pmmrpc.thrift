@@ -16,6 +16,11 @@ struct FetchDBItem {
 	3:string uid;
 }
 
+struct FetchDBInitialSyncItem {
+	1:string email;
+	2:list<string> uids;
+}
+
 struct NotificationPayload {
 	1:string devtoken;
 	2:string message;

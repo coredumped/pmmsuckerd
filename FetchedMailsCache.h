@@ -50,7 +50,7 @@ namespace pmm {
 #endif
 		bool addEntry2(const std::string &email, const std::string &uid, bool propagate2Remote = true);
 		bool addEntry2(const std::string &email, uint32_t &uid, bool propagate2Remote = true);
-
+		bool addEntry2(const std::string &email, const std::vector<std::string> &uid, bool propagate2Remote = true);
 
 		
 

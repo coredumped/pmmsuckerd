@@ -25,10 +25,10 @@ namespace pmm {
 	public:
 		pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV;
 		int port;
-		pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ;
+		pmm::SharedQueue<pmmrpc::FetchDBInitialSyncItem> *items2SaveQ;
 		RPCService();
 		RPCService(int _port);
-		RPCService(int _port, pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ_);
+		RPCService(int _port, pmm::SharedQueue<pmmrpc::FetchDBInitialSyncItem> *items2SaveQ_);
 		void operator()();
 	};
 	

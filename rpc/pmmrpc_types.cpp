@@ -197,6 +197,101 @@ void swap(FetchDBItem &a, FetchDBItem &b) {
   swap(a.__isset, b.__isset);
 }
 
+const char* FetchDBInitialSyncItem::ascii_fingerprint = "25702B8D5E28AA39160F267DABBC8446";
+const uint8_t FetchDBInitialSyncItem::binary_fingerprint[16] = {0x25,0x70,0x2B,0x8D,0x5E,0x28,0xAA,0x39,0x16,0x0F,0x26,0x7D,0xAB,0xBC,0x84,0x46};
+
+uint32_t FetchDBInitialSyncItem::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->email);
+          this->__isset.email = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->uids.clear();
+            uint32_t _size8;
+            ::apache::thrift::protocol::TType _etype11;
+            xfer += iprot->readListBegin(_etype11, _size8);
+            this->uids.resize(_size8);
+            uint32_t _i12;
+            for (_i12 = 0; _i12 < _size8; ++_i12)
+            {
+              xfer += iprot->readString(this->uids[_i12]);
+            }
+            xfer += iprot->readListEnd();
+          }
+          this->__isset.uids = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t FetchDBInitialSyncItem::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("FetchDBInitialSyncItem");
+
+  xfer += oprot->writeFieldBegin("email", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->email);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("uids", ::apache::thrift::protocol::T_LIST, 2);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->uids.size()));
+    std::vector<std::string> ::const_iterator _iter13;
+    for (_iter13 = this->uids.begin(); _iter13 != this->uids.end(); ++_iter13)
+    {
+      xfer += oprot->writeString((*_iter13));
+    }
+    xfer += oprot->writeListEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(FetchDBInitialSyncItem &a, FetchDBInitialSyncItem &b) {
+  using ::std::swap;
+  swap(a.email, b.email);
+  swap(a.uids, b.uids);
+  swap(a.__isset, b.__isset);
+}
+
 const char* NotificationPayload::ascii_fingerprint = "194A357BC9EE908DC4763D0A5147760A";
 const uint8_t NotificationPayload::binary_fingerprint[16] = {0x19,0x4A,0x35,0x7B,0xC9,0xEE,0x90,0x8D,0xC4,0x76,0x3D,0x0A,0x51,0x47,0x76,0x0A};
 
@@ -381,14 +476,14 @@ uint32_t MailAccountInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->devTokens.clear();
-            uint32_t _size8;
-            ::apache::thrift::protocol::TType _etype11;
-            xfer += iprot->readListBegin(_etype11, _size8);
-            this->devTokens.resize(_size8);
-            uint32_t _i12;
-            for (_i12 = 0; _i12 < _size8; ++_i12)
+            uint32_t _size14;
+            ::apache::thrift::protocol::TType _etype17;
+            xfer += iprot->readListBegin(_etype17, _size14);
+            this->devTokens.resize(_size14);
+            uint32_t _i18;
+            for (_i18 = 0; _i18 < _size14; ++_i18)
             {
-              xfer += iprot->readString(this->devTokens[_i12]);
+              xfer += iprot->readString(this->devTokens[_i18]);
             }
             xfer += iprot->readListEnd();
           }
@@ -468,10 +563,10 @@ uint32_t MailAccountInfo::write(::apache::thrift::protocol::TProtocol* oprot) co
   xfer += oprot->writeFieldBegin("devTokens", ::apache::thrift::protocol::T_LIST, 8);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->devTokens.size()));
-    std::vector<std::string> ::const_iterator _iter13;
-    for (_iter13 = this->devTokens.begin(); _iter13 != this->devTokens.end(); ++_iter13)
+    std::vector<std::string> ::const_iterator _iter19;
+    for (_iter19 = this->devTokens.begin(); _iter19 != this->devTokens.end(); ++_iter19)
     {
-      xfer += oprot->writeString((*_iter13));
+      xfer += oprot->writeString((*_iter19));
     }
     xfer += oprot->writeListEnd();
   }

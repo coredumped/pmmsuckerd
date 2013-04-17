@@ -33,7 +33,7 @@ namespace  pmmrpc {
 		pmm::FetchedMailsCache fetchedMails;
 	public:
 		pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV;
-		pmm::SharedQueue<FetchDBItem> *items2SaveQ;
+		pmm::SharedQueue<FetchDBInitialSyncItem> *items2SaveQ;
 		PMMSuckerRPCHandler(pmm::SharedVector< std::map<std::string, std::map<std::string, std::string> > > *rtCommandV_) {
 			// Your initialization goes here
 			rtCommandV = rtCommandV_;
@@ -53,25 +53,20 @@ namespace  pmmrpc {
 		}
 		
 		void fetchDBPutItemAsync(const std::string& email, const std::string& uid) throw (FetchDBUnableToPutItemException, GenericException) {
-			FetchDBItem fitem;
+			FetchDBInitialSyncItem fitem;
 			fitem.email = email;
-			fitem.timestamp = (int32_t)time(0);
-			fitem.uid = uid;
+			fitem.uids.push_back(uid);
 			items2SaveQ->add(fitem);
 		}
 		
 		void fetchDBInitialSyncPutItemAsync (const std::string& email, const std::string& uidBatch, const std::string &delim) throw (FetchDBUnableToPutItemException, GenericException) {
-			time_t now = time(0) - 86400;
 			std::vector<std::string> uidV;
 			pmm::splitString(uidV, uidBatch, delim);
 			pmm::Log << "INFO: Batch syncing " << (int)uidV.size() << " e-mail uids for " << email << "..." << pmm::NL;
-			for (size_t i = 0; i < uidV.size(); i++) {
-				FetchDBItem fitem;
-				fitem.email = email;
-				fitem.timestamp = (int32_t)now;
-				fitem.uid = uidV[i];
-				items2SaveQ->add(fitem);
-			}
+			FetchDBInitialSyncItem fitem;
+			fitem.email = email;
+			fitem.uids = uidV;
+			items2SaveQ->add(fitem);
 		}
 		
 		void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) throw (GenericException) {
@@ -126,7 +121,7 @@ namespace pmm {
 		port = _port;
 	}
 	
-	RPCService::RPCService(int _port, pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ_){
+	RPCService::RPCService(int _port, pmm::SharedQueue<pmmrpc::FetchDBInitialSyncItem> *items2SaveQ_){
 		port = _port;
 		items2SaveQ = items2SaveQ_;
 	}

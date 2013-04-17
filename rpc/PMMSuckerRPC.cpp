@@ -77,14 +77,14 @@ uint32_t PMMSuckerRPC_getAllEmailAccounts_result::read(::apache::thrift::protoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size14;
-            ::apache::thrift::protocol::TType _etype17;
-            xfer += iprot->readListBegin(_etype17, _size14);
-            this->success.resize(_size14);
-            uint32_t _i18;
-            for (_i18 = 0; _i18 < _size14; ++_i18)
+            uint32_t _size20;
+            ::apache::thrift::protocol::TType _etype23;
+            xfer += iprot->readListBegin(_etype23, _size20);
+            this->success.resize(_size20);
+            uint32_t _i24;
+            for (_i24 = 0; _i24 < _size20; ++_i24)
             {
-              xfer += iprot->readString(this->success[_i18]);
+              xfer += iprot->readString(this->success[_i24]);
             }
             xfer += iprot->readListEnd();
           }
@@ -123,10 +123,10 @@ uint32_t PMMSuckerRPC_getAllEmailAccounts_result::write(::apache::thrift::protoc
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
-      std::vector<std::string> ::const_iterator _iter19;
-      for (_iter19 = this->success.begin(); _iter19 != this->success.end(); ++_iter19)
+      std::vector<std::string> ::const_iterator _iter25;
+      for (_iter25 = this->success.begin(); _iter25 != this->success.end(); ++_iter25)
       {
-        xfer += oprot->writeString((*_iter19));
+        xfer += oprot->writeString((*_iter25));
       }
       xfer += oprot->writeListEnd();
     }
@@ -165,14 +165,14 @@ uint32_t PMMSuckerRPC_getAllEmailAccounts_presult::read(::apache::thrift::protoc
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size20;
-            ::apache::thrift::protocol::TType _etype23;
-            xfer += iprot->readListBegin(_etype23, _size20);
-            (*(this->success)).resize(_size20);
-            uint32_t _i24;
-            for (_i24 = 0; _i24 < _size20; ++_i24)
+            uint32_t _size26;
+            ::apache::thrift::protocol::TType _etype29;
+            xfer += iprot->readListBegin(_etype29, _size26);
+            (*(this->success)).resize(_size26);
+            uint32_t _i30;
+            for (_i30 = 0; _i30 < _size26; ++_i30)
             {
-              xfer += iprot->readString((*(this->success))[_i24]);
+              xfer += iprot->readString((*(this->success))[_i30]);
             }
             xfer += iprot->readListEnd();
           }
@@ -921,14 +921,14 @@ uint32_t PMMSuckerRPC_fetchDBGetItems_result::read(::apache::thrift::protocol::T
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size25;
-            ::apache::thrift::protocol::TType _etype28;
-            xfer += iprot->readListBegin(_etype28, _size25);
-            this->success.resize(_size25);
-            uint32_t _i29;
-            for (_i29 = 0; _i29 < _size25; ++_i29)
+            uint32_t _size31;
+            ::apache::thrift::protocol::TType _etype34;
+            xfer += iprot->readListBegin(_etype34, _size31);
+            this->success.resize(_size31);
+            uint32_t _i35;
+            for (_i35 = 0; _i35 < _size31; ++_i35)
             {
-              xfer += this->success[_i29].read(iprot);
+              xfer += this->success[_i35].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -967,10 +967,10 @@ uint32_t PMMSuckerRPC_fetchDBGetItems_result::write(::apache::thrift::protocol::
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
-      std::vector<FetchDBItem> ::const_iterator _iter30;
-      for (_iter30 = this->success.begin(); _iter30 != this->success.end(); ++_iter30)
+      std::vector<FetchDBItem> ::const_iterator _iter36;
+      for (_iter36 = this->success.begin(); _iter36 != this->success.end(); ++_iter36)
       {
-        xfer += (*_iter30).write(oprot);
+        xfer += (*_iter36).write(oprot);
       }
       xfer += oprot->writeListEnd();
     }
@@ -1009,14 +1009,14 @@ uint32_t PMMSuckerRPC_fetchDBGetItems_presult::read(::apache::thrift::protocol::
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size31;
-            ::apache::thrift::protocol::TType _etype34;
-            xfer += iprot->readListBegin(_etype34, _size31);
-            (*(this->success)).resize(_size31);
-            uint32_t _i35;
-            for (_i35 = 0; _i35 < _size31; ++_i35)
+            uint32_t _size37;
+            ::apache::thrift::protocol::TType _etype40;
+            xfer += iprot->readListBegin(_etype40, _size37);
+            (*(this->success)).resize(_size37);
+            uint32_t _i41;
+            for (_i41 = 0; _i41 < _size37; ++_i41)
             {
-              xfer += (*(this->success))[_i35].read(iprot);
+              xfer += (*(this->success))[_i41].read(iprot);
             }
             xfer += iprot->readListEnd();
           }

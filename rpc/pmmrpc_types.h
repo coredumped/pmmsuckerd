@@ -126,6 +126,57 @@ class FetchDBItem {
 
 void swap(FetchDBItem &a, FetchDBItem &b);
 
+typedef struct _FetchDBInitialSyncItem__isset {
+  _FetchDBInitialSyncItem__isset() : email(false), uids(false) {}
+  bool email;
+  bool uids;
+} _FetchDBInitialSyncItem__isset;
+
+class FetchDBInitialSyncItem {
+ public:
+
+  static const char* ascii_fingerprint; // = "25702B8D5E28AA39160F267DABBC8446";
+  static const uint8_t binary_fingerprint[16]; // = {0x25,0x70,0x2B,0x8D,0x5E,0x28,0xAA,0x39,0x16,0x0F,0x26,0x7D,0xAB,0xBC,0x84,0x46};
+
+  FetchDBInitialSyncItem() : email() {
+  }
+
+  virtual ~FetchDBInitialSyncItem() throw() {}
+
+  std::string email;
+  std::vector<std::string>  uids;
+
+  _FetchDBInitialSyncItem__isset __isset;
+
+  void __set_email(const std::string& val) {
+    email = val;
+  }
+
+  void __set_uids(const std::vector<std::string> & val) {
+    uids = val;
+  }
+
+  bool operator == (const FetchDBInitialSyncItem & rhs) const
+  {
+    if (!(email == rhs.email))
+      return false;
+    if (!(uids == rhs.uids))
+      return false;
+    return true;
+  }
+  bool operator != (const FetchDBInitialSyncItem &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const FetchDBInitialSyncItem & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(FetchDBInitialSyncItem &a, FetchDBInitialSyncItem &b);
+
 typedef struct _NotificationPayload__isset {
   _NotificationPayload__isset() : devtoken(false), message(false), sound(false), badge(false) {}
   bool devtoken;

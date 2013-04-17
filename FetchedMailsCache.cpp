@@ -434,6 +434,44 @@ namespace pmm {
 		return tableCreated;
 	}
 	
+	bool FetchedMailsCache::addEntry2(const std::string &email, const std::vector<std::string> &uid, bool propagate2Remote) {
+		bool tableCreated;
+		sqlite3 *conn = openDatabase(email, tableCreated);
+		char *errmsg_s;
+		std::stringstream sqlCmd;
+		time_t now = time(0);
+		
+		sqlite3_exec(conn, "BEGIN TRANSACTION", NULL, NULL, NULL);
+		for (size_t k = 0; k < uid.size(); k++) {
+			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << "," << uid[k] << ")";
+			int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
+			if (errCode != SQLITE_OK) {
+				sqlite3_exec(conn, "COMMIT TRANSACTION", NULL, NULL, NULL);
+				sqlite3_close(conn);
+				setUConnection(email, 0);
+				std::stringstream errmsg;
+				errmsg << "Unable to execute command: " << sqlCmd.str() << " due to: " << errmsg_s;
+#ifdef DEBUG
+				CacheLog << errmsg.str() << pmm::NL;
+#endif
+				throw GenericException(errmsg.str());
+			}
+			if (propagate2Remote) {
+				//Inserts the item in the queue distributor
+				pmmrpc::FetchDBItem fitem;
+				fitem.email = email;
+				std::stringstream uid_s;
+				uid_s << uid[k];
+				fitem.uid = uid_s.str();
+				fitem.timestamp = (int32_t)now;
+				RemoteFetchDBSyncQueue.add(fitem);
+			}
+		}
+		sqlite3_exec(conn, "COMMIT TRANSACTION", NULL, NULL, NULL);
+		autoRefreshUConn(email);
+		return tableCreated;
+	}
+	
 #ifdef OLD_CACHE_INTERFACE
 	bool FetchedMailsCache::entryExists(const std::string &email, uint32_t uid){
 		bool ret = false;

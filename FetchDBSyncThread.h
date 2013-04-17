@@ -18,7 +18,7 @@ namespace pmm {
 	private:
 	protected:
 	public:
-		pmm::SharedQueue<pmmrpc::FetchDBItem> *items2SaveQ;
+		pmm::SharedQueue<pmmrpc::FetchDBInitialSyncItem> *items2SaveQ;
 		FetchDBSyncThread();
 		void operator()();
 	};

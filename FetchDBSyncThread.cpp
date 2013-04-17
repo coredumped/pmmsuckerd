@@ -27,16 +27,16 @@ namespace pmm {
 		pmm::Log << "Starting FetchDBSyncThread main loop..." << pmm::NL;
 		time_t start = time(0);
 		while (time(0) - start <= 86400) {
-			pmmrpc::FetchDBItem theItem;
+			pmmrpc::FetchDBInitialSyncItem theItem;
 			size_t total = items2SaveQ->size();
 			if (total > 0) {
 				if(pmm::mailboxPollBlocked == false) pmm::mailboxPollBlocked = true;
 			}
 			while (items2SaveQ->extractEntry(theItem)) {
 				//Save to fetched mails cache
-				fetchedMails.addEntry2(theItem.email, theItem.uid, false);
+				fetchedMails.addEntry2(theItem.email, theItem.uids, false);
 				if (++idx % 100 == 0) {
-					pmm::Log << "INFO: " << idx << " items synched" << pmm::NL;
+					pmm::Log << "INFO: " << idx << "/" << (int)items2SaveQ->size() << " items synched" << pmm::NL;
 				}
 			}
 			if (total == 0) {
