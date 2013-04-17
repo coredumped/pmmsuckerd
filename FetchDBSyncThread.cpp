@@ -29,9 +29,6 @@ namespace pmm {
 		while (time(0) - start <= 86400) {
 			pmmrpc::FetchDBInitialSyncItem theItem;
 			size_t total = items2SaveQ->size();
-			if (total > 0) {
-				if(pmm::mailboxPollBlocked == false) pmm::mailboxPollBlocked = true;
-			}
 			while (items2SaveQ->extractEntry(theItem)) {
 				//Save to fetched mails cache
 				fetchedMails.addEntry2(theItem.email, theItem.uids, false);
@@ -40,8 +37,8 @@ namespace pmm {
 				}
 			}
 			if (total == 0) {
-				sleep(1);
 				if(pmm::mailboxPollBlocked == true) pmm::mailboxPollBlocked = false;
+				sleep(1);
 			}
 			else{
 				usleep(10000L);
