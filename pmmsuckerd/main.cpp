@@ -1147,23 +1147,25 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 				while ((errCode = sqlite3_step(stmt)) == SQLITE_ROW) {
 					//Read averything here
 					char *uniqueid = (char *)sqlite3_column_text(stmt, 0);
-					if (strstr(uniqueid, delim[delimidx].c_str()) != 0) {
+					
+					if (strstr(uniqueid, delim[delimidx].c_str()) == 0) {
+						if (uidBatch.str().size() == 0) {
+							uidBatch << uniqueid;
+						}
+						else {
+							uidBatch << delim[delimidx] << uniqueid;
+						}
+					}
+					else {
 						shouldRestart = true;
 						delimidx++;
 						uidBatch.str(std::string());
 						pmm::Log << "INFO: Changing delimiter to \"" << delim[delimidx] << "\"" << pmm::NL;
 						break;
 					}
-					//client->fetchDBPutItemAsync(email_, uniqueid);
-					if (uidBatch.str().size() == 0) {
-						uidBatch << uniqueid;
-					}
-					else {
-						uidBatch << delim[delimidx] << uniqueid;
-					}
 				}
 				sqlite3_finalize(stmt);
-				if (uidBatch.str().size() == 0) {
+				if (uidBatch.str().size() > 0) {
 #ifdef DEBUG
 					pmm::Log << "Sending batch: " << uidBatch.str() << pmm::NL;
 #endif
