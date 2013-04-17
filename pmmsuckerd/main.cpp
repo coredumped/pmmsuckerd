@@ -1122,9 +1122,12 @@ void broadcastMessageToAll(std::map<std::string, std::string> &params, pmm::Shar
 }
 
 static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string &dbFile, const std::string &email_){
-	sqlite3 *theDB = 0;
+	std::string delim[] = { "\t", " ", "|", "\t"};
+	int delimidx = 0;
 	int errCode;
 	do {
+		sqlite3 *theDB = 0;
+		bool shouldRestart = false;
 		if((errCode = sqlite3_open_v2(dbFile.c_str(), &theDB, SQLITE_OPEN_READONLY|SQLITE_OPEN_FULLMUTEX, NULL)) == SQLITE_OK){
 			std::stringstream sqlCmd;
 			sqlite3_stmt *stmt = 0;
@@ -1134,16 +1137,31 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 			std::string query = sqlCmd.str();
 			errCode = sqlite3_prepare_v2(theDB, query.c_str(), (int)query.size(), &stmt, (const char **)&pzTail);
 			if (errCode == SQLITE_OK){
+				std::string uidBatch;
 				while ((errCode = sqlite3_step(stmt)) == SQLITE_ROW) {
 					//Read averything here
 					char *uniqueid = (char *)sqlite3_column_text(stmt, 0);
-					//time_t timestamp = (time_t)sqlite3_column_int(stmt, 1);
-					/*pmmrpc::FetchDBItem fitem;
-					fitem.uid = uniqueid;
-					fitem.timestamp = (int32_t)timestamp;*/
-					client->fetchDBPutItemAsync(email_, uniqueid);
+					if (strstr(uniqueid, delim[delimidx].c_str()) != 0) {
+						shouldRestart = true;
+						delimidx++;
+						uidBatch = "";
+						pmm::Log << "INFO: Changing delimiter to \"" << delim[delimidx] << "\"" << pmm::NL;
+						break;
+					}
+					//client->fetchDBPutItemAsync(email_, uniqueid);
+					if (uidBatch.size() == 0) {
+						uidBatch = uniqueid;
+					}
+					else {
+						std::stringstream stx;
+						stx << uidBatch << delim[delimidx] << uniqueid;
+						uidBatch = stx.str();
+					}
 				}
 				sqlite3_finalize(stmt);
+				if (uidBatch.size() == 0) {
+					client->fetchDBInitialSyncPutItemAsync(email_, uidBatch, delim[delimidx]);
+				}
 			}
 			else {
 				sqlite3_close(theDB);
@@ -1152,6 +1170,9 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 			}
 			sqlite3_close(theDB);
 			errCode = SQLITE_OK;
+			if (shouldRestart) {
+				continue;
+			}
 		}
 		else if(errCode == SQLITE_BUSY){
 			pmm::Log << "Retrying, the database was busy" << pmm::NL;

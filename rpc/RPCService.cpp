@@ -12,6 +12,7 @@
 #include "FetchedMailsCache.h"
 #include "PMMSuckerSession.h"
 #include "FetchDBSyncThread.h"
+#include "UtilityFunctions.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TThreadPoolServer.h>
 #include <thrift/transport/TServerSocket.h>
@@ -51,12 +52,25 @@ namespace  pmmrpc {
 			return true;
 		}
 		
-		void fetchDBPutItemAsync(const std::string& email, const std::string& uid){
+		void fetchDBPutItemAsync(const std::string& email, const std::string& uid) throw (FetchDBUnableToPutItemException, GenericException) {
 			FetchDBItem fitem;
 			fitem.email = email;
 			fitem.timestamp = (int32_t)time(0);
 			fitem.uid = uid;
 			items2SaveQ->add(fitem);
+		}
+		
+		void fetchDBInitialSyncPutItemAsync (const std::string& email, const std::string& uidBatch, const std::string &delim) throw (FetchDBUnableToPutItemException, GenericException) {
+			time_t now = time(0) - 86400;
+			std::vector<std::string> uidV;
+			pmm::splitString(uidV, uidBatch, delim);
+			for (size_t i = 0; i < uidV.size(); i++) {
+				FetchDBItem fitem;
+				fitem.email = email;
+				fitem.timestamp = (int32_t)now;
+				fitem.uid = uidV[i];
+				items2SaveQ->add(fitem);
+			}
 		}
 		
 		void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) throw (GenericException) {

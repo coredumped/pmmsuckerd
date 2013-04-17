@@ -617,6 +617,220 @@ uint32_t PMMSuckerRPC_fetchDBPutItemAsync_presult::read(::apache::thrift::protoc
   return xfer;
 }
 
+uint32_t PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->email);
+          this->__isset.email = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->uidBatch);
+          this->__isset.uidBatch = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->delim);
+          this->__isset.delim = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args");
+
+  xfer += oprot->writeFieldBegin("email", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->email);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("uidBatch", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString(this->uidBatch);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("delim", ::apache::thrift::protocol::T_STRING, 3);
+  xfer += oprot->writeString(this->delim);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_pargs");
+
+  xfer += oprot->writeFieldBegin("email", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString((*(this->email)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("uidBatch", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString((*(this->uidBatch)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("delim", ::apache::thrift::protocol::T_STRING, 3);
+  xfer += oprot->writeString((*(this->delim)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex1.read(iprot);
+          this->__isset.ex1 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex2.read(iprot);
+          this->__isset.ex2 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+
+  uint32_t xfer = 0;
+
+  xfer += oprot->writeStructBegin("PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result");
+
+  if (this->__isset.ex1) {
+    xfer += oprot->writeFieldBegin("ex1", ::apache::thrift::protocol::T_STRUCT, 1);
+    xfer += this->ex1.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  } else if (this->__isset.ex2) {
+    xfer += oprot->writeFieldBegin("ex2", ::apache::thrift::protocol::T_STRUCT, 2);
+    xfer += this->ex2.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex1.read(iprot);
+          this->__isset.ex1 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->ex2.read(iprot);
+          this->__isset.ex2 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
 uint32_t PMMSuckerRPC_fetchDBGetItems_args::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
@@ -1703,6 +1917,67 @@ void PMMSuckerRPCClient::recv_fetchDBPutItemAsync()
   return;
 }
 
+void PMMSuckerRPCClient::fetchDBInitialSyncPutItemAsync(const std::string& email, const std::string& uidBatch, const std::string& delim)
+{
+  send_fetchDBInitialSyncPutItemAsync(email, uidBatch, delim);
+  recv_fetchDBInitialSyncPutItemAsync();
+}
+
+void PMMSuckerRPCClient::send_fetchDBInitialSyncPutItemAsync(const std::string& email, const std::string& uidBatch, const std::string& delim)
+{
+  int32_t cseqid = 0;
+  oprot_->writeMessageBegin("fetchDBInitialSyncPutItemAsync", ::apache::thrift::protocol::T_CALL, cseqid);
+
+  PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_pargs args;
+  args.email = &email;
+  args.uidBatch = &uidBatch;
+  args.delim = &delim;
+  args.write(oprot_);
+
+  oprot_->writeMessageEnd();
+  oprot_->getTransport()->writeEnd();
+  oprot_->getTransport()->flush();
+}
+
+void PMMSuckerRPCClient::recv_fetchDBInitialSyncPutItemAsync()
+{
+
+  int32_t rseqid = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TMessageType mtype;
+
+  iprot_->readMessageBegin(fname, mtype, rseqid);
+  if (mtype == ::apache::thrift::protocol::T_EXCEPTION) {
+    ::apache::thrift::TApplicationException x;
+    x.read(iprot_);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+    throw x;
+  }
+  if (mtype != ::apache::thrift::protocol::T_REPLY) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  if (fname.compare("fetchDBInitialSyncPutItemAsync") != 0) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult result;
+  result.read(iprot_);
+  iprot_->readMessageEnd();
+  iprot_->getTransport()->readEnd();
+
+  if (result.__isset.ex1) {
+    throw result.ex1;
+  }
+  if (result.__isset.ex2) {
+    throw result.ex2;
+  }
+  return;
+}
+
 void PMMSuckerRPCClient::fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email)
 {
   send_fetchDBGetItems(email);
@@ -2196,6 +2471,65 @@ void PMMSuckerRPCProcessor::process_fetchDBPutItemAsync(int32_t seqid, ::apache:
 
   if (this->eventHandler_.get() != NULL) {
     this->eventHandler_->postWrite(ctx, "PMMSuckerRPC.fetchDBPutItemAsync", bytes);
+  }
+}
+
+void PMMSuckerRPCProcessor::process_fetchDBInitialSyncPutItemAsync(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+{
+  void* ctx = NULL;
+  if (this->eventHandler_.get() != NULL) {
+    ctx = this->eventHandler_->getContext("PMMSuckerRPC.fetchDBInitialSyncPutItemAsync", callContext);
+  }
+  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "PMMSuckerRPC.fetchDBInitialSyncPutItemAsync");
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preRead(ctx, "PMMSuckerRPC.fetchDBInitialSyncPutItemAsync");
+  }
+
+  PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args args;
+  args.read(iprot);
+  iprot->readMessageEnd();
+  uint32_t bytes = iprot->getTransport()->readEnd();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postRead(ctx, "PMMSuckerRPC.fetchDBInitialSyncPutItemAsync", bytes);
+  }
+
+  PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result result;
+  try {
+    iface_->fetchDBInitialSyncPutItemAsync(args.email, args.uidBatch, args.delim);
+  } catch (FetchDBUnableToPutItemException &ex1) {
+    result.ex1 = ex1;
+    result.__isset.ex1 = true;
+  } catch (GenericException &ex2) {
+    result.ex2 = ex2;
+    result.__isset.ex2 = true;
+  } catch (const std::exception& e) {
+    if (this->eventHandler_.get() != NULL) {
+      this->eventHandler_->handlerError(ctx, "PMMSuckerRPC.fetchDBInitialSyncPutItemAsync");
+    }
+
+    ::apache::thrift::TApplicationException x(e.what());
+    oprot->writeMessageBegin("fetchDBInitialSyncPutItemAsync", ::apache::thrift::protocol::T_EXCEPTION, seqid);
+    x.write(oprot);
+    oprot->writeMessageEnd();
+    oprot->getTransport()->writeEnd();
+    oprot->getTransport()->flush();
+    return;
+  }
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preWrite(ctx, "PMMSuckerRPC.fetchDBInitialSyncPutItemAsync");
+  }
+
+  oprot->writeMessageBegin("fetchDBInitialSyncPutItemAsync", ::apache::thrift::protocol::T_REPLY, seqid);
+  result.write(oprot);
+  oprot->writeMessageEnd();
+  bytes = oprot->getTransport()->writeEnd();
+  oprot->getTransport()->flush();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postWrite(ctx, "PMMSuckerRPC.fetchDBInitialSyncPutItemAsync", bytes);
   }
 }
 

@@ -18,6 +18,7 @@ class PMMSuckerRPCIf {
   virtual void getAllEmailAccounts(std::vector<std::string> & _return) = 0;
   virtual bool fetchDBPutItem(const std::string& email, const std::string& uid) = 0;
   virtual void fetchDBPutItemAsync(const std::string& email, const std::string& uid) = 0;
+  virtual void fetchDBInitialSyncPutItemAsync(const std::string& email, const std::string& uidBatch, const std::string& delim) = 0;
   virtual void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) = 0;
   virtual bool notificationPayloadPush() = 0;
   virtual bool commandSubmit(const Command& cmd) = 0;
@@ -60,6 +61,9 @@ class PMMSuckerRPCNull : virtual public PMMSuckerRPCIf {
     return _return;
   }
   void fetchDBPutItemAsync(const std::string& /* email */, const std::string& /* uid */) {
+    return;
+  }
+  void fetchDBInitialSyncPutItemAsync(const std::string& /* email */, const std::string& /* uidBatch */, const std::string& /* delim */) {
     return;
   }
   void fetchDBGetItems(std::vector<FetchDBItem> & /* _return */, const std::string& /* email */) {
@@ -446,6 +450,142 @@ class PMMSuckerRPC_fetchDBPutItemAsync_presult {
   GenericException ex2;
 
   _PMMSuckerRPC_fetchDBPutItemAsync_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+typedef struct _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args__isset {
+  _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args__isset() : email(false), uidBatch(false), delim(false) {}
+  bool email;
+  bool uidBatch;
+  bool delim;
+} _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args__isset;
+
+class PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args {
+ public:
+
+  PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args() : email(), uidBatch(), delim() {
+  }
+
+  virtual ~PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args() throw() {}
+
+  std::string email;
+  std::string uidBatch;
+  std::string delim;
+
+  _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args__isset __isset;
+
+  void __set_email(const std::string& val) {
+    email = val;
+  }
+
+  void __set_uidBatch(const std::string& val) {
+    uidBatch = val;
+  }
+
+  void __set_delim(const std::string& val) {
+    delim = val;
+  }
+
+  bool operator == (const PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args & rhs) const
+  {
+    if (!(email == rhs.email))
+      return false;
+    if (!(uidBatch == rhs.uidBatch))
+      return false;
+    if (!(delim == rhs.delim))
+      return false;
+    return true;
+  }
+  bool operator != (const PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_pargs {
+ public:
+
+
+  virtual ~PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_pargs() throw() {}
+
+  const std::string* email;
+  const std::string* uidBatch;
+  const std::string* delim;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result__isset {
+  _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result__isset() : ex1(false), ex2(false) {}
+  bool ex1;
+  bool ex2;
+} _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result__isset;
+
+class PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result {
+ public:
+
+  PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result() {
+  }
+
+  virtual ~PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result() throw() {}
+
+  FetchDBUnableToPutItemException ex1;
+  GenericException ex2;
+
+  _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result__isset __isset;
+
+  void __set_ex1(const FetchDBUnableToPutItemException& val) {
+    ex1 = val;
+  }
+
+  void __set_ex2(const GenericException& val) {
+    ex2 = val;
+  }
+
+  bool operator == (const PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result & rhs) const
+  {
+    if (!(ex1 == rhs.ex1))
+      return false;
+    if (!(ex2 == rhs.ex2))
+      return false;
+    return true;
+  }
+  bool operator != (const PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult__isset {
+  _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult__isset() : ex1(false), ex2(false) {}
+  bool ex1;
+  bool ex2;
+} _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult__isset;
+
+class PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult {
+ public:
+
+
+  virtual ~PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult() throw() {}
+
+  FetchDBUnableToPutItemException ex1;
+  GenericException ex2;
+
+  _PMMSuckerRPC_fetchDBInitialSyncPutItemAsync_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -1046,6 +1186,9 @@ class PMMSuckerRPCClient : virtual public PMMSuckerRPCIf {
   void fetchDBPutItemAsync(const std::string& email, const std::string& uid);
   void send_fetchDBPutItemAsync(const std::string& email, const std::string& uid);
   void recv_fetchDBPutItemAsync();
+  void fetchDBInitialSyncPutItemAsync(const std::string& email, const std::string& uidBatch, const std::string& delim);
+  void send_fetchDBInitialSyncPutItemAsync(const std::string& email, const std::string& uidBatch, const std::string& delim);
+  void recv_fetchDBInitialSyncPutItemAsync();
   void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email);
   void send_fetchDBGetItems(const std::string& email);
   void recv_fetchDBGetItems(std::vector<FetchDBItem> & _return);
@@ -1079,6 +1222,7 @@ class PMMSuckerRPCProcessor : public ::apache::thrift::TDispatchProcessor {
   void process_getAllEmailAccounts(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_fetchDBPutItem(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_fetchDBPutItemAsync(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_fetchDBInitialSyncPutItemAsync(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_fetchDBGetItems(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_notificationPayloadPush(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_commandSubmit(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
@@ -1090,6 +1234,7 @@ class PMMSuckerRPCProcessor : public ::apache::thrift::TDispatchProcessor {
     processMap_["getAllEmailAccounts"] = &PMMSuckerRPCProcessor::process_getAllEmailAccounts;
     processMap_["fetchDBPutItem"] = &PMMSuckerRPCProcessor::process_fetchDBPutItem;
     processMap_["fetchDBPutItemAsync"] = &PMMSuckerRPCProcessor::process_fetchDBPutItemAsync;
+    processMap_["fetchDBInitialSyncPutItemAsync"] = &PMMSuckerRPCProcessor::process_fetchDBInitialSyncPutItemAsync;
     processMap_["fetchDBGetItems"] = &PMMSuckerRPCProcessor::process_fetchDBGetItems;
     processMap_["notificationPayloadPush"] = &PMMSuckerRPCProcessor::process_notificationPayloadPush;
     processMap_["commandSubmit"] = &PMMSuckerRPCProcessor::process_commandSubmit;
@@ -1149,6 +1294,15 @@ class PMMSuckerRPCMultiface : virtual public PMMSuckerRPCIf {
       ifaces_[i]->fetchDBPutItemAsync(email, uid);
     }
     ifaces_[i]->fetchDBPutItemAsync(email, uid);
+  }
+
+  void fetchDBInitialSyncPutItemAsync(const std::string& email, const std::string& uidBatch, const std::string& delim) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->fetchDBInitialSyncPutItemAsync(email, uidBatch, delim);
+    }
+    ifaces_[i]->fetchDBInitialSyncPutItemAsync(email, uidBatch, delim);
   }
 
   void fetchDBGetItems(std::vector<FetchDBItem> & _return, const std::string& email) {
