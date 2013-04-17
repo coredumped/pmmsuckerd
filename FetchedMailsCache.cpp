@@ -443,7 +443,15 @@ namespace pmm {
 		
 		sqlite3_exec(conn, "BEGIN TRANSACTION", NULL, NULL, NULL);
 		for (size_t k = 0; k < uid.size(); k++) {
-			sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << "," << uid[k] << ")";
+			if (uid[k].find('\'') != uid[k].npos) {
+				//Escape uid
+				std::string uid_s;
+				sqliteEscapeString(uid[k], uid_s);
+				sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << ",'" << uid_s << "')";
+			}
+			else {
+				sqlCmd << "INSERT OR REPLACE INTO " << fetchedMailsTable << " (timestamp,uniqueid) VALUES (" << now << ",'" << uid[k] << "' )";
+			}
 			int errCode = sqlite3_exec(conn, sqlCmd.str().c_str(), NULL, NULL, &errmsg_s);
 			if (errCode != SQLITE_OK) {
 				sqlite3_exec(conn, "COMMIT TRANSACTION", NULL, NULL, NULL);
