@@ -64,6 +64,7 @@ namespace  pmmrpc {
 			time_t now = time(0) - 86400;
 			std::vector<std::string> uidV;
 			pmm::splitString(uidV, uidBatch, delim);
+			pmm::Log << "INFO: Batch syncing " << (int)uidV.size() << " e-mail uids for " << email << "..." << pmm::NL;
 			for (size_t i = 0; i < uidV.size(); i++) {
 				FetchDBItem fitem;
 				fitem.email = email;

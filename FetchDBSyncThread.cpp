@@ -31,7 +31,7 @@ namespace pmm {
 			while (items2SaveQ->extractEntry(theItem)) {
 				//Save to fetched mails cache
 				fetchedMails.addEntry2(theItem.email, theItem.uid);
-				if (idx++ % 100 == 0) {
+				if (++idx % 100 == 0) {
 					pmm::Log << "INFO: " << idx << " items synched" << pmm::NL;
 				}
 			}
@@ -39,8 +39,7 @@ namespace pmm {
 				sleep(1);
 			}
 			else{
-				usleep(100000L);
-				pmm::Log << "INFO: Batch sync of " << (int)total << " items completed" << pmm::NL;
+				usleep(10000L);
 			}
 		}
 		pmm::Log << "INFO: Stopping FetchDBSyncThread, no need to have it running!!!" << pmm::NL;
