@@ -360,7 +360,7 @@ namespace pmm {
 	
 
 	
-	bool FetchedMailsCache::addEntry2(const std::string &email, const std::string &uid){
+	bool FetchedMailsCache::addEntry2(const std::string &email, const std::string &uid, bool propagate2Remote){
 		bool tableCreated;
 		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
@@ -388,17 +388,19 @@ namespace pmm {
 		}
 		autoRefreshUConn(email);
 		
-		//Inserts the item in the queue distributor
-		pmmrpc::FetchDBItem fitem;
-		fitem.email = email;
-		fitem.uid = uid;
-		fitem.timestamp = (int32_t)now;
-		//fetchDBItems2SaveQ.add(fitem);
-		RemoteFetchDBSyncQueue.add(fitem);
+		if (propagate2Remote) {
+			//Inserts the item in the queue distributor
+			pmmrpc::FetchDBItem fitem;
+			fitem.email = email;
+			fitem.uid = uid;
+			fitem.timestamp = (int32_t)now;
+			//fetchDBItems2SaveQ.add(fitem);
+			RemoteFetchDBSyncQueue.add(fitem);
+		}
 		return tableCreated;
 	}
 	
-	bool FetchedMailsCache::addEntry2(const std::string &email, uint32_t &uid){
+	bool FetchedMailsCache::addEntry2(const std::string &email, uint32_t &uid, bool propagate2Remote){
 		bool tableCreated;
 		sqlite3 *conn = openDatabase(email, tableCreated);
 		char *errmsg_s;
@@ -418,15 +420,17 @@ namespace pmm {
 		}
 		autoRefreshUConn(email);
 		
-		//Inserts the item in the queue distributor
-		pmmrpc::FetchDBItem fitem;
-		fitem.email = email;
-		std::stringstream uid_s;
-		uid_s << uid;
-		fitem.uid = uid_s.str();
-		fitem.timestamp = (int32_t)now;
-		//fetchDBItems2SaveQ.add(fitem);
-		RemoteFetchDBSyncQueue.add(fitem);
+		if (propagate2Remote) {
+			//Inserts the item in the queue distributor
+			pmmrpc::FetchDBItem fitem;
+			fitem.email = email;
+			std::stringstream uid_s;
+			uid_s << uid;
+			fitem.uid = uid_s.str();
+			fitem.timestamp = (int32_t)now;
+			//fetchDBItems2SaveQ.add(fitem);
+			RemoteFetchDBSyncQueue.add(fitem);
+		}
 		return tableCreated;
 	}
 	

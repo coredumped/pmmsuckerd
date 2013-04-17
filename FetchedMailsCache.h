@@ -48,8 +48,8 @@ namespace pmm {
 		void removeEntriesNotInSet(const std::string &email, const std::vector<uint32_t> &uidSet);
 		void removeAllEntriesOfEmail(const std::string &email);
 #endif
-		bool addEntry2(const std::string &email, const std::string &uid);
-		bool addEntry2(const std::string &email, uint32_t &uid);
+		bool addEntry2(const std::string &email, const std::string &uid, bool propagate2Remote = true);
+		bool addEntry2(const std::string &email, uint32_t &uid, bool propagate2Remote = true);
 
 
 		
