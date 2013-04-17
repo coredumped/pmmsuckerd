@@ -1143,30 +1143,31 @@ static void sendDBContents(pmmrpc::PMMSuckerRPCClient *client, const std::string
 			std::string query = sqlCmd.str();
 			errCode = sqlite3_prepare_v2(theDB, query.c_str(), (int)query.size(), &stmt, (const char **)&pzTail);
 			if (errCode == SQLITE_OK){
-				std::string uidBatch;
+				std::stringstream uidBatch;
 				while ((errCode = sqlite3_step(stmt)) == SQLITE_ROW) {
 					//Read averything here
 					char *uniqueid = (char *)sqlite3_column_text(stmt, 0);
 					if (strstr(uniqueid, delim[delimidx].c_str()) != 0) {
 						shouldRestart = true;
 						delimidx++;
-						uidBatch = "";
+						uidBatch.str(std::string());
 						pmm::Log << "INFO: Changing delimiter to \"" << delim[delimidx] << "\"" << pmm::NL;
 						break;
 					}
 					//client->fetchDBPutItemAsync(email_, uniqueid);
-					if (uidBatch.size() == 0) {
-						uidBatch = uniqueid;
+					if (uidBatch.str().size() == 0) {
+						uidBatch << uniqueid;
 					}
 					else {
-						std::stringstream stx;
-						stx << uidBatch << delim[delimidx] << uniqueid;
-						uidBatch = stx.str();
+						uidBatch << delim[delimidx] << uniqueid;
 					}
 				}
 				sqlite3_finalize(stmt);
-				if (uidBatch.size() == 0) {
-					client->fetchDBInitialSyncPutItemAsync(email_, uidBatch, delim[delimidx]);
+				if (uidBatch.str().size() == 0) {
+#ifdef DEBUG
+					pmm::Log << "Sending batch: " << uidBatch.str() << pmm::NL;
+#endif
+					client->fetchDBInitialSyncPutItemAsync(email_, uidBatch.str(), delim[delimidx]);
 				}
 			}
 			else {
