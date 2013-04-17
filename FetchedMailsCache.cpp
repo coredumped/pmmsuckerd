@@ -437,12 +437,12 @@ namespace pmm {
 	bool FetchedMailsCache::addEntry2(const std::string &email, const std::vector<std::string> &uid, bool propagate2Remote) {
 		bool tableCreated;
 		sqlite3 *conn = openDatabase(email, tableCreated);
-		char *errmsg_s;
-		std::stringstream sqlCmd;
 		time_t now = time(0);
 		
 		sqlite3_exec(conn, "BEGIN TRANSACTION", NULL, NULL, NULL);
 		for (size_t k = 0; k < uid.size(); k++) {
+			char *errmsg_s;
+			std::stringstream sqlCmd;
 			if (uid[k].find('\'') != uid[k].npos) {
 				//Escape uid
 				std::string uid_s;
