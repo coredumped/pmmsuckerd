@@ -585,7 +585,7 @@ namespace pmm {
 					else if(n == -4){
 						yahooAccountsToBan.insert(pf.mailAccountInfo.email());
 					}
-					gotSomething = true;
+					if (n > 0) gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
 					if(n == 0) usleep(1000);
 				}
