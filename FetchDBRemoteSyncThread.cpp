@@ -53,8 +53,9 @@ namespace pmm {
 				transport = boost::shared_ptr<apache::thrift::transport::TTransport>(new apache::thrift::transport::TBufferedTransport(socket));
 				protocol = boost::shared_ptr<apache::thrift::protocol::TProtocol>(new apache::thrift::protocol::TBinaryProtocol(transport));
 				client = new pmmrpc::PMMSuckerRPCClient(protocol);
+				transport->open();
 			}
-			if (!transport->isOpen()) {
+			if (client != 0 && !transport->isOpen()) {
 				transport->open();
 			}
 		}
@@ -101,8 +102,8 @@ namespace pmm {
 			while (RemoteFetchDBSyncQueue.extractEntry(item2Save)) {
 				for (std::map<std::string, PMMSuckerRemoteClient *>::iterator iter = connPool.begin(); iter != connPool.end(); iter++) {
 					PMMSuckerRemoteClient *theClient = iter->second;
-					theClient->open();
 					try {
+						theClient->open();
 						theClient->client->fetchDBPutItem(item2Save.email, item2Save.uid);
 					} catch (apache::thrift::TException &tex1) {
 						pmm::Log << "Unable to upload " << item2Save.uid << " to " << iter->first << ": "
