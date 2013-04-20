@@ -454,6 +454,7 @@ namespace pmm {
 				std::vector<std::string> props;
 				splitString(props, sibDefS[j], ";");
 				PMMSuckerInfo info;
+				info.suckerID = props[0];
 				if (info.suckerID.compare(myID) != 0) {
 					info.suckerID = props[0];
 					info.hostname = props[1];
@@ -463,6 +464,7 @@ namespace pmm {
 					else info.allowsPOP3 = false;
 					std::istringstream portS(props[4]);
 					portS >> info.port;
+					info.secret = props[5];
 					sibTempV.push_back(info);
 					pmm::Log << "INFO: Received " << info.suckerID << " from " << info.hostname << " as sibling." << pmm::NL;
 				}

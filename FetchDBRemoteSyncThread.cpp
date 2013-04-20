@@ -60,7 +60,7 @@ namespace pmm {
 		}
 		
 		void close(){
-			if (transport->isOpen()) {
+			if (client != 0 && transport->isOpen()) {
 				transport->close();
 			}
 		}
