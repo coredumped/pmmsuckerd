@@ -49,7 +49,7 @@ namespace  pmmrpc {
 		}
 		
 		bool fetchDBPutItem(const std::string& email, const std::string& uid){
-			fetchedMails.addEntry2(email, uid);
+			fetchedMails.addEntry2(email, uid, false);
 			return true;
 		}
 		
