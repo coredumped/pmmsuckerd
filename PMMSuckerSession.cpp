@@ -471,6 +471,9 @@ namespace pmm {
 			}
 			siblingSuckers->operator=(sibTempV);
 		}
+		else {
+			siblingSuckers->clear();
+		}
 		if (shouldSync) {
 #ifdef DEBUG
 			pmm::Log << "Performing full fetchdb synchronization, pausing execution for 60 seconds..." << pmm::NL;
