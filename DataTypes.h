@@ -16,6 +16,7 @@ namespace pmm {
 		public:
 		std::string emailAddress;
 		int quotaValue;
+		time_t creationTime;
 		QuotaIncreasePetition();
 		QuotaIncreasePetition(const std::string &_email, int quota);
 		QuotaIncreasePetition(const QuotaIncreasePetition &q);

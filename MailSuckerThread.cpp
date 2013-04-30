@@ -307,7 +307,14 @@ namespace pmm {
 						}
 						
 					}
-					else quotaIncreaseQueue->add(p);
+					else{
+						if (rightNow - p.creationTime < 1800) {
+							quotaIncreaseQueue->add(p);
+						}
+						else {
+							pmm::Log << "PANIC: Expiring quota increase petition to " << p.emailAddress << " because it is too old!!!" << pmm::NL;
+						}
+					}
 				}
 				processAccountUpdate(emailAccounts[i], i);
 				if (emailAccounts[i].devTokens().size() > 0) {

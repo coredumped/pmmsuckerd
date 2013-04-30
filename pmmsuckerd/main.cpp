@@ -654,6 +654,7 @@ int main (int argc, const char * argv[])
 						}
 						else if (command.compare(pmm::Commands::mailAccountQuotaChanged) == 0){
 							pmm::QuotaIncreasePetition p;
+							p.creationTime = time(0);
 							p.emailAddress = parameters["email"];
 							std::stringstream input(parameters["quota"]);
 							input >> p.quotaValue;
