@@ -14,6 +14,7 @@
 #include "SharedQueue.h"
 #include "SharedVector.h"
 #include "PMMSuckerInfo.h"
+#include "MTLogger.h"
 
 namespace pmm {
 	class FetchDBRemoteSyncThread : public GenericThread {
@@ -27,6 +28,7 @@ namespace pmm {
 	};
 	
 	extern SharedQueue<pmmrpc::FetchDBItem> RemoteFetchDBSyncQueue;
+	extern MTLogger rmtSyncLog;
 }
 
 #endif

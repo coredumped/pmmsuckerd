@@ -243,6 +243,10 @@ int main (int argc, const char * argv[])
 	pmm::imapLog.setTag("IMAPSuckerThread");
 	pmm::pop3Log.open("pop3-fetch.log");
 	pmm::pop3Log.setTag("POP3SuckerThread");
+	pmm::rmtSyncLog.open("remote-sync.log");
+	pmm::rmtSyncLog.setTag("RemoteSync");
+	pmm::rpcLog.open("rpc.log");
+	pmm::rpcLog.setTag("Thrift");
 	
 	pmm::ObjectDatastore localConfig;
 
@@ -1226,7 +1230,7 @@ static void finddbAndSyncDBFiles(const std::string &startDir, pmmrpc::PMMSuckerR
 					decodeEmailFromDBFile(dData->d_name, email_);
 					pmm::Log << "INFO: Sending [" << email_ << "] " << fullPath.str() << "..." << pmm::NL;
 					sendDBContents(client, fullPath.str(), email_);
-					if(time(0) % 5 == 0) session.performAutoRegister();
+					if(time(0) % 2 == 0) session.performAutoRegister();
 				}
 			}
 		}

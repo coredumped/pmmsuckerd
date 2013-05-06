@@ -272,7 +272,7 @@ namespace pmm {
 				if (nowx % 60 == 0) {
 					pmm::Log << "Polling operations are blocked." << pmm::NL;
 				}
-				if (nowx - currTime > 300) {
+				if (nowx - currTime > 1500) {
 					mailboxPollBlocked = false;
 					pmm::Log << "Unblocking polling operations, the timeout has been exceeded" << pmm::NL;
 					break;

@@ -14,6 +14,7 @@
 #include "SharedVector.h"
 #include "SharedQueue.h"
 #include "GenericThread.h"
+#include "MTLogger.h"
 #include <map>
 
 namespace pmm {
@@ -32,6 +33,7 @@ namespace pmm {
 		void operator()();
 	};
 	
+	extern MTLogger rpcLog;
 }
 
 #endif

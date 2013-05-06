@@ -18,6 +18,8 @@
 
 
 namespace pmm {
+	MTLogger rmtSyncLog;
+	
 	class PMMSuckerRemoteClient {
 	private:
 	protected:
@@ -87,6 +89,7 @@ namespace pmm {
 		}
 		pmm::Log << "Starting remote synchronizer thread..." << pmm::NL;
 		while (true) {
+			bool upLoadFailed = false;
 			pmmrpc::FetchDBItem item2Save;
 			//Refresh or add suckerInfo to connPool list
 			siblingSuckers->beginCriticalSection();
@@ -94,7 +97,7 @@ namespace pmm {
 				std::string suckerId = siblingSuckers->atUnlocked(i).suckerID;
 				if (connPool.find(suckerId) == connPool.end()) {
 					//Add new sucker definition to map cache
-					pmm::Log << "Adding " << suckerId << "(" << siblingSuckers->atUnlocked(i).hostname << ") to connection pool..." << pmm::NL;
+					pmm::rmtSyncLog << "Adding " << suckerId << "(" << siblingSuckers->atUnlocked(i).hostname << ") to connection pool..." << pmm::NL;
 					connPool[suckerId] = new PMMSuckerRemoteClient(siblingSuckers->atUnlocked(i));
 				}
 			}
@@ -106,20 +109,29 @@ namespace pmm {
 						theClient->open();
 						theClient->client->fetchDBPutItem(item2Save.email, item2Save.uid);
 					} catch (apache::thrift::TException &tex1) {
-						pmm::Log << "Unable to upload " << item2Save.uid << " to " << iter->first << ": "
+						pmm::rmtSyncLog << "Unable to upload " << item2Save.uid << " to " << iter->first << ": "
 						<< tex1.what() << pmm::NL;
+						upLoadFailed = true;
+						RemoteFetchDBSyncQueue.add(item2Save);
+						break;
 					}
 
 				}
 			}
-			if (time(0) % 60 == 0) {
+			if (time(0) % 60 == 0 || upLoadFailed) {
 				//Release connections
 				for (std::map<std::string, PMMSuckerRemoteClient *>::iterator iter = connPool.begin(); iter != connPool.end(); iter++) {
 					PMMSuckerRemoteClient *theClient = iter->second;
 					theClient->close();
 				}
 			}
-			sleep(1);
+			if (upLoadFailed) {
+				pmm::rmtSyncLog << "Retrying failed uid upload in 30 seconds..." << pmm::NL;
+				sleep(30);
+			}
+			else{
+				sleep(1);
+			}
 		}
 	}
 }

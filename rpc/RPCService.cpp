@@ -28,7 +28,14 @@ using namespace ::apache::thrift::server;
 
 using boost::shared_ptr;
 
+namespace pmm {
+	MTLogger rpcLog;
+}
+
 namespace  pmmrpc {
+	
+	
+	
 	class PMMSuckerRPCHandler : virtual public PMMSuckerRPCIf {
 	protected:
 		pmm::FetchedMailsCache fetchedMails;
@@ -50,6 +57,9 @@ namespace  pmmrpc {
 		
 		bool fetchDBPutItem(const std::string& email, const std::string& uid){
 			fetchedMails.addEntry2(email, uid, false);
+#ifdef DEBUG
+			pmm::rpcLog << "Receiving remote " << uid << " for: " << email << pmm::NL;
+#endif
 			return true;
 		}
 		
@@ -64,7 +74,7 @@ namespace  pmmrpc {
 			std::vector<std::string> uidV;
 			pmm::mailboxPollBlocked = true;
 			pmm::splitString(uidV, uidBatch, delim);
-			pmm::Log << "INFO: Batch syncing " << (int)uidV.size() << " e-mail uids for " << email << "..." << pmm::NL;
+			pmm::rpcLog << "INFO: Batch syncing " << (int)uidV.size() << " e-mail uids for " << email << "..." << pmm::NL;
 			FetchDBInitialSyncItem fitem;
 			fitem.email = email;
 			fitem.uids = uidV;
@@ -130,7 +140,7 @@ namespace pmm {
 	
 	void RPCService::operator()(){
 		if (rtCommandV == 0) {
-			pmm::Log << "Unable to start rpc service with not real-time command vector" << pmm::NL;
+			pmm::rpcLog << "Unable to start rpc service with not real-time command vector" << pmm::NL;
 			abort();
 		}
 		shared_ptr<pmmrpc::PMMSuckerRPCHandler> handler(new pmmrpc::PMMSuckerRPCHandler(rtCommandV));
@@ -144,7 +154,7 @@ namespace pmm {
 		shared_ptr<concurrency::PosixThreadFactory> tfact = shared_ptr<concurrency::PosixThreadFactory>(new concurrency::PosixThreadFactory());
 		tman->threadFactory(tfact);
 		tman->start();
-		pmm::Log << "INFO: Thrift listener starting..." << pmm::NL;
+		pmm::rpcLog << "INFO: Thrift listener starting..." << pmm::NL;
 		server::TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, tman);
 		server.serve();
 	}
