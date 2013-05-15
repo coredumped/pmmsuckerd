@@ -285,11 +285,26 @@ namespace pmm {
 	}
 	
 	void APNSNotificationThread::disconnectFromAPNS(){
-		int err = SSL_shutdown(apnsConnection);
-		if(err == -1)
-		{
-			throw SSLException(apnsConnection, err, "SSL shutdown");
-		}    
+		int err;
+		int shutdownRetryCount = 0;
+		do {
+			err = SSL_shutdown(apnsConnection);
+			if (shutdownRetryCount > 20 && err == 0) {
+				throw SSLException(apnsConnection, err, "Max SSL shutdown attempts made!");
+			}
+			if(err == -1)
+			{
+				err = SSL_get_error(apnsConnection, err);
+				if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+					err = 1;
+				}
+				else if(err != SSL_ERROR_SYSCALL) throw SSLException(apnsConnection, err, "SSL shutdown");
+			}
+			shutdownRetryCount++;
+#ifdef DEBUG
+			APNSLog << "WARNING: Retrying(" << shutdownRetryCount << ") SSL shutdown..." << pmm::NL;
+#endif
+		}while (err == 0);
 		err = close(_socket);
 		if(err == -1)
 		{
