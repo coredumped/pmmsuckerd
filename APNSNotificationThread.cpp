@@ -297,6 +297,7 @@ namespace pmm {
 				err = SSL_get_error(apnsConnection, err);
 				if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
 					err = 1;
+					usleep(2000);
 				}
 				else if(err != SSL_ERROR_SYSCALL) throw SSLException(apnsConnection, err, "SSL shutdown");
 			}
@@ -304,7 +305,7 @@ namespace pmm {
 #ifdef DEBUG
 			APNSLog << "WARNING: Retrying(" << shutdownRetryCount << ") SSL shutdown..." << pmm::NL;
 #endif
-		}while (err == 0);
+		}while (err == 1);
 		err = close(_socket);
 		if(err == -1)
 		{
