@@ -289,8 +289,12 @@ namespace pmm {
 		int shutdownRetryCount = 0;
 		do {
 			err = SSL_shutdown(apnsConnection);
-			if (shutdownRetryCount > 20 && err == 0) {
-				throw SSLException(apnsConnection, err, "Max SSL shutdown attempts made!");
+			if (shutdownRetryCount > 20) {
+				if (err == 0) {
+					throw SSLException(apnsConnection, err, "Max SSL shutdown attempts made!");
+				}
+				APNSLog << "Maximum retry count reached, forcing close!!!" << pmm::NL;
+				break;
 			}
 			if(err == -1)
 			{
@@ -303,7 +307,7 @@ namespace pmm {
 			}
 			shutdownRetryCount++;
 #ifdef DEBUG
-			APNSLog << "WARNING: Retrying(" << shutdownRetryCount << ") SSL shutdown..." << pmm::NL;
+			APNSLog << "WARNING: Retrying(" << shutdownRetryCount << ") SSL shutdown (err=" << err << ")..." << pmm::NL;
 #endif
 		}while (err == 1);
 		err = close(_socket);
