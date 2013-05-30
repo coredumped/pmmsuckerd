@@ -290,7 +290,7 @@ namespace pmm {
 		do {
 			err = SSL_shutdown(apnsConnection);
 			if (shutdownRetryCount > 20) {
-				if (err == 0) {
+				if (err != SSL_ERROR_NONE) {
 					throw SSLException(apnsConnection, err, "Max SSL shutdown attempts made!");
 				}
 				APNSLog << "Maximum retry count reached, forcing close!!!" << pmm::NL;
