@@ -321,12 +321,12 @@ namespace pmm {
 								clist *unseenMails = clist_new();
 								struct mailimap_search_key *sKey = mailimap_search_key_new(MAILIMAP_SEARCH_KEY_UNSEEN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 								result = mailimap_uid_search(imap, (const char *)NULL, sKey, &unseenMails);
-								if (etpanOperationFailed(result)) {
+								if (result  != MAILIMAP_NO_ERROR) {
 									if (imap->imap_response == 0) {
-#ifdef DEBUG
-										if(imap->imap_response != NULL) pmm::imapLog << "DEBUG: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
-#endif
 										imapLog << "CRITICAL: Can't find unseen messages, IMAP SEARCH failed miserably" << pmm::NL;
+									}
+									else {
+										pmm::imapLog << "CRITICAL: MailFetcher: " << imapFetch.mailAccountInfo.email() << " SEARCH imap response=" << imap->imap_response << pmm::NL;
 									}
 								}
 								else {

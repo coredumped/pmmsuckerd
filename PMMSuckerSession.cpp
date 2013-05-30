@@ -87,6 +87,7 @@ namespace pmm {
 		static const char *pmmSuckerRetrieveSilentModeInfo = "pmmSuckerRetrieveSilentModeInfo";
 		static const char *pmmSuckerUploadMultipleMessages = "pmmSuckerUploadMultipleMessages";
 		static const char *pmmSuckerReportInvalidToken = "pmmSuckerReportInvalidToken";
+		const char *PMMSuckerReqAllAccounts2Poll = "pmmSuckerReqAllAccounts2Poll";
 	};
 	
 	namespace Commands {
@@ -325,6 +326,7 @@ namespace pmm {
 		preparePostRequest(www, postData, &serverOutput, dest_url);
 		//Let's url encode the param map
 		curl_easy_setopt(www, CURLOPT_ERRORBUFFER, errorBuffer);
+
 		CURLcode ret = curl_easy_perform(www);
 		if(ret == CURLE_OK){
 			output.assign(serverOutput.buffer, serverOutput.size);
@@ -334,6 +336,10 @@ namespace pmm {
 				pmm::Log.flush();
 			}
 #endif
+		}
+		else if (ret == CURLE_COULDNT_RESOLVE_HOST) {
+			pmm::Log << "PANIC: " << errorBuffer << pmm::NL;
+			
 		}
 		else {
 #ifdef DEBUG
@@ -532,6 +538,52 @@ namespace pmm {
 #endif
 		}
 		return response.status;
+	}
+	
+	void SuckerSession::retrieveInitialPolledAddresses(std::vector<MailAccountInfo> &emailAddresses) {
+		std::map<std::string, std::string> params;
+		params["apiKey"] = apiKey;
+		params["opType"] = pmm::OperationTypes::PMMSuckerReqAllAccounts2Poll;
+		params["suckerID"] = this->myID;
+		std::string output;
+		executePost(params, output, pmmServiceURL.c_str());
+		//ServerResponse xresp(output);
+		//Read and parse returned data
+		std::istringstream input(output);
+		jsonxx::Array o;
+		jsonxx::Array::parse(input, o);
+		for (unsigned int i = 0; i < o.size(); i++) {
+			std::vector<std::string> devTokens;
+			for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").size(); j++) {
+				devTokens.push_back(o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").get<std::string>(j));
+			}
+			MailAccountInfo m(
+							  o.get<jsonxx::Object>(i).get<std::string>("email"),
+							  o.get<jsonxx::Object>(i).get<std::string>("mailboxType"),
+							  o.get<jsonxx::Object>(i).get<std::string>("username"),
+							  o.get<jsonxx::Object>(i).get<std::string>("password"),
+							  o.get<jsonxx::Object>(i).get<std::string>("serverAddress"),
+							  o.get<jsonxx::Object>(i).get<jsonxx::number>("serverPort"),
+							  devTokens,
+							  o.get<jsonxx::Object>(i).get<bool>("useSSL")
+							  );
+			m.quota = o.get<jsonxx::Object>(i).get<jsonxx::number>("quota");
+			if(m.quota <= 0){
+				m.quota = 0;
+				m.isEnabled = false;
+			}
+			else {
+				m.isEnabled = true;
+			}
+			m.devel = false;
+			if (o.get<jsonxx::Object>(i).has<std::string>("devel")) {
+				std::string theDevel = o.get<jsonxx::Object>(i).get<std::string>("devel");
+				//int v = o.get<jsonxx::Object>(i).get<jsonxx::number>("devel");
+				if (theDevel.compare("0") == 0) m.devel = false;
+				else m.devel = true;
+			}
+			emailAddresses.push_back(m);
+		}
 	}
 	
 	void SuckerSession::retrieveEmailAddresses(std::vector<MailAccountInfo> &emailAddresses, const std::string &specificEmail, bool performDelta){

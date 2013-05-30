@@ -104,11 +104,11 @@ namespace  pmmrpc {
 		}
 		
 		bool emailAccountRegister(const MailAccountInfo& m) throw (GenericException) {
-			GenericException ex1;
-			ex1.errorCode = 666;
-			ex1.errorMessage = "Method not implemented";
-			throw ex1;
-			return true;
+			Command c;
+			c.name = pmm::Commands::newMailAccountRegistered;
+			c.parameter["email"] = m.email;
+			c.parameter["mailboxType"] = m.mailboxType;
+			return commandSubmit(c);
 		}
 		
 		bool emailAccountUnregister(const std::string& email) throw (GenericException) {

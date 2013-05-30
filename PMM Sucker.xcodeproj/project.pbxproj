@@ -108,6 +108,8 @@
 		8262B2B215471B61005E9243 /* ThreadDispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B0E143187EB00444844 /* ThreadDispatcher.cpp */; };
 		8262B2B3154751FA005E9243 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
 		8262B2B415475551005E9243 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		826B8F6C174DF69400AF80BE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826B8F6B174DF69400AF80BE /* main.cpp */; };
+		826B8F6E174DF69400AF80BE /* imapoauth_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 826B8F6D174DF69400AF80BE /* imapoauth_test.1 */; };
 		826FE28616A6198E0099A8F1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 826FE28516A6198E0099A8F1 /* main.cpp */; };
 		826FE28816A6198E0099A8F1 /* bulk_uploader_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 826FE28716A6198E0099A8F1 /* bulk_uploader_test.1 */; };
 		826FE28D16A61B870099A8F1 /* PMMSuckerSession.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */; };
@@ -337,6 +339,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		826B8F67174DF69400AF80BE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				826B8F6E174DF69400AF80BE /* imapoauth_test.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		826FE28016A6198E0099A8F1 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -434,6 +446,9 @@
 		8262B2A115470B89005E9243 /* fetchCacheTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fetchCacheTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8262B2A415470B89005E9243 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		8262B2A615470B89005E9243 /* fetchCacheTest.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = fetchCacheTest.1; sourceTree = "<group>"; };
+		826B8F69174DF69400AF80BE /* imapoauth-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "imapoauth-test"; sourceTree = BUILT_PRODUCTS_DIR; };
+		826B8F6B174DF69400AF80BE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		826B8F6D174DF69400AF80BE /* imapoauth_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = imapoauth_test.1; sourceTree = "<group>"; };
 		826FE28216A6198E0099A8F1 /* bulk-uploader-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "bulk-uploader-test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		826FE28516A6198E0099A8F1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		826FE28716A6198E0099A8F1 /* bulk_uploader_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = bulk_uploader_test.1; sourceTree = "<group>"; };
@@ -579,6 +594,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		826B8F66174DF69400AF80BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		826FE27F16A6198E0099A8F1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -712,6 +734,15 @@
 			path = fetchCacheTest;
 			sourceTree = "<group>";
 		};
+		826B8F6A174DF69400AF80BE /* imapoauth-test */ = {
+			isa = PBXGroup;
+			children = (
+				826B8F6B174DF69400AF80BE /* main.cpp */,
+				826B8F6D174DF69400AF80BE /* imapoauth_test.1 */,
+			);
+			path = "imapoauth-test";
+			sourceTree = "<group>";
+		};
 		826FE28416A6198E0099A8F1 /* bulk-uploader-test */ = {
 			isa = PBXGroup;
 			children = (
@@ -809,6 +840,7 @@
 				82AA3D77154A1F6F006CC761 /* loadMessages */,
 				826FE28416A6198E0099A8F1 /* bulk-uploader-test */,
 				826FE2B516AF7C8B0099A8F1 /* obj-datastore-test */,
+				826B8F6A174DF69400AF80BE /* imapoauth-test */,
 				82F86B2E1425A457006ACFEB /* Frameworks */,
 				82F86B2C1425A457006ACFEB /* Products */,
 			);
@@ -827,6 +859,7 @@
 				82CE5B6915521BBA007E8AD7 /* pmmsuckerd copy */,
 				826FE28216A6198E0099A8F1 /* bulk-uploader-test */,
 				826FE2B316AF7C8B0099A8F1 /* obj-datastore-test */,
+				826B8F69174DF69400AF80BE /* imapoauth-test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1008,6 +1041,23 @@
 			productReference = 8262B2A115470B89005E9243 /* fetchCacheTest */;
 			productType = "com.apple.product-type.tool";
 		};
+		826B8F68174DF69400AF80BE /* imapoauth-test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 826B8F71174DF69400AF80BE /* Build configuration list for PBXNativeTarget "imapoauth-test" */;
+			buildPhases = (
+				826B8F65174DF69400AF80BE /* Sources */,
+				826B8F66174DF69400AF80BE /* Frameworks */,
+				826B8F67174DF69400AF80BE /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "imapoauth-test";
+			productName = "imapoauth-test";
+			productReference = 826B8F69174DF69400AF80BE /* imapoauth-test */;
+			productType = "com.apple.product-type.tool";
+		};
 		826FE28116A6198E0099A8F1 /* bulk-uploader-test */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 826FE28B16A6198E0099A8F1 /* Build configuration list for PBXNativeTarget "bulk-uploader-test" */;
@@ -1158,6 +1208,7 @@
 				82CE5B3E15521BBA007E8AD7 /* pmmsucker-devel */,
 				826FE28116A6198E0099A8F1 /* bulk-uploader-test */,
 				826FE2B216AF7C8B0099A8F1 /* obj-datastore-test */,
+				826B8F68174DF69400AF80BE /* imapoauth-test */,
 			);
 		};
 /* End PBXProject section */
@@ -1275,6 +1326,14 @@
 				8262B2AE15470E8B005E9243 /* FetchedMailsCache.cpp in Sources */,
 				8262B2AF15470E8B005E9243 /* MTLogger.cpp in Sources */,
 				8262B2A515470B89005E9243 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		826B8F65174DF69400AF80BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				826B8F6C174DF69400AF80BE /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1634,6 +1693,38 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+			};
+			name = Release;
+		};
+		826B8F6F174DF69400AF80BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		826B8F70174DF69400AF80BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -1997,6 +2088,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		826B8F71174DF69400AF80BE /* Build configuration list for PBXNativeTarget "imapoauth-test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				826B8F6F174DF69400AF80BE /* Debug */,
+				826B8F70174DF69400AF80BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		826FE28B16A6198E0099A8F1 /* Build configuration list for PBXNativeTarget "bulk-uploader-test" */ = {
 			isa = XCConfigurationList;

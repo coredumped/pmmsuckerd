@@ -80,6 +80,8 @@ namespace pmm {
 		
 		//Asks for membership in order to join the global PMM Service server cluster
 		bool reqMembership(const std::string &petition, const std::string &contactEmail = "");
+		
+		void retrieveInitialPolledAddresses(std::vector<MailAccountInfo> &emailAddresses);
 
 		//Retrieves configured e-mail accounts located at the remote server so we can poll them later
 		// @parameter emailAddresses has a vector of addresses to be polled by this pmmSucker

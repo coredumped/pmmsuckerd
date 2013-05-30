@@ -231,6 +231,29 @@ int main (int argc, const char * argv[])
 		else if(arg.compare("--dummy") == 0){
 			dummyMode = true;
 		}
+		else if(arg.compare("--thread-stack-size") == 0 && (i + 1) < argc){
+			arg = argv[++i];
+			if (arg.find("G") == arg.size() - 1){
+				std::stringstream input(arg.substr(0, arg.size() - 1));
+				input >> threadStackSize;
+				threadStackSize = threadStackSize * 1024 * 1024 * 1024;
+			}
+			else if (arg.find("M") == arg.size() - 1){
+				std::stringstream input(arg.substr(0, arg.size() - 1));
+				input >> threadStackSize;
+				threadStackSize = threadStackSize * 1024 * 1024;
+			}
+			else if (arg.find("K") == arg.size() - 1){
+				std::stringstream input(arg.substr(0, arg.size() - 1));
+				input >> threadStackSize;
+				threadStackSize = threadStackSize * 1024;
+			}
+			else {
+				std::cerr << "Unable to set \"" << arg << "\" as thread stack size, can't understand parameter, use a proper suffix (M,K or G)." << std::endl << std::endl;
+				printHelpInfo();
+				return 1;
+			}
+		}
 	}
 	pmm::Log.open(logFilePath);
 	pmm::CacheLog.open("mailcache.log");
@@ -306,7 +329,8 @@ int main (int argc, const char * argv[])
 	std::set_terminate(emergencyUnregister);
 	//2. Request accounts to poll
 	std::vector<pmm::MailAccountInfo> emailAccounts;
-	session.retrieveEmailAddresses(emailAccounts);
+	//session.retrieveEmailAddresses(emailAccounts);
+	session.retrieveInitialPolledAddresses(emailAccounts);
 	//3. Save email account information to local datastore, perform full database cleanup
 	pmm::QuotaDB::clearData();
 	for (size_t i = 0; i < emailAccounts.size(); i++) {
@@ -857,15 +881,18 @@ int main (int argc, const char * argv[])
 }
 
 void printHelpInfo() {
-	std::cout << "Argument           Parameter  Help text" << std::endl;
-	std::cout << "--help                        Shows this help message." << std::endl;
-	std::cout << "--req-membership   <email>    Asks for membership in the PMM Controller cluster" << std::endl;
-	std::cout << "--url              <URL>      Specifies the PMMServer service URL" << std::endl;
-	std::cout << "--max-nthreads	 <number>	Changes the maximum amount of threads to allocate for push notification handling" << std::endl;
-	std::cout << "--max-imap-threads <number>   Specifies the amount of threads to dispatch for IMAP mailbox sucking" << std::endl;
-	std::cout << "--max-pop3-threads <number>   Specifies the amount of threads to dispatch for POP3 mailbox sucking" << std::endl;
-	std::cout << "--ssl-certificate  <file>     Path where the SSL certificate for APNS is located" << std::endl;
-	std::cout << "--ssl-private-key  <file>     Path where the SSL certificate private key is located" << std::endl;
+	std::cout << "Argument            Parameter        Help text" << std::endl;
+	std::cout << "--help                               Shows this help message." << std::endl;
+	std::cout << "--req-membership    <email>          Asks for membership in the PMM Controller cluster" << std::endl;
+	std::cout << "--url               <URL>            Specifies the PMMServer service URL" << std::endl;
+	std::cout << "--max-nthreads	  <number>	       Changes the maximum amount of threads to allocate for push notification" << std::endl;
+	std::cout << "                                     handling" << std::endl;
+	std::cout << "--max-imap-threads  <number>         Specifies the amount of threads to dispatch for IMAP mailbox sucking" << std::endl;
+	std::cout << "--max-pop3-threads  <number>         Specifies the amount of threads to dispatch for POP3 mailbox sucking" << std::endl;
+	std::cout << "--ssl-certificate   <file>           Path where the SSL certificate for APNS is located" << std::endl;
+	std::cout << "--ssl-private-key   <file>           Path where the SSL certificate private key is located" << std::endl;
+	std::cout << "--thread-stack-size <number><M|K|G>  Allows to change the global thread stack size in units of Mega, Kilo or" << std::endl;
+	std::cout << "                                     Gigabytes." << std::endl;
 }
 
 void emergencyUnregister(){
