@@ -588,6 +588,7 @@ namespace pmm {
 					if (n > 0) gotSomething = true;
 					busyEmailsSet.erase(pf.mailAccountInfo.email());
 					if(n == 0) usleep(1000);
+					else usleep(10000);
 				}
 			}
 			if(gotSomething) usleep(1000);
