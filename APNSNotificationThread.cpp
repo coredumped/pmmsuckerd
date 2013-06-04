@@ -309,7 +309,7 @@ namespace pmm {
 #ifdef DEBUG
 			APNSLog << "WARNING: Retrying(" << shutdownRetryCount << ") SSL shutdown (err=" << err << ")..." << pmm::NL;
 #endif
-		}while (err == 1);
+		}while (err > 1);
 		err = close(_socket);
 		if(err == -1)
 		{
