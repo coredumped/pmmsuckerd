@@ -506,8 +506,19 @@ namespace pmm {
 			if (m.usesOAuth) {
 				//Retrieve an access token first!!!!!
 				GmailXOAuth gmailCtrl;
+#ifdef DEBUG
+				pmm::imapLog << "Refreshing access token for " << m.email() << "..." << pmm::NL;
+#endif
 				std::string accessToken = gmailCtrl.refreshToken(m.password());
 				result = mailimap_oauth2_authenticate(imapControl[theEmail].imap, m.username().c_str(), accessToken.c_str());
+#ifdef DEBUG
+				if (imapControl[theEmail].imap->imap_response != NULL) {
+					pmm::imapLog << "OAuth2(" << m.email() << ") authentication result: " << result << ": " << imapControl[theEmail].imap->imap_response << pmm::NL;
+				}
+				else {
+					pmm::imapLog << "OAuth2(" << m.email() << ") authentication result: " << result << pmm::NL;
+				}
+#endif
 			}
 			else {
 				result = mailimap_login(imapControl[theEmail].imap, m.username().c_str(), m.password().c_str());
