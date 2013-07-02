@@ -561,7 +561,6 @@ namespace pmm {
 			bool hasOA = false;
 			if (o.get<jsonxx::Object>(i).has<bool>("oa")) {
 				hasOA = o.get<jsonxx::Object>(i).get<bool>("oa");
-				pmm::Log << "Object oa not found for JSON object of " << o.get<jsonxx::Object>(i).get<std::string>("email") << pmm::NL;
 			}
 			MailAccountInfo m(
 							  o.get<jsonxx::Object>(i).get<std::string>("email"),
@@ -614,6 +613,10 @@ namespace pmm {
 			for (unsigned int j = 0; j < o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").size(); j++) {
 				devTokens.push_back(o.get<jsonxx::Object>(i).get<jsonxx::Array>("devTokens").get<std::string>(j));
 			}
+			bool hasOA = false;
+			if (o.get<jsonxx::Object>(i).has<bool>("oa")) {
+				hasOA = o.get<jsonxx::Object>(i).get<bool>("oa");
+			}
 			MailAccountInfo m(
 							  o.get<jsonxx::Object>(i).get<std::string>("email"),
 							  o.get<jsonxx::Object>(i).get<std::string>("mailboxType"),
@@ -623,7 +626,7 @@ namespace pmm {
 							  o.get<jsonxx::Object>(i).get<jsonxx::number>("serverPort"),
 							  devTokens,
 							  o.get<jsonxx::Object>(i).get<bool>("useSSL"),
-							  o.get<jsonxx::Object>(i).get<bool>("oa")
+							  hasOA
 							  );
 			m.quota = o.get<jsonxx::Object>(i).get<jsonxx::number>("quota");
 			if(m.quota <= 0){
