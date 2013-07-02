@@ -93,6 +93,7 @@ namespace pmm {
 		if(serverPort__ > 0) serverPort_ = serverPort__;
 		if(devTokens__.size() > 0) devTokens_ = devTokens__;
 		useSSL_ = useSSL__;
+		usesOAuth = usesOAuth__;
 		isEnabled = true;
 	}
 
