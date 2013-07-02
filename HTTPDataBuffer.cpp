@@ -8,6 +8,7 @@
 
 #include "HTTPDataBuffer.h"
 #include <cstdlib>
+#include <cstring>
 
 namespace pmm {
 	DataBuffer::DataBuffer(){
