@@ -14,10 +14,12 @@
 #include <string.h>
 #include <cstdlib>
 #include <algorithm>
+#include <curl/curl.h>
 #include "UtilityFunctions.h"
 #include "Mutex.h"
 #include "GenericException.h"
 #include "MTLogger.h"
+#include "HTTPDataBuffer.h"
 
 namespace pmm {
 	
@@ -75,14 +77,17 @@ namespace pmm {
 			if (isURLEncodable(theString[i])) {
 				size_t _w = urlEncodedString.width();
 				int normval = (int)(theString[i] & 0x000000ff);
-				urlEncodedString.width(2);
-				urlEncodedString.fill('0');
+				//urlEncodedString.width(2);
+				//urlEncodedString.fill('0');
 				if(normval >= 0x7f){
 					int pfx = (normval >> 6) + 0x000000c0;
 					urlEncodedString << "%" << std::hex << std::uppercase << pfx;
 					normval = normval & 0x000007f + 0x000080;
 				}
 				urlEncodedString << "%";
+				if (normval <= 0x0F) {
+					urlEncodedString << "0";
+				}
 				urlEncodedString << std::hex << std::uppercase << normval;
 				urlEncodedString.width(_w);
 				replaceHappened = true;
@@ -93,6 +98,101 @@ namespace pmm {
 			}
 		}
 		if(replaceHappened) theString.assign(urlEncodedString.str());
+	}
+	
+	static size_t gotDataFromServer2(char *ptr, size_t size, size_t nmemb, void *userdata){
+		DataBuffer *realData = (DataBuffer *)userdata;
+		if(realData->appendData(ptr, size * nmemb) == NULL) return 0;
+		return size * nmemb;
+	}
+	
+	int httpPostPerform(const std::string &url, std::map<std::string, std::string> &params, std::string &output, void *httpConn) {
+		int http_status = 0;
+		CURL *www = httpConn;
+		if(httpConn == 0){
+			www = curl_easy_init();
+			if (www == NULL) {
+				throw GenericException("Unable to create HTTP connection handle!!!");
+			}
+		}
+		DataBuffer buffer;
+		curl_easy_setopt(www, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(www, CURLOPT_HTTPGET, 1);
+		curl_easy_setopt(www, CURLOPT_USE_SSL, 1);
+		curl_easy_setopt(www, CURLOPT_USE_SSL, 1);
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, &buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer2);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		//Build params payload here
+		std::stringstream paramsPayload;
+		for (std::map<std::string, std::string>::iterator iter = params.begin(); iter != params.end() ; iter++) {
+			std::string var, val;
+			var = iter->first;
+			val = iter->second;
+			url_encode(var);
+			url_encode(val);
+			if (iter != params.begin()) {
+				paramsPayload << "&";
+			}
+			paramsPayload << var << "=" << val;
+		}
+		std::string payload = paramsPayload.str();
+		curl_easy_setopt(www, CURLOPT_POST, 1);
+		curl_easy_setopt(www, CURLOPT_POSTFIELDS, payload.c_str());
+		curl_easy_setopt(www, CURLOPT_POSTFIELDSIZE, payload.size());
+		CURLcode curl_err = curl_easy_perform(www);
+		curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_status);
+		if (curl_err == CURLE_OK) {
+			output.assign(buffer.buffer, buffer.size);
+		}
+		else {
+#ifdef DEBUG
+			pmm::Log << "Unable to HTTP POST: \"" << url << "\", got: " << curl_easy_strerror(curl_err) << pmm::NL;
+#endif
+			throw GenericException(curl_easy_strerror(curl_err));
+		}
+		if(httpConn == 0){
+			curl_easy_cleanup(www);
+		}
+		return http_status;
+	}
+	
+	int httpGetPerform(const std::string &url, std::string &output, void *httpConn) {
+		int http_status = 0;
+		CURL *www = httpConn;
+		if(httpConn == 0){
+			www = curl_easy_init();
+			if (www == NULL) {
+				throw GenericException("Unable to create HTTP connection handle!!!");
+			}
+		}
+		DataBuffer buffer;
+		curl_easy_setopt(www, CURLOPT_NOPROGRESS, 1);
+		curl_easy_setopt(www, CURLOPT_NOSIGNAL, 1);
+		curl_easy_setopt(www, CURLOPT_HTTPGET, 1);
+		curl_easy_setopt(www, CURLOPT_USE_SSL, 1);
+		curl_easy_setopt(www, CURLOPT_USE_SSL, 1);
+		curl_easy_setopt(www, CURLOPT_WRITEDATA, &buffer);
+		curl_easy_setopt(www, CURLOPT_WRITEFUNCTION, gotDataFromServer2);
+		curl_easy_setopt(www, CURLOPT_FAILONERROR, 1);
+		
+		CURLcode curl_err = curl_easy_perform(www);
+		curl_easy_getinfo(www, CURLINFO_HTTP_CODE, &http_status);
+		if (curl_err == CURLE_OK) {
+			output.assign(buffer.buffer, buffer.size);
+		}
+		else {
+#ifdef DEBUG
+			pmm::Log << "Unable to HTTP GET: \"" << url << "\", got: " << curl_easy_strerror(curl_err) << pmm::NL;
+#endif
+			throw GenericException(curl_easy_strerror(curl_err));
+		}
+		if(httpConn == 0){
+			curl_easy_cleanup(www);
+		}
+		return http_status;
 	}
 	
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken){
@@ -446,5 +546,52 @@ namespace pmm {
 			return true;
 		}
 		return false;
+	}
+	
+	namespace b64 {
+		static char encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+			'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+			'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+			'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+			'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+			'w', 'x', 'y', 'z', '0', '1', '2', '3',
+			'4', '5', '6', '7', '8', '9', '+', '/'};
+		static char *decoding_table = NULL;
+		static int mod_table[] = {0, 2, 1};
+		
+		static char *encode(const unsigned char *data, size_t input_length, size_t *output_length) {
+			
+			*output_length = 4 * ((input_length + 2) / 3);
+			
+			char *encoded_data = (char *)malloc(*output_length);
+			if (encoded_data == NULL) return NULL;
+			
+			for (int i = 0, j = 0; i < input_length;) {
+				
+				uint32_t octet_a = i < input_length ? data[i++] : 0;
+				uint32_t octet_b = i < input_length ? data[i++] : 0;
+				uint32_t octet_c = i < input_length ? data[i++] : 0;
+				
+				uint32_t triple = (octet_a << 0x10) + (octet_b << 0x08) + octet_c;
+				
+				encoded_data[j++] = encoding_table[(triple >> 3 * 6) & 0x3F];
+				encoded_data[j++] = encoding_table[(triple >> 2 * 6) & 0x3F];
+				encoded_data[j++] = encoding_table[(triple >> 1 * 6) & 0x3F];
+				encoded_data[j++] = encoding_table[(triple >> 0 * 6) & 0x3F];
+			}
+			
+			for (int i = 0; i < mod_table[input_length % 3]; i++)
+				encoded_data[*output_length - 1 - i] = '=';
+			
+			return encoded_data;
+		}
+	}
+	
+	void base64Encode(const void *data, size_t size, std::string &b64out){
+		size_t l;
+		char *buf = b64::encode((const unsigned char *)data, size, &l);
+		b64out.assign(buf, l);
+		free(buf);
 	}
 }

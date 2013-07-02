@@ -21,7 +21,19 @@ namespace pmm {
 	
 	void buildHTMLEntityMap();
 
+	/** Encodes the given string so it can be used in a URL string */
 	void url_encode(std::string &theString);
+	
+	/** Sends an HTTP GET request to the given url
+	 * @param url The URL to send the GET request
+	 * @param output Stores the output once the HTTP request has been sent
+	 * @return the http status code */
+	int httpGetPerform(const std::string &url, std::string &output, void *httpConn = 0);
+	int httpPostPerform(const std::string &url, std::map<std::string, std::string> &params, std::string &output, void *httpConn = 0);
+	
+	/** Converts a device token from string to a binary form
+	 * @param devTokenString the device token in string form
+	 * @param returns the device token in binary form. */
 	void devToken2Binary(std::string devTokenString, std::string &binaryDevToken);
 	void binary2DevToken(std::string &devToken, uint32_t binaryToken);
 	
@@ -44,6 +56,8 @@ namespace pmm {
 	void configValueGetString(const std::string &varname, std::string &val);
 	
 	bool getBoolFromString(const std::string &str);
+	
+	void base64Encode(const void *data, size_t size, std::string &b64out);
 }
 
 #endif

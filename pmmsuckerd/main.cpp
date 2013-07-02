@@ -979,14 +979,24 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 		for (size_t k = 0; k < mailSuckerThreads[j].emailAccounts.unlockedSize() && !accountFound; k++) {
 			if (mailAccount.compare(mailSuckerThreads[j].emailAccounts.atUnlocked(k).email()) == 0) {
 				//Update all metadata;
-				int serverPort, _useSSL;
-				bool useSSL;
+				int serverPort, _useSSL, _useOA;
+				bool useSSL, useOAuth;
 				std::stringstream input(mailAccountInfo["serverPort"]);
 				input >> serverPort;
 				std::stringstream input2(mailAccountInfo["useSSL"]);
 				input2 >> _useSSL;
 				if(_useSSL == 0) useSSL = false;
 				else useSSL = true;
+				
+				if (mailAccountInfo.find("oa") == mailAccountInfo.end()){
+					useOAuth = false;
+				}
+				else {
+					std::stringstream input3(mailAccountInfo["oa"]);
+					input3 >> _useOA;
+					if(_useOA == 0) useOAuth = false;
+					else useOAuth = true;
+				}
 				//Build new devtoken vector
 				std::vector<std::string> devTokens;
 				std::string devToken_s = mailAccountInfo["devTokens"];
@@ -1001,7 +1011,7 @@ void updateAccountProperties(pmm::MailSuckerThread *mailSuckerThreads, size_t nE
 																			mailAccountInfo["serverAddress"],
 																			serverPort,
 																			devTokens,
-																			useSSL);
+																			useSSL, useOAuth);
 				accountFound = true;
 			}
 		}

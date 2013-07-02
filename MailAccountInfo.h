@@ -29,7 +29,7 @@ namespace pmm {
 		MailAccountInfo();
 		MailAccountInfo(const std::string &email__, const std::string &mailboxType__, const std::string &username__, 
 						const std::string &password__, const std::string &serverAddress__, int serverPort__, 
-						const std::vector<std::string> &devTokens__, bool useSSL__);
+						const std::vector<std::string> &devTokens__, bool useSSL__, bool usesOAuth__);
 		MailAccountInfo(const MailAccountInfo &m);
 		const std::string &email() const;
 		const std::string &mailboxType() const;
@@ -44,9 +44,10 @@ namespace pmm {
 		AtomicFlag isEnabled;
 		int quota;
 		bool devel;
+		bool usesOAuth;
 		
 		void updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 				
-					   const std::vector<std::string> &devTokens__, bool useSSL__);
+					   const std::vector<std::string> &devTokens__, bool useSSL__, bool usesOAuth__);
 
 		void deviceTokenAdd(const std::string &newDevToken);
 		void deviceTokenRemove(const std::string &oldDevToken);

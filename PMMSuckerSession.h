@@ -23,22 +23,9 @@
 #include "SharedQueue.h"
 #include "PMMSuckerInfo.h"
 #include "SharedVector.h"
+#include "GenericException.h"
 
 namespace pmm {
-	/** Exception thrown whenever we received an error response from a remote server */
-	class HTTPException {
-		private:
-		int code;
-		std::string msg;
-		public:
-		HTTPException(){ }
-		HTTPException(int _code, const std::string &_msg){ 
-			code = _code;
-			msg = _msg;
-		}
-		int errorCode(){ return code; }
-		std::string errorMessage(){ return std::string(msg); }
-	};
 	
 	/** Use is to communicate with the remote PMM Service server */
 	class SuckerSession {

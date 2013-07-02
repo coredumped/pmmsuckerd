@@ -77,6 +77,11 @@
 		821675BF14283DDE00F8FF70 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BE14283DDE00F8FF70 /* Security.framework */; };
 		8217B24514B5DD9A00E45AA0 /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
 		8217B24614B5E01100E45AA0 /* QuotaDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */; };
+		821A3DB01773F631001FA236 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821675BB14283DA800F8FF70 /* CoreFoundation.framework */; };
+		821A3DB21773F631001FA236 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821A3DB11773F631001FA236 /* CFNetwork.framework */; };
+		821A3DB31773F64B001FA236 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B2414355EB700444844 /* libssl.dylib */; };
+		821A3DB41773F661001FA236 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 826FE2A416A6235A0099A8F1 /* libcrypto.dylib */; };
+		821A3DB61773F669001FA236 /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 821A3DB51773F669001FA236 /* libsasl2.dylib */; };
 		821BBCE61445EB680023DF32 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
 		821BBCE71445EB820023DF32 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
 		8238F497142AFA3E007F76C0 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
@@ -180,6 +185,22 @@
 		828879C61544642A00DEF837 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0461444AECD001ED14E /* libcrypto.a */; };
 		828879C71544642A00DEF837 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 823BD0471444AECD001ED14E /* libssl.a */; };
 		828879C81544648000DEF837 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		828B1A8917618ACF00BFCDF5 /* GmailXOAuth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828B1A8717618ACF00BFCDF5 /* GmailXOAuth.cpp */; };
+		828B1A8A17618ACF00BFCDF5 /* GmailXOAuth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828B1A8717618ACF00BFCDF5 /* GmailXOAuth.cpp */; };
+		828B1A8B17618ACF00BFCDF5 /* GmailXOAuth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828B1A8717618ACF00BFCDF5 /* GmailXOAuth.cpp */; };
+		828B1A8E1762C92F00BFCDF5 /* HTTPDataBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828B1A8C1762C92E00BFCDF5 /* HTTPDataBuffer.cpp */; };
+		828B1A8F1762C92F00BFCDF5 /* HTTPDataBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828B1A8C1762C92E00BFCDF5 /* HTTPDataBuffer.cpp */; };
+		828B1A901762C92F00BFCDF5 /* HTTPDataBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 828B1A8C1762C92E00BFCDF5 /* HTTPDataBuffer.cpp */; };
+		828B1A911762F3F000BFCDF5 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8293E22F142CCD0000F62897 /* jsonxx.cc */; };
+		828B1A921762F3F000BFCDF5 /* UtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B1F1435419F00444844 /* UtilityFunctions.cpp */; };
+		828B1A931762F3F000BFCDF5 /* GenericException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82ED5B27143622DA00444844 /* GenericException.cpp */; };
+		828B1A941762F40600BFCDF5 /* MTLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821BBCE51445EB680023DF32 /* MTLogger.cpp */; };
+		828B1A951762F41400BFCDF5 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82AA9FCC1426B22000E3FB3C /* libcurl.dylib */; };
+		828B1A961762F42100BFCDF5 /* JSONParseException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8238F496142AFA3E007F76C0 /* JSONParseException.cpp */; };
+		828B1A971762F43000BFCDF5 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 82571EA914413E0F0047347E /* libsqlite3.dylib */; };
+		828B1A981762F43D00BFCDF5 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
+		828B1A991762F44700BFCDF5 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
+		828B1A9A1762F45700BFCDF5 /* Atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82425B9F15AC7522004E3D0F /* Atomic.cpp */; };
 		8290FB96142F47D30080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
 		8290FB99142F508B0080BB85 /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB98142F508B0080BB85 /* Mutex.cpp */; };
 		8290FB9A142F51930080BB85 /* MailAccountInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */; };
@@ -231,6 +252,7 @@
 		82C1D9DC170A61FA008B7BA6 /* pmmrpc.proto in Resources */ = {isa = PBXBuildFile; fileRef = 82C1D9DB170A61FA008B7BA6 /* pmmrpc.proto */; };
 		82C1D9DF170A698A008B7BA6 /* RPCService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9DD170A698A008B7BA6 /* RPCService.cpp */; };
 		82C1D9E0170A698A008B7BA6 /* RPCService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C1D9DD170A698A008B7BA6 /* RPCService.cpp */; };
+		82C5580D177A2142006EFF09 /* libetpan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82ED5B391438613400444844 /* libetpan.framework */; };
 		82C649F01702A13C00569666 /* PMMSuckerInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */; };
 		82C649F1170378DF00569666 /* PMMSuckerInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C649EE1702A13C00569666 /* PMMSuckerInfo.cpp */; };
 		82CE5B4015521BBA007E8AD7 /* PendingNotificationStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820BBDF8153E7187005A1C5A /* PendingNotificationStore.cpp */; };
@@ -430,6 +452,8 @@
 		821675BE14283DDE00F8FF70 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8217B24214B5DCEA00E45AA0 /* QuotaDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuotaDB.h; sourceTree = "<group>"; };
 		8217B24414B5DD9A00E45AA0 /* QuotaDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QuotaDB.cpp; sourceTree = "<group>"; };
+		821A3DB11773F631001FA236 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		821A3DB51773F669001FA236 /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = usr/lib/libsasl2.dylib; sourceTree = SDKROOT; };
 		821BBCE31445EB270023DF32 /* MTLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTLogger.h; sourceTree = "<group>"; };
 		821BBCE51445EB680023DF32 /* MTLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MTLogger.cpp; sourceTree = "<group>"; };
 		8238F494142AF767007F76C0 /* JSONParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONParseException.h; sourceTree = "<group>"; };
@@ -471,6 +495,10 @@
 		828879B71544607300DEF837 /* msgParser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = msgParser; sourceTree = BUILT_PRODUCTS_DIR; };
 		828879BA1544607300DEF837 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		828879BC1544607300DEF837 /* msgParser.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = msgParser.1; sourceTree = "<group>"; };
+		828B1A8717618ACF00BFCDF5 /* GmailXOAuth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GmailXOAuth.cpp; sourceTree = "<group>"; };
+		828B1A8817618ACF00BFCDF5 /* GmailXOAuth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GmailXOAuth.h; sourceTree = "<group>"; };
+		828B1A8C1762C92E00BFCDF5 /* HTTPDataBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HTTPDataBuffer.cpp; sourceTree = "<group>"; };
+		828B1A8D1762C92E00BFCDF5 /* HTTPDataBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPDataBuffer.h; sourceTree = "<group>"; };
 		8290FB93142F47770080BB85 /* MailAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailAccountInfo.h; sourceTree = "<group>"; };
 		8290FB95142F47D30080BB85 /* MailAccountInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MailAccountInfo.cpp; sourceTree = "<group>"; };
 		8290FB97142F502D0080BB85 /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mutex.h; sourceTree = "<group>"; };
@@ -598,6 +626,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82C5580D177A2142006EFF09 /* libetpan.framework in Frameworks */,
+				821A3DB61773F669001FA236 /* libsasl2.dylib in Frameworks */,
+				821A3DB41773F661001FA236 /* libcrypto.dylib in Frameworks */,
+				821A3DB31773F64B001FA236 /* libssl.dylib in Frameworks */,
+				821A3DB21773F631001FA236 /* CFNetwork.framework in Frameworks */,
+				821A3DB01773F631001FA236 /* CoreFoundation.framework in Frameworks */,
+				828B1A971762F43000BFCDF5 /* libsqlite3.dylib in Frameworks */,
+				828B1A951762F41400BFCDF5 /* libcurl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -783,6 +819,15 @@
 			path = msgParser;
 			sourceTree = "<group>";
 		};
+		828B1A861761891800BFCDF5 /* GmailIntegration */ = {
+			isa = PBXGroup;
+			children = (
+				828B1A8717618ACF00BFCDF5 /* GmailXOAuth.cpp */,
+				828B1A8817618ACF00BFCDF5 /* GmailXOAuth.h */,
+			);
+			path = GmailIntegration;
+			sourceTree = "<group>";
+		};
 		82AA3D77154A1F6F006CC761 /* loadMessages */ = {
 			isa = PBXGroup;
 			children = (
@@ -812,6 +857,8 @@
 		82F86B201425A457006ACFEB = {
 			isa = PBXGroup;
 			children = (
+				821A3DB51773F669001FA236 /* libsasl2.dylib */,
+				821A3DB11773F631001FA236 /* CFNetwork.framework */,
 				82C1D9CB170948E4008B7BA6 /* rpc */,
 				82C1D9C9170947A3008B7BA6 /* libthrift.a */,
 				826FE2A416A6235A0099A8F1 /* libcrypto.dylib */,
@@ -920,6 +967,7 @@
 		82F86B611425B500006ACFEB /* SuckingEngine */ = {
 			isa = PBXGroup;
 			children = (
+				828B1A861761891800BFCDF5 /* GmailIntegration */,
 				820BBE321542DEAC005A1C5A /* APNS Interaction */,
 				82F86B621425B54B006ACFEB /* PMMSuckerSession.h */,
 				82F86B631425B618006ACFEB /* PMMSuckerSession.cpp */,
@@ -983,6 +1031,8 @@
 				82141E9A1713BC5000EE1278 /* FetchDBSyncThread.h */,
 				82141E9D1714F23100EE1278 /* FetchDBRemoteSyncThread.cpp */,
 				82141E9E1714F23100EE1278 /* FetchDBRemoteSyncThread.h */,
+				828B1A8C1762C92E00BFCDF5 /* HTTPDataBuffer.cpp */,
+				828B1A8D1762C92E00BFCDF5 /* HTTPDataBuffer.h */,
 			);
 			name = SuckingEngine;
 			sourceTree = "<group>";
@@ -1333,7 +1383,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				828B1A9A1762F45700BFCDF5 /* Atomic.cpp in Sources */,
+				828B1A991762F44700BFCDF5 /* MailAccountInfo.cpp in Sources */,
+				828B1A981762F43D00BFCDF5 /* Mutex.cpp in Sources */,
+				828B1A961762F42100BFCDF5 /* JSONParseException.cpp in Sources */,
+				828B1A941762F40600BFCDF5 /* MTLogger.cpp in Sources */,
+				828B1A911762F3F000BFCDF5 /* jsonxx.cc in Sources */,
+				828B1A921762F3F000BFCDF5 /* UtilityFunctions.cpp in Sources */,
+				828B1A931762F3F000BFCDF5 /* GenericException.cpp in Sources */,
 				826B8F6C174DF69400AF80BE /* main.cpp in Sources */,
+				828B1A8B17618ACF00BFCDF5 /* GmailXOAuth.cpp in Sources */,
+				828B1A901762C92F00BFCDF5 /* HTTPDataBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1506,6 +1566,8 @@
 				82C1D9DF170A698A008B7BA6 /* RPCService.cpp in Sources */,
 				82141E9B1713BC5100EE1278 /* FetchDBSyncThread.cpp in Sources */,
 				82141E9F1714F23100EE1278 /* FetchDBRemoteSyncThread.cpp in Sources */,
+				828B1A8917618ACF00BFCDF5 /* GmailXOAuth.cpp in Sources */,
+				828B1A8E1762C92F00BFCDF5 /* HTTPDataBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1550,6 +1612,8 @@
 				82C1D9E0170A698A008B7BA6 /* RPCService.cpp in Sources */,
 				82141E9C1713BC5100EE1278 /* FetchDBSyncThread.cpp in Sources */,
 				82141EA01714F23100EE1278 /* FetchDBRemoteSyncThread.cpp in Sources */,
+				828B1A8A17618ACF00BFCDF5 /* GmailXOAuth.cpp in Sources */,
+				828B1A8F1762C92F00BFCDF5 /* HTTPDataBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1706,7 +1770,15 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1722,7 +1794,15 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2019,6 +2099,7 @@
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = "\"/usr/local/include\"";
+				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
@@ -2030,7 +2111,7 @@
 					/usr/local/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\" /usr/local/include";
 			};
 			name = Debug;
 		};
@@ -2043,6 +2124,7 @@
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
 				);
 				HEADER_SEARCH_PATHS = "\"/usr/local/include\"";
+				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../DerivedData/PushMeMail/Build/Products/Debug\"",
@@ -2055,7 +2137,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = YES;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../cxxLibraries/openssl-mac/openssl-1.0.0e/include\" /usr/local/include";
 			};
 			name = Release;
 		};
@@ -2096,6 +2178,7 @@
 				826B8F70174DF69400AF80BE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		826FE28B16A6198E0099A8F1 /* Build configuration list for PBXNativeTarget "bulk-uploader-test" */ = {
 			isa = XCConfigurationList;

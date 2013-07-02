@@ -17,7 +17,7 @@ namespace pmm {
 	
 	MailAccountInfo::MailAccountInfo(const std::string &email__, const std::string &mailboxType__, const std::string &username__, 
 					const std::string &password__, const std::string &serverAddress__, int serverPort__, 
-					const std::vector<std::string> &devTokens__, bool useSSL__){
+					const std::vector<std::string> &devTokens__, bool useSSL__, bool usesOAuth__){
 		email_ = email__;
 		mailboxType_ = mailboxType__;
 		username_ = username__;
@@ -26,6 +26,7 @@ namespace pmm {
 		serverPort_ = serverPort__;
 		devTokens_ = devTokens__;
 		useSSL_ = useSSL__;
+		usesOAuth = usesOAuth__;
 		devel = false;
 	}
 	
@@ -41,6 +42,7 @@ namespace pmm {
 		quota = m.quota;
 		isEnabled = m.isEnabled;
 		devel = m.devel;
+		usesOAuth = m.usesOAuth;
 	}
 	
 	const std::string &MailAccountInfo::email() const {
@@ -85,7 +87,7 @@ namespace pmm {
 	}
 	
 	void MailAccountInfo::updateInfo(const std::string &password__, const std::string &serverAddress__, int serverPort__, 
-									 const std::vector<std::string> &devTokens__, bool useSSL__){
+									 const std::vector<std::string> &devTokens__, bool useSSL__, bool usesOAuth__){
 		if(password__.size() > 0) password_ = password__;
 		if(serverAddress__.size() > 0) serverAddress_ = serverAddress__;
 		if(serverPort__ > 0) serverPort_ = serverPort__;

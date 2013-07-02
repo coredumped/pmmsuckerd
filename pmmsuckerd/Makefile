@@ -12,7 +12,7 @@
 ##
 
 GCC=g++
-CFLAGS=-g -I. -I.. -I../../jsonxx -I../rpc `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1 -DENABLE_NATE_DOT_COM_WORKAROUND=1
+CFLAGS=-g -I. -I.. -I../../jsonxx -I../rpc -I../GmailIntegration `pkg-config libcurl --cflags` -DDEBUG=1 -DUSE_RWLOCK=1 -DENABLE_NATE_DOT_COM_WORKAROUND=1
 LIBS=`pkg-config libcurl --libs` -luuid -lpthread -lssl -letpan -lsqlite3 -lthrift
 
 all: thriftcheck pmmsuckerd
@@ -26,7 +26,7 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 		MTLogger.o MailMessage.o MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o \
 		QuotaDB.o UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o Atomic.o \
 		ObjectDatastore.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o PMMSuckerInfo.o RPCService.o \
-		FetchDBSyncThread.o FetchDBRemoteSyncThread.o
+		FetchDBSyncThread.o FetchDBRemoteSyncThread.o HTTPDataBuffer.o GmailXOAuth.o
 	$(GCC) $(CFLAGS) -g -o pmmsuckerd main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResponse.o \
 				Mutex.o MailAccountInfo.o GenericThread.o APNSNotificationThread.o ThreadDispatcher.o \
 				SharedQueue.o NotificationPayload.o UtilityFunctions.o GenericException.o \
@@ -34,7 +34,8 @@ pmmsuckerd: main.cpp jsonxx.o JSONParseException.o PMMSuckerSession.o ServerResp
 				MessageUploaderThread.o DataTypes.o POP3SuckerThread.o SilentMode.o QuotaDB.o \
 				UserPreferences.o APNSFeedbackThread.o PendingNotificationStore.o RWLock.o \
 				ObjectDatastore.o Atomic.o pmmrpc_types.o pmmrpc_constants.o PMMSuckerRPC.o \
-				PMMSuckerInfo.o RPCService.o FetchDBSyncThread.o FetchDBRemoteSyncThread.o $(LIBS)
+				PMMSuckerInfo.o RPCService.o FetchDBSyncThread.o FetchDBRemoteSyncThread.o \
+				HTTPDataBuffer.o GmailXOAuth.o $(LIBS)
 
 pmmrpc_types.o: ../rpc/pmmrpc_types.h ../rpc/pmmrpc_types.cpp
 	$(GCC) $(CFLAGS) -c -o pmmrpc_types.o ../rpc/pmmrpc_types.cpp
@@ -60,8 +61,11 @@ jsonxx.o: ../../jsonxx/jsonxx.h ../../jsonxx/jsonxx.cc
 JSONParseException.o: ../JSONParseException.h ../JSONParseException.cpp ../PMMSuckerInfo.h
 	$(GCC) $(CFLAGS) -c -o JSONParseException.o ../JSONParseException.cpp
 
-PMMSuckerSession.o: ../PMMSuckerSession.h ../PMMSuckerSession.cpp ../PMMSuckerInfo.h ../Mutex.h ../SharedVector.h ../SharedQueue.h ../MailAccountInfo.h ../NotificationPayload.h
+PMMSuckerSession.o: ../PMMSuckerSession.h ../PMMSuckerSession.cpp ../PMMSuckerInfo.h ../Mutex.h ../SharedVector.h ../SharedQueue.h ../MailAccountInfo.h ../NotificationPayload.h ../HTTPDataBuffer.h ../GenericException.h
 	$(GCC) $(CFLAGS) -c -o PMMSuckerSession.o ../PMMSuckerSession.cpp
+
+HTTPDataBuffer.o: ../HTTPDataBuffer.h ../HTTPDataBuffer.cpp
+	$(GCC) $(CFLAGS) -c -o HTTPDataBuffer.o ../HTTPDataBuffer.cpp
 
 ServerResponse.o: ../ServerResponse.h ../ServerResponse.cpp
 	$(GCC) $(CFLAGS) -c -o ServerResponse.o ../ServerResponse.cpp
@@ -117,8 +121,11 @@ FetchedMailsCache.o: ../FetchedMailsCache.cpp ../FetchedMailsCache.h ../FetchDBR
 MailSuckerThread.o: ../MailSuckerThread.cpp ../MailSuckerThread.h ../SharedQueue.h ../GenericThread.h ../Mutex.h ../RWLock.h ../Atomic.h
 	$(GCC) $(CFLAGS) -c -o MailSuckerThread.o ../MailSuckerThread.cpp
 
-IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h ../Atomic.h
+IMAPSuckerThread.o: ../IMAPSuckerThread.cpp ../IMAPSuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h ../Atomic.h ../GmailIntegration/GmailXOAuth.h
 	$(GCC) $(CFLAGS) -c -o IMAPSuckerThread.o ../IMAPSuckerThread.cpp
+
+GmailXOAuth.o: ../GmailIntegration/GmailXOAuth.h ../GmailIntegration/GmailXOAuth.cpp ../GenericException.h ../UtilityFunctions.h ../JSONParseException.h 
+	$(GCC) $(CFLAGS) -c -o GmailXOAuth.o ../GmailIntegration/GmailXOAuth.cpp
 
 POP3SuckerThread.o: ../POP3SuckerThread.cpp ../POP3SuckerThread.h ../MailSuckerThread.h ../FetchedMailsCache.h ../QuotaDB.h ../UserPreferences.h ../SharedSet.h ../Mutex.h ../RWLock.h ../Atomic.h
 	$(GCC) $(CFLAGS) -c -o POP3SuckerThread.o ../POP3SuckerThread.cpp

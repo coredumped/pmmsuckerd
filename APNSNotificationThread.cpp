@@ -290,9 +290,9 @@ namespace pmm {
 		do {
 			err = SSL_shutdown(apnsConnection);
 			if (shutdownRetryCount > 20) {
-				if (err != SSL_ERROR_NONE) {
+				/*if (err != 0) {
 					throw SSLException(apnsConnection, err, "Max SSL shutdown attempts made!");
-				}
+				}*/
 				APNSLog << "Maximum retry count reached, forcing close!!!" << pmm::NL;
 				break;
 			}
@@ -311,10 +311,10 @@ namespace pmm {
 #endif
 		}while (err > 1);
 		err = close(_socket);
-		if(err == -1)
+		/*if(err == -1)
 		{
 			throw GenericException("Can't close socket client APNS socket");
-		}    
+		} */
 		SSL_free(apnsConnection);    
 	}
 	

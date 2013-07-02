@@ -36,6 +36,7 @@
 #include "jsonxx.h"
 #include "UtilityFunctions.h"
 #include "MTLogger.h"
+#include "HTTPDataBuffer.h"
 
 #ifndef DEFAULT_API_KEY
 #define DEFAULT_API_KEY "e63d4e6b515b323e93c649dc5b9fcca0d1487a704c8a336f8fe98c353dc6f17deec9ab455cd8b4c4bd1395e7d463f3549baa7ae5191a6cdc377aa5bbc5366668"
@@ -233,7 +234,7 @@ namespace pmm {
 	 if(replaceHappened) theString.assign(urlEncodedString.str());
 	 }*/
 	
-	class DataBuffer {
+	/*class DataBuffer {
 	public:
 		char *buffer;
 		size_t size;
@@ -263,7 +264,7 @@ namespace pmm {
 			}
 			return buffer;
 		}
-	};
+	};*/
 	
 	static size_t gotDataFromServer(char *ptr, size_t size, size_t nmemb, void *userdata){
 		DataBuffer *realData = (DataBuffer *)userdata;
@@ -565,7 +566,8 @@ namespace pmm {
 							  o.get<jsonxx::Object>(i).get<std::string>("serverAddress"),
 							  o.get<jsonxx::Object>(i).get<jsonxx::number>("serverPort"),
 							  devTokens,
-							  o.get<jsonxx::Object>(i).get<bool>("useSSL")
+							  o.get<jsonxx::Object>(i).get<bool>("useSSL"),
+							  o.get<jsonxx::Object>(i).get<bool>("oa")
 							  );
 			m.quota = o.get<jsonxx::Object>(i).get<jsonxx::number>("quota");
 			if(m.quota <= 0){
@@ -615,7 +617,8 @@ namespace pmm {
 							  o.get<jsonxx::Object>(i).get<std::string>("serverAddress"),
 							  o.get<jsonxx::Object>(i).get<jsonxx::number>("serverPort"),
 							  devTokens,
-							  o.get<jsonxx::Object>(i).get<bool>("useSSL")
+							  o.get<jsonxx::Object>(i).get<bool>("useSSL"),
+							  o.get<jsonxx::Object>(i).get<bool>("oa")
 							  );
 			m.quota = o.get<jsonxx::Object>(i).get<jsonxx::number>("quota");
 			if(m.quota <= 0){

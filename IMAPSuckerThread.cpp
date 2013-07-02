@@ -15,6 +15,7 @@
 #include "ThreadDispatcher.h"
 #include "MailMessage.h"
 #include "libetpan/libetpan.h"
+#include "GmailXOAuth.h"
 #include <string.h>
 #include <cstdlib>
 #include "QuotaDB.h"
@@ -292,7 +293,14 @@ namespace pmm {
 #endif
 					}
 					else {
-						result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
+						if (imapFetch.mailAccountInfo.usesOAuth) {
+							GmailXOAuth gmailOAuth;
+							std::string access_token = gmailOAuth.refreshToken(imapFetch.mailAccountInfo.password());
+							result = mailimap_oauth2_authenticate(imap, imapFetch.mailAccountInfo.username().c_str(), access_token.c_str());
+						}
+						else {
+							result = mailimap_login(imap, imapFetch.mailAccountInfo.username().c_str(), imapFetch.mailAccountInfo.password().c_str());
+						}
 						if(etpanOperationFailed(result)){
 #warning TODO: Remember to report the user whenever we have too many login attempts
 #ifdef DEBUG
@@ -495,7 +503,15 @@ namespace pmm {
 		else {
 			mailboxControl[theEmail].openedOn = time(NULL);
 			//Proceed to login stage
-			result = mailimap_login(imapControl[theEmail].imap, m.username().c_str(), m.password().c_str());
+			if (m.usesOAuth) {
+				//Retrieve an access token first!!!!!
+				GmailXOAuth gmailCtrl;
+				std::string accessToken = gmailCtrl.refreshToken(m.password());
+				result = mailimap_oauth2_authenticate(imapControl[theEmail].imap, m.username().c_str(), accessToken.c_str());
+			}
+			else {
+				result = mailimap_login(imapControl[theEmail].imap, m.username().c_str(), m.password().c_str());
+			}
 			if(etpanOperationFailed(result)){
 				int attempt = serverConnectAttempts[m.serverAddress()] + 1;
 				serverConnectAttempts[m.serverAddress()] = attempt;
