@@ -5,6 +5,9 @@
 //  Created by Juan V. Guerrero on 9/26/11.
 //  Copyright (c) 2011 fn(x) Software. All rights reserved.
 //
+// Disclaimer: the sendPayload function has been taken from:
+//   Apple's Local and Push Notification Programming Guide, Appendix A: Enhanced Notification Format
+// Small code changes and better debug/logging capabilities have been implemented.
 
 #include <iostream>
 #include <sstream>
@@ -157,7 +160,13 @@ namespace pmm {
 			APNSLog << "Loading certificate: " << _certPath << pmm::NL;
 #endif
 #warning TODO: Verify that the certificate has not expired, if it has send a very loud panic alert
-			if(SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM) <= 0){
+            int retval;
+			if((retval = SSL_CTX_use_certificate_file(sslCTX, _certPath.c_str(), SSL_FILETYPE_PEM)) <= 0){
+                FILE *fp = fopen(_certPath.c_str(), "r");
+                X509 *xCert = NULL;
+                xCert = PEM_read_X509(fp, &xCert, NULL, NULL);
+
+                X509_free(xCert);
 				throw SSLException(NULL, 0, "Unable to load certificate file");
 			}
 			SSL_CTX_set_default_passwd_cb(sslCTX, (pem_password_cb *)_certPassword.c_str());
