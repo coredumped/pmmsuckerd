@@ -178,7 +178,7 @@ namespace pmm {
 		
 	void APNSNotificationThread::initSSL(){
 		if(!sslInitComplete){
-			sslCTX = SSL_CTX_new(SSLv3_method());
+			sslCTX = SSL_CTX_new(SSLv23_method());
 			if(!sslCTX){
 				//Fatal error, stop daemon, notify pmm service inmediately so it can release all e-mail
 				//accounts from this pmm sucker inmediatelly
